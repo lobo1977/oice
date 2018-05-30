@@ -1,8 +1,8 @@
 {
   "name": "oice",
   "version": "1.0.0",
-  "description": "商办经纪人做单助理前端工程",
-  "author": "lobo 314932@qq.com",
+  "description": "Oice 商办云",
+  "author": "lobo1977@qq.com",
   "private": true,
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
