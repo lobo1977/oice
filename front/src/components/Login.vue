@@ -1,0 +1,179 @@
+<template>
+  <div style="margin:0 auto;max-width:600px;padding:15px;">
+
+    <div style="margin:36px 0;text-align:center;">
+      <img src="/static/img/logo.png">
+      <h3 style="margin-top:10px;">Oice 商办云</h3>
+    </div>
+
+    <group>
+      <x-input ref="input_mobile" type="text" mask="999 9999 9999" placeholder="输入手机号码" v-model="mobile" :max="13" :required="true"
+         is-type="china-mobile" @on-click-error-icon="mobileError" :should-toast-error="false" @on-enter="login" @on-change="validatedForm">
+        <x-icon slot="label" type="iphone" size="28" style="fill:#333;position:relative;left:-6px;top:3px;"></x-icon>
+      </x-input>
+      <x-input ref="input_password" v-if="loginModel === 'password'" type="password" placeholder="输入登录密码" v-model="password" :max="16" :required="true"
+        :should-toast-error="false" @on-click-error-icon="passwordError" @on-enter="login" @on-change="validatedForm">
+        <x-icon slot="label" type="locked" size="20" style="fill:#333;position:relative;left:-2px;top:1px;margin-right:9px;"></x-icon>
+      </x-input>
+      <x-input ref="input_vcode" v-if="loginModel === 'password' && error" placeholder="输入验证码" v-model="vcode" :max="5" :required="true"
+         :should-toast-error="false" @on-click-error-icon="vcodeError" @on-enter="login" @on-change="validatedForm">
+        <img slot="right" id="imgVCode" class="weui-vcode-img" src="/verify" alt="captcha" @click="reloadVCodeImg">
+      </x-input>
+      <x-input ref="input_verify_code" v-if="loginModel === 'verifyCode'" placeholder="输入验证码" v-model="verifyCode" :max="6" :required="true"
+        :should-toast-error="false" @on-click-error-icon="verifyCodeError" @on-enter="login" @on-change="validatedForm">
+        <x-icon slot="label" type="android-apps" size="20" style="fill:#333;position:relative;left:-2px;top:1px;margin-right:9px;"></x-icon>
+        <x-button slot="right" action-type="button" type="primary" mini :disabled="!isMobileValidated || timerStart" @click.native="sendVerifyCode">
+          <span slot="default" v-show="!timerStart">发送验证码</span>
+          <span solt="default" v-show="timerStart">
+            <countdown v-model="timer" :start="timerStart" @on-finish="timerFinish"></countdown> 秒后重新发送
+          </span>
+        </x-button>
+      </x-input>
+    </group>
+    <div>
+      <p style="padding-top:10px;margin-bottom:30px;color:#0a95dc;">
+        <a @click.prevent="changeLoginModel">
+            <span v-show="loginModel === 'verifyCode'">使用账号密码登录</span>
+            <span v-show="loginModel === 'password'">使用验证码登录</span>
+        </a>
+      </p>
+
+      <x-button action-type="button" @click.native="login" type="primary" :disabled="!formValidated">登录</x-button>
+
+      <p v-if="error" style="margin-top:15px;color:red;text-align:center">{{message}}</p>
+    </div>
+  </div>
+</template>
+
+<script>
+import { Group, XInput, XButton, Countdown } from 'vux'
+import { mapState, mapActions } from 'vuex'
+
+export default {
+  components: {
+    Group,
+    XInput,
+    XButton,
+    Countdown
+  },
+  data () {
+    return {
+      formValidated: false,
+      loginModel: 'verifyCode',
+      mobile: '',
+      password: '',
+      vcode: '',
+      verifyCode: '',
+      isMobileValidated: false,
+      timer: 60,
+      timerStart: false,
+      error: false,
+      message: ''
+    }
+  },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      if (localStorage.loginModel) {
+        vm.loginModel = localStorage.loginModel
+      }
+    })
+  },
+  methods: {
+    ...mapActions([
+      'setUser'
+    ]),
+    validatedForm () {
+      this.isMobileValidated = this.$refs.input_mobile.valid
+      this.formValidated = this.isMobileValidated &&
+        ((this.loginModel === 'password' &&
+        this.password.length &&
+        (this.vcode.length || this.error === false)) ||
+        (this.loginModel === 'verifyCode' &&
+        this.verifyCode.length))
+    },
+    changeLoginModel () {
+      if (this.loginModel === 'verifyCode') {
+        this.loginModel = 'password'
+      } else {
+        this.loginModel = 'verifyCode'
+      }
+      localStorage.loginModel = this.loginModel
+    },
+    mobileError () {
+      this.$vux.toast.show({
+        text: this.mobile.length ? '手机号码无效' : '请输入手机号'
+      })
+    },
+    passwordError () {
+      this.$vux.toast.show({
+        text: '请输入密码'
+      })
+    },
+    vcodeError () {
+      this.$vux.toast.show({
+        text: '请输入验证码'
+      })
+    },
+    verifyCodeError () {
+      this.$vux.toast.show({
+        text: '请输入验证码'
+      })
+    },
+    reloadVCodeImg () {
+      document.getElementById('imgVCode').src = '/verify?' + (new Date()).valueOf()
+    },
+    sendVerifyCode () {
+      this.message = ''
+      this.timerStart = true
+      this.$sendVerifyCode(this.mobile.replace(/\s+/g, ''), (res) => {
+        if (!res.success) {
+          this.timerStart = false
+          this.$vux.toast.show({
+            text: res.message,
+            width: '16em'
+          })
+        }
+      })
+    },
+    timerFinish () {
+      this.timerStart = false
+    },
+    login () {
+      this.validatedForm()
+      if (!this.formValidated) {
+        return
+      }
+      this.message = ''
+      this.$vux.loading.show()
+      this.$login(this.mobile.replace(/\s+/g, ''), this.password, this.vcode, this.verifyCode, (res) => {
+        this.$vux.loading.hide()
+        if (res.success) {
+          this.error = false
+          if (res.data) {
+            this.setUser(res.data)
+          }
+          if (this.$route.query && this.$route.query.redirect) {
+            this.$router.replace({path: this.$route.query.redirect})
+          } else {
+            this.$router.push({name: 'My'})
+          }
+        } else {
+          this.password = ''
+          this.verifyCode = ''
+          if (this.vcode.length) {
+            this.reloadVCodeImg()
+            this.vcode = ''
+          }
+          this.error = true
+          this.message = res.message
+        }
+      })
+    }
+  },
+  computed: {
+    ...mapState({
+      user: state => state.oice.user
+    })
+  }
+}
+</script>

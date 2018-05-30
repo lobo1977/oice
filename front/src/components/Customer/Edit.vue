@@ -1,0 +1,366 @@
+<template>
+  <div>
+    <tab v-show="false">
+      <tab-item @on-item-click="tab = 0" selected>基本信息</tab-item>
+      <tab-item @on-item-click="tab = 1" :disabled="id === 0"></tab-item>
+    </tab>
+
+    <div v-if="tab === 0">
+      <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
+        <x-input ref="input_name" title="客户名称" v-model="info.customer_name" :required="true" :max="30"
+          @on-click-error-icon="nameError" :should-toast-error="false" @on-change="validateForm"></x-input>
+        <x-input v-if="id === 0" ref="input_linkman" title="联系人" v-model="info.linkman" :required="true" :max="30"
+          @on-click-error-icon="linkmanError" :should-toast-error="false" @on-change="validateForm"></x-input>
+        <x-input v-if="id === 0" ref="input_mobile" title="联系电话" type="text" mask="999 9999 9999" placeholder="请输入手机号码" 
+          v-model="info.mobile" :max="13" :required="true" is-type="china-mobile"
+          @on-change="validateForm" @on-click-error-icon="mobileError" :should-toast-error="false"></x-input>
+        <popup-picker title="所在地" :data="districtPickerData" @on-change="districtChange"
+          :columns="2" :fixed-columns="1"
+          v-model="districtValue" value-text-align="left"></popup-picker>
+        <x-input title="详细地址" v-model="info.address" :max="100"></x-input>
+      </group>
+
+      <group gutter="10px" label-width="4em" label-margin-right="1em" label-align="right">
+        <popup-picker title="需求项目" :data="typePickerData" @on-change="typeChange" v-model="typeValue" value-text-align="left"></popup-picker>
+        <cell title="租购" @click.native="showleaseBuyPicker = true" is-link :value="info.lease_buy" value-align="left"></cell>
+        <cell title="意向区域" @click.native="showDistrictSelect = true" is-link :value="info.district" value-align="left"></cell>
+
+        <x-input title="最小面积" type="number" v-model="info.min_acreage" :max="10" :show-clear="false">
+          <span slot="right">平方米</span>
+        </x-input>
+        <x-input title="最大面积" type="number" v-model="info.max_acreage" :max="10" :show-clear="false">
+          <span slot="right">平方米</span>
+        </x-input>
+
+        <x-input title="预算" v-model="info.budget" :max="30"></x-input>
+        <datetime title="入驻日期" v-model="info.settle_date" value-text-align="left"></datetime>
+
+        <x-input title="在驻面积" type="number" v-model="info.current_area" :max="10" :show-clear="false">
+          <span slot="right">平方米</span>
+        </x-input>
+        <datetime title="到期日" v-model="info.end_date" value-text-align="left"></datetime>
+      </group>
+
+      <group gutter="10px">
+        <x-textarea placeholder="备注" :rows="3" v-model="info.rem" :max="200"></x-textarea>
+      </group>
+
+      <group gutter="10px" label-width="4em" label-margin-right="1em" label-align="right">
+        <cell title="状态" @click.native="showStatusPicker = true" :is-link="true" :value="statusText" value-align="left"></cell>
+        <cell title="所属企业" @click.native="selectCompany" :is-link="companyPickerData.length != 1" 
+          :value="companyText" value-align="left"></cell>
+        <x-switch title="是否共享" inline-desc="共享给企业内部成员" v-model="info.share"></x-switch>
+      </group>
+
+      <popup v-model="showDistrictSelect">
+        <popup-header
+          left-text="取消"
+          right-text="完成"
+          @on-click-left="showDistrictSelect = false"
+          @on-click-right="confirmSelectDistrict"></popup-header>
+        <checker v-model="selectedDistrict"
+          type="checkbox"
+          default-item-class="checker-item"
+          selected-item-class="checker-item-selected">
+          <checker-item v-for="i in districtSelectData" :key="i" :value="i">{{i}}</checker-item>
+        </checker>
+      </popup>
+
+      <actionsheet v-model="showleaseBuyPicker" :menus="leaseBuyPickerData" theme="android" @on-click-menu="leaseBuySelect"></actionsheet>
+      <actionsheet v-model="showStatusPicker" :menus="statusPickerData" theme="android" @on-click-menu="statusSelect"></actionsheet>
+      <actionsheet v-model="showCompanyPicker" :menus="companyPickerData" theme="android" @on-click-menu="companySelect"></actionsheet>
+
+      <div class="bottom-bar">
+        <x-button type="primary" class="bottom-btn" @click.native="save" :disabled="!formValidate">
+          <x-icon type="android-archive" class="btn-icon"></x-icon> 保存
+        </x-button>
+      </div>
+    </div>
+
+    <div v-if="tab === 1">
+    </div>
+    
+  </div>
+</template>
+
+<script>
+import { Tab, TabItem, Group, Cell, Actionsheet, Popup, PopupHeader, Checker, CheckerItem,
+  PopupPicker, Datetime, XInput, XNumber, XSwitch, XTextarea, XButton, dateFormat } from 'vux'
+import typeData from '../../data/building_type.json'
+import districtData from '../../data/beijing_area.json'
+import leaseBuyData from '../../data/lease_buy.json'
+import statusData from '../../data/customer_status.json'
+
+export default {
+  components: {
+    Tab,
+    TabItem,
+    Group,
+    Cell,
+    Actionsheet,
+    Popup,
+    PopupHeader,
+    Checker,
+    CheckerItem,
+    PopupPicker,
+    Datetime,
+    XInput,
+    XNumber,
+    XSwitch,
+    XTextarea,
+    XButton
+  },
+  data () {
+    return {
+      tab: 0,
+      id: 0,
+      formValidate: false,
+      info: {
+        __token__: '',
+        customer_name: '',    // 名称
+        area: '',             // 城区
+        address: '',          // 地址
+        demand: '',           // 需求项目
+        lease_buy: '',        // 租赁/购买
+        district: '',         // 意向商圈
+        min_acreage: null,    // 最小面积(平方米)
+        max_acreage: null,    // 最大面积(平方米)
+        budget: '',           // 预算
+        settle_date: null,    // 入驻日期
+        current_area: null,   // 在驻面积
+        end_date: null,       // 到日期
+        rem: '',              // 项目说明
+        status: 0,            // 状态
+        company_id: 0,        // 所属企业
+        share: false,         // 共享状态
+        linkman: '',          // 联系人
+        mobile: ''            // 联系电话
+      },
+      showDistrictPicker: false,
+      districtPickerData: [],
+      districtValue: ['', ''],
+      showTypePicker: false,
+      typePickerData: [typeData],
+      typeValue: [''],
+      showleaseBuyPicker: false,
+      leaseBuyPickerData: leaseBuyData,
+      showDistrictSelect: false,
+      districtSelectData: [],
+      selectedDistrict: [],
+      showStatusPicker: false,
+      statusPickerData: statusData,
+      statusText: '',
+      showCompanyPicker: false,
+      companyPickerData: [],
+      companyText: ''
+    }
+  },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      for (let i in districtData) {
+        if (districtData[i].parent && districtData[i].value) {
+          if (vm.districtSelectData.indexOf(districtData[i].value) < 0) {
+            vm.districtSelectData.push(districtData[i].value)
+          }
+        } else if (districtData[i].value !== 'all') {
+          vm.districtPickerData.push(districtData[i])
+        }
+      }
+
+      if (to.params.id) {
+        vm.id = parseInt(to.params.id)
+        if (isNaN(vm.id)) {
+          vm.id = 0
+        }
+      }
+
+      vm.$get('/api/customer/edit?id=' + vm.id, (res) => {
+        if (res.success) {
+          if (res.data.companyList) {
+            for (let i in res.data.companyList) {
+              vm.companyPickerData.push({
+                label: res.data.companyList[i].title,
+                value: res.data.companyList[i].id
+              })
+              if (res.data.companyList[i].default === 1) {
+                vm.info.company_id = res.data.companyList[i].id
+                vm.companyText = res.data.companyList[i].title
+              }
+            }
+          }
+          if (vm.id) {
+            for (let item in vm.info) {
+              if (res.data[item] !== undefined && res.data[item] !== null) {
+                if (item === 'company_id') {
+                  if (res.data.company_id > 0) {
+                    vm.info.company_id = res.data.company_id
+                    for (let i in vm.companyPickerData) {
+                      if (vm.info.company_id === vm.companyPickerData[i].value) {
+                        vm.companyText = vm.companyPickerData[i].label
+                        break
+                      }
+                    }
+                  }
+                } else {
+                  vm.info[item] = res.data[item]
+                }
+              }
+            }
+            if (vm.info.area) {
+              vm.districtValue = [vm.info.area, '']
+            }
+            if (vm.info.demand) {
+              vm.typeValue = [vm.info.demand]
+            }
+            if (vm.info.district) {
+              vm.selectedDistrict = vm.info.district.split(',')
+            }
+            if (vm.info.settle_date) {
+              vm.info.settle_date = dateFormat(new Date(Date.parse(vm.info.settle_date.replace(/-/g, '/'))), 'YYYY-MM-DD')
+            }
+            if (vm.info.end_date) {
+              vm.info.end_date = dateFormat(new Date(Date.parse(vm.info.end_date.replace(/-/g, '/'))), 'YYYY-MM-DD')
+            }
+            if (!vm.info.min_acreage || vm.info.min_acreage === '0') {
+              vm.info.min_acreage = null
+            }
+            if (!vm.info.max_acreage || vm.info.max_acreage === '0') {
+              vm.info.max_acreage = null
+            }
+            if (!vm.info.current_area || vm.info.current_area === '0') {
+              vm.info.current_area = null
+            }
+            vm.statusText = vm.statusPickerData[vm.info.status].label
+            vm.info.share = vm.info.share === 1
+            vm.$emit('on-view-loaded', vm.info.customer_name)
+          } else {
+            vm.info.__token__ = res.data.__token__
+            vm.statusText = vm.statusPickerData[vm.info.status].label
+            vm.$emit('on-view-loaded', '添加客户')
+          }
+          if (vm.info.company_id === 0 && vm.companyPickerData.length) {
+            vm.info.company_id = vm.companyPickerData[0].value
+            vm.companyText = vm.companyPickerData[0].label
+          }
+        } else {
+          vm.$vux.toast.show({
+            text: res.message,
+            width: '16em'
+          })
+        }
+      })
+    })
+  },
+  methods: {
+    nameError () {
+      this.$vux.toast.show({
+        text: '请输入客户名称'
+      })
+    },
+    linkmanError () {
+      this.$vux.toast.show({
+        text: '请输入联系人'
+      })
+    },
+    mobileError () {
+      this.$vux.toast.show({
+        text: this.info.mobile.length ? '联系人手机号码无效' : '请输入联系电话'
+      })
+    },
+    validateForm () {
+      if (this.id === 0) {
+        this.formValidate = this.$refs.input_name.valid &&
+          this.$refs.input_linkman.valid && this.$refs.input_mobile.valid
+      } else {
+        this.formValidate = this.$refs.input_name.valid
+      }
+    },
+    districtChange (val) {
+      this.info.area = (val[0] === 'all') ? '' : val[0]
+    },
+    typeChange (val) {
+      this.info.demand = val[0]
+    },
+    leaseBuySelect (key, item) {
+      this.info.lease_buy = item
+    },
+    confirmSelectDistrict () {
+      this.info.district = this.selectedDistrict.join()
+      this.showDistrictSelect = false
+    },
+    statusSelect (key, item) {
+      this.info.status = item.value
+      this.statusText = item.label
+    },
+    companySelect (key, item) {
+      this.info.company_id = item.value
+      this.companyText = item.label
+    },
+    selectCompany () {
+      if (this.companyPickerData.length > 1) {
+        this.showCompanyPicker = true
+      } else if (this.companyPickerData.length === 0) {
+        let vm = this
+        vm.$vux.confirm.show({
+          title: '选择企业',
+          content: '您还没有加入企业，是否立即创建或加入企业？',
+          onConfirm () {
+            vm.$router.push({name: 'Company'})
+          }
+        })
+      }
+    },
+    save () {
+      this.validateForm()
+      if (!this.formValidate) {
+        return
+      }
+      this.$vux.loading.show()
+      this.info.share = (this.info.share ? 1 : 0)
+      this.$post('/api/customer/edit?id=' + this.id, this.info, (res) => {
+        this.$vux.loading.hide()
+        if (res.success) {
+          if (this.id === 0) {
+            this.id = res.data
+            this.$router.replace({name: 'CustomerView', params: {id: this.id}})
+          } else {
+            this.$router.back()
+          }
+        } else {
+          this.info.__token__ = res.data
+          this.$vux.toast.show({
+            text: res.message,
+            width: '16em'
+          })
+        }
+      })
+    }
+  },
+  computed: {
+  }
+}
+</script>
+
+<style lang="less">
+.vux-checker-box {
+  padding-left:10px;
+  padding-bottom:10px;
+  background-color:#fff;
+}
+
+.checker-item {
+  background-color: #ddd;
+  color: #222;
+  font-size: 14px;
+  padding: 5px 10px;
+  margin-top: 10px;
+  margin-right: 10px;
+  line-height: 18px;
+  border-radius: 4px;
+}
+
+.checker-item-selected {
+  background-color: rgb(6, 165, 27);
+  color: #fff;
+}
+</style>

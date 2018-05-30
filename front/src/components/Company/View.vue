@@ -1,0 +1,338 @@
+<template>
+  <div>
+    <masker color="255,255,255" :opacity="1" style="margin:10px;height:130px;border-radius:2px;">
+      <div slot="content" class="company-info">
+        <div style="margin-bottom:15px;height:60px;">
+          <img v-if="info.logo && info.logo.length > 0" :src="info.logo" />
+        </div>
+        <h4>{{info.title}}</h4>
+      </div>
+    </masker>
+
+    <group gutter="0">
+      <cell v-if="info.full_name" title="企业全称" :value="info.full_name">
+        <x-icon slot="icon" type="android-list" class="cell-icon"></x-icon>
+      </cell>
+      <cell v-if="info.area && info.address" title="地址" :value="info.area + ' ' + info.address">
+        <x-icon slot="icon" type="location" class="cell-icon"></x-icon>
+      </cell>
+      <cell v-if="info.addin > 0" title="成员" :value="info.addin"
+        :link="info.isAddin === 1 || (user && user.id == info.user_id) ? {name: 'CompanyUser', params: {id: info.id}} : null">
+        <x-icon slot="icon" type="ios-people" class="cell-icon"></x-icon>
+      </cell>
+    </group>
+
+    <group title="企业介绍" v-if="info.rem && info.rem.length > 0">
+      <p class="group-padding">{{ info.rem }}</p>
+    </group>
+
+    <group v-if="info.id > 0 && user && user.id > 0 && user.id == info.user_id && waitUser.length" 
+      title="待审核成员" footerTitle="向左滑动条目完成操作" class="wait-group">
+      <swipeout>
+        <swipeout-item v-for="(item, index) in waitUser" :key="index" transition-mode="follow">
+          <div slot="right-menu">
+            <swipeout-button @click.native="audit(item.id, 1)" type="primary">通过</swipeout-button>
+            <swipeout-button @click.native="audit(item.id, 0)" type="warn">驳回</swipeout-button>
+          </div>
+          <cell slot="content" :title="item.title" :inline-desc="item.mobile">
+            <img slot="icon" :src="item.avatar" class="cell-image">
+          </cell>
+        </swipeout-item>
+      </swipeout>
+    </group>
+
+    <div v-if="info.id > 0 && user && user.id > 0 && user.id != info.user_id" class="bottom-bar">
+      <x-button v-if="info.isAddin === false && info.join_way < 2" type="primary" class="bottom-btn" @click.native="addin">
+        <x-icon type="log-in" class="btn-icon"></x-icon>
+        <span v-if="info.join_way < 2">加入</span>
+        <span v-if="info.join_way > 1">需通过邀请加入</span>
+      </x-button>
+      <x-button v-if="info.isAddin === 1" type="warn" class="bottom-btn" @click.native="quit">
+        <x-icon type="log-out" class="btn-icon"></x-icon> 退出
+      </x-button>
+      <x-button v-if="info.isAddin === 0" type="warn" class="bottom-btn" @click.native="quit">
+        <x-icon type="log-out" class="btn-icon"></x-icon> 放弃申请
+      </x-button>
+    </div>
+
+    <flexbox v-if="info.id > 0 && user && user.id > 0 && user.id == info.user_id" :gutter="0" class="bottom-bar">
+      <flexbox-item :span="5">
+        <x-button type="warn" class="bottom-btn" @click.native="invite">
+          <x-icon type="log-in" class="btn-icon"></x-icon> 邀请
+        </x-button>
+      </flexbox-item>
+      <flexbox-item :span="5">
+        <x-button type="primary" class="bottom-btn" 
+          :link="{name: 'CompanyEdit', params: {id: info.id}}">
+          <x-icon type="compose" class="btn-icon"></x-icon> 修改
+        </x-button>
+      </flexbox-item>
+      <flexbox-item :span="2">
+        <x-button type="default" class="bottom-btn" @click.native="remove">
+          <x-icon type="trash-a" class="btn-icon"></x-icon>
+        </x-button>
+      </flexbox-item>
+    </flexbox>
+  </div>
+</template>
+
+<script>
+import { Masker, Group, Swipeout, SwipeoutItem, SwipeoutButton, Cell, Flexbox, FlexboxItem, XButton } from 'vux'
+import { mapState, mapActions } from 'vuex'
+
+export default {
+  components: {
+    Masker,
+    Group,
+    Swipeout,
+    SwipeoutItem,
+    SwipeoutButton,
+    Cell,
+    Flexbox,
+    FlexboxItem,
+    XButton
+  },
+  data () {
+    return {
+      info: {
+        id: 0,
+        title: '',
+        full_name: '',
+        logo: '',
+        area: '',
+        address: '',
+        rem: '',
+        join_way: 0,
+        addin: 0,
+        wait: 0,
+        isAddin: false,
+        user_id: 0
+      },
+      waitUser: []
+    }
+  },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      let id = parseInt(to.params.id)
+      if (!isNaN(id)) {
+        vm.getInfo(id)
+      }
+    })
+  },
+  methods: {
+    ...mapActions([
+      'setUser', 'getUser'
+    ]),
+    getInfo (id) {
+      let vm = this
+      vm.$get('/api/company/detail?id=' + id, (res) => {
+        if (res.success) {
+          for (let item in vm.info) {
+            if (res.data[item] !== undefined && res.data[item] !== null) {
+              vm.info[item] = res.data[item]
+            }
+          }
+          if (res.data.waitUser) {
+            vm.waitUser = res.data.waitUser
+          }
+          vm.$emit('on-view-loaded', vm.info.title)
+        } else {
+          vm.info.id = 0
+          vm.$vux.toast.show({
+            text: res.message,
+            width: '15em'
+          })
+        }
+      })
+    },
+    audit (userId, flag) {
+      let vm = this
+      let url = '/api/company/passAddin'
+      if (!flag) {
+        url = '/api/company/rejectAddin'
+      }
+      vm.$vux.loading.show()
+      vm.$post(url, {
+        id: vm.info.id,
+        user_id: userId
+      }, (res) => {
+        vm.$vux.loading.hide()
+        if (res.success) {
+          vm.getInfo(vm.info.id)
+        } else {
+          vm.$vux.toast.show({
+            text: res.message,
+            width: '13em'
+          })
+        }
+      })
+    },
+    addin () {
+      let vm = this
+      vm.$vux.loading.show()
+      vm.$post('/api/company/addin', {
+        id: vm.info.id
+      }, (res) => {
+        if (res.success) {
+          vm.$updateUser((res2) => {
+            vm.$vux.loading.hide()
+            if (res2.success) {
+              vm.getUser()
+              if (res.data === 1) {
+                vm.$vux.alert.show({
+                  title: '恭喜',
+                  content: '您已加入 <strong> ' + vm.info.title + '</strong>',
+                  onHide () {
+                    vm.$router.back()
+                  }
+                })
+              } else {
+                vm.$vux.alert.show({
+                  title: '提示',
+                  content: '您已申请加入 <strong> ' + vm.info.title + '</strong>，请等待管理员审核。',
+                  onHide () {
+                    vm.$router.back()
+                  }
+                })
+              }
+            } else {
+              vm.$vux.toast.show({
+                text: res2.message,
+                width: '13em'
+              })
+            }
+          })
+        } else {
+          vm.$vux.loading.hide()
+          vm.$vux.toast.show({
+            text: res.message,
+            width: '13em'
+          })
+        }
+      })
+    },
+    quit () {
+      let vm = this
+      this.$vux.confirm.show({
+        title: '退出企业',
+        content: '确定要退出企业 <strong>' + vm.info.title + '</strong> 吗？',
+        onConfirm () {
+          vm.$vux.loading.show()
+          vm.$post('/api/company/quit', {
+            id: vm.info.id
+          }, (res) => {
+            vm.$vux.loading.hide()
+            if (res.success) {
+              if (res.data) {
+                vm.setUser(res.data)
+              }
+              vm.$vux.alert.show({
+                title: '提示',
+                content: '您已退出 <strong> ' + vm.info.title + '</strong>。',
+                onHide () {
+                  vm.$router.back()
+                }
+              })
+            } else {
+              vm.$vux.toast.show({
+                text: res.message,
+                width: '15em'
+              })
+            }
+          })
+        }
+      })
+    },
+    invite () {
+      let vm = this
+      this.$vux.confirm.prompt('请输入对方手机号码', {
+        title: '邀请新人加入',
+        onConfirm (msg) {
+          if (msg === '') {
+            return
+          } else if (/1[3456789]\d{9}/.test(msg) === false) {
+            vm.$vux.toast.show({
+              type: 'warn',
+              text: '手机号码无效',
+              width: '13em'
+            })
+            return
+          }
+          vm.$vux.loading.show()
+          vm.$post('/api/company/invite', {
+            id: vm.info.id,
+            mobile: msg
+          }, (res) => {
+            vm.$vux.loading.hide()
+            if (res.success) {
+              vm.$vux.alert.show({
+                title: '提示',
+                content: '您向手机用户 <strong> ' + msg + '</strong> 发出邀请，请等待对方确认。'
+              })
+            } else {
+              vm.$vux.toast.show({
+                text: res.message,
+                width: '16em'
+              })
+            }
+          })
+        }
+      })
+    },
+    remove () {
+      let vm = this
+      this.$vux.confirm.show({
+        title: '删除企业',
+        content: '确定要删除企业 <strong>' + vm.info.title + '</strong> 吗？',
+        onConfirm () {
+          vm.$vux.loading.show()
+          vm.$post('/api/company/remove', {
+            id: vm.info.id
+          }, (res) => {
+            vm.$vux.loading.hide()
+            if (res.success) {
+              vm.$router.back()
+            } else {
+              vm.$vux.toast.show({
+                text: res.message,
+                width: '15em'
+              })
+            }
+          })
+        }
+      })
+    }
+  },
+  computed: {
+    ...mapState({
+      user: state => state.oice.user
+    })
+  }
+}
+</script>
+
+<style lang="less">
+  .company-info {
+    padding:10px;
+    text-align:center;
+    h4 {
+      margin-bottom: 20px;
+      color:#999;
+      text-align:center;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    img {
+      height:60px;
+    }
+    p {
+      color:#666;
+    }
+  }
+
+  .wait-group {
+    .weui-cells {
+      border-top: 1px solid #e9e9e9;
+    }
+  }
+</style>

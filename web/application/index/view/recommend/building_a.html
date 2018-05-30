@@ -1,0 +1,111 @@
+{foreach $data.list as $key=>$vo}
+    <div class="page">
+        {include file="../application/index/view/recommend/page_top.html" /}
+        <div class="main">
+            <div class="building_info">
+                <div class="building_title">{$vo.building_name}</div>
+                <div class="building_label">{$vo.desc} {$vo.address}</div>
+                {if count($vo.images) > 0}
+                    <div>
+                        {foreach $vo.images as $key=>$img}
+                            {if $key < 3}
+                                <img src="{$img.src}" border="1" class="building_image">
+                            {/if}
+                        {/foreach}
+                    </div>
+                {/if}
+                <div class="building_sub_title" style="clear:both;padding-bottom:5px;">项目概况</div>
+                <div class="info_list">
+                    {if $vo.completion_date != ''}
+                        <div class="label">竣工日期：</div>
+                        <div class="text">{$vo.completion_date|date='Y年m月d日'}</div>
+                    {/if}
+                    {if $vo.building_floor != ''}
+                        <div class="label">楼层：</div>
+                        <div class="text">{$vo.building_floor}</div>
+                    {/if}
+                    {if $vo.floor_area > 0}
+                        <div class="label">标准层面积：</div>
+                        <div class="text">{$vo.floor_area} 平方米</div>
+                    {/if}
+                    {if $vo.floor_height > 0}
+                        <div class="label">层高：</div>
+                        <div class="text">{$vo.floor_height} 米</div>
+                    {/if}
+                    {if $vo.bearing != ''}
+                        <div class="label">楼板承重：</div>
+                        <div class="text">{$vo.bearing} 千克/平方米</div>
+                    {/if}
+                    {if $vo.fee != ''}
+                        <div class="label">物业费：</div>
+                        <div class="text">{$vo.fee}</div>
+                    {/if}
+                    {if $vo.electricity_fee != ''}
+                        <div class="label">电费：</div>
+                        <div class="text">{$vo.electricity_fee}</div>
+                    {/if}
+                    {if $vo.car_seat != ''}
+                        <div class="label" style="clear:both;">停车位：</div>
+                        <div class="text" style="width:85%">{$vo.car_seat}</div>
+                    {/if}
+                    {if $vo.developer != ''}
+                        <div class="label" style="clear:both;">开发商：</div>
+                        <div class="text" style="width:85%">{$vo.developer}</div>
+                    {/if}
+                    {if $vo.manager != ''}
+                        <div class="label" style="clear:both;">物业管理：</div>
+                        <div class="text" style="width:85%">{$vo.manager}</div>
+                    {/if}
+                </div>
+                {if count($vo.units) > 0 }
+                    <div class="building_sub_title" style="padding:10px 0 5px 0;">建议单元</div>
+                    <table border="0" cellpadding="2" cellspacing="0" class="unit_list">
+                        <thead>
+                            <tr>
+                                <th>单元</th>
+                                <th>朝向</th>
+                                <th>建筑面积</th>
+                                <th>租金</th>
+                                <th>售价</th>
+                                <th>交付状况</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {foreach $vo.units as $key=>$unit}
+                                <tr>
+                                    <td>{$unit.unit}</td>
+                                    <td>{$unit.face}</td>
+                                    <td>{$unit.acreage}</td>
+                                    <td>{$unit.rent_price}</td>
+                                    <td>{$unit.sell_price}</td>
+                                    <td>{$unit.decoration}</td>
+                                </tr>
+                            {/foreach}
+                        </tbody>
+                    </table>
+                {/if}
+                {if $vo.rem != ''}
+                    <div style="padding-top:10px;">
+                        <span class="building_sub_title">项目说明：</span><span>{$vo.rem}</span>
+                    </div>
+                {/if}
+                {if $vo.traffic != ''}
+                    <div style="padding-top:10px;">
+                        <span class="building_sub_title">交通状况：</span><span>{$vo.traffic}</span>
+                    </div>
+                {/if}
+                {if $vo.equipment != ''}
+                    <div style="padding-top:10px;">
+                        <span class="building_sub_title">楼宇设备：</span><span>{$vo.equipment}</span>
+                    </div>
+                {/if}
+                {if $vo.facility != ''}
+                    <div style="padding-top:10px;">
+                        <span class="building_sub_title">配套设施：</span><span>{$vo.facility}</span>
+                    </div>
+                {/if}
+            </div>
+        </div>
+        {include file="../application/index/view/recommend/page_foot.html" /}
+    </div>
+{/foreach}

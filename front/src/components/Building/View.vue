@@ -1,0 +1,656 @@
+<template>
+  <div>
+    <swiper v-if="images.length" :auto="true" :loop="true" height="260px"
+      :show-dots="images.length > 1">
+      <swiper-item class="swiper-img" v-for="(item, index) in images" :key="index">
+        <img :src="item.src" @click="preview(index)">
+      </swiper-item>
+    </swiper>
+
+    <div v-transfer-dom v-if="images.length">
+      <previewer :list="images" ref="previewer" :options="previewOptions"></previewer>
+    </div>
+
+    <sticky :offset="46">
+      <tab>
+        <tab-item @on-item-click="goTab(0)" :selected="tab === 0">基本信息</tab-item>
+        <tab-item @on-item-click="goTab(1)" :selected="tab === 1">联系人</tab-item>
+        <tab-item @on-item-click="goTab(2)" :selected="tab === 2">单元销控</tab-item>
+      </tab>
+    </sticky>
+
+    <div v-show="tab === 0">
+      <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
+        <cell title="项目类型" value-align="left" :value="info.building_type" v-show="info.building_type"></cell>
+        <cell title="地址" value-align="left" :value="info.address" v-show="info.address" 
+          :is-link="(info.longitude || info.latitude) != 0" @click.native="showMap = ((info.longitude || info.latitude) != 0)"></cell>
+        <cell title="竣工日期" value-align="left" :value="info.completionDate|formatDate" v-show="info.completionDate"></cell>
+        <cell title="租售" value-align="left" :value="info.rent_sell" v-show="info.rent_sell"></cell>
+        <cell title="价格" value-align="left" :value="info.price" v-show="info.price"></cell>
+        <cell title="楼层" value-align="left" :value="info.floor" v-show="info.floor"></cell>
+        <cell title="层面积" value-align="left" :value="info.floorArea + ' 平方米'" v-show="info.floorArea > 0"></cell>
+        <cell title="层高" value-align="left" :value="info.floorHeight + ' 米'" v-show="info.floorHeight > 0 && info.floorHeight != 2"></cell>
+        <cell title="楼板承重" value-align="left" :value="info.bearing + ' 千克/平方米'" v-show="info.bearing > 0"></cell>
+        <cell title="开发商" value-align="left" :value="info.developer" v-show="info.developer"></cell>
+        <cell title="物业管理" value-align="left" :value="info.manager" v-show="info.manager"></cell>
+        <cell title="物业费" value-align="left" :value="info.fee" v-show="info.fee"></cell>
+        <cell title="电费" value-align="left" :value="info.electricity_fee" v-show="info.electricity_fee"></cell>
+        <cell title="停车位" value-align="left" :value="info.car_seat" v-show="info.car_seat"></cell>
+      </group>
+
+      <group title="项目说明" v-show="info.rem">
+        <p class="group-padding">{{info.rem}}</p>
+      </group>
+      <group title="交通状况" v-show="info.traffic">
+        <p class="group-padding">{{info.traffic}}</p>
+      </group>
+      <group title="楼宇设备" v-show="info.equipment">
+        <p class="group-padding">{{info.equipment}}</p>
+      </group>
+      <group title="配套设施" v-show="info.facility">
+        <p class="group-padding">{{info.facility}}</p>
+      </group>
+      <group title="周边环境" v-show="info.environment">
+        <p class="group-padding">{{info.environment}}</p>
+      </group>
+
+      <flexbox :gutter="0" class="bottom-bar">
+        <flexbox-item :span="4">
+          <x-button type="primary" class="bottom-btn" :disabled="info.id === 0"
+            @click.native="favorite">
+              <x-icon type="star" class="btn-icon"></x-icon> {{favoriteText}}
+          </x-button>
+        </flexbox-item>
+        <flexbox-item :span="4">
+          <x-button type="warn" class="bottom-btn" :disabled="myCustomer.length === 0"
+            @click.native="toFilter">
+              <x-icon type="funnel" class="btn-icon"></x-icon> 加入筛选
+          </x-button>
+        </flexbox-item>
+        <flexbox-item>
+          <x-button type="default" class="bottom-btn" :disabled="info.id === 0"
+            :link="{name:'BuildingEdit', params: {id: this.info.id}}">
+            <x-icon type="compose" class="btn-icon"></x-icon> 修改
+          </x-button>
+        </flexbox-item>
+      </flexbox>
+    </div>
+
+    <div v-show="tab === 1">
+      <cell v-for="(item, index) in linkman" :key="index"
+          :title="item.title" :link="{name: 'Linkman', params: {id: item.id}}" 
+          :inline-desc="item.desc"></cell>
+      
+      <div class="bottom-bar">
+        <x-button type="warn" class="bottom-btn" :disabled="info.id === 0"
+          :link="{name: 'LinkmanEdit', params: {id: 0, type: 'building', oid: info.id}}">
+          <x-icon type="plus" class="btn-icon"></x-icon> 添加
+        </x-button>
+      </div>
+    </div>
+
+    <div v-show="tab === 2">
+      <checker v-model="selectedUnit" type="checkbox" @on-change="selectUnit"
+        class="unit-checker-box" default-item-class="unit-item" 
+        selected-item-class="unit-item-selected" disabled-item-class="unit-item-disabled">
+        <div v-for="(building, b) in unitTree" :key="b">
+          <divider v-if="building.building">{{building.building}}</divider>
+          <div v-for="(floor, f) in building.floor" :key="f">
+            <h5 v-if="floor.floor">{{floor.floor|formatFloor}}</h5>
+            <checker-item v-for="(unit, index) in floor.unit" :key="index" :value="unit.id">
+              <div :class="{active: touchUnit == unit}" @touchstart="unitTouch(unit, true)" @touchmove="unitTouchMove(true)" @touchend="unitTouchEnd(true)"
+                @mousedown="unitTouch(unit)" @mousemove="unitTouchMove(false)" @mouseup="unitTouchEnd(false)">
+                #{{unit.room}}/{{unit.acreage}}
+              </div>
+            </checker-item>
+          </div>
+        </div>
+      </checker>
+
+      <div v-show="selectedUnit.length" style="padding:10px 15px;font-size:0.8em">
+        <span>已选中 {{selectedUnit.length}} 个单元</span>
+      </div>
+
+      <actionsheet v-model="showUnitMenu" :menus="unitMenu" theme="android" 
+        @on-click-menu="unitMenuClick" @on-after-hide="menuUnit = null"></actionsheet>
+
+      <flexbox :gutter="0" class="bottom-bar">
+        <flexbox-item :span="4">
+          <x-button type="primary" class="bottom-btn" :disabled="selectedUnit.length === 0"
+            @click.native="batchFavorite">
+            <x-icon type="star" class="btn-icon"></x-icon> 收藏
+          </x-button>
+        </flexbox-item>
+        <flexbox-item :span="4">
+          <x-button type="warn" class="bottom-btn" :disabled="myCustomer.length === 0 || selectedUnit.length === 0"
+            @click.native="toFilter">
+            <x-icon type="funnel" class="btn-icon"></x-icon> 添加筛选
+          </x-button>
+        </flexbox-item>
+        <flexbox-item>
+          <x-button type="default" class="bottom-btn" :disabled="info.id === 0"
+            :link="{name: 'UnitEdit', params: { id:0, bid: info.id }}">
+            <x-icon type="plus" class="btn-icon"></x-icon> 添加
+          </x-button>
+        </flexbox-item>
+      </flexbox>
+    </div>
+
+    <popup-picker ref="customerPicker" class="popup-picker" :show.sync="showCustomerPicker" 
+      popup-title="选择客户" :show-cell="false" :data="myCustomer" v-model="selectCustomer"
+      @on-hide="addFilter"></popup-picker>
+    
+    <popup v-model="showMap" position="bottom"
+      height="100%" style="overflow-y:hidden;">
+      <baidumap :get-point="false"
+        :is-shown="showMap"
+        :title="info.building_name"
+        :address="info.address"
+        :longitude="info.longitude" 
+        :latitude="info.latitude" 
+        @on-close="closeMap"></baidumap>
+    </popup>
+  </div>
+</template>
+
+<script>
+import { Swiper, SwiperItem, Previewer, TransferDom, Sticky, Tab, TabItem,
+  Group, GroupTitle, Cell, Divider, Checker, CheckerItem, Actionsheet,
+  Flexbox, FlexboxItem, XButton, PopupPicker, Popup, dateFormat } from 'vux'
+import Baidumap from '../Common/BaiduMap.vue'
+
+export default {
+  directives: {
+    TransferDom
+  },
+  components: {
+    Swiper,
+    SwiperItem,
+    Previewer,
+    Sticky,
+    Tab,
+    TabItem,
+    Group,
+    GroupTitle,
+    Cell,
+    Divider,
+    Checker,
+    CheckerItem,
+    Actionsheet,
+    Flexbox,
+    FlexboxItem,
+    XButton,
+    PopupPicker,
+    Popup,
+    Baidumap
+  },
+  data () {
+    return {
+      user: {
+        id: 0
+      },
+      tab: 0,
+      info: {
+        id: 0,
+        building_name: '',    // 名称
+        building_type: '',    // 类型
+        location: '',         // 位置
+        address: '',          // 地址
+        longitude: 0,         // 经度
+        latitude: 0,          // 纬度
+        completionDate: '',   // 竣工日期
+        rent_sell: '',        // 租售
+        price: '',            // 价格
+        acreage: 0,           // 建筑面积
+        floor: '',            // 楼层
+        floorArea: 0,         // 层面积
+        floorHeight: 0,       // 层高
+        bearing: 0,           // 楼板承重
+        developer: '',        // 开发商
+        manager: '',          // 物业管理
+        fee: '',              // 物业费
+        electricity_fee: '',  // 电费
+        car_seat: '',         // 停车位
+        rem: '',              // 项目说明
+        facility: '',         // 配套设施
+        equipment: '',        // 楼宇设备
+        traffic: '',          // 交通状况
+        environment: '',      // 周边环境
+        isFavorite: false
+      },
+      images: [],
+      linkman: [],
+      unit: [],
+      showCustomerPicker: false,
+      myCustomer: [],
+      selectCustomer: [],
+      previewOptions: {
+      },
+      showUnitMenu: false,
+      menuUnit: null,
+      touchUnit: null,
+      unitTouchEvent: 0,
+      selectedUnit: [],
+      touchX: 0,
+      touchY: 0,
+      moveX: 0,
+      moveY: 0,
+      showMap: false
+    }
+  },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      vm.user = vm.$store.state.oice.user
+
+      let id = parseInt(to.params.id)
+      if (to.query.tab) {
+        vm.tab = parseInt(to.query.tab)
+        if (isNaN(vm.tab)) {
+          vm.tab = 0
+        }
+      }
+      if (!isNaN(id)) {
+        vm.$get('/api/building/detail?id=' + id, (res) => {
+          if (res.success) {
+            for (let item in vm.info) {
+              if (res.data[item] !== undefined && res.data[item] !== null) {
+                vm.info[item] = res.data[item]
+              }
+            }
+            vm.info.building_type = res.data.type
+            if (res.data.level) {
+              vm.info.building_type += `（${res.data.level}级）`
+            }
+            // if (res.data.area) {
+            //   vm.info.location = res.data.area
+            // }
+            // if (res.data.district) {
+            //   vm.info.location += res.data.district
+            // }
+            vm.info.completionDate = res.data.completion_date
+            if (res.data.isFavorite) {
+              vm.info.isFavorite = true
+            }
+            if (res.data.images && res.data.images.length) {
+              vm.images = res.data.images
+            }
+            if (res.data.linkman) {
+              vm.linkman = res.data.linkman
+            }
+            if (res.data.unit) {
+              vm.unit = res.data.unit
+            }
+            if (res.data.customer) {
+              let customer = []
+              for (let i in res.data.customer) {
+                customer.push({
+                  name: res.data.customer[i].customer_name,
+                  value: res.data.customer[i].id
+                })
+              }
+              if (customer.length) {
+                vm.myCustomer.push(customer)
+              }
+            }
+            vm.$emit('on-view-loaded', vm.info.building_name)
+          } else {
+            vm.info.id = 0
+            vm.$vux.toast.show({
+              text: res.message,
+              width: '15em'
+            })
+          }
+        })
+      }
+    })
+  },
+  methods: {
+    goTab (tab) {
+      this.$router.replace({name: 'BuildingView', id: this.info.id, query: {tab: tab}})
+      this.tab = tab
+    },
+    preview (index) {
+      this.$refs.previewer.show(index)
+    },
+    favorite () {
+      if (this.user) {
+        this.$vux.loading.show()
+        if (this.info.isFavorite) {
+          this.$post('/api/building/unFavorite', {
+            id: this.info.id
+          }, (res) => {
+            this.$vux.loading.hide()
+            if (res.success) {
+              this.info.isFavorite = false
+              this.$vux.toast.show({
+                type: 'success',
+                text: '已从收藏夹移除。',
+                width: '13em'
+              })
+            } else {
+              this.$vux.toast.show({
+                text: res.message,
+                width: '15em'
+              })
+            }
+          })
+        } else {
+          this.$post('/api/building/favorite', {
+            id: this.info.id
+          }, (res) => {
+            this.$vux.loading.hide()
+            if (res.success) {
+              this.info.isFavorite = true
+              this.$vux.toast.show({
+                type: 'success',
+                text: '已添加到收藏夹。',
+                width: '13em'
+              })
+            } else {
+              this.$vux.toast.show({
+                text: res.message,
+                width: '15em'
+              })
+            }
+          })
+        }
+      } else {
+        this.$router.push({
+          name: 'Login',
+          query: { redirect: this.$route.fullPath }
+        })
+      }
+    },
+    closeMap () {
+      this.showMap = false
+    },
+    selectUnit () {
+    },
+    toFilter () {
+      if (this.user) {
+        this.showCustomerPicker = true
+      } else {
+        this.$router.push({
+          name: 'Login',
+          query: { redirect: this.$route.fullPath }
+        })
+      }
+    },
+    addFilter (isConfirm) {
+      if (!isConfirm || this.selectCustomer.length <= 0) return
+      let customerId = this.selectCustomer[0]
+      let ids = []
+      if (this.tab === 0) {
+        ids.push('' + this.info.id + ',0')
+      } else {
+        if (this.selectedUnit.length <= 0) return
+        for (let i in this.selectedUnit) {
+          ids.push('0,' + this.selectedUnit[i])
+        }
+      }
+      this.$vux.loading.show()
+      this.$post('/api/customer/addFilter', {
+        cid: customerId,
+        ids: ids
+      }, (res) => {
+        this.$vux.loading.hide()
+        if (res.success) {
+          this.info.isFavorite = true
+          this.$vux.toast.show({
+            type: 'success',
+            text: '已添加到客户筛选表。',
+            width: '13em'
+          })
+        } else {
+          this.$vux.toast.show({
+            text: res.message,
+            width: '15em'
+          })
+        }
+      })
+    },
+    batchFavorite () {
+      if (this.user) {
+        if (this.selectedUnit.length <= 0) {
+          return
+        }
+        this.$vux.loading.show()
+        this.$post('/api/building/batchFavorite', {
+          ids: this.selectedUnit
+        }, (res) => {
+          this.$vux.loading.hide()
+          if (res.success) {
+            this.$vux.toast.show({
+              type: 'success',
+              text: '已添加到收藏夹。',
+              width: '13em'
+            })
+          } else {
+            this.$vux.toast.show({
+              text: res.message,
+              width: '15em'
+            })
+          }
+        })
+      } else {
+        this.$router.push({
+          name: 'Login',
+          query: { redirect: this.$route.fullPath }
+        })
+      }
+    },
+    unitTouch (item, isTouch) {
+      let vm = this
+      vm.touchUnit = item
+      if (isTouch) {
+        event.preventDefault()
+        if (event.touches) {
+          vm.touchX = event.touches[0].pageX
+          vm.touchY = event.touches[0].pageY
+        } else if (event.changedTouches) {
+          vm.touchX = event.changedTouches[0].pageX
+          vm.touchY = event.changedTouches[0].pageY
+        } else if (event.targetTouches) {
+          vm.touchX = event.targetTouches[0].pageX
+          vm.touchY = event.targetTouches[0].pageY
+        }
+        vm.moveX = vm.touchX
+        vm.moveY = vm.touchY
+      }
+      vm.unitTouchEvent = setTimeout(() => {
+        vm.unitTouchEvent = 0
+        if (!isTouch || (Math.abs(vm.moveX - vm.touchX) <= 5 && Math.abs(vm.moveY - vm.touchY) <= 5)) {
+          vm.menuUnit = item
+          vm.showUnitMenu = true
+        }
+      }, 500)
+    },
+    unitTouchMove (isTouch) {
+      if (isTouch) {
+        if (event.touches) {
+          this.moveX = event.touches[0].pageX
+          this.moveY = event.touches[0].pageY
+        } else if (event.changedTouches) {
+          this.moveX = event.changedTouches[0].pageX
+          this.moveY = event.changedTouches[0].pageY
+        } else if (event.targetTouches) {
+          this.moveX = event.targetTouches[0].pageX
+          this.moveY = event.targetTouches[0].pageY
+        }
+      } else {
+        this.touchUnit = null
+        clearTimeout(this.unitTouchEvent)
+        this.unitTouchEvent = 0
+      }
+    },
+    unitTouchEnd (isTouch) {
+      this.touchUnit = null
+      clearTimeout(this.unitTouchEvent)
+      if (this.unitTouchEvent !== 0 && isTouch) {
+        if (event.changedTouches) {
+          this.moveX = event.changedTouches[0].pageX
+          this.moveY = event.changedTouches[0].pageY
+        } else if (event.targetTouches) {
+          this.moveX = event.targetTouches[0].pageX
+          this.moveY = event.targetTouches[0].pageY
+        }
+        if (Math.abs(this.moveX - this.touchX) <= 5 && Math.abs(this.moveY - this.touchY) <= 5) {
+          let e = document.createEvent('MouseEvents')
+          e.initEvent('click', true, true)
+          event.target.dispatchEvent(e)
+        }
+      }
+      return false
+    },
+    unitMenuClick (key, item) {
+      let vm = this
+      if (vm.menuUnit != null) {
+        let unitId = vm.menuUnit.id
+        if (key === 'view') {
+          vm.$router.push({name: 'Unit', params: {id: unitId}})
+        } else if (key === 'edit') {
+          vm.$router.push({name: 'UnitEdit', params: {id: unitId, bid: this.info.id}})
+        } else if (key === 'delete' &&
+          vm.menuUnit.user_id === vm.user.id) {
+          vm.$vux.confirm.show({
+            title: '删除单元',
+            content: '确定要删除这个单元吗？',
+            onConfirm () {
+              vm.$vux.loading.show()
+              vm.$post('/api/unit/remove', {
+                id: unitId,
+                bid: vm.info.id
+              }, (res) => {
+                vm.$vux.loading.hide()
+                if (res.success) {
+                  vm.unit = res.data
+                  vm.selectedUnit = []
+                } else {
+                  vm.$vux.toast.show({
+                    text: res.message,
+                    width: '13em'
+                  })
+                }
+              })
+            }
+          })
+        }
+      }
+    }
+  },
+  computed: {
+    unitTree () {
+      let tree = []
+      if (!this.unit || !this.unit.length) {
+        return tree
+      }
+      let building = {}
+      let floor = {}
+      let b, f
+      for (let i in this.unit) {
+        if (b !== this.unit[i].building_no) {
+          b = this.unit[i].building_no
+          f = null
+          building = {building: b, floor: []}
+          tree.push(building)
+        }
+        if (f !== this.unit[i].floor) {
+          f = this.unit[i].floor
+          floor = {floor: f, unit: []}
+          building.floor.push(floor)
+        }
+        floor.unit.push(this.unit[i])
+      }
+      return tree
+    },
+    unitMenu () {
+      if (this.menuUnit && this.user) {
+        if (this.menuUnit.user_id === this.user.id) {
+          return {
+            view: '查看',
+            edit: '修改',
+            delete: '删除'
+          }
+        } else {
+          return {
+            view: '查看',
+            edit: '修改'
+          }
+        }
+      } else {
+        return []
+      }
+    },
+    favoriteText () {
+      return this.info.isFavorite ? '取消收藏' : '收藏'
+    }
+  },
+  filters: {
+    formatDate (date) {
+      if (date) {
+        return dateFormat(new Date(Date.parse(date.replace(/-/g, '/'))), 'YYYY年M月D日')
+      } else {
+        return ''
+      }
+    },
+    formatFloor (floor) {
+      if (floor > 0) {
+        return floor + '层'
+      } else if (floor < 0) {
+        return '地下' + Math.abs(floor) + '层'
+      } else {
+        return ''
+      }
+    }
+  }
+}
+</script>
+
+<style lang="less">
+.swiper-img {
+  text-align:center;
+  overflow: hidden;
+  img {
+    margin:0 auto;
+    height:260px;
+  }
+}
+
+.unit-checker-box {
+  padding-left:10px;
+  padding-right:15px;
+  padding-bottom:10px;
+  background-color:#fff;
+  .vux-divider {
+    padding: 15px 0 0 0
+  }
+  h5 { padding-top:10px; }
+}
+
+.unit-item {
+  margin-top: 10px;
+  margin-left: 5px;
+  line-height: 1.4em;
+  text-align: center;
+  color: #222;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  border-radius: 3px;
+  div {
+    padding: 5px 10px;
+    user-select: none;
+  }
+  div.active {
+    background-color: #ECECEC;
+  }
+}
+
+.unit-item-selected {
+  background-color: rgb(6, 165, 27);
+  color: #fff;
+}
+
+.unit-item-disabled {
+  background-color:#ccc;
+}
+</style>

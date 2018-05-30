@@ -1,0 +1,78 @@
+{foreach $data.list as $key=>$vo}
+    <div class="page horizontal">
+        {include file="../application/index/view/recommend/page_top.html" /}
+        <div class="main">
+            <div class="title">{$vo.building_name} {$vo.eng.name}</div>
+            {if count($vo.images) > 0}
+                <div style="float:left;text-align:center;width:240px;">
+                    {foreach $vo.images as $key=>$img}
+                        {if $key < 3}
+                            <img src="{$img.src}" border="1" class="building_image">
+                        {/if}
+                    {/foreach}
+                </div>
+            {/if}
+            <div class="building_info">
+                {if $vo.address != ''}
+                    <strong>地理位置：</strong><span>{$vo.address}</span><br />
+                {/if}
+                {if $vo.completion_date != ''}
+                    <strong>竣工日期：</strong><span>{$vo.completion_date|date='Y年m月d日'}</span><br />
+                {/if}
+                {if $vo.developer != ''}
+                    <strong>开 发 商：</strong><span>{$vo.developer}</span><br />
+                {/if}
+                {if $vo.manager != ''}
+                    <strong>物业管理：</strong><span>{$vo.manager}</span><br />
+                {/if}
+                {if $vo.rem != ''}
+                    <strong>项目说明：</strong><span>{$vo.rem}</span><br />
+                {/if}
+                {if $vo.traffic != ''}
+                    <strong>交通状况：</strong><span>{$vo.traffic}</span><br />
+                {/if}
+                {if $vo.equipment != ''}
+                    <strong>楼宇设备：</strong><span>{$vo.equipment}</span><br />
+                {/if}
+                {if $vo.facility != ''}
+                    <strong>配套设施：</strong><span>{$vo.facility}</span><br />
+                {/if}
+                {if $vo.environment != ''}
+                    <!-- <strong>周边环境：</strong><span>{$vo.environment}</span> -->
+                {/if}
+            </div>
+            {if $vo.eng != null}
+                <div class="building_info">
+                    {if $vo.eng.location != ''}
+                        <strong>Location: </strong><span>{$vo.eng.location}</span><br />
+                    {/if}
+                    {if $vo.eng.situation != ''}
+                        <strong>Building situation: </strong><span>{$vo.eng.situation}</span><br />
+                    {/if}
+                    {if $vo.eng.developer != ''}
+                        <strong>Investors: </strong><span>{$vo.eng.developer}</span><br />
+                    {/if}
+                    {if $vo.eng.manager != ''}
+                        <strong>Management company: </strong><span>{$vo.eng.manager}</span><br />
+                    {/if}
+                    {if $vo.eng.network != ''}
+                        <strong>Communication: </strong><span>{$vo.eng.network}</span><br />
+                    {/if}
+                    {if $vo.eng.elevator != ''}
+                        <strong>Elevator: </strong><span>{$vo.eng.elevator}</span><br />
+                    {/if}
+                    {if $vo.eng.hvac != ''}
+                        <strong>HVAC system: </strong><span>{$vo.eng.hvac}</span><br />
+                    {/if}
+                    {if $vo.eng.amenities != ''}
+                        <strong>Amenities: </strong><span>{$vo.eng.amenities}</span><br />
+                    {/if}
+                    {if $vo.eng.tenants != ''}
+                        <strong>Existing tenants: </strong><span>{$vo.eng.tenants}</span>
+                    {/if}
+                </div>
+            {/if}
+        </div>
+        {include file="../application/index/view/recommend/page_foot.html" /}
+    </div>
+{/foreach}

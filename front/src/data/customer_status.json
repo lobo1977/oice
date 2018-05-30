@@ -1,0 +1,23 @@
+[
+    {
+        "label": "潜在",
+        "value": 0
+    }, {
+        "label": "跟进",
+        "value": 1
+    }, {
+        "label": "看房",
+        "value": 2
+    }, {
+        "label": "确认",
+        "value": 3
+    }, {
+        "label": "成交",
+        "type": "primary",
+        "value": 4
+    }, {
+        "label": "失败",
+        "type": "warn",
+        "value": 5
+    }
+]

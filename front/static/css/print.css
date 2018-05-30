@@ -1,0 +1,162 @@
+body {
+  padding: 0px;
+  margin: 0px;
+  background-color:#ffffff;
+  font-size:16px;
+  font-family:幼圆,Verdana;
+  font-weight:normal;
+  color:#000000;
+}
+
+a:link, a:visited, a:hover, a:active {
+  color: #00135D;
+  text-decoration: none;
+}
+
+img {
+  border:0px;
+  margin:0px;
+}
+
+th {
+    background-color:#c0c0c0;
+}
+
+th,td {
+    text-align:center;
+    vertical-align:middle;
+    line-height:26px;
+}
+
+.page {
+    position: relative;
+    width:760px;
+    height:1100px;
+    margin-left:auto;
+    margin-right:auto;
+    overflow: hidden;
+    page-break-after:always;
+}
+
+.page.horizontal {
+    width:1080px;
+    height:730;
+}
+
+.page-top {
+    height:70px;
+    border-bottom:1px solid #000000;
+    font-size:10pt;
+}
+
+.page-top img {
+    max-height:65px;
+}
+
+.page-foot {
+    position: absolute;
+    top: 1030px;
+    display: block;
+    width:100%;
+    height:70px;
+    border-top:1px solid #000000;
+    font-size:10pt;
+    line-height: 22px;
+}
+
+.main {
+    line-height:26px;
+}
+
+.main::after {
+    display: block;
+    content: ' ';
+    clear: both;
+}
+
+.title {
+    padding-top:30px;
+    padding-bottom:20px;
+    font-size:18pt;
+    font-weight:bold;
+    text-align:center;
+}
+
+.process-table th, .process-table td {
+    border-right:1px solid #000000;
+}
+
+.horizontal .building_info {
+    float:left;
+    text-align:left;
+    width:400px;
+    padding-right:20px;
+    font-size:10pt;
+    line-height:25px;
+}
+
+.building_title {
+    padding-top:30px;
+    padding-bottom:20px;
+    font-size:15pt;
+    font-weight:bold;
+}
+
+.building_label {
+    font-weight:bold;
+}
+
+.building_sub_title {
+    font-weight:bold;
+    color:#800000;
+    padding-right:30px;
+}
+
+.info_list {
+    line-height:30px;
+}
+
+.info_list::after {
+    display: block;
+    content: ' ';
+    clear: both;
+}
+
+.info_list .label {
+    float:left;
+    width:15%;
+    font-weight:bold;
+}
+
+.info_list .text {
+    float:left;
+    width:35%;
+}
+
+.unit_list {
+    width:100%;
+    border-bottom:1px solid #000000;
+}
+
+.unit_list th {
+    border-bottom:1px solid #000000;
+    background-color:#ffffff;
+}
+
+.unit_list td {
+    text-align: center;
+}
+
+.edit {
+    border:0px;
+    height:22px;
+    font-size:13pt;
+    font-family:幼圆,Verdana;
+}
+
+.building_image {
+    width: 200px;
+    border:solid 1px #000000;
+    margin-top:10px;
+    margin-bottom:10px;
+}
