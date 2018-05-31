@@ -17,7 +17,7 @@
       </x-input>
       <x-input ref="input_vcode" v-if="loginModel === 'password' && error" placeholder="输入验证码" v-model="vcode" :max="5" :required="true"
          :should-toast-error="false" @on-click-error-icon="vcodeError" @on-enter="login" @on-change="validatedForm">
-        <img slot="right" id="imgVCode" class="weui-vcode-img" src="/verify" alt="captcha" @click="reloadVCodeImg">
+        <img slot="right" id="imgVCode" class="weui-vcode-img" src="/api/verify" alt="captcha" @click="reloadVCodeImg">
       </x-input>
       <x-input ref="input_verify_code" v-if="loginModel === 'verifyCode'" placeholder="输入验证码" v-model="verifyCode" :max="6" :required="true"
         :should-toast-error="false" @on-click-error-icon="verifyCodeError" @on-enter="login" @on-change="validatedForm">
