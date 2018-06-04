@@ -12,7 +12,7 @@ class Customer extends Base
 {
   protected $beforeActionList = [
     'getUser',
-    'checkAuth' => ['except'=>'index,detail']
+    'checkAuth' => ['except'=>'index,detail,show']
   ];
 
   /**
