@@ -17,7 +17,7 @@ return [
   'tmpInviteId' => 0,       // 邀请加入短信
 
   // 短信签名
-  'sign' => "云普力合",
+  'sign' => "商办云",
 
   // 创蓝短信接口配置
   'user' => 'yunpu888',
