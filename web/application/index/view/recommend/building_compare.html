@@ -1,0 +1,15 @@
+{foreach $data.list as $key=>$vo}
+    {if $key % 3 == 0}
+        <div class="page">
+            {include file="../application/index/view/recommend/page_top.html" /}
+            <div class="main">
+                <div class="title">物业对比表</div>
+                <table border="0" cellspacing="0" style="width:100%;border-top:1px solid #000000;border-left:1px solid #000000;">
+                
+                </table>
+                <div style="padding:5px;">说明：上述资料及数据虽力求精确但仅供参考，一切以最终合同为准！</div>
+            </div>
+            {include file="../application/index/view/recommend/page_foot.html" /}
+        </div>
+    {/if}
+{/foreach}

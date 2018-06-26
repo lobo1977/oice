@@ -36,7 +36,9 @@ class Recommend extends Base
     $this->assign('process', $process);
     $this->assign('data', $data);
 
-    if ($mode == 3) {
+    if ($mode == 4) {
+      return view('print_compare');
+    } else if ($mode == 3) {
       return view('print_hor');
     } else if ($mode == 2) {
       return view('print_b');

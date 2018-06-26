@@ -7,8 +7,8 @@
                 <div class="building_label">{$vo.desc} {$vo.address}</div>
                 {if count($vo.images) > 0}
                     <div>
-                        {foreach $vo.images as $key=>$img}
-                            {if $key < 3}
+                        {foreach $vo.images as $key2=>$img}
+                            {if $key2 < 3}
                                 <img src="{$img.src}" border="1" class="building_image">
                             {/if}
                         {/foreach}
@@ -71,7 +71,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {foreach $vo.units as $key=>$unit}
+                            {foreach $vo.units as $key3=>$unit}
                                 <tr>
                                     <td>{$unit.unit}</td>
                                     <td>{$unit.face}</td>
