@@ -21,7 +21,7 @@ class Utils
     }
     
     /**
-     * 生成随机数字字符串
+     * 生成随机数字符串
      * @param length 字符串长度
      */
     public static function getRandNumber($length)
@@ -35,5 +35,25 @@ class Utils
         }
 
         return $str;
+    }
+
+    /**
+     *  判断是否是微信客户端 
+     */
+    public static function isWechat() {
+        if (strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 判断是否是QQ客户端 
+     */
+    public static function isQQ() {
+        if (strpos($_SERVER['HTTP_USER_AGENT'], ' QQ/') !== false) {
+            return true;
+        }
+        return false;
     }
 }

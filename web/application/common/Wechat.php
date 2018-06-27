@@ -1,12 +1,14 @@
 <?php
 namespace app\common;
 
+use think\facade\Log;
+
 /**
  * 微信公众号接口类
  * @author lobo
  *
  */
-class Weixin {
+class Wechat {
 	
 	private $user;
 	
@@ -23,8 +25,8 @@ class Weixin {
 	public function get_access_token() {
 		$token = cache('wx_token');
 		if (!$token) {
-			$url = sprintf(config('weixin.token_url'), 
-				config('weixin.app_id'), config('weixin.app_secret'));
+			$url = sprintf(config('wechat.token_url'), 
+				config('wechat.app_id'), config('wechat.app_secret'));
 			
 			$res = file_get_contents($url);
 			$res = json_decode($res, true);
@@ -100,7 +102,7 @@ class Weixin {
 		$signature = $_GET["signature"];
 		$timestamp = $_GET["timestamp"];
 		$nonce = $_GET["nonce"];
-		$token = config('weixin.token');
+		$token = config('wechat.token');
 		$tmpArr = array($token, $timestamp, $nonce);
 		sort($tmpArr, SORT_STRING);
 		$tmpStr = implode($tmpArr);
@@ -214,7 +216,7 @@ class Weixin {
 			$token = $this->get_access_token();
 			
 			if (!empty($token)) {
-				$url = sprintf(config('weixin.ticket_url'), $token, 'jsapi');
+				$url = sprintf(config('wechat.ticket_url'), $token, 'jsapi');
 				$res = file_get_contents($url);
 				$res = json_decode($res, true);
 				if ($res['ticket']) {
@@ -611,16 +613,7 @@ class Weixin {
 	}
 	
 	private function logger($log_content) {
-		if (isset($_SERVER['HTTP_APPNAME'])) {   //SAE
-			sae_set_display_errors(false);
-			sae_debug($log_content);
-			sae_set_display_errors(true);
-		} else { //LOCAL
-			$max_size = 500000;
-			$log_filename = "weixin_log.txt";
-			if(file_exists($log_filename) and (abs(filesize($log_filename)) > $max_size)){unlink($log_filename);}
-			file_put_contents($log_filename, date('Y-m-d H:i:s ').$log_content."\r\n", FILE_APPEND);
-		}
+		Log::info($log_content);
 	}
 	
 	/**

@@ -261,12 +261,12 @@ export default {
             if (res.data.level) {
               vm.info.building_type += `（${res.data.level}级）`
             }
-            // if (res.data.area) {
-            //   vm.info.location = res.data.area
-            // }
-            // if (res.data.district) {
-            //   vm.info.location += res.data.district
-            // }
+            if (res.data.area) {
+              vm.info.location = res.data.area
+            }
+            if (res.data.district) {
+              vm.info.location += res.data.district
+            }
             vm.info.completionDate = res.data.completion_date
             if (res.data.isFavorite) {
               vm.info.isFavorite = true
@@ -293,6 +293,55 @@ export default {
               }
             }
             vm.$emit('on-view-loaded', vm.info.building_name)
+
+            let shareUrl = window.location.href
+
+            // 微信接口
+            vm.$post('/api/wechat/config', {
+              url: shareUrl
+            }, (res2) => {
+              if (res2.success) {
+                let shareDesc = (res.data.level ? res.data.level + '级' : '') + res.data.type +
+                  ' ' + vm.info.location + ' ' + vm.info.price
+                let shareImage = null
+
+                if (vm.images.length) {
+                  shareImage = window.location.protocol + '//' +
+                    window.location.host + '/' + vm.images[0].src
+                }
+
+                vm.$wechat.config(res2.data)
+
+                vm.$wechat.error((res) => {
+                  vm.$vux.toast.show({
+                    text: res.errMsg,
+                    width: '15em'
+                  })
+                })
+
+                vm.$wechat.ready(() => {
+                  vm.$wechat.onMenuShareTimeline({
+                    title: vm.info.building_name,
+                    link: shareUrl,
+                    imgUrl: shareImage
+                  })
+
+                  vm.$wechat.onMenuShareAppMessage({
+                    title: vm.info.building_name,
+                    desc: shareDesc,
+                    link: shareUrl,
+                    imgUrl: shareImage
+                  })
+
+                  vm.$wechat.onMenuShareQQ({
+                    title: vm.info.building_name,
+                    desc: shareDesc,
+                    link: shareUrl,
+                    imgUrl: shareImage
+                  })
+                })
+              }
+            })
           } else {
             vm.info.id = 0
             vm.$vux.toast.show({
