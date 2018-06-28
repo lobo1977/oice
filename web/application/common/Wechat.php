@@ -22,6 +22,10 @@ class Wechat {
 		$this->errmsg = '';
 	}
 
+	public function getUser() {
+		return $this->user;
+	}
+
 	public function getCode() {
 		return $this->errcode;
 	}
@@ -196,7 +200,6 @@ class Wechat {
 	 * 验证签名
 	 */
 	public function checkSign() {
-		$echoStr = $_GET["echostr"];
 		$signature = $_GET["signature"];
 		$timestamp = $_GET["timestamp"];
 		$nonce = $_GET["nonce"];
@@ -205,12 +208,22 @@ class Wechat {
 		sort($tmpArr, SORT_STRING);
 		$tmpStr = implode($tmpArr);
 		$tmpStr = sha1($tmpStr);
-		ob_clean();
-		if($tmpStr == $signature) {
-			return $echoStr;
-		} else {
-			return '签名验证失败';
-		}
+		return $tmpStr == $signature;
+	}
+
+	/**
+	 * 发送消息
+	 * @param unknown $openId
+	 * @param unknown $msg
+	 * @return array
+	 */
+	private function sendMsg($openId, $msg) {
+		$access_token = $this->getAccessToken();
+		$url = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=" . $access_token;
+		$jsondata = urldecode(json_encode($msg));
+		$res = $this->https_request($url, $jsondata);
+		$res = json_decode(htmlspecialchars_decode($res), true);
+		return $res;
 	}
 	
 	/**
@@ -304,21 +317,6 @@ class Wechat {
 	}
 	
 	/**
-	 * 发送消息
-	 * @param unknown $openId
-	 * @param unknown $msg
-	 * @return array
-	 */
-	private function sendMsg($openId, $msg) {
-		$access_token = $this->getAccessToken();
-		$url = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=" . $access_token;
-		$jsondata = urldecode(json_encode($msg));
-		$res = $this->https_request($url, $jsondata);
-		$res = json_decode(htmlspecialchars_decode($res), true);
-		return $res;
-	}
-	
-	/**
 	 * 接收事件消息
 	 */
 	private function receiveEvent($object) {
@@ -358,7 +356,7 @@ class Wechat {
 			//扫码带提示
 			case "scancode_waitmsg":
 				break;
-				//扫码推事件
+			//扫码推事件
 			case "scancode_push":
 				break;
 			//系统拍照

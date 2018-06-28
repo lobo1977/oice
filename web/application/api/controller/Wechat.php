@@ -18,10 +18,15 @@ class Wechat extends Base
    * 公众号入口
    */
   public function index() {
-    if (!isset($_GET['echostr'])) {
-			$this->response();
+    ob_clean();
+    if (isset($_GET['echostr'])) {
+			if ($this->wechat->checkSign()) {
+        echo $_GET['echostr'];
+      } else {
+        echo '签名无效';
+      }
 		} else {
-			echo $this->wechat->checkSign();
+      $this->response();
 		}
   }
 
@@ -29,8 +34,11 @@ class Wechat extends Base
    * 用户交互
    */
   public function response() {
-    ob_clean();
     echo $this->wechat->response();
+    $user = $this->wechat->getUser();
+    if ($user != null) {
+      
+    }
   }
 
   /**
