@@ -9,20 +9,32 @@ use think\facade\Log;
  *
  */
 class Wechat {
-	
 	private $user;
+	private $errcode;
+	private $errmsg;
 	
 	/**
 	 * 构造函数
 	 */
 	function __construct() {
+		$this->user = null;
+		$this->errcode = 0;
+		$this->errmsg = '';
+	}
+
+	public function getCode() {
+		return $this->errcode;
+	}
+
+	public function getMessage() {
+		return $this->errmsg;
 	}
 	
 	/**
 	 * 获取微信 access_token
 	 * @return unknown|mixed|object
 	 */
-	public function get_access_token() {
+	public function getAccessToken() {
 		$token = cache('wx_token');
 		if (!$token) {
 			$url = sprintf(config('wechat.token_url'), 
@@ -31,12 +43,52 @@ class Wechat {
 			$res = file_get_contents($url);
 			$res = json_decode($res, true);
 			
-			if ($res['access_token']) {
+			if (isset($res['access_token'])) {
 				$token = $res['access_token'];
 				cache('wx_token', $token, 5400);	//token 有效期为两小时，缓存设定为1小时30分钟
+			} else {
+				Log::error('[ Wechat getAccessToken ] ' + $res);
+				if (isset($res['errcode'])) {
+					$this->errcode = $res['errcode'];
+				}
+				if (isset($res['errmsg'])) {
+					$this->errmsg = $res['errmsg'];
+				}
 			}
 		}
 		return $token;
+	}
+
+	/**
+	 * 获取微信 JS-SDK ticket
+	 * @return unknown|mixed|object
+	 */
+	public function getJssdkTicket() {
+		$ticket = cache('wx_ticket');
+		
+		if (empty($ticket)) {
+			$token = $this->getAccessToken();
+			
+			if (!empty($token)) {
+				$url = sprintf(config('wechat.ticket_url'), $token, 'jsapi');
+				$res = file_get_contents($url);
+				$res = json_decode($res, true);
+
+				if (isset($res['ticket'])) {
+					$ticket = $res['ticket'];
+					cache('wx_ticket', $ticket, 5400);
+				} else {
+					Log::error('[ Wechat getJssdkTicket ] ' + $res);
+					if (isset($res['errcode'])) {
+						$this->errcode = $res['errcode'];
+					}
+					if (isset($res['errmsg'])) {
+						$this->errmsg = $res['errmsg'];
+					}
+				}
+			}
+		}
+		return $ticket;
 	}
 	
 	/**
@@ -46,13 +98,37 @@ class Wechat {
 	 * @param unknown $url
 	 * @return string
 	 */
-	public function get_jssdk_sign($nonceStr, $timestamp, $url) {
+	public function getJssdkSign($nonceStr, $timestamp, $url) {
 		$ticket = $this->getJssdkTicket();
-		$strOri = sprintf("jsapi_ticket=%s&noncestr=%s&timestamp=%s&url=%s", $ticket, $nonceStr,
+		if ($ticket) {
+			$strOri = sprintf("jsapi_ticket=%s&noncestr=%s&timestamp=%s&url=%s", $ticket, $nonceStr,
 				$timestamp, $url);
-		$strSha1 = sha1($strOri);
-		
-		return $strSha1;
+			return sha1($strOri);
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * 自定义菜单
+	 */
+	public function menuCreate($menu) {
+		$access_token = $this->getAccessToken();
+		if ($access_token) {
+			$url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" . $access_token;
+			$jsondata = urldecode(json_encode($menu));
+			$res = $this->https_request($url, $jsondata);
+			$this->errcode = $res['errcode'];
+			if ($this->errcode == 0) {
+				return true;
+			} else {
+				Log::error('[ Wechat menuCreate ] ' + $res);
+				$this->errmsg = $res['errmsg'];
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 	
 	/**
@@ -60,13 +136,33 @@ class Wechat {
 	 * @param unknown $openid
 	 * @return mixed
 	 */
-	public function get_user_info($openid) {
-		$access_token = $this->get_access_token();
-		$url = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=%s&openid=%s&lang=zh_CN";
-		$url = sprintf($url, $access_token, $openid);
-		$res = file_get_contents($url);
-		$res = json_decode($res, true);
-		return $res;
+	public function getUserInfo($openid) {
+		$access_token = $this->getAccessToken();
+		if ($access_token) {
+			$url = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=%s&openid=%s&lang=zh_CN";
+			$url = sprintf($url, $access_token, $openid);
+			$res = file_get_contents($url);
+			$res = json_decode($res, true);
+			if (isset($res['subscribe'])){
+				if ($res['subscribe'] == 1) {
+					return $res;
+				} else {
+					$this->errmsg = '用户未关注。';
+					return null;
+				}
+			} else {
+				Log::error('[ Wechat getUserInfo ] ' + $res);
+				if (isset($res['errcode'])) {
+					$this->errcode = $res['errcode'];
+				}
+				if (isset($res['errmsg'])) {
+					$this->errmsg = $res['errmsg'];
+				}
+				return null;
+			}
+		} else {
+			return null;
+		}
 	}
 	
 	/**
@@ -74,22 +170,24 @@ class Wechat {
 	 * @param unknown $longUrl
 	 * @return array
 	 */
-	public function get_short_url($longUrl) {
-		$access_token = $this->get_access_token();
+	public function getShortUrl($longUrl) {
+		$access_token = $this->getAccessToken();
 		$url = "https://api.weixin.qq.com/cgi-bin/shorturl?access_token=" .  $access_token;
 		$arr = array (
 			"action" => "long2short",
 			"long_url" => $longUrl
 		);
 		$jsondata = json_encode($arr);
-		$res = http_post_json($url, $jsondata);
+		$res = $this->https_request($url, $jsondata);
 		$res = json_decode(htmlspecialchars_decode($res), true);
-		if ($res && $res['errcode'] == 0) {
-			$data['ori_url'] = $longUrl;
-			$data['short_url'] = $res['short_url'];
-			$urlModel->add($data);
+		$this->errcode = $res['errcode'];
+		if ($this->errcode == 0) {
 			return $res['short_url'];
 		} else {
+			Log::error('[ Wechat getShortUrl ] ' + $res);
+			if (isset($res['errmsg'])) {
+				$this->errmsg = $res['errmsg'];
+			}
 			return $longUrl;
 		}
 	}
@@ -97,7 +195,7 @@ class Wechat {
 	/**
 	 * 验证签名
 	 */
-	public function check_sign() {
+	public function checkSign() {
 		$echoStr = $_GET["echostr"];
 		$signature = $_GET["signature"];
 		$timestamp = $_GET["timestamp"];
@@ -121,7 +219,7 @@ class Wechat {
 	 * @param unknown $message
 	 * @return array
 	 */
-	public function send_text_msg($openId, $message) {
+	public function sendTextMsg($openId, $message) {
 		$arr = array (
 			"touser" => $openId,
 			"msgtype" => "text",
@@ -138,7 +236,7 @@ class Wechat {
 	 * @param unknown $message
 	 * @return array
 	 */
-	public function send_news_msg($openId, $title, $description, $url, $picUrl) {
+	public function sendNewsMsg($openId, $title, $description, $url, $picUrl) {
 		$arr = array (
 			"touser" => $openId,
 			"msgtype" => "news",
@@ -163,11 +261,11 @@ class Wechat {
 		$postStr = $GLOBALS["HTTP_RAW_POST_DATA"];
 		if (!empty($postStr)){
 			
-			$this->logger("REC:".$postStr);
+			$this->logger("Receive: ".$postStr);
 			
 			$postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
 			$RX_TYPE = trim($postObj->MsgType);
-			$this->user = $this->get_user_info($postObj->FromUserName);
+			$this->user = $this->getUserInfo($postObj->FromUserName);
 			
 			//消息类型路由
 			switch ($RX_TYPE) {
@@ -197,35 +295,12 @@ class Wechat {
 					break;
 			}
 			
-			$this->logger("RES:" . $result);
+			$this->logger("Response: " . $result);
 			
 			return $result;
 		} else {
 			return "";
 		}
-	}
-	
-	/**
-	 * 获取微信 JS-SDK ticket
-	 * @return unknown|mixed|object
-	 */
-	private function getJssdkTicket() {
-		$ticket = cache('wx_ticket');
-		
-		if (empty($ticket)) {
-			$token = $this->get_access_token();
-			
-			if (!empty($token)) {
-				$url = sprintf(config('wechat.ticket_url'), $token, 'jsapi');
-				$res = file_get_contents($url);
-				$res = json_decode($res, true);
-				if ($res['ticket']) {
-					$ticket = $res['ticket'];
-					cache('wx_ticket', $ticket, 3600);
-				}
-			}
-		}
-		return $ticket;
 	}
 	
 	/**
@@ -235,10 +310,10 @@ class Wechat {
 	 * @return array
 	 */
 	private function sendMsg($openId, $msg) {
-		$access_token = $this->get_access_token();
+		$access_token = $this->getAccessToken();
 		$url = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=" . $access_token;
 		$jsondata = urldecode(json_encode($msg));
-		$res = http_post_json($url, $jsondata);
+		$res = $this->https_request($url, $jsondata);
 		$res = json_decode(htmlspecialchars_decode($res), true);
 		return $res;
 	}
@@ -253,30 +328,6 @@ class Wechat {
 			//关注
 			case "subscribe":
 				$content = "欢迎关注" . config('app_name');
-				
-				// 查询并注册用户
-				// if ($this->user) {
-				// 	$userApi = new User\Api\UserApi();
-
-				// 	$openData['wx_openid'] = $this->user['openid'];
-				// 	if ($this->user['unionid']) {
-				// 		$openData['wx_unionid'] = $this->user['unionid'];
-				// 	}
-					
-				// 	$uid = $userApi->register('', getRandChar(16), '', '', $openData);
-					
-				// 	if ($uid) {
-				// 		$memberModel = D('Mobile/Member');
-				// 		$userData['nickname'] = $this->user['nickname'];
-				// 		$userData['sex'] = $this->user['sex'] == 2 ? 0 : 1;
-				// 		$userData['province'] = $this->user['province'];
-				// 		$userData['city'] = $this->user['city'];
-				// 		$userData['avatar'] = $this->user['headimgurl'];
-				// 		$userData['source'] = 882;  //设置聚爱网账号为所属红娘
-				// 		$memberModel->saveMemberInfo($uid, $userData, false);
-				// 	}
-				// }
-				
 				break;
 			//取消关注
 			case "unsubscribe":
@@ -605,28 +656,16 @@ class Wechat {
 	}
 	
 	/**
-	 * 消息日志
-	 */
-	private function traceHttp() {
-		$this->logger("REMOTE_ADDR:".$_SERVER["REMOTE_ADDR"].(strstr($_SERVER["REMOTE_ADDR"],'101.226')? " FROM WeiXin": " Unknown IP"));
-		$this->logger("QUERY_STRING:".$_SERVER["QUERY_STRING"]);
-	}
-	
-	private function logger($log_content) {
-		Log::info($log_content);
-	}
-	
-	/**
 	 * 上传多媒体素材并获取缩略图ID
 	 * @param unknown $filename
 	 * @return mixed
 	 */
 	function addMaterial($filename) {
-		$access_token = $this->get_access_token();
+		$access_token = $this->getAccessToken();
 		$type = 'image';
 		$url = "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=".$access_token."&type=".$type;
 		$data = array("media"=>'@'. $filename);
-		$res = https_request($url, $data, 'post');
+		$res = $this->https_request($url, $data);
 		return $res['media_id'];
 	}
 	
@@ -635,10 +674,10 @@ class Wechat {
 	 * @return unknown
 	 */
 	function uploadImage($filename) {
-		$access_token = $this->get_access_token();
+		$access_token = $this->getAccessToken();
 		$url = "https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token=".$access_token;
 		$data = array("media" => '@'. $filename);
-		$res = https_request($url, $data, 'post');
+		$res = $this->https_request($url, $data);
 		return $res['url'];
 	}
 	
@@ -648,7 +687,7 @@ class Wechat {
 	 */
 	function uploadNews($author, $title, $thumb, $images, $content, $digest, $source) {
 		//1.获取全局access_token
-		$access_token = $this->get_access_token();
+		$access_token = $this->getAccessToken();
 		$url = "https://api.weixin.qq.com/cgi-bin/media/uploadnews?access_token=". $access_token;
 		
 		//2.组装数据
@@ -678,7 +717,7 @@ class Wechat {
 			)
 		);
 		$postJson = urldecode(json_encode($array));
-		$res = https_request($url, $postJson, 'post');
+		$res = $this->https_request($url, $postJson);
 		return $res['media_id'];
 	}
 	
@@ -688,7 +727,7 @@ class Wechat {
 	 */
 	function sendMsgForPreview($openid, $media_id, $content) {
 		//1.获取全局access_token
-		$access_token = $this->get_access_token();
+		$access_token = $this->getAccessToken();
 		//2.组装群发预览接口数据  array
 		$url = "https://api.weixin.qq.com/cgi-bin/message/mass/preview?access_token=".$access_token;
 		$array = array();
@@ -703,9 +742,9 @@ class Wechat {
 			return false;
 		}
 		//3.将数组转成json格式
-		$postJson = json_encode ($array);
+		$postJson = json_encode($array);
 		//4.调用第三方接口
-		$res = https_request($url, $postJson, 'post');
+		$res = $this->https_request($url, $postJson);
 		return $res;
 	}
 	
@@ -717,7 +756,7 @@ class Wechat {
 	 */
 	function sendMsgToAll($media_id, $content) {
 		//1.获取全局access_token
-		$access_token = $this->get_access_token();
+		$access_token = $this->getAccessToken();
 		//2.组装群发预览接口数据  array
 		$url = "https://api.weixin.qq.com/cgi-bin/message/mass/sendall?access_token=".$access_token;
 		$array = array();
@@ -732,9 +771,47 @@ class Wechat {
 			return false;
 		}
 		//3.将数组转成json格式
-		$postJson = json_encode ($array);
+		$postJson = json_encode($array);
 		//4.调用第三方接口
-		$res = https_request($url, $postJson, 'post');
+		$res = $this->https_request($url, $postJson);
 		return $res;
+	}
+
+	/**
+	 * 消息日志
+	 */
+	private function logger($log_content) {
+		Log::info('[ Wechat ] ' + $log_content);
+	}
+
+	private function trace_http() {
+		$this->logger("REMOTE_ADDR:".$_SERVER["REMOTE_ADDR"].(strstr($_SERVER["REMOTE_ADDR"],'101.226')? " FROM WeiXin": " Unknown IP"));
+		$this->logger("QUERY_STRING:".$_SERVER["QUERY_STRING"]);
+	}
+
+	/**
+	 * 构造HTTP请求
+	 */
+	private function https_request($url, $data = '', $type='post', $res='json') {
+		//1.初始化curl
+		$curl = curl_init();
+		//2.设置curl的参数
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST,2);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+		if ($type == "post"){
+			curl_setopt($curl, CURLOPT_POST, 1);
+			curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+		}
+		//3.采集
+		$output = curl_exec($curl);
+		//4.关闭
+		curl_close($curl);
+		if ($res == 'json') {
+			return json_decode(htmlspecialchars_decode($output),true);
+		} else {
+			return $output;
+		}
 	}
 }

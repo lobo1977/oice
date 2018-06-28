@@ -294,54 +294,17 @@ export default {
             }
             vm.$emit('on-view-loaded', vm.info.building_name)
 
-            let shareUrl = window.location.href
+            let shareLink = window.location.href
+            let shareDesc = (res.data.level ? res.data.level + '级' : '') + res.data.type +
+                ' ' + vm.info.location + ' ' + vm.info.price
+            let shareImage = null
 
-            // 微信接口
-            vm.$post('/api/wechat/config', {
-              url: shareUrl
-            }, (res2) => {
-              if (res2.success) {
-                let shareDesc = (res.data.level ? res.data.level + '级' : '') + res.data.type +
-                  ' ' + vm.info.location + ' ' + vm.info.price
-                let shareImage = null
+            if (vm.images.length) {
+              shareImage = window.location.protocol + '//' +
+                window.location.host + '/' + vm.images[0].src
+            }
 
-                if (vm.images.length) {
-                  shareImage = window.location.protocol + '//' +
-                    window.location.host + '/' + vm.images[0].src
-                }
-
-                vm.$wechat.config(res2.data)
-
-                vm.$wechat.error((res) => {
-                  vm.$vux.toast.show({
-                    text: res.errMsg,
-                    width: '15em'
-                  })
-                })
-
-                vm.$wechat.ready(() => {
-                  vm.$wechat.onMenuShareTimeline({
-                    title: vm.info.building_name,
-                    link: shareUrl,
-                    imgUrl: shareImage
-                  })
-
-                  vm.$wechat.onMenuShareAppMessage({
-                    title: vm.info.building_name,
-                    desc: shareDesc,
-                    link: shareUrl,
-                    imgUrl: shareImage
-                  })
-
-                  vm.$wechat.onMenuShareQQ({
-                    title: vm.info.building_name,
-                    desc: shareDesc,
-                    link: shareUrl,
-                    imgUrl: shareImage
-                  })
-                })
-              }
-            })
+            vm.$wechatConfig(shareLink, vm.info.building_name, shareDesc, shareImage)
           } else {
             vm.info.id = 0
             vm.$vux.toast.show({

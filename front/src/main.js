@@ -87,6 +87,42 @@ router.afterEach(function (to) {
   store.commit('updateLoadingStatus', {isLoading: false})
 })
 
+// 微信接口注册
+Vue.prototype.$wechatConfig = function (link, title, desc, image) {
+  Vue.post('/api/wechat/config', {
+    url: window.location.href
+  }, (res) => {
+    if (res.success) {
+      Vue.wechat.config(res.data)
+
+      Vue.wechat.error((res) => {
+      })
+
+      Vue.wechat.ready(() => {
+        Vue.wechat.onMenuShareTimeline({
+          title: title,
+          link: link,
+          imgUrl: image
+        })
+
+        Vue.wechat.onMenuShareAppMessage({
+          title: title,
+          desc: desc,
+          link: link,
+          imgUrl: image
+        })
+
+        Vue.wechat.onMenuShareQQ({
+          title: title,
+          desc: desc,
+          link: link,
+          imgUrl: image
+        })
+      })
+    }
+  })
+}
+
 new Vue({
   store,
   router,
