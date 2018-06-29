@@ -51,12 +51,12 @@ class Wechat {
 				$token = $res['access_token'];
 				cache('wx_token', $token, 5400);	//token 有效期为两小时，缓存设定为1小时30分钟
 			} else {
-				Log::error('[ Wechat getAccessToken ] ' + $res);
 				if (isset($res['errcode'])) {
 					$this->errcode = $res['errcode'];
 				}
 				if (isset($res['errmsg'])) {
 					$this->errmsg = $res['errmsg'];
+					Log::error('[ Wechat getAccessToken ] ' . $res['errmsg']);
 				}
 			}
 		}
@@ -82,12 +82,12 @@ class Wechat {
 					$ticket = $res['ticket'];
 					cache('wx_ticket', $ticket, 5400);
 				} else {
-					Log::error('[ Wechat getJssdkTicket ] ' + $res);
 					if (isset($res['errcode'])) {
 						$this->errcode = $res['errcode'];
 					}
 					if (isset($res['errmsg'])) {
 						$this->errmsg = $res['errmsg'];
+						Log::error('[ Wechat getJssdkTicket ] ' . $res['errmsg']);
 					}
 				}
 			}
@@ -126,7 +126,7 @@ class Wechat {
 			if ($this->errcode == 0) {
 				return true;
 			} else {
-				Log::error('[ Wechat menuCreate ] ' + $res);
+				Log::error('[ Wechat menuCreate ] ' . $res['errmsg']);
 				$this->errmsg = $res['errmsg'];
 				return false;
 			}
@@ -155,12 +155,12 @@ class Wechat {
 					return null;
 				}
 			} else {
-				Log::error('[ Wechat getUserInfo ] ' + $res);
 				if (isset($res['errcode'])) {
 					$this->errcode = $res['errcode'];
 				}
 				if (isset($res['errmsg'])) {
 					$this->errmsg = $res['errmsg'];
+					Log::error('[ Wechat getUserInfo ] ' . $res['errmsg']);
 				}
 				return null;
 			}
@@ -188,9 +188,9 @@ class Wechat {
 		if ($this->errcode == 0) {
 			return $res['short_url'];
 		} else {
-			Log::error('[ Wechat getShortUrl ] ' + $res);
 			if (isset($res['errmsg'])) {
 				$this->errmsg = $res['errmsg'];
+				Log::error('[ Wechat getShortUrl ] ' . $res['errmsg']);
 			}
 			return $longUrl;
 		}
@@ -696,7 +696,7 @@ class Wechat {
 			for ($i = 0; $i < count($images); $i++) {
 				$img_url = $this->uploadImage($images[$i]);
 				if ($img_url) {
-					$content = $content . '<br/><a src="' + $img_url + '" style="margin:10px 0;">';
+					$content = $content . '<br/><a src="' . $img_url . '" style="margin:10px 0;">';
 				}
 			}
 		}
@@ -779,7 +779,7 @@ class Wechat {
 	 * 消息日志
 	 */
 	private function logger($log_content) {
-		Log::info('[ Wechat ] ' + $log_content);
+		Log::info('[ Wechat ] ' . $log_content);
 	}
 
 	private function trace_http() {

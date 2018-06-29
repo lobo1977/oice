@@ -45,42 +45,44 @@ class Wechat extends Base
    * 自定义菜单
    */
   public function menu() {
+    $app_root = 'http://' . config('app_host');
+
     $menu = array(
-      'button' =>array(
+      'button' => array(
         array(
           'name'=>urlencode("房源"),
-          'sub_button'=>array(
+          'sub_button'=> array(
             array(
-              'name'=>urlencode("写字楼"),
-              'type'=>'view',
-              'url'=>'http://m.o-ice.com/app/building?type=1'
+              'name'=> urlencode("写字楼"),
+              'type'=> 'view',
+              'url'=> $app_root . '/app/building?type=1'
             ),
             array(
-              'name'=>urlencode("商铺独楼"),
-              'type'=>'view',
-              'url'=>'http://m.o-ice.com/app/building?type=2'
+              'name'=> urlencode("商铺独楼"),
+              'type'=> 'view',
+              'url'=> $app_root . '/app/building?type=2'
             ),
             array(
-              'name'=>urlencode("商务中心"),
-              'type'=>'view',
-              'url'=>'http://m.o-ice.com/app/building?type=3'
+              'name'=> urlencode("商务中心"),
+              'type'=> 'view',
+              'url'=> $app_root . '/app/building?type=3'
             ),
             array(
-              'name'=>urlencode("商住公寓"),
-              'type'=>'view',
-              'url'=>'http://m.o-ice.com/app/building?type=4'
+              'name'=> urlencode("商住公寓"),
+              'type'=> 'view',
+              'url'=> $app_root . '/app/building?type=4'
             )
           )
         ),
         array(
-          'name'=>urlencode("客户"),
-          'type'=>'view',
-          'url'=>'http://m.o-ice.com/app/customer'
+          'name'=> urlencode("客户"),
+          'type'=> 'view',
+          'url'=> $app_root . '/app/customer'
         ),
         array(
-          'name'=>urlencode("我的"),
-          'type'=>'view',
-          'url'=>'http://m.o-ice.com/app/my'
+          'name'=> urlencode("我的"),
+          'type'=> 'view',
+          'url'=> $app_root . '/app/my'
         )
       )
     );
