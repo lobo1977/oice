@@ -4,6 +4,7 @@ namespace app\api\controller;
 use think\facade\Log;
 use app\common\Utils;
 use app\common\Wechat as WechatApi;
+use app\api\model\Oauth;
 use app\api\controller\Base;
 
 class Wechat extends Base
@@ -37,7 +38,15 @@ class Wechat extends Base
     echo $this->wechat->response();
     $user = $this->wechat->getUser();
     if ($user != null) {
-      
+      $data = [
+        'platform' => 'wechat',
+        'openid' => $user['openid'],
+        'unionid' => isset($user['unionid']) ? $user['unionid'] : '',
+        'nickname' => $user['nickname'],
+        'sex' => $user['sex'],
+        'avatar' => $user['headimgurl']
+      ];
+      Oauth::add($data);
     }
   }
 
