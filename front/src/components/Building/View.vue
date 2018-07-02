@@ -294,17 +294,19 @@ export default {
             }
             vm.$emit('on-view-loaded', vm.info.building_name)
 
-            let shareLink = window.location.href
-            let shareDesc = (res.data.level ? res.data.level + '级' : '') + res.data.type +
-                ' ' + vm.info.location + ' ' + vm.info.price
-            let shareImage = null
+            if (vm.$isWechat()) {
+              let shareLink = window.location.href
+              let shareDesc = (res.data.level ? res.data.level + '级' : '') + res.data.type +
+                  ' ' + vm.info.location + ' ' + vm.info.price
+              let shareImage = null
 
-            if (vm.images.length) {
-              shareImage = window.location.protocol + '//' +
-                window.location.host + '/' + vm.images[0].src
+              if (vm.images.length) {
+                shareImage = window.location.protocol + '//' +
+                  window.location.host + '/' + vm.images[0].src
+              }
+
+              vm.$wechatConfig(shareLink, vm.info.building_name, shareDesc, shareImage)
             }
-
-            vm.$wechatConfig(shareLink, vm.info.building_name, shareDesc, shareImage)
           } else {
             vm.info.id = 0
             vm.$vux.toast.show({

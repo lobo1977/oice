@@ -134,4 +134,64 @@ class Wechat extends Base
       return $this->fail($this->wechat->getMessage());
     }
   }
+
+  /**
+   * 用户登录
+   */
+  public function login($redirect = '') {
+    if ($redirect) {
+      session('redirect', $redirect);
+    }
+
+    $wechatUrl = '';
+    $callback = urlencode('http://' . config('app_host') . '/app/wechat/login');
+
+    // 是否是微信客户端
+    if (Utils::isWechat()) {
+      $wechatUrl = sprintf(config('wechat.get_code_url'),
+        config('wechat.app_id'), $callback, 'snsapi_base', config('wechat.state_code'));
+    } else {
+      $wechatUrl = sprintf(config('wechat.open_get_code_url'),
+        config('wechat.open_app_id'), $callback, config('wechat.open_state_code'));
+    }
+
+    $this->redirect($wechatUrl);
+  }
+
+  /**
+   * 登录后跳转
+   */
+  public function user($code, $state) {
+    // 微信客户端通过 openid 自动登录
+    if (!empty($code) && $state == config('wechat.state_code')) {
+      $data = $this->wechat->getUserToken($code);
+      if ($data) {
+        $redirect = '';
+        if (session('redirect')) {
+          $redirect = session('redirect');
+          session('redirect', 'null');
+        }
+
+        $user = Oauth::login('wechat', $data);
+        if ($user === true) {
+          if ($redirect) {
+            return $this->succeed(['redirect' => $redirect]);
+          } else {
+            return $this->succeed();
+          }
+        } else if ($user) {
+          if ($redirect) {
+            $user->redirect = $redirect;
+          }
+          return $this->succeed($user);
+        } else {
+          return $this->fail();
+        }
+      } else {
+        return $this->fail($this->wechat->getMessage());
+      }
+    }
+
+    return $this->fail();
+  }
 }

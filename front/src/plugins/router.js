@@ -4,6 +4,7 @@ import Building from '@/components/Building/Index'
 import Customer from '@/components/Customer/Index'
 import My from '@/components/My/Index'
 import Login from '@/components/Login'
+import Mobile from '@/components/Mobile'
 
 Vue.use(Router)
 
@@ -184,9 +185,9 @@ export default new Router({
       }
     }, {
       path: '/my/mobile',
-      name: 'Mobile',
+      name: 'ChangeMobile',
       meta: {
-        title: '绑定手机',
+        title: '更换手机号码',
         showBack: true,
         hideBar: true,
         requiresAuth: true
@@ -274,6 +275,17 @@ export default new Router({
         hideBar: true
       },
       component: Login
+    }, {
+      path: '/Mobile',
+      name: 'BindMobile',
+      meta: {
+        title: '绑定手机',
+        hideBar: true
+      },
+      component: Mobile
+    }, {
+      path: '/wechat/login',
+      name: 'WechatLogin'
     }, {
       path: '/logout',
       name: 'Logout'

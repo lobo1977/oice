@@ -19,6 +19,18 @@ export default {
       })
     }
 
+    Vue.mobile = (mobile, verifyCode, cb) => {
+      Vue.post('/api/mobile', {
+        mobile: mobile,
+        verifyCode: verifyCode
+      }, (res) => {
+        if (res.success) {
+          localStorage.user = JSON.stringify(res.data)
+        }
+        if (cb) cb(res)
+      })
+    }
+
     Vue.sendVerifyCode = (mobile, cb) => {
       Vue.post('/api/sendVerifyCode', {
         mobile: mobile
@@ -84,6 +96,10 @@ export default {
 
     Vue.prototype.$login = (mobile, password, vcode, verifyCode, cb) => {
       Vue.login(mobile, password, vcode, verifyCode, cb)
+    }
+
+    Vue.prototype.$mobile = (mobile, verifyCode, cb) => {
+      Vue.mobile(mobile, verifyCode, cb)
     }
 
     Vue.prototype.$sendVerifyCode = (mobile, cb) => {

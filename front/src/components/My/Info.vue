@@ -12,7 +12,7 @@
         </cell>
         <x-input name="title" ref="input_name" title="姓名" v-model="info.title" :required="true" :max="30"
           @on-click-error-icon="nameError" :should-toast-error="false" @on-change="validateForm"></x-input>
-        <cell title="手机" :value="info.mobile" is-link value-align="left" :link="{name: 'Mobile'}"></cell>
+        <cell title="手机" :value="info.mobile" is-link value-align="left" :link="{name: 'ChangeMobile'}"></cell>
         <x-input name="email" type="email" ref="input_email" title="电子邮箱" v-model="info.email" :max="30" is-type="email"
           @on-change="validateForm" @on-click-error-icon="emailError" :should-toast-error="false"></x-input>
         <x-input name="weixin" title="微信" v-model="info.weixin" :max="30"></x-input>
@@ -48,31 +48,37 @@ export default {
         mobile: '',   // 手机号码
         email: '',    // 电子邮箱
         weixin: '',   // 微信
-        qq: '',       // QQ
-        rem: ''       // 个人说明
+        qq: ''       // QQ
       },
       avatarSrc: null
     }
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      vm.$get('/api/my/edit', (res) => {
-        if (res.success) {
-          for (let item in vm.info) {
-            if (res.data[item] !== undefined && res.data[item] !== null) {
-              vm.info[item] = res.data[item]
-            }
-          }
-          if (res.data.avatar) {
-            vm.avatarSrc = res.data.avatar
-          }
-        } else {
-          vm.$vux.toast.show({
-            text: res.message,
-            width: '15em'
-          })
-        }
-      })
+      let user = vm.$store.state.oice.user
+      vm.info.title = user.title
+      vm.info.mobile = user.mobile
+      vm.info.email = user.email
+      vm.info.weixin = user.weixin
+      vm.info.qq = user.qq
+      vm.avatarSrc = user.avatar
+      // vm.$get('/api/my/edit', (res) => {
+      //   if (res.success) {
+      //     for (let item in vm.info) {
+      //       if (res.data[item] !== undefined && res.data[item] !== null) {
+      //         vm.info[item] = res.data[item]
+      //       }
+      //     }
+      //     if (res.data.avatar) {
+      //       vm.avatarSrc = res.data.avatar
+      //     }
+      //   } else {
+      //     vm.$vux.toast.show({
+      //       text: res.message,
+      //       width: '15em'
+      //     })
+      //   }
+      // })
     })
   },
   methods: {

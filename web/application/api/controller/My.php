@@ -71,11 +71,11 @@ class My extends Base
   }
 
   /**
-   * 绑定手机
+   * 更换手机号码
    */
   public function mobile($mobile, $verifyCode) {
     if ($mobile && $verifyCode) {
-      $result = User::mobile($this->user_id, $mobile, $verifyCode);
+      $result = User::changeMobile($this->user_id, $mobile, $verifyCode);
       return $this->succeed($this->getUser(true));
     } else {
       return;

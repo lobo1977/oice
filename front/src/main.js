@@ -5,7 +5,8 @@ import App from './App'
 import HttpRequest from './plugins/http'
 import router from './plugins/router'
 import Authenticate from './plugins/auth'
-import { LoadingPlugin, ToastPlugin, AlertPlugin, ConfirmPlugin, WechatPlugin } from 'vux'
+import Wechat from './plugins/wechat'
+import { LoadingPlugin, ToastPlugin, AlertPlugin, ConfirmPlugin } from 'vux'
 
 Vue.config.productionTip = false
 
@@ -16,7 +17,7 @@ Vue.use(AlertPlugin)
 Vue.use(ConfirmPlugin)
 Vue.use(HttpRequest)
 Vue.use(Authenticate)
-Vue.use(WechatPlugin)
+Vue.use(Wechat)
 
 FastClick.attach(document.body)
 
@@ -65,16 +66,46 @@ router.beforeEach(function (to, from, next) {
     Vue.logout()
     store.commit('setUser', {user: null})
     next({name: 'Login', replace: true})
+  } else if (to.name === 'WechatLogin') {
+    let query = to.query
+    if (query.code && query.state) {
+      Vue.post('/api/wechat/user', {
+        code: query.code,
+        state: query.state
+      }, (res) => {
+        if (res.success) {
+          if (res.data && res.data.id) {
+            localStorage.user = JSON.stringify(res.data)
+            if (res.data.redirect) {
+              next({path: res.data.redirect, replace: true})
+            } else {
+              next({name: 'My', replace: true})
+            }
+          } else {
+            next({name: 'BindMobile', query: res.data, replace: true})
+          }
+        } else {
+          next({name: 'Login', replace: true})
+        }
+      })
+    } else {
+      next({name: 'Login', replace: true})
+    }
   } else if (window.history.length <= 1 && !to.query.index && !from.query.index) {
     let query = to.query
     Vue.set(query, 'index', 'true')
     next({name: to.name, params: to.params, query: query, replace: true})
   } else if (to.matched.some(record => record.meta.requiresAuth)) {
     if (store.state.oice.user == null) {
-      next({
-        name: 'Login',
-        query: {redirect: to.fullPath}
-      })
+      if (Vue.isWechat()) {
+        document.location.href = '/api/wechat/login?redirect=' + encodeURI(to.fullPath)
+        next(false)
+      } else {
+        next({
+          name: 'Login',
+          query: {redirect: to.fullPath}
+        })
+      }
     } else {
       next()
     }
@@ -86,42 +117,6 @@ router.beforeEach(function (to, from, next) {
 router.afterEach(function (to) {
   store.commit('updateLoadingStatus', {isLoading: false})
 })
-
-// 微信接口注册
-Vue.prototype.$wechatConfig = function (link, title, desc, image) {
-  Vue.post('/api/wechat/config', {
-    url: window.location.href
-  }, (res) => {
-    if (res.success) {
-      Vue.wechat.config(res.data)
-
-      Vue.wechat.error((res) => {
-      })
-
-      Vue.wechat.ready(() => {
-        Vue.wechat.onMenuShareTimeline({
-          title: title,
-          link: link,
-          imgUrl: image
-        })
-
-        Vue.wechat.onMenuShareAppMessage({
-          title: title,
-          desc: desc,
-          link: link,
-          imgUrl: image
-        })
-
-        Vue.wechat.onMenuShareQQ({
-          title: title,
-          desc: desc,
-          link: link,
-          imgUrl: image
-        })
-      })
-    }
-  })
-}
 
 new Vue({
   store,

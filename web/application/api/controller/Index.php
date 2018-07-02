@@ -4,6 +4,7 @@ namespace app\api\controller;
 use think\captcha\Captcha;
 use app\api\controller\Base;
 use app\api\model\User;
+use app\api\model\Oauth;
 use app\api\model\Verify;
 
 class Index extends Base
@@ -51,6 +52,25 @@ class Index extends Base
       } else {
         return;
       }
+
+      if ($user) {
+        return $this->succeed($user);
+      } else {
+        return $this->fail();
+      }
+    }
+    return;
+  }
+
+  /**
+   * 第三方登录绑定手机号码
+   */
+  public function mobile() {
+    if (input('?post.mobile')) {
+      $mobile = input('post.mobile');
+      $verify_code = input('post.verifyCode');
+
+      $user = Oauth::mobile($mobile, $verify_code);
 
       if ($user) {
         return $this->succeed($user);

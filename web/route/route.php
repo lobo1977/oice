@@ -11,6 +11,7 @@
 
 Route::rule('api/verify','api/index/verify');
 Route::rule('api/login','api/index/login');
+Route::rule('api/mobile','api/index/mobile');
 Route::rule('api/sendVerifyCode','api/index/sendVerifyCode');
 Route::rule('api/getUserInfo','api/index/getUserInfo');
 Route::rule('api/updateToken','api/index/updateToken');

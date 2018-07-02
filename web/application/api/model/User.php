@@ -124,11 +124,17 @@ class User extends Base
   /**
    * 更新 token
    */
-  public static function updateToken($id, $token) {
+  public static function updateToken($id, $token = null) {
     $newToken = self::genToken($id);
-    if (db('token')
-      ->where('token', $token)
-      ->update($newToken) > 0) {
+    if ($token == null) {
+      $result = db('token')->insert($newToken);
+    } else {
+      $result = db('token')
+        ->where('user_id', $id)
+        ->where('token', $token)
+        ->update($newToken);
+    }
+    if ($result) {
       $newToken['expire_time'] = strtotime($newToken['expire_time']);
       return $newToken;
     } else {
@@ -223,17 +229,22 @@ class User extends Base
   }
 
   /**
-   * 绑定手机号码
+   * 更换手机号码
    */
-  public static function mobile($user_id, $mobile, $verify_code) {
-    $user = self::get($user_id);
-    if ($user == null) {
-      self::exception('账号不存在。');
-    }
-
+  public static function changeMobile($user_id, $mobile, $verify_code) {
     $checkResult = Verify::check($mobile, $verify_code);
     if (!$checkResult) {
       self::exception('验证码错误。');
+    }
+
+    $find = self::where('mobile', $mobile)->find();
+    if ($find && $find->id != $user_id) {
+      self::exception('该手机号已被占用。');
+    }
+
+    $user = self::get($user_id);
+    if ($user == null) {
+      self::exception('账号不存在。');
     }
 
     $user->mobile = $mobile;
@@ -274,7 +285,7 @@ class User extends Base
   /**
    * 登录成功
    */
-  private static function loginSuccess($user_id, $summary, $isReg = false) {
+  public static function loginSuccess($user_id, $summary, $isReg = false) {
     $log = [
       "table" => "user",
       "owner_id" => $user_id,

@@ -812,4 +812,26 @@ class Wechat {
 			return $output;
 		}
 	}
+
+	/**
+	 * 获取用户 openid 及 access_token
+	 */
+	public function getUserToken($code) {
+		$url = sprintf(config('wechat.access_token_url'), 
+		  	config('wechat.app_id'), config('wechat.app_secret'), $code);
+		$res = file_get_contents($url);
+		$res = json_decode($res, true);
+		if (isset($res['access_token'])) {
+			return $res;
+		} else {
+			if (isset($res['errcode'])) {
+				$this->errcode = $res['errcode'];
+			}
+			if (isset($res['errmsg'])) {
+				$this->errmsg = $res['errmsg'];
+				Log::error('[ Wechat getUserToken ] ' . $res['errmsg']);
+			}
+			return false;
+		}
+	}
 }
