@@ -18,7 +18,9 @@ class User extends Base
   public static function formatUserInfo($user) {
     if ($user == null) return null;
     if ($user->avatar) {
-      $user->avatar = '/upload/user/images/60/' . $user->avatar;
+      if (strpos($user->avatar, 'http') != 0) {
+        $user->avatar = '/upload/user/images/60/' . $user->avatar;
+      }
     } else {
       $user->avatar = '/static/img/avatar.png';
     }
@@ -92,7 +94,7 @@ class User extends Base
   /**
    * 验证码登录
    */
-  public static function loginByVerifyCode($mobile, $verify_code) {
+  public static function loginByVerifyCode($mobile, $verify_code, $oauth = null) {
     $checkResult = Verify::check($mobile, $verify_code);
     
     if (!$checkResult) {
@@ -112,6 +114,14 @@ class User extends Base
         $user = new User();
         $user->mobile = $mobile;
         $user->salt = substr(md5(strval(time())), 0, 5);
+        if ($oauth) {
+          if ($oauth->nickname) {
+            $user->title = $oauth->nickname;
+          }
+          if ($oauth->avatar) {
+            $user->avatar = $oauth->avatar;
+          }
+        }
         if ($user->save()) {
           return self::loginSuccess($user->id, $mobile, true);
         } else {

@@ -67,26 +67,27 @@ class Oauth extends Base
   public static function mobile($mobile, $verify_code) {
     $platform = session('oauth');
     $openid = session('oauth_openid');
-    $user = User::loginByVerifyCode($mobile, $verify_code);
-    if ($platform && $openid && $user) {
+    if ($platform && $openid) {
       $oauth = self::where('platform', $platform)
         ->where('openid', $openid)->find();
       if ($oauth) {
-        $oauth->user_id = $user->id;
-        if ($oauth->save()) {
-          session('oauth', null);
-          session('oauth_openid', null);
-        }
-        if ($oauth->nickname && empty($user->title)) {
-          $user->title = $oauth->nickname;
-        }
-        if ($oauth->avatar && empty($user->avatar)) {
-          $user->avatar = $oauth->avatar;
+        $user = User::loginByVerifyCode($mobile, $verify_code, $oauth);
+        if ($user) {
+          $oauth->user_id = $user->id;
+          if ($oauth->save()) {
+            session('oauth', null);
+            session('oauth_openid', null);
+          }
+          if ($oauth->nickname && empty($user->title)) {
+            $user->title = $oauth->nickname;
+          }
+          if ($oauth->avatar && empty($user->avatar)) {
+            $user->avatar = $oauth->avatar;
+          }
+          return $user;
         }
       }
-      return $user;
-    } else {
-      return false;
     }
+    return false;
   }
 }
