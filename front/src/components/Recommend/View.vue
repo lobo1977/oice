@@ -122,6 +122,7 @@ export default {
     return {
       id: 0,
       customer: {
+        title: '',
         customer_name: ''
       },
       company: {
@@ -188,6 +189,20 @@ export default {
               vm.manager = res.data.manager
               vm.date = res.data.date
               vm.list = res.data.list
+
+              if (vm.$isWechat()) {
+                let shareTitle = vm.company.title + '物业推荐'
+                let shareLink = window.location.href
+                let shareDesc = '呈送：' + vm.customer.customer_name + ' 客户经理:' + vm.manager.title
+                let shareImage = null
+
+                if (vm.list[0].images.length) {
+                  shareImage = window.location.protocol + '//' +
+                    window.location.host + '/' + vm.list[0].images[0].msrc
+                }
+
+                vm.$wechatConfig(shareLink, shareTitle, shareDesc, shareImage)
+              }
             }
           })
         }
