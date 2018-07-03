@@ -1,9 +1,9 @@
 <template>
   <div style="margin:0 auto;max-width:600px;padding:15px;">
 
-    <div style="margin:36px 0;text-align:center;">
+    <div style="margin:0 0 30px 0;text-align:center;">
       <img src="/static/img/logo.png">
-      <h3 style="margin-top:10px;">Oice 商办云</h3>
+      <h3 style="margin-top:10px;">商办云</h3>
     </div>
 
     <group>
