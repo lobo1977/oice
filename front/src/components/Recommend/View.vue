@@ -201,7 +201,7 @@ export default {
                     window.location.host + '/' + vm.list[0].images[0].msrc
                 }
 
-                vm.$wechatConfig(shareLink, shareTitle, shareDesc, shareImage)
+                vm.$wechatShare(null, shareLink, shareTitle, shareDesc, shareImage)
               }
             }
           })

@@ -305,7 +305,7 @@ export default {
                   window.location.host + '/' + vm.images[0].src
               }
 
-              vm.$wechatConfig(shareLink, vm.info.building_name, shareDesc, shareImage)
+              vm.$wechatShare(null, shareLink, vm.info.building_name, shareDesc, shareImage)
             }
           } else {
             vm.info.id = 0

@@ -123,10 +123,7 @@ class Wechat extends Base
         "appId" => config('wechat.app_id'),
         "timestamp" => $timestamp,
         "nonceStr" => $randStr,
-        "signature" => $signature,
-        "jsApiList" => ['checkJsApi','showOptionMenu','hideOptionMenu',
-          'onMenuShareTimeline','onMenuShareAppMessage','onMenuShareQQ',
-          'openLocation','getLocation','previewImage']
+        "signature" => $signature
       ];
   
       return $this->succeed($data);

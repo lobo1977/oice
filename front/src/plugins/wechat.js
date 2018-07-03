@@ -13,18 +13,54 @@ export default {
       return /micromessenger/.test(ua)
     }
 
-    // 微信接口注册
-    Vue.wechatConfig = function (link, title, desc, image) {
+    // 隐藏分享按钮
+    Vue.wechatHideShare = function (url) {
       Vue.post('/api/wechat/config', {
-        url: window.location.href
+        url: url || window.location.href
       }, (res) => {
-        if (res.success) {
+        if (res.success && res.data) {
+          res.data.jsApiList = ['hideMenuItems']
           Vue.wechat.config(res.data)
 
-          Vue.wechat.error((res) => {
-          })
+          Vue.wechat.error((res) => {})
 
           Vue.wechat.ready(() => {
+            Vue.wechat.hideMenuItems({
+              menuList: [
+                'menuItem:share:appMessage',
+                'menuItem:share:timeline',
+                'menuItem:share:qq',
+                'menuItem:share:QZone'
+              ]
+            })
+          })
+        }
+      })
+    }
+
+    // 注册微信分享接口
+    Vue.wechatShare = function (url, link, title, desc, image) {
+      Vue.post('/api/wechat/config', {
+        url: url || window.location.href
+      }, (res) => {
+        if (res.success && res.data) {
+          res.data.jsApiList = ['showMenuItems',
+            'onMenuShareTimeline', 'onMenuShareAppMessage', 'onMenuShareQQ']
+
+          Vue.wechat.config(res.data)
+
+          Vue.wechat.error((res) => {})
+
+          Vue.wechat.ready(() => {
+            Vue.wechat.showMenuItems({
+              menuList: [
+                'menuItem:share:appMessage',
+                'menuItem:share:timeline',
+                'menuItem:share:qq',
+                'menuItem:share:QZone'
+              ]
+            })
+
             Vue.wechat.onMenuShareTimeline({
               title: title,
               link: link,
@@ -44,6 +80,13 @@ export default {
               link: link,
               imgUrl: image
             })
+
+            Vue.wechat.onMenuShareQZone({
+              title: title,
+              desc: desc,
+              link: link,
+              imgUrl: image
+            })
           })
         }
       })
@@ -53,8 +96,12 @@ export default {
       return Vue.isWechat()
     }
 
-    Vue.prototype.$wechatConfig = (link, title, desc, image) => {
-      Vue.wechatConfig(link, title, desc, image)
+    Vue.prototype.$wechatShare = (url, link, title, desc, image) => {
+      Vue.wechatShare(url, link, title, desc, image)
+    }
+
+    Vue.prototype.$wechatHideShare = (url) => {
+      Vue.wechatHideShare(url)
     }
   }
 }

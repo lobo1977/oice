@@ -116,6 +116,11 @@ router.beforeEach(function (to, from, next) {
 
 router.afterEach(function (to) {
   store.commit('updateLoadingStatus', {isLoading: false})
+  if (Vue.isWechat() && (!to.meta || !to.meta.canShare)) {
+    let url = window.location.protocol + '//' +
+      window.location.host + '/app' + to.fullPath
+    Vue.wechatHideShare(url)
+  }
 })
 
 new Vue({

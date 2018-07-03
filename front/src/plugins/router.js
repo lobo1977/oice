@@ -22,7 +22,8 @@ export default new Router({
       meta: {
         title: '房源',
         showPlus: true,
-        keepAlive: true
+        keepAlive: true,
+        canShare: true
       },
       component: Building
     }, {
@@ -32,7 +33,8 @@ export default new Router({
         title: '',
         showBack: true,
         showPlus: true,
-        hideBar: true
+        hideBar: true,
+        canShare: true
       },
       component: function (resolve) {
         require(['../components/Building/View.vue'], resolve)
@@ -55,7 +57,8 @@ export default new Router({
       meta: {
         title: '',
         showBack: true,
-        hideBar: true
+        hideBar: true,
+        canShare: true
       },
       component: function (resolve) {
         require(['../components/Building/Unit.vue'], resolve)
@@ -88,7 +91,8 @@ export default new Router({
         title: '',
         showBack: true,
         showPlus: true,
-        hideBar: true
+        hideBar: true,
+        canShare: true
       },
       component: function (resolve) {
         require(['../components/Customer/view.vue'], resolve)
@@ -123,7 +127,8 @@ export default new Router({
       meta: {
         title: '',
         showBack: true,
-        hideBar: true
+        hideBar: true,
+        canShare: true
       },
       component: function (resolve) {
         require(['../components/Linkman/view.vue'], resolve)
@@ -157,7 +162,8 @@ export default new Router({
       name: 'RecommendView',
       meta: {
         title: '项目推荐',
-        hideBar: true
+        hideBar: true,
+        canShare: true
       },
       component: function (resolve) {
         require(['../components/Recommend/View.vue'], resolve)
@@ -214,7 +220,8 @@ export default new Router({
         title: '企业信息',
         showBack: true,
         hideBar: true,
-        requiresAuth: true
+        requiresAuth: true,
+        canShare: true
       },
       component: function (resolve) {
         require(['../components/Company/View.vue'], resolve)
