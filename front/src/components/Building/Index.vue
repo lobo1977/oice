@@ -113,6 +113,19 @@ export default {
       results: []
     }
   },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      if (vm.$isWechat()) {
+        let shareTitle = document.title
+        let shareLink = window.location.href
+        let shareDesc = '商用写字楼经纪人助理'
+        let shareImage = window.location.protocol + '//' +
+            window.location.host + '/static/img/logo.png'
+
+        vm.$wechatShare(null, shareLink, shareTitle, shareDesc, shareImage)
+      }
+    })
+  },
   methods: {
     // Searcher
     resultClick (item) {

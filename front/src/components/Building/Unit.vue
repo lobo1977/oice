@@ -134,6 +134,21 @@ export default {
               vm.linkman = res.data.linkman
             }
             vm.$emit('on-view-loaded', vm.info.title)
+
+            if (vm.$isWechat()) {
+              let shareLink = window.location.href
+              let shareDesc = (vm.info.acreage ? vm.info.acreage + ' 平方米 ' : '') +
+                (vm.info.rent_price ? vm.info.rent_price + ' 元/平方米/日 ' : '') +
+                vm.info.decoration
+              let shareImage = null
+
+              if (vm.images.length) {
+                shareImage = window.location.protocol + '//' +
+                  window.location.host + vm.images[0].src
+              }
+
+              vm.$wechatShare(null, shareLink, vm.info.title, shareDesc, shareImage)
+            }
           } else {
             vm.info.id = 0
             vm.$vux.toast.show({

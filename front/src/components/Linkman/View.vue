@@ -80,6 +80,15 @@ export default {
             }
             vm.info.status = (vm.info.status === 0 ? '在职' : '离职')
             vm.$emit('on-view-loaded', vm.info.title)
+
+            if (vm.$isWechat()) {
+              let shareLink = window.location.href
+              let shareDesc = vm.info.department + vm.info.job
+              let shareImage = window.location.protocol + '//' +
+                window.location.host + '/static/img/logo.png'
+
+              vm.$wechatShare(null, shareLink, vm.info.title, shareDesc, shareImage)
+            }
           } else {
             vm.info.id = 0
             vm.$vux.toast.show({

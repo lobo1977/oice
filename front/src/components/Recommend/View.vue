@@ -198,7 +198,7 @@ export default {
 
                 if (vm.list[0].images.length) {
                   shareImage = window.location.protocol + '//' +
-                    window.location.host + '/' + vm.list[0].images[0].msrc
+                    window.location.host + vm.list[0].images[0].msrc
                 }
 
                 vm.$wechatShare(null, shareLink, shareTitle, shareDesc, shareImage)

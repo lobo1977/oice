@@ -136,6 +136,18 @@ export default {
             vm.waitUser = res.data.waitUser
           }
           vm.$emit('on-view-loaded', vm.info.title)
+
+          if (vm.$isWechat()) {
+            let shareLink = window.location.href
+            let shareDesc = '商办云入驻企业'
+            let shareImage = null
+            if (vm.info.logo) {
+              shareImage = window.location.protocol + '//' +
+                window.location.host + vm.info.logo
+            }
+
+            vm.$wechatShare(null, shareLink, vm.info.full_name, shareDesc, shareImage)
+          }
         } else {
           vm.info.id = 0
           vm.$vux.toast.show({

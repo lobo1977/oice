@@ -256,6 +256,15 @@ export default {
               vm.recommend = res.data.recommend
             }
             vm.$emit('on-view-loaded', vm.info.customer_name)
+
+            if (vm.$isWechat()) {
+              let shareLink = window.location.href
+              let shareDesc = vm.info.lease_buy + vm.info.demand + ' ' + vm.info.acreage
+              let shareImage = window.location.protocol + '//' +
+                window.location.host + '/static/img/logo.png'
+
+              vm.$wechatShare(null, shareLink, vm.info.customer_name, shareDesc, shareImage)
+            }
           } else {
             vm.info.id = 0
             vm.$vux.toast.show({
