@@ -14,7 +14,10 @@
     <div v-show="!isSearching">
       <group v-if="my.length > 0" title="切换企业">
         <swipeout>
-          <swipeout-item v-for="(item, index) in my" :key="index" transition-mode="follow">
+          <swipeout-item v-for="(item, index) in my" :key="index" transition-mode="follow" 
+            @mousedown.native="itemMouseDown" @mouseup.native="itemMouseUp" 
+            @touchstart.native="itemMouseDown" @touchend.native="itemMouseUp"
+            @click.native="itemClick(item.id)">
             <div slot="right-menu">
               <swipeout-button v-if="user && item.id != user.company_id" @click.native="setDefault(item.id)" type="primary">切换</swipeout-button>
               <swipeout-button @click.native="view(item.id)" type="default">查看</swipeout-button>
@@ -91,7 +94,10 @@ export default {
       my: [],
       waites: [],
       inviteMe: [],
-      creates: []
+      creates: [],
+      pageX: null,
+      pageY: null,
+      mouseMove: false
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -160,7 +166,26 @@ export default {
         }
       })
     },
+    itemMouseDown (event) {
+      this.pageX = event.pageX
+      this.pageY = event.pageY
+    },
+    itemMouseUp (event) {
+      if (this.pageX !== event.pageX || this.pageY !== event.pageY) {
+        this.mouseMove = true
+      } else {
+        this.mouseMove = false
+      }
+    },
+    itemClick (value) {
+      if (!this.mouseMove) {
+        this.setDefault(value)
+      }
+    },
     setDefault (value) {
+      if (this.user && value === this.user.company_id) {
+        return
+      }
       this.$vux.loading.show()
       this.$post('/api/company/setDefault', {
         id: value

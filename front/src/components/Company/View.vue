@@ -29,7 +29,10 @@
     <group v-if="info.id > 0 && user && user.id > 0 && user.id == info.user_id && waitUser.length" 
       title="待审核成员" footerTitle="向左滑动条目完成操作" class="wait-group">
       <swipeout>
-        <swipeout-item v-for="(item, index) in waitUser" :key="index" transition-mode="follow">
+        <swipeout-item v-for="(item, index) in waitUser" :key="index" transition-mode="follow"
+          @mousedown.native="itemMouseDown" @mouseup.native="itemMouseUp" 
+          @touchstart.native="itemMouseDown" @touchend.native="itemMouseUp"
+          @click.native="itemClick(item.id)">
           <div slot="right-menu">
             <swipeout-button @click.native="audit(item.id, 1)" type="primary">通过</swipeout-button>
             <swipeout-button @click.native="audit(item.id, 0)" type="warn">驳回</swipeout-button>
@@ -108,7 +111,10 @@ export default {
         isAddin: false,
         user_id: 0
       },
-      waitUser: []
+      waitUser: [],
+      pageX: null,
+      pageY: null,
+      mouseMove: false
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -156,6 +162,19 @@ export default {
           })
         }
       })
+    },
+    itemMouseDown (event) {
+      this.pageX = event.pageX
+      this.pageY = event.pageY
+    },
+    itemMouseUp (event) {
+      if (this.pageX !== event.pageX || this.pageY !== event.pageY) {
+        this.mouseMove = true
+      } else {
+        this.mouseMove = false
+      }
+    },
+    itemClick (id) {
     },
     audit (userId, flag) {
       let vm = this

@@ -107,7 +107,10 @@
     <div v-show="tab === 2">
       <group :gutter="0">
         <swipeout>
-          <swipeout-item v-for="(item, index) in filter" :key="index" transition-mode="follow">
+          <swipeout-item v-for="(item, index) in filter" :key="index" transition-mode="follow"
+            @mousedown.native="itemMouseDown" @mouseup.native="itemMouseUp" 
+            @touchstart.native="itemMouseDown" @touchend.native="itemMouseUp"
+            @click.native="itemClick(item)">
             <div slot="right-menu">
               <swipeout-button v-if="index > 0" @click.native="sortFilter(item, true)" type="primary">上移</swipeout-button>
               <swipeout-button v-if="index < filter.length - 1" @click.native="sortFilter(item, false)" type="default">下移</swipeout-button>
@@ -222,7 +225,10 @@ export default {
       recommend: [],          // 推荐资料
       checkCount: 0,
       showPrintPicker: false,
-      printMode: printModeData
+      printMode: printModeData,
+      pageX: null,
+      pageY: null,
+      mouseMove: false
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -359,6 +365,24 @@ export default {
         }
       })
       return selectedList
+    },
+    itemMouseDown (event) {
+      this.pageX = event.pageX
+      this.pageY = event.pageY
+    },
+    itemMouseUp (event) {
+      if (this.pageX !== event.pageX || this.pageY !== event.pageY) {
+        this.mouseMove = true
+      } else {
+        this.mouseMove = false
+      }
+    },
+    itemClick (item) {
+      if (item.unit_id) {
+        this.$router.push({name: 'Unit', params: {id: item.unit_id}})
+      } else if (item.building_id) {
+        this.$router.push({name: 'BuildingView', params: {id: item.building_id}})
+      }
     },
     sortFilter (item, up) {
       this.$vux.loading.show()
