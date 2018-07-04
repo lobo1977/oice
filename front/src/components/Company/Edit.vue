@@ -106,8 +106,8 @@ export default {
                 vm.info[item] = res.data[item]
               }
             }
-            if (vm.info.logo) {
-              vm.logoSrc = vm.info.logo
+            if (res.data.logo) {
+              vm.logoSrc = res.data.logo
             }
             if (vm.info.area) {
               vm.districtValue = [vm.info.area, '']
