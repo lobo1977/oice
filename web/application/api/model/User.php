@@ -18,7 +18,8 @@ class User extends Base
   public static function formatUserInfo($user) {
     if ($user == null) return null;
     if ($user->avatar) {
-      if (strpos($user->avatar, 'http') != 0) {
+      $find = strpos($user->avatar, 'http');
+      if ($find == false || $find > 0) {
         $user->avatar = '/upload/user/images/60/' . $user->avatar;
       }
     } else {
