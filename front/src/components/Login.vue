@@ -120,7 +120,7 @@ export default {
       })
     },
     reloadVCodeImg () {
-      document.getElementById('imgVCode').src = '/verify?' + (new Date()).valueOf()
+      document.getElementById('imgVCode').src = '/api/verify?' + (new Date()).valueOf()
     },
     sendVerifyCode () {
       this.message = ''
