@@ -228,9 +228,12 @@ html, body {
     border-radius:0;
     white-space: nowrap;
     text-overflow: ellipsis;
+    font-size:0.9em;
     .btn-icon {
       position: relative;
       top: 5px;
+      width: 20px;
+      height: 20px;
     }
   }
   .weui-btn:after {
