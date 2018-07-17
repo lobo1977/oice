@@ -439,7 +439,7 @@ export default {
       let uids = ''
       if (this.tab === 0) {
         bid = this.info.id
-        if (customerId === 0) {
+        if (customerId === '0' || customerId === 0) {
           this.$router.push({
             name: 'CustomerEdit',
             params: {id: 0},
@@ -450,7 +450,7 @@ export default {
       } else {
         if (this.selectedUnit.length <= 0) return
         uids = this.selectedUnit.join(',')
-        if (customerId === 0) {
+        if (customerId === '0' || customerId === 0) {
           this.$router.push({
             name: 'CustomerEdit',
             params: {id: 0},

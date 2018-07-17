@@ -179,13 +179,13 @@ export default {
 
       if (to.query) {
         if (to.query.flag) {
-          this.flag = to.query.flag
+          vm.flag = to.query.flag
         }
         if (to.query.bid) {
-          this.bid = to.query.bid
+          vm.bid = to.query.bid
         }
         if (to.query.uid) {
-          this.uid = to.query.uid
+          vm.uid = to.query.uid
         }
       }
 
