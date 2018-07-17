@@ -37,29 +37,43 @@
     </group>
 
     <flexbox :gutter="0" class="bottom-bar">
-      <flexbox-item :span="6">
-        <x-button type="primary" class="bottom-btn" :disabled="info.id === 0"
+      <flexbox-item :span="4">
+        <x-button type="warn" class="bottom-btn"
+          @click.native="toCustomer(0)">
+            <x-icon type="funnel" class="btn-icon"></x-icon> 加入筛选
+        </x-button>
+      </flexbox-item>
+      <flexbox-item :span="4">
+        <x-button type="primary" class="bottom-btn"
+          @click.native="toCustomer(1)">
+            <x-icon type="checkmark-circled" class="btn-icon"></x-icon> 客户确认
+        </x-button>
+      </flexbox-item>
+      <flexbox-item :span="3">
+        <x-button type="default" class="bottom-btn"
           @click.native="favorite">
           <x-icon type="star" class="btn-icon"></x-icon> {{favoriteText}}
         </x-button>
       </flexbox-item>
       <flexbox-item>
-        <x-button type="warn" class="bottom-btn" :disabled="info.id === 0"
-          :link="{name:'UnitEdit', params: {id: info.id, bid: info.building_id}}">
-          <x-icon type="compose" class="btn-icon"></x-icon> 修改
-        </x-button>
-      </flexbox-item>
-      <flexbox-item :span="2" v-if="user && info.user_id == user.id">
-        <x-button type="default" class="bottom-btn" @click.native="remove">
-          <x-icon type="trash-a" class="btn-icon"></x-icon>
+        <x-button type="default" class="bottom-btn" 
+          @click.native="showUnitMenu = true">
+          <x-icon type="ios-more" class="btn-icon"></x-icon>
         </x-button>
       </flexbox-item>
     </flexbox>
+
+    <popup-picker ref="customerPicker" class="popup-picker" :show.sync="showCustomerPicker" 
+      popup-title="选择客户" :show-cell="false" :data="myCustomer" v-model="selectCustomer"
+      @on-hide="customerSelected"></popup-picker>
+
+    <actionsheet v-model="showUnitMenu" :menus="unitMenu" theme="android" 
+      @on-click-menu="unitMenuClick"></actionsheet>
   </div>
 </template>
 
 <script>
-import { Swiper, SwiperItem, Previewer, TransferDom,
+import { Swiper, SwiperItem, Previewer, TransferDom, PopupPicker, Actionsheet,
   Group, GroupTitle, Cell, Flexbox, FlexboxItem, XButton, dateFormat } from 'vux'
 
 export default {
@@ -70,6 +84,8 @@ export default {
     Swiper,
     SwiperItem,
     Previewer,
+    PopupPicker,
+    Actionsheet,
     Group,
     GroupTitle,
     Cell,
@@ -105,7 +121,12 @@ export default {
       previewOptions: {
       },
       images: [],
-      linkman: []
+      linkman: [],
+      showCustomerPicker: false,
+      myCustomer: [],
+      selectCustomer: [],
+      customerFlag: 0,
+      showUnitMenu: false
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -120,7 +141,7 @@ export default {
                 vm.info[item] = res.data[item]
               }
             }
-            vm.info.title = vm.info.building_name + vm.info.building_no + vm.formatFloor(vm.info.floor) + vm.info.room
+            vm.info.title = vm.info.building_name + vm.info.title
             if (vm.info.end_date) {
               vm.info.end_date = vm.info.end_date ? dateFormat(new Date(Date.parse(vm.info.end_date.replace(/-/g, '/'))), 'YYYY年M月D日') : ''
             }
@@ -132,6 +153,22 @@ export default {
             }
             if (res.data.linkman) {
               vm.linkman = res.data.linkman
+            }
+            if (res.data.customer) {
+              let customer = []
+              for (let i in res.data.customer) {
+                customer.push({
+                  name: res.data.customer[i].customer_name,
+                  value: res.data.customer[i].id
+                })
+              }
+              if (customer.length) {
+                customer.push({
+                  name: '新客户',
+                  value: 0
+                })
+                vm.myCustomer.push(customer)
+              }
             }
             vm.$emit('on-view-loaded', vm.info.title)
 
@@ -163,98 +200,183 @@ export default {
     })
   },
   methods: {
-    formatFloor (floor) {
-      if (floor > 0) {
-        return floor + '层'
-      } else if (floor < 0) {
-        return '地下' + Math.abs(floor) + '层'
-      } else {
-        return ''
-      }
-    },
     favorite () {
-      if (this.user) {
-        this.$vux.loading.show()
-        if (this.info.isFavorite) {
-          this.$post('/api/unit/unFavorite', {
-            id: this.info.id
-          }, (res) => {
-            this.$vux.loading.hide()
-            if (res.success) {
-              this.info.isFavorite = false
-              this.$vux.toast.show({
-                type: 'success',
-                text: '已从资料夹移除。',
-                width: '13em'
-              })
-            } else {
-              this.$vux.toast.show({
-                text: res.message,
-                width: '15em'
-              })
-            }
-          })
-        } else {
-          this.$post('/api/unit/favorite', {
-            id: this.info.id
-          }, (res) => {
-            this.$vux.loading.hide()
-            if (res.success) {
-              this.info.isFavorite = true
-              this.$vux.toast.show({
-                type: 'success',
-                text: '已添加到资料夹。',
-                width: '13em'
-              })
-            } else {
-              this.$vux.toast.show({
-                text: res.message,
-                width: '15em'
-              })
-            }
-          })
-        }
-      } else {
+      if (!this.user) {
         this.$router.push({
           name: 'Login',
           query: { redirect: this.$route.fullPath }
         })
       }
-    },
-    remove () {
-      if (this.user) {
-        let vm = this
-        this.$vux.confirm.show({
-          title: '删除单元',
-          content: '确定要删除单元 <strong>' + vm.info.title + '</strong> 吗？',
-          onConfirm () {
-            vm.$vux.loading.show()
-            vm.$post('/api/unit/remove', {
-              id: vm.info.id
-            }, (res) => {
-              vm.$vux.loading.hide()
-              if (res.success) {
-                vm.$router.back()
-              } else {
-                vm.$vux.toast.show({
-                  text: res.message,
-                  width: '13em'
-                })
-              }
+      this.$vux.loading.show()
+      if (this.info.isFavorite) {
+        this.$post('/api/unit/unFavorite', {
+          id: this.info.id
+        }, (res) => {
+          this.$vux.loading.hide()
+          if (res.success) {
+            this.info.isFavorite = false
+            this.$vux.toast.show({
+              type: 'success',
+              text: '已从收藏夹移除。',
+              width: '13em'
+            })
+          } else {
+            this.$vux.toast.show({
+              text: res.message,
+              width: '15em'
             })
           }
         })
       } else {
+        this.$post('/api/unit/favorite', {
+          id: this.info.id
+        }, (res) => {
+          this.$vux.loading.hide()
+          if (res.success) {
+            this.info.isFavorite = true
+            this.$vux.toast.show({
+              type: 'success',
+              text: '已添加到收藏夹。',
+              width: '13em'
+            })
+          } else {
+            this.$vux.toast.show({
+              text: res.message,
+              width: '15em'
+            })
+          }
+        })
+      }
+    },
+    toCustomer (flag) {
+      if (!this.user) {
         this.$router.push({
           name: 'Login',
           query: { redirect: this.$route.fullPath }
         })
       }
+      this.customerFlag = flag
+      if (this.myCustomer.length) {
+        this.showCustomerPicker = true
+      } else {
+        this.$router.push({
+          name: 'CustomerEdit',
+          params: {id: 0},
+          query: {uid: this.info.id, flag: this.customerFlag === 0 ? 'filter' : 'confirm'}
+        })
+      }
+    },
+    customerSelected (isConfirm) {
+      if (!isConfirm || this.selectCustomer.length <= 0) return
+      let customerId = this.selectCustomer[0]
+      if (customerId === 0) {
+        this.$router.push({
+          name: 'CustomerEdit',
+          params: {id: 0},
+          query: {uid: this.info.id, flag: this.customerFlag === 0 ? 'filter' : 'confirm'}
+        })
+      } else if (this.customerFlag === 1) {
+        this.toConfirm(customerId, this.info.id)
+      } else {
+        this.toFilter(customerId, this.info.id)
+      }
+    },
+    toFilter (cid, id) {
+      this.$vux.loading.show()
+      this.$post('/api/customer/addFilter', {
+        cid: cid,
+        bids: 0,
+        uids: id
+      }, (res) => {
+        this.$vux.loading.hide()
+        if (res.success) {
+          this.info.isFavorite = true
+          this.$vux.toast.show({
+            type: 'success',
+            text: '已添加到客户筛选表。',
+            width: '13em'
+          })
+        } else {
+          this.$vux.toast.show({
+            text: res.message,
+            width: '15em'
+          })
+        }
+      })
+    },
+    toConfirm (cid, id) {
+      this.$vux.loading.show()
+      this.$post('/api/customer/addConfirm', {
+        cid: cid,
+        bid: 0,
+        uid: id
+      }, (res) => {
+        this.$vux.loading.hide()
+        if (res.success) {
+          this.$vux.toast.show({
+            type: 'success',
+            text: '客户确认书已生成。',
+            width: '12em'
+          })
+        } else {
+          this.$vux.toast.show({
+            text: res.message,
+            width: '15em'
+          })
+        }
+      })
+    },
+    unitMenuClick (key, item) {
+      let vm = this
+      if (key === 'new') {
+        vm.$router.push({name: 'UnitEdit', params: {id: 0, bid: vm.info.building_id}})
+      } else if (key === 'edit') {
+        vm.$router.push({name: 'UnitEdit', params: {id: vm.info.id, bid: vm.info.building_id}})
+      } else if (key === 'delete' && vm.info.user_id === vm.user.id) {
+        vm.remove()
+      }
+    },
+    remove () {
+      let vm = this
+      this.$vux.confirm.show({
+        title: '删除单元',
+        content: '确定要删除单元 <strong>' + vm.info.title + '</strong> 吗？',
+        onConfirm () {
+          vm.$vux.loading.show()
+          vm.$post('/api/unit/remove', {
+            id: vm.info.id
+          }, (res) => {
+            vm.$vux.loading.hide()
+            if (res.success) {
+              vm.$router.back()
+            } else {
+              vm.$vux.toast.show({
+                text: res.message,
+                width: '13em'
+              })
+            }
+          })
+        }
+      })
     }
   },
   computed: {
     favoriteText () {
-      return this.info.isFavorite ? '从资料夹移除' : '添加到资料夹'
+      return this.info.isFavorite ? '取消收藏' : '收藏'
+    },
+    unitMenu () {
+      if (this.info.user_id && this.info.user_id === this.user.id) {
+        return {
+          new: '添加',
+          edit: '修改',
+          delete: '删除'
+        }
+      } else {
+        return {
+          new: '添加',
+          edit: '修改'
+        }
+      }
     }
   }
 }

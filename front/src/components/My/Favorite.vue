@@ -60,7 +60,9 @@ export default {
       list: [],
       showCustomerPicker: false,
       myCustomer: [],
-      selectCustomer: []
+      selectCustomer: [],
+      selectedBuildingIds: [],
+      selectedUnitIds: []
     }
   },
   methods: {
@@ -91,9 +93,16 @@ export default {
     },
     getSelectedList () {
       let selectedList = []
+      this.selectedBuildingIds = []
+      this.selectedUnitIds = []
       this.list.forEach((item, index) => {
         if (item.checked) {
           selectedList.push('' + item.building_id + ',' + item.unit_id)
+          if (item.unit_id) {
+            this.selectedUnitIds.push(item.unit_id)
+          } else {
+            this.selectedBuildingIds.push(item.building_id)
+          }
         }
       })
       return selectedList
@@ -142,9 +151,11 @@ export default {
         })
       } else {
         vm.$vux.loading.show()
+        vm.getSelectedList()
         vm.$post('/api/customer/addFilter', {
           cid: vm.customer_id,
-          ids: vm.getSelectedList()
+          bids: this.selectedBuildingIds.join(','),
+          uids: this.selectedUnitIds.join(',')
         }, (res) => {
           vm.$vux.loading.hide()
           if (res.success) {

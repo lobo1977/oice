@@ -129,16 +129,22 @@
       <actionsheet v-model="showPrintPicker" :menus="printMode" theme="android" @on-click-menu="choseMode"></actionsheet>
 
       <flexbox :gutter="0" class="bottom-bar">
-        <flexbox-item :span="6">
-          <x-button type="primary" class="bottom-btn" :disabled="info.id === 0"
-            :link="{name:'Favorite', query: { cid: info.id }}">
-            <x-icon type="plus" class="btn-icon"></x-icon> 添加筛选
+        <flexbox-item :span="4">
+          <x-button type="warn" class="bottom-btn" @click.native="toRecommend" 
+            :disabled="info.id === 0 || checkCount <= 0">
+            <x-icon type="share" class="btn-icon"></x-icon> 生成推荐资料
+          </x-button>
+        </flexbox-item>
+        <flexbox-item :span="4">
+          <x-button type="primary" class="bottom-btn" @click.native="toConfirm" 
+            :disabled="info.id === 0 || checkCount != 1">
+            <x-icon type="checkmark-circled" class="btn-icon"></x-icon> 生成确认书
           </x-button>
         </flexbox-item>
         <flexbox-item>
-          <x-button type="warn" class="bottom-btn" @click.native="newRecommend" 
-            :disabled="info.id === 0 || checkCount <= 0">
-            <x-icon type="share" class="btn-icon"></x-icon> 生成推荐资料
+          <x-button type="default" class="bottom-btn" :disabled="info.id === 0"
+            :link="{name:'Favorite', query: { cid: info.id }}">
+            <x-icon type="plus" class="btn-icon"></x-icon> 添加筛选
           </x-button>
         </flexbox-item>
       </flexbox>
@@ -421,15 +427,60 @@ export default {
         }
       })
     },
-    newRecommend () {
+    toRecommend () {
       let vm = this
-      if (vm.checkCount <= 0) {
+      if (vm.checkCount < 1) {
         vm.$vux.toast.show({
           text: '请选择要推荐的项目。',
-          width: '15em'
+          width: '12em'
         })
       } else {
         this.showPrintPicker = true
+      }
+    },
+    toConfirm () {
+      let vm = this
+      if (vm.checkCount < 1) {
+        vm.$vux.toast.show({
+          text: '请选择要生成确认书的项目。',
+          width: '15em'
+        })
+      } else if (vm.checkCount > 1) {
+        vm.$vux.toast.show({
+          text: '只能选择一个项目生成确认书。',
+          width: '16em'
+        })
+      } else {
+        let bid = 0
+        let uid = 0
+        for (let i = 0; i < vm.filter.length; i++) {
+          if (vm.filter[i].checked) {
+            bid = vm.filter[i].building_id
+            uid = vm.filter[i].unit_id
+            break
+          }
+        }
+        if (bid === 0 && uid === 0) return
+        vm.$vux.loading.show()
+        vm.$post('/api/customer/addConfirm', {
+          cid: vm.info.id,
+          bid: bid,
+          uid: uid
+        }, (res) => {
+          this.$vux.loading.hide()
+          if (res.success) {
+            this.$vux.toast.show({
+              type: 'success',
+              text: '客户确认书已生成。',
+              width: '12em'
+            })
+          } else {
+            this.$vux.toast.show({
+              text: res.message,
+              width: '15em'
+            })
+          }
+        })
       }
     },
     choseMode (key, item) {

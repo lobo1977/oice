@@ -6,6 +6,7 @@ use app\api\controller\Base;
 use app\api\model\File;
 use app\api\model\Building as modelBuilding;
 use app\api\model\Unit as modelUnit;
+use app\api\model\Customer;
 
 class Unit extends Base
 {
@@ -32,6 +33,9 @@ class Unit extends Base
   public function detail($id = 0) {
     if ($id) {
       $data = modelUnit::detail($id, $this->user_id, $this->company_id);
+      if ($data != null) {
+        $data->customer = Customer::search(['status' => '0,1,2'], $this->user_id, $this->company_id);
+      }
       return $this->succeed($data);
     } else {
       return;
@@ -103,7 +107,7 @@ class Unit extends Base
   }
 
   /**
-   * 添加到资料夹
+   * 添加到收藏夹
    */
   public function favorite($id) {
     $result = modelBuilding::favorite(0, $id, $this->user_id);
@@ -115,7 +119,7 @@ class Unit extends Base
   }
 
   /**
-   * 从资料夹删除
+   * 从收藏夹删除
    */
   public function unFavorite($id) {
     $result = modelBuilding::unFavorite(0, $id, $this->user_id);

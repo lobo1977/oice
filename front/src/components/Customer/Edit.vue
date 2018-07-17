@@ -152,7 +152,10 @@ export default {
       statusText: '',
       showCompanyPicker: false,
       companyPickerData: [],
-      companyText: ''
+      companyText: '',
+      flag: '',
+      bid: 0,
+      uid: ''
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -171,6 +174,18 @@ export default {
         vm.id = parseInt(to.params.id)
         if (isNaN(vm.id)) {
           vm.id = 0
+        }
+      }
+
+      if (to.query) {
+        if (to.query.flag) {
+          this.flag = to.query.flag
+        }
+        if (to.query.bid) {
+          this.bid = to.query.bid
+        }
+        if (to.query.uid) {
+          this.uid = to.query.uid
         }
       }
 
@@ -317,7 +332,11 @@ export default {
       }
       this.$vux.loading.show()
       this.info.share = (this.info.share ? 1 : 0)
-      this.$post('/api/customer/edit?id=' + this.id, this.info, (res) => {
+      let url = '/api/customer/edit?id=' + this.id
+      if (this.bid || this.uid) {
+        url = url + '&flag=' + this.flag + '&bid=' + this.bid + '&uid=' + this.uid
+      }
+      this.$post(url, this.info, (res) => {
         this.$vux.loading.hide()
         if (res.success) {
           if (this.id === 0) {

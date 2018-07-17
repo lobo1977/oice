@@ -6,6 +6,7 @@ use app\api\controller\Base;
 use app\api\model\Customer as modelCustomer;
 use app\api\model\Filter;
 use app\api\model\Recommend;
+use app\api\model\Confirm;
 use app\api\model\Log;
 
 class Customer extends Base
@@ -67,7 +68,7 @@ class Customer extends Base
   /**
    * 添加/修改客户信息
    */
-  public function edit($id = 0) {
+  public function edit($id = 0, $flag = '', $bid = 0, $uid = '') {
     if ($this->request->isGet()) {
       $form_token = $this->formToken();
       $companyList = \app\api\model\Company::my($this->user_id);
@@ -124,6 +125,20 @@ class Customer extends Base
         $result = modelCustomer::addUp($id, $data, 
           $this->user_id, $this->company_id);
         if ($result) {
+          // 添加筛选
+          if ($flag == 'filter') {
+            if ($bid) {
+              Filter::addBuilding($result, $bid, 0, $this->user_id);
+            } else if ($uid) {
+              $arrIds = explode(',', $uid);
+              foreach ($arrIds as $unit_id) {
+                Filter::addBuilding($result, 0, intval($unit_id), $this->user_id);
+              }
+            }
+          // 生成客户确认书
+          } else if ($flag == 'confirm' && ($bid || $uid)) {
+            Confirm::addNew($result, $bid, intval($uid), $this->user_id);
+          }
           return $this->succeed($result);
         } else {
           return $this->fail();
@@ -218,17 +233,38 @@ class Customer extends Base
   /**
    * 添加筛选
    */
-  public function addFilter($cid, $ids) {
+  public function addFilter($cid, $bids, $uids) {
     $result = 0;
-    foreach ($ids as $id) {
-      $arrIds = explode(',', $id);
-      if (count($arrIds) == 2) {
-        $result += Filter::addBuilding($cid, intval($arrIds[0]), intval($arrIds[1]), $this->user_id);
+    
+    if ($bids) {
+      $arrIds = explode(',', $bids);
+      foreach ($arrIds as $building_id) {
+        $result = Filter::addBuilding($cid, intval($building_id), 0, $this->user_id);
       }
     }
+    
+    if ($uids) {
+      $arrIds = explode(',', $uids);
+      foreach ($arrIds as $unit_id) {
+        $result += Filter::addBuilding($cid, 0, intval($unit_id), $this->user_id);
+      }
+    }
+    
     if ($result > 0) {
       $list = Filter::query($cid, $this->user_id);
       return $this->succeed($list);
+    } else {
+      return $this->fail();
+    }
+  }
+
+  /**
+   * 生成客户确认书
+   */
+  public function addConfirm($cid, $bid, $uid) {
+    $result = Confirm::addNew($cid, $bid, $uid, $this->user_id);
+    if ($result > 0) {
+      return $this->succeed();
     } else {
       return $this->fail();
     }

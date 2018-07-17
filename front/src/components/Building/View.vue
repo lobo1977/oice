@@ -56,24 +56,33 @@
 
       <flexbox :gutter="0" class="bottom-bar">
         <flexbox-item :span="4">
-          <x-button type="primary" class="bottom-btn" :disabled="info.id === 0"
-            @click.native="favorite">
-              <x-icon type="star" class="btn-icon"></x-icon> {{favoriteText}}
-          </x-button>
-        </flexbox-item>
-        <flexbox-item :span="4">
-          <x-button type="warn" class="bottom-btn" :disabled="myCustomer.length === 0"
-            @click.native="toFilter">
+          <x-button type="warn" class="bottom-btn"
+            @click.native="toCustomer(0)">
               <x-icon type="funnel" class="btn-icon"></x-icon> 加入筛选
           </x-button>
         </flexbox-item>
+        <flexbox-item :span="4">
+          <x-button type="primary" class="bottom-btn"
+            @click.native="toCustomer(1)">
+              <x-icon type="checkmark-circled" class="btn-icon"></x-icon> 客户确认
+          </x-button>
+        </flexbox-item>
+        <flexbox-item :span="3">
+          <x-button type="default" class="bottom-btn"
+            @click.native="favorite">
+            <x-icon type="star" class="btn-icon"></x-icon> {{favoriteText}}
+          </x-button>
+        </flexbox-item>
         <flexbox-item>
-          <x-button type="default" class="bottom-btn" :disabled="info.id === 0"
-            :link="{name:'BuildingEdit', params: {id: this.info.id}}">
-            <x-icon type="compose" class="btn-icon"></x-icon> 修改
+          <x-button type="default" class="bottom-btn" 
+            @click.native="showBuildingMenu = true">
+            <x-icon type="ios-more" class="btn-icon"></x-icon>
           </x-button>
         </flexbox-item>
       </flexbox>
+
+      <actionsheet v-model="showBuildingMenu" :menus="buildingMenu" theme="android" 
+        @on-click-menu="buildingMenuClick"></actionsheet>
     </div>
 
     <div v-show="tab === 1">
@@ -116,15 +125,21 @@
 
       <flexbox :gutter="0" class="bottom-bar">
         <flexbox-item :span="4">
-          <x-button type="primary" class="bottom-btn" :disabled="selectedUnit.length === 0"
-            @click.native="batchFavorite">
-            <x-icon type="star" class="btn-icon"></x-icon> 收藏
+          <x-button type="warn" class="bottom-btn" :disabled="selectedUnit.length === 0"
+            @click.native="toCustomer(0)">
+            <x-icon type="funnel" class="btn-icon"></x-icon> 添加筛选
           </x-button>
         </flexbox-item>
         <flexbox-item :span="4">
-          <x-button type="warn" class="bottom-btn" :disabled="myCustomer.length === 0 || selectedUnit.length === 0"
-            @click.native="toFilter">
-            <x-icon type="funnel" class="btn-icon"></x-icon> 添加筛选
+          <x-button type="primary" class="bottom-btn" :disabled="selectedUnit.length === 0"
+            @click.native="toCustomer(1)">
+            <x-icon type="checkmark-circled" class="btn-icon"></x-icon> 客户确认
+          </x-button>
+        </flexbox-item>
+        <flexbox-item :span="2">
+          <x-button type="default" class="bottom-btn" :disabled="selectedUnit.length === 0"
+            @click.native="batchFavorite">
+            <x-icon type="star" class="btn-icon"></x-icon> 收藏
           </x-button>
         </flexbox-item>
         <flexbox-item>
@@ -138,7 +153,7 @@
 
     <popup-picker ref="customerPicker" class="popup-picker" :show.sync="showCustomerPicker" 
       popup-title="选择客户" :show-cell="false" :data="myCustomer" v-model="selectCustomer"
-      @on-hide="addFilter"></popup-picker>
+      @on-hide="customerSelected"></popup-picker>
     
     <popup v-model="showMap" position="bottom"
       height="100%" style="overflow-y:hidden;">
@@ -216,6 +231,7 @@ export default {
         equipment: '',        // 楼宇设备
         traffic: '',          // 交通状况
         environment: '',      // 周边环境
+        user_id: 0,
         isFavorite: false
       },
       images: [],
@@ -224,8 +240,10 @@ export default {
       showCustomerPicker: false,
       myCustomer: [],
       selectCustomer: [],
+      customerFlag: 0,
       previewOptions: {
       },
+      showBuildingMenu: false,
       showUnitMenu: false,
       menuUnit: null,
       touchUnit: null,
@@ -289,6 +307,10 @@ export default {
                 })
               }
               if (customer.length) {
+                customer.push({
+                  name: '新客户',
+                  value: 0
+                })
                 vm.myCustomer.push(customer)
               }
             }
@@ -327,51 +349,50 @@ export default {
       this.$refs.previewer.show(index)
     },
     favorite () {
-      if (this.user) {
-        this.$vux.loading.show()
-        if (this.info.isFavorite) {
-          this.$post('/api/building/unFavorite', {
-            id: this.info.id
-          }, (res) => {
-            this.$vux.loading.hide()
-            if (res.success) {
-              this.info.isFavorite = false
-              this.$vux.toast.show({
-                type: 'success',
-                text: '已从收藏夹移除。',
-                width: '13em'
-              })
-            } else {
-              this.$vux.toast.show({
-                text: res.message,
-                width: '15em'
-              })
-            }
-          })
-        } else {
-          this.$post('/api/building/favorite', {
-            id: this.info.id
-          }, (res) => {
-            this.$vux.loading.hide()
-            if (res.success) {
-              this.info.isFavorite = true
-              this.$vux.toast.show({
-                type: 'success',
-                text: '已添加到收藏夹。',
-                width: '13em'
-              })
-            } else {
-              this.$vux.toast.show({
-                text: res.message,
-                width: '15em'
-              })
-            }
-          })
-        }
-      } else {
+      if (!this.user) {
         this.$router.push({
           name: 'Login',
           query: { redirect: this.$route.fullPath }
+        })
+      }
+      this.$vux.loading.show()
+      if (this.info.isFavorite) {
+        this.$post('/api/building/unFavorite', {
+          id: this.info.id
+        }, (res) => {
+          this.$vux.loading.hide()
+          if (res.success) {
+            this.info.isFavorite = false
+            this.$vux.toast.show({
+              type: 'success',
+              text: '已从收藏夹移除。',
+              width: '12em'
+            })
+          } else {
+            this.$vux.toast.show({
+              text: res.message,
+              width: '15em'
+            })
+          }
+        })
+      } else {
+        this.$post('/api/building/favorite', {
+          id: this.info.id
+        }, (res) => {
+          this.$vux.loading.hide()
+          if (res.success) {
+            this.info.isFavorite = true
+            this.$vux.toast.show({
+              type: 'success',
+              text: '已添加到收藏夹。',
+              width: '12em'
+            })
+          } else {
+            this.$vux.toast.show({
+              text: res.message,
+              width: '15em'
+            })
+          }
         })
       }
     },
@@ -380,32 +401,76 @@ export default {
     },
     selectUnit () {
     },
-    toFilter () {
-      if (this.user) {
-        this.showCustomerPicker = true
-      } else {
+    toCustomer (flag) {
+      if (!this.user) {
         this.$router.push({
           name: 'Login',
           query: { redirect: this.$route.fullPath }
         })
       }
-    },
-    addFilter (isConfirm) {
-      if (!isConfirm || this.selectCustomer.length <= 0) return
-      let customerId = this.selectCustomer[0]
-      let ids = []
-      if (this.tab === 0) {
-        ids.push('' + this.info.id + ',0')
+      this.customerFlag = flag
+      if (this.customerFlag === 1 && this.tab === 2 && this.selectedUnit.length > 1) {
+        this.$vux.toast.show({
+          text: '只能选择一个单元生成客户确认书。',
+          width: '18em'
+        })
+      } else if (this.myCustomer.length) {
+        this.showCustomerPicker = true
       } else {
-        if (this.selectedUnit.length <= 0) return
-        for (let i in this.selectedUnit) {
-          ids.push('0,' + this.selectedUnit[i])
+        if (this.tab === 0) {
+          this.$router.push({
+            name: 'CustomerEdit',
+            params: {id: 0},
+            query: {bid: this.info.id, flag: this.customerFlag === 0 ? 'filter' : 'confirm'}
+          })
+        } else {
+          this.$router.push({
+            name: 'CustomerEdit',
+            params: {id: 0},
+            query: {uid: this.selectedUnit.join(','), flag: this.customerFlag === 0 ? 'filter' : 'confirm'}
+          })
         }
       }
+    },
+    customerSelected (isConfirm) {
+      if (!isConfirm || this.selectCustomer.length <= 0) return
+      let customerId = this.selectCustomer[0]
+      let bid = 0
+      let uids = ''
+      if (this.tab === 0) {
+        bid = this.info.id
+        if (customerId === 0) {
+          this.$router.push({
+            name: 'CustomerEdit',
+            params: {id: 0},
+            query: {bid: bid, flag: this.customerFlag === 0 ? 'filter' : 'confirm'}
+          })
+          return
+        }
+      } else {
+        if (this.selectedUnit.length <= 0) return
+        uids = this.selectedUnit.join(',')
+        if (customerId === 0) {
+          this.$router.push({
+            name: 'CustomerEdit',
+            params: {id: 0},
+            query: {uid: uids, flag: this.customerFlag === 0 ? 'filter' : 'confirm'}
+          })
+          return
+        }
+      }
+      if (this.customerFlag === 1) {
+        this.toConfirm(customerId, bid, uids)
+      } else {
+        this.toFilter(customerId, bid, uids)
+      }
+    },
+    toFilter (cid, bids, uids) {
       this.$vux.loading.show()
       this.$post('/api/customer/addFilter', {
-        cid: customerId,
-        ids: ids
+        cid: cid,
+        bids: bids,
+        uids: uids
       }, (res) => {
         this.$vux.loading.hide()
         if (res.success) {
@@ -413,7 +478,29 @@ export default {
           this.$vux.toast.show({
             type: 'success',
             text: '已添加到客户筛选表。',
-            width: '13em'
+            width: '12em'
+          })
+        } else {
+          this.$vux.toast.show({
+            text: res.message,
+            width: '15em'
+          })
+        }
+      })
+    },
+    toConfirm (cid, bid, uid) {
+      this.$vux.loading.show()
+      this.$post('/api/customer/addConfirm', {
+        cid: cid,
+        bid: bid,
+        uid: uid
+      }, (res) => {
+        this.$vux.loading.hide()
+        if (res.success) {
+          this.$vux.toast.show({
+            type: 'success',
+            text: '客户确认书已生成。',
+            width: '12em'
           })
         } else {
           this.$vux.toast.show({
@@ -450,6 +537,33 @@ export default {
         this.$router.push({
           name: 'Login',
           query: { redirect: this.$route.fullPath }
+        })
+      }
+    },
+    buildingMenuClick (key, item) {
+      let vm = this
+      if (key === 'edit') {
+        vm.$router.push({name: 'BuildingEdit', params: {id: vm.info.id}})
+      } else if (key === 'delete' && vm.info.user_id === vm.user.id) {
+        vm.$vux.confirm.show({
+          title: '删除项目',
+          content: '确定要删除这个项目吗？',
+          onConfirm () {
+            vm.$vux.loading.show()
+            vm.$post('/api/building/remove', {
+              id: vm.info.id
+            }, (res) => {
+              vm.$vux.loading.hide()
+              if (res.success) {
+                vm.$router.back()
+              } else {
+                vm.$vux.toast.show({
+                  text: res.message,
+                  width: '13em'
+                })
+              }
+            })
+          }
         })
       }
     },
@@ -576,6 +690,18 @@ export default {
         floor.unit.push(this.unit[i])
       }
       return tree
+    },
+    buildingMenu () {
+      if (this.info.user_id && this.info.user_id === this.user.id) {
+        return {
+          edit: '修改',
+          delete: '删除'
+        }
+      } else {
+        return {
+          edit: '修改'
+        }
+      }
     },
     unitMenu () {
       if (this.menuUnit && this.user) {

@@ -186,7 +186,7 @@ class Building extends Base
   }
 
   /**
-   * 添加到资料夹
+   * 添加到收藏夹
    */
   public function favorite($id) {
     $result = modelBuilding::favorite($id, 0, $this->user_id);
@@ -198,7 +198,7 @@ class Building extends Base
   }
 
   /**
-   * 从资料夹删除
+   * 从收藏夹删除
    */
   public function unFavorite($id) {
     $result = modelBuilding::unFavorite($id, 0, $this->user_id);
@@ -210,7 +210,7 @@ class Building extends Base
   }
 
   /**
-   * 批量添加资料夹(单元)
+   * 批量添加收藏(单元)
    */
   public function batchFavorite($ids) {
     $result = 0;
@@ -225,7 +225,7 @@ class Building extends Base
   }
 
   /**
-   * 批量移除资料夹
+   * 批量移除收藏(单元)
    */
   public function batchUnFavorite($ids) {
     $result = 0;
@@ -236,6 +236,18 @@ class Building extends Base
       }
     }
     if ($result > 0) {
+      return $this->succeed();
+    } else {
+      return $this->fail();
+    }
+  }
+
+  /**
+   * 删除项目
+   */
+  public function remove($id) {
+    $result = modelBuilding::remove($id, $this->user_id);
+    if ($result == 1) {
       return $this->succeed();
     } else {
       return $this->fail();

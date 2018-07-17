@@ -95,8 +95,8 @@ class Recommend extends Base
           $unit['floor'] = $building['floor'] . '层';
           $unit['unit'] = $unit['unit'] . $building['floor'] . '层';
         } else if ($building['floor'] < 0) {
-          $unit['unit'] = $unit['unit'] . '地下' . $building['floor'] . '层';
-          $unit['floor'] = '地下' + $building['floor'] + '层';
+          $unit['unit'] = $unit['unit'] . '地下' . abs($building['floor']) . '层';
+          $unit['floor'] = '地下' + abs($building['floor']) + '层';
         }
         $unit['unit'] = $unit['unit'] . $building['room'];
         $unit['room'] = $building['room'];

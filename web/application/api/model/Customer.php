@@ -309,6 +309,37 @@ class Customer extends Base
   }
 
   /**
+   * 变更客户状态
+   */
+  public static function changeStatus($id, $status, $user_id) {
+    $customer = self::get($id);
+    if ($customer == null) {
+      return true;
+    } else if ($customer->user_id != $user_id) {
+      self::exception('您没有权限。');
+    }
+
+    $log = [
+      "table" => 'customer',
+      "owner_id" => $customer->id,
+      "title" => '修改客户状态',
+      "summary" => self::$status[$customer->status] . ' -> ' . self::$status[$status],
+      "user_id" => $user_id
+    ];
+
+    if ($customer->status != $status) {
+      $customer->status = $status;
+      $result = $customer->save();
+      if ($result) {
+        Log::add($log);
+      }
+    } else {
+      $result = 1;
+    }
+    return $result;
+  }
+
+  /**
    * 删除客户
    */
   public static function remove($id, $user_id) {

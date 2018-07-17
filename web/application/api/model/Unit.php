@@ -17,6 +17,23 @@ class Unit extends Base
   public static $share = ['隐藏','公开'];
 
   /**
+   * 格式化单元信息
+   */
+  public static function formatInfo($unit) {
+    if ($unit != null) {
+      $unit->title = $unit->building_no;
+      if ($unit->floor > 0) {
+        $unit->title = $unit->title . $unit->floor . '层';
+      } else if ($unit->floor < 0) {
+        $unit->title = $unit->title . '地下' . abs($unit->floor) . '层';
+      }
+      if ($unit->room) {
+        $unit->title = $unit->title . $unit->room;
+      }
+    }
+  }
+
+  /**
    * 通过房源ID获取单元列表
    */
   public static function getByBuildingId($id, $user_id = 0, $company_id = 0) {
@@ -27,6 +44,10 @@ class Unit extends Base
       ->order('room', 'asc')
       ->order('id', 'asc')
       ->select();
+    
+    foreach($list as $key=>$unit) {
+      self::formatInfo($unit);
+    }
     
     return $list;
   }
@@ -51,6 +72,7 @@ class Unit extends Base
       $unit->images = File::getList($id, 'unit');
       $unit->linkman = Linkman::getByOwnerId($id, 'unit', $user_id);
       $unit->isFavorite = false;
+      self::formatInfo($unit);
       if ($user_id) {
         if (db('favorite')->where('user_id', $user_id)
           ->where('unit_id', $id)->find() != null) {
@@ -235,7 +257,7 @@ class Unit extends Base
       if ($data['floor'] > 0) {
         $summary = $summary . $data['floor'] . '层';
       } else if ($data['floor'] < 0) {
-        $summary = $summary . '地下' . $data['floor'] . '层';
+        $summary = $summary . '地下' . abs($data['floor']) . '层';
       }
       if ($data['room']) {
         $summary = $summary . $data['room'];
@@ -276,20 +298,14 @@ class Unit extends Base
     } else if ($unit->user_id != $user_id) {
       self::exception('您没有权限删除此单元。');
     }
-    $summary = $unit->building_no;
-    if ($unit->floor > 0) {
-      $summary = $summary . $unit->floor . '层';
-    } else if ($unit->floor < 0) {
-      $summary = $summary . '地下' . $unit->floor . '层';
-    }
-    if ($unit->room) {
-      $summary = $summary . $unit->room;
-    }
+
+    self::formatInfo($unit);
+
     $log = [
       "table" => 'building',
       "owner_id" => $unit->building_id,
       "title" => '删除单元',
-      "summary" => $summary,
+      "summary" => $unit->title,
       "user_id" => $user_id
     ];
     $result = $unit->delete();
