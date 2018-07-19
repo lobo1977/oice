@@ -25,28 +25,29 @@ class Customer extends Base
     if ($params) {
       $list = modelCustomer::search($params, $this->user_id, $this->company_id);
 
-      if (!$list->isEmpty()) {
-        foreach($list as $key=>$customer) {
-          $customer->title = '【' . modelCustomer::$status[$customer['status']] . '】' . $customer->customer_name;
-          
-          $customer->desc = (empty($customer->lease_buy) ? '' : $customer->lease_buy) . 
-            (empty($customer->demand) ? '' : $customer->demand . ' ');
-
-          if ($customer->min_acreage && $customer->max_acreage) {
-              $customer->desc = $customer->desc . ' ' . $customer->min_acreage . ' 至 ' . $customer->max_acreage . ' 平米';
-          } else if ($customer->min_acreage) {
-              $customer->desc = $customer->desc . ' ' . $customer->min_acreage . ' 平米以上';
-          } else if ($customer->max_acreage) {
-              $customer->desc = $customer->desc . ' ' . $customer->max_acreage . ' 平米以内';
-          }
-
-          if ($customer->budget) {
-            $customer->desc = $customer->desc . ' ' . $customer->budget;
-          }
-
-          $customer->url = '/customer/view/' . $customer->id;
+      foreach($list as $key=>$customer) {
+        $customer->title = '【' . modelCustomer::$status[$customer->status] . '】' . $customer->customer_name;
+        if ($customer->clash) {
+          $customer->title = $customer->title . '（撞单）';
         }
+        $customer->desc = (empty($customer->lease_buy) ? '' : $customer->lease_buy) . 
+          (empty($customer->demand) ? '' : $customer->demand . ' ');
+
+        if ($customer->min_acreage && $customer->max_acreage) {
+            $customer->desc = $customer->desc . ' ' . $customer->min_acreage . ' 至 ' . $customer->max_acreage . ' 平米';
+        } else if ($customer->min_acreage) {
+            $customer->desc = $customer->desc . ' ' . $customer->min_acreage . ' 平米以上';
+        } else if ($customer->max_acreage) {
+            $customer->desc = $customer->desc . ' ' . $customer->max_acreage . ' 平米以内';
+        }
+
+        if ($customer->budget) {
+          $customer->desc = $customer->desc . ' ' . $customer->budget;
+        }
+
+        $customer->url = '/customer/view/' . $customer->id;
       }
+
       return $this->succeed($list);
     } else {
       return;
@@ -76,6 +77,8 @@ class Customer extends Base
         $data = modelCustomer::get($id);
         if ($data == null) {
           return $this->exception('客户不存在。');
+        } else if ($data->clash > 0) {
+          return $this->exception('撞单客户不可修改，请等待管理员处理。');
         } else if ($data->user_id != $this->user_id) {
           return $this->exception('您没有权限修改这个客户。');
         } else {
@@ -119,27 +122,39 @@ class Customer extends Base
       
       if (!$validate->check($data)) {
         $form_token = $this->formToken();
-        return $this->fail($validate->getError(), $form_token);
+        return $this->fail($validate->getError(), ['token' => $form_token]);
       } else {
         unset($data['__token__']);
-        $result = modelCustomer::addUp($id, $data, 
-          $this->user_id, $this->company_id);
-        if ($result) {
-          // 添加筛选
-          if ($flag == 'filter') {
-            if ($bid) {
-              Filter::addBuilding($result, $bid, 0, $this->user_id);
-            } else if ($uid) {
-              $arrIds = explode(',', $uid);
-              foreach ($arrIds as $unit_id) {
-                Filter::addBuilding($result, 0, intval($unit_id), $this->user_id);
+        $result = modelCustomer::addUp($id, $data, $this->user_id, $this->company_id);
+        if (is_numeric($result) && $result > 0) {
+          $message = '';
+          if (isset($data['clash']) && $data['clash'] > 0) {
+            $message = '撞单客户不可修改及跟进，请等候管理员处理。';
+          } else {
+            // 添加筛选
+            if ($flag == 'filter') {
+              if ($bid) {
+                Filter::addBuilding($result, $bid, 0, $this->user_id);
+              } else if ($uid) {
+                $arrIds = explode(',', $uid);
+                foreach ($arrIds as $unit_id) {
+                  Filter::addBuilding($result, 0, intval($unit_id), $this->user_id);
+                }
               }
+            // 生成客户确认书
+            } else if ($flag == 'confirm' && ($bid || $uid)) {
+              Confirm::addNew($result, $bid, intval($uid), $this->user_id);
             }
-          // 生成客户确认书
-          } else if ($flag == 'confirm' && ($bid || $uid)) {
-            Confirm::addNew($result, $bid, intval($uid), $this->user_id);
           }
-          return $this->succeed($result);
+          return $this->succeed($result, $message);
+        } else if (isset($result['message'])) {
+          $form_token = $this->formToken();
+          if (isset($result['data'])) {
+            $result['data']['token'] = $form_token;
+          } else {
+            $result['data'] = ['token' => $form_token];
+          }
+          return $this->fail($result['message'], $result['data']);
         } else {
           return $this->fail();
         }
@@ -188,7 +203,7 @@ class Customer extends Base
           return $this->exception('客户信息不存在。');
         }
       } else {
-        return $this->succeed(["__token__" => $form_token]);
+        return $this->succeed(['__token__' => $form_token]);
       }
     } else {
       $data = input('post.');

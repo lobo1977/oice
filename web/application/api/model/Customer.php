@@ -6,6 +6,7 @@ use app\api\model\Base;
 use app\api\model\Log;
 use app\api\model\Linkman;
 use app\api\model\Filter;
+use app\api\model\User;
 use app\api\model\Recommend;
 
 class Customer extends Base
@@ -16,6 +17,7 @@ class Customer extends Base
 
   public static $status = ['潜在','跟进','看房','确认','成交','失败'];
   public static $share = ['私有','共享'];
+  private static $IGNORE_WORDS = '/北京|上海|深圳|广州|中国|美国|日本|德国|英国|法国|（|）|\(|\)/';
   
   /**
    * 检索客户信息
@@ -41,19 +43,27 @@ class Customer extends Base
       ->where('user_id = ' . $user_id . ' OR (share = 1 AND company_id > 0 AND company_id = ' . $company_id . ')');
 
     if (isset($filter['keyword']) && $filter['keyword'] != '') {
-      $list = $list->where('customer_name', 'like', '%' . $filter['keyword'] . '%');
+      $list->where('customer_name', 'like', '%' . $filter['keyword'] . '%');
     }
 
-    if (isset($filer['status']) && $filter['status'] != '') {
-      $list = $list->where('status', 'in', $filter['status']);
+    if (isset($filter['status']) && $filter['status'] != '') {
+      $list->where('status', 'in', $filter['status']);
     }
 
-    $list = $list->field('id,customer_name,logo,area,address,demand,lease_buy,min_acreage,max_acreage,budget,status')
+    if (isset($filter['clash'])) {
+      if ($filter['clash']) {
+        $list->where('clash', '>', 0);
+      } else {
+        $list->where('clash', ['exp', 'IS NULL'], ['=', 0], 'or');
+      }
+    }
+
+    $result = $list->field('id,customer_name,logo,area,address,demand,lease_buy,min_acreage,max_acreage,budget,status,clash')
       ->page($filter['page'], $filter['page_size'])
       ->order('id', 'desc')
       ->select();
 
-    return $list;
+    return $result;
   }
 
   /**
@@ -97,9 +107,92 @@ class Customer extends Base
   }
 
   /**
+   * 撞单检查
+   */
+  private static function clashCheck($id, $name, $mobile, $company_id) {
+    if(!$company_id) {
+      return false;
+    }
+
+    $keyword = mb_substr(preg_replace(self::$IGNORE_WORDS, "", $name), 0, 3, 'utf-8');
+
+    $clashData = self::alias('a')
+      ->join('user u', "a.user_id = u.id")
+      ->leftJoin('linkman b',"b.type = 'customer' AND b.owner_id = a.id")
+      ->where('a.id', '<>', $id)
+      ->where('a.company_id', $company_id)
+      ->where('a.clash', ['exp', 'IS NULL'], ['=', 0], 'or')
+      ->where(function ($query) use($keyword, $mobile) {
+          $query->where('a.customer_name', 'like', '%' . $keyword . '%');
+          if ($mobile) {
+            $query->whereOr('b.mobile', '=', $mobile);
+          } 
+      })->field('a.id,a.customer_name,a.status,a.user_id,u.title as user,b.title as linkman,b.mobile')
+      ->find();
+    
+    return $clashData;
+  }
+
+  /**
    * 添加/修改客户信息
    */
   public static function addUp($id, $data, $user_id, $company_id = 0) {
+    $oldData = null;
+
+    if ($id) {
+      $oldData = self::get($id);
+      if ($oldData == null) {
+        self::exception('客户不存在。');
+      } else if ($oldData->user_id != $user_id) {
+        self::exception('您没有权限修改此客户。');
+      } else if ($oldData->clash > 0) {
+        return $this->exception('撞单客户不可修改，请等待管理员处理。');
+      }
+    }
+
+    $mobile = isset($data['mobile']) ? $data['mobile'] : '';
+
+    // 撞单检查
+    if (!isset($data['clash']) || $data['clash'] == 0) {
+      $clash = self::clashCheck($id, $data['customer_name'], $mobile, $company_id);
+      
+      if ($clash) {
+        $message = '';
+        $resultData = [
+          'confirm' => false,
+          'clash' => $clash->id
+        ];
+
+        if ($clash->user_id == $user_id) {
+          $message = '客户资料和您的' . self::$status[$clash->status] . '客户：<strong>' .
+            $clash->customer_name . '</strong> 信息重复，请检查。';
+        } else {
+          Log::add([
+            "table" => "customer",
+            "owner_id" => $clash->id,
+            "title" => '客户撞单',
+            "summary" => $data['customer_name'] . ' ' . $mobile,
+            "user_id" => $user_id
+          ]);
+
+          if ($clash->status == 5) {
+            self::transfer($clash->id, $user_id, $user_id, $data);
+            $message = '客户资料和<strong>' . $clash->user . '</strong>的' . self::$status[$clash->status] . '客户：<strong>' .
+              $clash->customer_name . '</strong> 发生撞单，旧客户已自动转交给您并转为' . self::$status[$data['status']] . '客户，请及时跟进。';
+          } else {
+            $message = '客户资料和<strong>' . $clash->user . '</strong>的' . self::$status[$clash->status] . '客户：<strong>' .
+              $clash->customer_name . '</strong> 发生撞单，您可以选择<strong>放弃登记</strong>或<strong>申请转交或并行</strong>，由管理员按照<strong>核查撞单及覆盖原则</strong>处理。点击<strong>确定</strong>申请转交或并行。';
+            $resultData['confirm'] = true;
+          }
+        }
+
+        return ['message' => $message, 'data' => $resultData];
+      }
+    } else {
+      // 撞单客户强制公开
+      $data['share'] = 1;
+    }
+
     if (empty($data['settle_date'])) {
       unset($data['settle_date']);
     }
@@ -108,14 +201,7 @@ class Customer extends Base
       unset($data['end_date']);
     }
 
-    if ($id) {
-      $oldData = self::get($id);
-      if ($oldData == null) {
-        self::exception('客户不存在。');
-      } else if ($oldData->user_id != $user_id) {
-        self::exception('您没有权限修改此客户。');
-      }
-
+    if ($oldData != null) {
       $summary = '';
 
       if ($data['customer_name'] != $oldData->customer_name) {
@@ -317,6 +403,8 @@ class Customer extends Base
       return true;
     } else if ($customer->user_id != $user_id) {
       self::exception('您没有权限。');
+    } else if ($customer->status == $status) {
+      return true;
     }
 
     $log = [
@@ -327,15 +415,50 @@ class Customer extends Base
       "user_id" => $user_id
     ];
 
-    if ($customer->status != $status) {
-      $customer->status = $status;
-      $result = $customer->save();
-      if ($result) {
-        Log::add($log);
-      }
-    } else {
-      $result = 1;
+    $customer->status = $status;
+    $result = $customer->save();
+    if ($result) {
+      Log::add($log);
     }
+
+    return $result;
+  }
+
+  // 转交客户
+  public static function transfer($id, $to_user, $user_id, $data = null) {
+    $customer = self::alias('a')
+      ->join('user u', "a.user_id = u.id")
+      ->field('a.id,a.user_id,a.status,u.title')->find();
+
+    if ($customer == null) {
+      self::exception('客户不存在。');
+    } else if ($customer->user_id == $to_user) {
+      return true;
+    }
+
+    $newUser = User::get($to_user);
+    if ($newUser == null) {
+      self::exception('用户不存在。');
+    }
+
+    $summary = $customer->title . ' -> ' . $newUser->title;
+
+    $customer->user_id = $to_user;
+    if ($data != null && isset($data['status']) && $customer->status != $data['status']) {
+      $summary = $summary . '\n客户状态：' . self::$status[$customer->status] . ' -> ' . self::$status[$data['status']];
+      $customer->status = $data['status'];
+    }
+    $result = $customer->save();
+    if ($result) {
+      Log::add([
+        "table" => 'customer',
+        "owner_id" => $customer->id,
+        "title" => '转交客户',
+        "summary" => $summary,
+        "user_id" => $user_id
+      ]);
+    }
+
     return $result;
   }
 

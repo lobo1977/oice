@@ -51,30 +51,30 @@ class Building extends Base
       ->where('a.share = 1 OR a.user_id = 0 OR (a.user_id = ' . $user_id . ') OR (a.company_id > 0 AND a.company_id = ' . $company_id . ')');
     
     if (isset($filter['keyword']) && $filter['keyword'] != '') {
-      $list = $list->where('a.building_name|a.pinyin', 'like', $filter['keyword'] . '%');
+      $list->where('a.building_name|a.pinyin', 'like', $filter['keyword'] . '%');
     } else {
       if (isset($filter['type']) && $filter['type'] != '' && $filter['type'] != 'all') {
-        $list = $list->where('a.type', 'like', '%' . $filter['type'] . '%');
+        $list->where('a.type', 'like', '%' . $filter['type'] . '%');
       }
       if (isset($filter['district']) && $filter['district'] != '' && $filter['district'] != 'all') {
-        $list = $list->where('a.district', $filter['district']);
+        $list->where('a.district', $filter['district']);
       } else if (isset($filter['area']) && $filter['area'] != '' && $filter['area'] != 'all') {
-        $list = $list->where('a.area', $filter['area']);
+        $list->where('a.area', $filter['area']);
       }
       if (isset($filter['rent_sell']) && $filter['rent_sell'] != '' && $filter['rent_sell'] != 'all') {
-        $list = $list->where('a.rent_sell', 'like', '%' . $filter['rent_sell'] . '%');
+        $list->where('a.rent_sell', 'like', '%' . $filter['rent_sell'] . '%');
       }
       if (isset($filter['level']) && $filter['level'] != '' && $filter['level'] != 'all') {
-        $list = $list->where('a.level', $filter['level']);
+        $list->where('a.level', $filter['level']);
       }
     }
 
-    $list = $list->field('a.id,a.building_name,a.level,a.area,a.district,a.address,a.rent_sell,a.price,b.file')
+    $result = $list->field('a.id,a.building_name,a.level,a.area,a.district,a.address,a.rent_sell,a.price,b.file')
       ->page($filter['page'], $filter['page_size'])
       ->order('a.update_time', 'desc')->order('a.id', 'desc')
       ->select();
 
-    return self::formatListData($list);
+    return self::formatListData($result);
   }
 
   /**

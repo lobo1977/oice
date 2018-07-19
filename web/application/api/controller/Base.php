@@ -42,7 +42,10 @@ class Base extends Controller
     return $this->setResult(true, $message, $data);
   }
 
-  protected function fail($message = '系统异常。', $data = null) {
+  protected function fail($message = '', $data = null) {
+    if ($message == '') {
+      $message = '系统异常。';
+    }
     return $this->setResult(false, $message, $data);
   }
 

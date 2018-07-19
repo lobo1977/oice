@@ -34,7 +34,7 @@ class Unit extends Base
     if ($id) {
       $data = modelUnit::detail($id, $this->user_id, $this->company_id);
       if ($data != null) {
-        $data->customer = Customer::search(['status' => '0,1,2'], $this->user_id, $this->company_id);
+        $data->customer = Customer::search(['status' => '0,1,2', 'clash' => false], $this->user_id, $this->company_id);
       }
       return $this->succeed($data);
     } else {

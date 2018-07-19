@@ -56,13 +56,13 @@
 
       <flexbox :gutter="0" class="bottom-bar">
         <flexbox-item :span="6">
-          <x-button type="primary" class="bottom-btn" :disabled="info.id === 0"
+          <x-button type="primary" class="bottom-btn" :disabled="info.id === 0 || info.clash > 0"
             :link="{name:'Favorite', query: { cid: info.id }}">
             <x-icon type="search" class="btn-icon"></x-icon> 筛选项目
           </x-button>
         </flexbox-item>
         <flexbox-item :span="4">
-          <x-button type="warn" class="bottom-btn" :disabled="info.id === 0 || info.user_id != user.id"
+          <x-button type="warn" class="bottom-btn" :disabled="info.id === 0 || info.user_id != user.id || info.clash > 0"
             :link="{name:'CustomerEdit', params: { id: info.id }}">
             <x-icon type="compose" class="btn-icon"></x-icon> 修改
           </x-button>
@@ -97,7 +97,7 @@
       </timeline>
 
       <div class="bottom-bar">
-        <x-button type="warn" class="bottom-btn" :disabled="info.id === 0"
+        <x-button type="warn" class="bottom-btn" :disabled="info.id === 0 || info.clash > 0"
           :link="{name: 'CustomerLog', params: {id:0, cid: info.id}}">
           <x-icon type="plus" class="btn-icon"></x-icon> 添加
         </x-button>
@@ -142,7 +142,7 @@
           </x-button>
         </flexbox-item>
         <flexbox-item>
-          <x-button type="default" class="bottom-btn" :disabled="info.id === 0"
+          <x-button type="default" class="bottom-btn" :disabled="info.id === 0 || info.clash > 0"
             :link="{name:'Favorite', query: { cid: info.id }}">
             <x-icon type="plus" class="btn-icon"></x-icon> 添加筛选
           </x-button>
@@ -223,7 +223,8 @@ export default {
         manager: '',          // 客户经理
         avatar: '/static/img/avatar.png',
         mobile: '',
-        company: ''           // 所属企业
+        company: '',          // 所属企业
+        clash: 0
       },
       linkman: [],            // 联系人
       log: [],                // 跟进纪要

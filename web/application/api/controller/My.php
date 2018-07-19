@@ -25,7 +25,7 @@ class My extends Base
    * 我的客户
    */
   public function customer() {
-    $list = Customer::search(['status' => '0,1,2'], $this->user_id, $this->company_id);
+    $list = Customer::search(['status' => '0,1,2', 'clash' => false], $this->user_id, $this->company_id);
     return $this->succeed($list);
   }
 

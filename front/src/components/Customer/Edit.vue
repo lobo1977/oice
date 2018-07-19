@@ -134,7 +134,8 @@ export default {
         company_id: 0,        // 所属企业
         share: false,         // 共享状态
         linkman: '',          // 联系人
-        mobile: ''            // 联系电话
+        mobile: '',           // 联系电话
+        clash: 0              // 撞单客户
       },
       showDistrictPicker: false,
       districtPickerData: [],
@@ -326,30 +327,67 @@ export default {
       }
     },
     save () {
-      this.validateForm()
-      if (!this.formValidate) {
+      let vm = this
+      vm.validateForm()
+      if (!vm.formValidate) {
         return
       }
-      this.$vux.loading.show()
-      this.info.share = (this.info.share ? 1 : 0)
-      let url = '/api/customer/edit?id=' + this.id
-      if (this.bid || this.uid) {
-        url = url + '&flag=' + this.flag + '&bid=' + this.bid + '&uid=' + this.uid
+      vm.$vux.loading.show()
+      vm.info.share = (vm.info.share ? 1 : 0)
+      let url = '/api/customer/edit?id=' + vm.id
+      if (vm.bid || vm.uid) {
+        url = url + '&flag=' + vm.flag + '&bid=' + vm.bid + '&uid=' + vm.uid
       }
-      this.$post(url, this.info, (res) => {
-        this.$vux.loading.hide()
+      vm.$post(url, vm.info, (res) => {
+        vm.$vux.loading.hide()
         if (res.success) {
-          if (this.id === 0) {
-            this.id = res.data
-            this.$router.replace({name: 'CustomerView', params: {id: this.id}})
+          if (res.message) {
+            vm.$vux.alert.show({
+              title: '保存成功',
+              content: res.message,
+              onHide () {
+                if (vm.id === 0) {
+                  vm.id = res.data
+                  vm.$router.replace({name: 'CustomerView', params: {id: vm.id}})
+                } else {
+                  vm.$router.back()
+                }
+              }
+            })
+          } else if (vm.id === 0) {
+            vm.id = res.data
+            vm.$router.replace({name: 'CustomerView', params: {id: vm.id}})
           } else {
-            this.$router.back()
+            vm.$router.back()
+          }
+        } else if (res.data) {
+          if (res.data.token) {
+            vm.info.__token__ = res.data.token
+          }
+          if (res.data.confirm && res.data.clash) {
+            vm.$vux.confirm.show({
+              title: '撞单提醒',
+              content: res.message,
+              onConfirm () {
+                vm.info.clash = res.data.clash
+                vm.save()
+              }
+            })
+          } else {
+            vm.$vux.alert.show({
+              title: res.data.clash ? '撞单提醒' : '发生错误',
+              content: res.message,
+              onHide () {
+                if (res.data.clash) {
+                  vm.$router.push({name: 'CustomerView', params: {id: res.data.clash}})
+                }
+              }
+            })
           }
         } else {
-          this.info.__token__ = res.data
-          this.$vux.toast.show({
-            text: res.message,
-            width: '16em'
+          vm.$vux.alert.show({
+            title: '发生错误',
+            content: res.message
           })
         }
       })

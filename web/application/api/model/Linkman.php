@@ -173,12 +173,10 @@ class Linkman extends Base
           unset($data['owner_id']);
         }
 
-        if (isset($data['user_id'])) {
-          unset($data['user_id']);
-        }
-
         if ($oldData->user_id == 0) {
           $data['user_id'] = $user_id;
+        } else if (isset($data['user_id'])) {
+          unset($data['user_id']);
         }
 
         $result =  $oldData->save($data);
