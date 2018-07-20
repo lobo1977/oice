@@ -19,6 +19,13 @@
         <popup-picker title="所在地" :data="districtPickerList" @on-change="districtChange"
           :columns="2" :fixed-columns="1" v-model="districtValue" value-text-align="left"></popup-picker>
         <x-input name="address" title="详细地址" v-model="info.address" :max="100"></x-input>
+        <cell title="公章">
+          <div solt="default" style="height:60px;line-height:0;">
+            <img v-show="stampSrc != null && stampSrc != ''" :src="stampSrc" style="height:60px;">
+          </div>
+          <input id="inputStamp" type="file" name="stamp" class="upload" @change="loadStamp"
+              accept="image/png,image/gif">
+        </cell>
       </group>
 
       <group gutter="10px">
@@ -76,6 +83,7 @@ export default {
         isAddin: false
       },
       logoSrc: null,
+      stampSrc: null,
       districtValue: ['', ''],
       districtPickerList: [],
       showJoinWayPicker: false,
@@ -108,6 +116,9 @@ export default {
             }
             if (res.data.logo) {
               vm.logoSrc = res.data.logo
+            }
+            if (res.data.stamp) {
+              vm.stampSrc = res.data.stamp
             }
             if (vm.info.area) {
               vm.districtValue = [vm.info.area, '']
@@ -151,6 +162,17 @@ export default {
       let reader = new FileReader()
       reader.onload = (e) => {
         this.logoSrc = e.target.result
+      }
+      reader.readAsDataURL(src.files[0])
+    },
+    loadStamp () {
+      let src = document.getElementById('inputStamp')
+      if (!src.files || !src.files[0]) {
+        return
+      }
+      let reader = new FileReader()
+      reader.onload = (e) => {
+        this.stampSrc = e.target.result
       }
       reader.readAsDataURL(src.files[0])
     },

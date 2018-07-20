@@ -157,6 +157,9 @@ class Company extends Base
     if ($data->logo) {
       $data->logo = '/upload/company/images/200/' . $data->logo;
     }
+    if ($data->stamp) {
+      $data->stamp = '/upload/company/images/60/' . $data->stamp;
+    }
     self::setAddinCount($data);
     return $data;
   }
@@ -164,7 +167,7 @@ class Company extends Base
   /**
    * 添加/修改企业信息
    */
-  public static function addUp($id, $data, $logo, $user_id) {
+  public static function addUp($id, $data, $logo, $stamp, $user_id) {
     if ($id) {
       $oldData = self::get($id);
       if ($oldData == null) {
@@ -174,14 +177,6 @@ class Company extends Base
       }
 
       $summary = '';
-
-      if ($logo) {
-        $logoPath = self::uploadLogo($logo);
-        if ($logoPath) {
-          $data['logo'] = $logoPath;
-          $summary = $summary . 'Logo：' . $oldData->logo . ' -> ' . $data['logo'] . '\n';
-        }
-      }
 
       if ($data['title'] != $oldData->title) {
         if ($oldData->title) {
@@ -233,6 +228,22 @@ class Company extends Base
           ' -> ' . self::$status[$data['status']] . '\n';
       }
 
+      if ($logo) {
+        $logoPath = self::uploadLogo($logo);
+        if ($logoPath) {
+          $data['logo'] = $logoPath;
+          $summary = $summary . 'Logo：' . $oldData->logo . ' -> ' . $data['logo'] . '\n';
+        }
+      }
+
+      if ($stamp) {
+        $stampPath = self::uploadStamp($stamp);
+        if ($stampPath) {
+          $data['stamp'] = $stampPath;
+          $summary = $summary . '公章：' . $oldData->stamp . ' -> ' . $data['stamp'] . '\n';
+        }
+      }
+
       $result =  $oldData->save($data);
 
       if ($result && $summary) {
@@ -253,6 +264,13 @@ class Company extends Base
         $logoPath = self::uploadLogo($logo);
         if ($logoPath) {
           $data['logo'] = $logoPath;
+        }
+      }
+
+      if ($stamp) {
+        $stampPath = self::uploadStamp($stamp);
+        if ($stampPath) {
+          $data['stamp'] = $stampPath;
         }
       }
 
@@ -618,6 +636,22 @@ class Company extends Base
   private static function uploadLogo($logo) {
     $uploadPath = '../public/upload/company/images';
     $info = $logo->validate(['size'=>2097152,'ext'=>'jpg,jpeg,png,gif'])
+      ->rule('uniqid')->move($uploadPath . '/original');
+
+    if ($info) {
+      File::thumbImage($info, [60,200], $uploadPath);
+      return $info->getFilename();
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * 上传印章
+   */
+  private static function uploadStamp($stamp) {
+    $uploadPath = '../public/upload/company/images';
+    $info = $stamp->validate(['size'=>2097152,'ext'=>'png,gif'])
       ->rule('uniqid')->move($uploadPath . '/original');
 
     if ($info) {

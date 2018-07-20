@@ -83,13 +83,14 @@ class Company extends Base
 
       $data = input('post.');
       $logo = request()->file('logo');
+      $stamp = request()->file('stamp');
       
       if (!$validate->check($data)) {
         $form_token = $this->formToken();
         return $this->fail($validate->getError(), $form_token);
       } else {
         unset($data['__token__']);
-        $result = modelCompany::addUp($id, $data, $logo, $this->user_id);
+        $result = modelCompany::addUp($id, $data, $logo, $stamp, $this->user_id);
         if ($result) {
           return $this->succeed($result);
         } else {

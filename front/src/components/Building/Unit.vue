@@ -200,6 +200,9 @@ export default {
     })
   },
   methods: {
+    preview (index) {
+      this.$refs.previewer.show(index)
+    },
     favorite () {
       if (!this.user) {
         this.$router.push({

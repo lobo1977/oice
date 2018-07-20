@@ -9,6 +9,10 @@
       </div>
     </masker>
 
+    <div v-transfer-dom v-if="user && user.id == info.user_id">
+      <previewer :list="images" ref="previewer" :options="previewOptions"></previewer>
+    </div>
+
     <group gutter="0">
       <cell v-if="info.full_name" title="企业全称" :value="info.full_name">
         <x-icon slot="icon" type="android-list" class="cell-icon"></x-icon>
@@ -19,6 +23,12 @@
       <cell v-if="info.addin > 0" title="成员" :value="info.addin"
         :link="info.isAddin === 1 || (user && user.id == info.user_id) ? {name: 'CompanyUser', params: {id: info.id}} : null">
         <x-icon slot="icon" type="ios-people" class="cell-icon"></x-icon>
+      </cell>
+      <cell title="公章" v-if="user && user.id == info.user_id" @click.native="previewStamp">
+        <x-icon slot="icon" type="ios-circle-filled" class="cell-icon"></x-icon>
+        <div solt="default" style="height:60px;line-height:0;">
+          <img v-show="info.stamp != null && info.stamp != ''" :src="info.stamp" style="height:60px;">
+        </div>
       </cell>
     </group>
 
@@ -80,13 +90,18 @@
 </template>
 
 <script>
-import { Masker, Group, Swipeout, SwipeoutItem, SwipeoutButton, Cell, Flexbox, FlexboxItem, XButton } from 'vux'
+import { Masker, Group, Previewer, TransferDom,
+  Swipeout, SwipeoutItem, SwipeoutButton, Cell, Flexbox, FlexboxItem, XButton } from 'vux'
 import { mapState, mapActions } from 'vuex'
 
 export default {
+  directives: {
+    TransferDom
+  },
   components: {
     Masker,
     Group,
+    Previewer,
     Swipeout,
     SwipeoutItem,
     SwipeoutButton,
@@ -102,6 +117,7 @@ export default {
         title: '',
         full_name: '',
         logo: '',
+        stamp: '',
         area: '',
         address: '',
         rem: '',
@@ -114,7 +130,10 @@ export default {
       waitUser: [],
       pageX: null,
       pageY: null,
-      mouseMove: false
+      mouseMove: false,
+      images: [],
+      previewOptions: {
+      }
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -141,6 +160,14 @@ export default {
           if (res.data.waitUser) {
             vm.waitUser = res.data.waitUser
           }
+
+          if (res.data.stamp) {
+            vm.images.push({
+              src: res.data.stamp.replace('/60/', '/200/'),
+              msrc: res.data.stamp
+            })
+          }
+
           vm.$emit('on-view-loaded', vm.info.title)
 
           if (vm.$isWechat()) {
@@ -162,6 +189,11 @@ export default {
           })
         }
       })
+    },
+    previewStamp () {
+      if (this.images.length) {
+        this.$refs.previewer.show(0)
+      }
     },
     itemMouseDown (event) {
       this.pageX = event.pageX
