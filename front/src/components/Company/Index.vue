@@ -20,7 +20,6 @@
             @touchstart.native="itemMouseDown" @touchend.native="itemMouseUp"
             @click.native="itemClick(item)">
             <div slot="right-menu">
-              <swipeout-button v-if="user && item.id != user.company_id" @click.native.stop="setDefault(item.id)" type="primary">切换</swipeout-button>
               <swipeout-button @click.native.stop="view(item.id)" type="default">查看</swipeout-button>
               <swipeout-button @click.native.stop="quit(item.id, item.title)" type="warn">退出</swipeout-button>
             </div>
