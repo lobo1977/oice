@@ -49,10 +49,10 @@
             <x-icon type="checkmark-circled" class="btn-icon"></x-icon> 客户确认
         </x-button>
       </flexbox-item>
-      <flexbox-item :span="3">
+      <flexbox-item :span="2">
         <x-button type="default" class="bottom-btn"
           @click.native="favorite">
-          <x-icon type="star" class="btn-icon"></x-icon> {{favoriteText}}
+          <x-icon type="star" class="btn-icon"></x-icon>
         </x-button>
       </flexbox-item>
       <flexbox-item>
@@ -368,7 +368,7 @@ export default {
       return this.info.isFavorite ? '取消收藏' : '收藏'
     },
     unitMenu () {
-      if (this.info.user_id && this.info.user_id === this.user.id) {
+      if (this.info.user_id && this.user && this.info.user_id === this.user.id) {
         return {
           new: '添加',
           edit: '修改',
