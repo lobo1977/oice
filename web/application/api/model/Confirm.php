@@ -13,6 +13,44 @@ use app\api\model\File;
 class Confirm extends Base
 {
   /**
+   * 客户确认列表
+   */
+  public static function query($customer_id, $building_id, $user_id) {
+    $list = self::alias('a')
+      ->join('customer c', 'a.customer_id = c.id')
+      ->leftJoin('unit u', 'a.unit_id = u.id AND a.unit_id > 0')
+      ->join('building b', 'a.building_id = b.id OR u.building_id = b.id');
+
+    if ($customer_id) {
+      $list->where('a.customer_id', $customer_id);
+    }
+
+    if ($building_id) {
+      $list->where('a.building_id', $building_id);
+    }
+
+    if ($user_id) {
+      $list->where('a.user_id', $user_id);
+    }
+
+    $result = $list->field('a.*,b.building_name,u.building_no,u.floor,u.room,c.customer_name')
+      ->order('a.create_time', 'desc')
+      ->select();
+
+    foreach($result as $key => $confirm) {
+      if ($building_id) {
+        $confirm->title = $confirm->customer_name;
+      } else {
+        $confirm->title = $confirm->building_name;
+        Unit::formatInfo($confirm);
+      }
+      $confirm->desc = $confirm->create_time;
+    }
+
+    return $result;
+  }
+  
+  /**
    * 生成客户确认
    */
   public static function addNew($cid, $bid, $uid, $user_id) {

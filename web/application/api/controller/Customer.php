@@ -279,7 +279,8 @@ class Customer extends Base
   public function addConfirm($cid, $bid, $uid) {
     $result = Confirm::addNew($cid, $bid, $uid, $this->user_id);
     if ($result > 0) {
-      return $this->succeed();
+      $confirm = Confirm::query($cid, 0, $this->user_id);
+      return $this->succeed($confirm);
     } else {
       return $this->fail();
     }

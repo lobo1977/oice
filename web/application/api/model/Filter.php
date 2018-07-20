@@ -2,6 +2,7 @@
 namespace app\api\model;
 
 use app\api\model\Base;
+use app\api\model\Unit;
 use app\api\model\Log;
 
 class Filter extends Base
@@ -23,19 +24,7 @@ class Filter extends Base
 
     foreach($list as $key => $building) {
       $building->title = $building->building_name;
-      if (!empty($building->building_no)) {
-        $building->title = $building->title . $building->building_no;
-      } 
-      if (!empty($building->floor)) {
-        if ($building->floor > 0) {
-          $building->title = $building->title . $building->floor . '层';
-        } else if ($building->floor < 0) {
-          $building->title = $building->title . '地下' . abs($building->floor) . '层';
-        }
-      }
-      if (!empty($building->room)) {
-        $building->title = $building->title . $building->room;
-      }
+      Unit::formatInfo($building);
 
       $building->desc = (empty($building->level) ? '' : $building->level . '级 ') .
         (empty($building->area) ? '' : $building->area . ' ') .

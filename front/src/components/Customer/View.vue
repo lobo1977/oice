@@ -43,7 +43,7 @@
           <router-link style="float:right;color:#333;" 
             :to="{name: 'LinkmanEdit', params: {id: 0, type: 'customer', oid: info.id}}">+ 添加</router-link>
         </group-title>
-        <cell v-for="(item, index) in linkman" :key="index"
+        <cell v-for="(item, index) in info.linkman" :key="index"
           :title="item.title" :link="{name: 'Linkman', params: {id: item.id}}" 
           :inline-desc="item.desc"></cell>
       </group>
@@ -52,6 +52,15 @@
         <cell :title="info.manager" :inline-desc="info.company || info.mobile">
           <img slot="icon" :src="info.avatar" class="cell-image">
         </cell>
+      </group>
+
+      <group v-if="info.confirm.length">
+        <group-title slot="title">
+          客户确认书
+        </group-title>
+        <cell v-for="(item, index) in info.confirm" :key="index"
+          :title="item.title" :link="{name: 'Confirm', params: {id: item.id}}" 
+          :inline-desc="item.desc"></cell>
       </group>
 
       <flexbox :gutter="0" class="bottom-bar">
@@ -78,7 +87,7 @@
 
     <div v-show="tab === 1" class="time-line">
       <timeline>
-        <timeline-item v-for="(item, index) in log" :key="index">
+        <timeline-item v-for="(item, index) in info.log" :key="index">
           <h4>
             <span>{{item.title}}</span>
             <span @click="editLog(item.id)">
@@ -107,13 +116,13 @@
     <div v-show="tab === 2">
       <group :gutter="0">
         <swipeout>
-          <swipeout-item v-for="(item, index) in filter" :key="index" transition-mode="follow"
+          <swipeout-item v-for="(item, index) in info.filter" :key="index" transition-mode="follow"
             @mousedown.native="itemMouseDown" @mouseup.native="itemMouseUp" 
             @touchstart.native="itemMouseDown" @touchend.native="itemMouseUp"
             @click.native="itemClick(item)">
             <div slot="right-menu">
               <swipeout-button v-if="index > 0" @click.native="sortFilter(item, true)" type="primary">上移</swipeout-button>
-              <swipeout-button v-if="index < filter.length - 1" @click.native="sortFilter(item, false)" type="default">下移</swipeout-button>
+              <swipeout-button v-if="index < info.filter.length - 1" @click.native="sortFilter(item, false)" type="default">下移</swipeout-button>
               <swipeout-button @click.native="removeFilter(item)" type="warn">删除</swipeout-button>
             </div>
             <cell slot="content" :title="item.title">
@@ -153,7 +162,7 @@
     <div v-show="tab === 3">
       <group :gutter="0">
         <swipeout>
-          <swipeout-item v-for="(item, index) in recommend" :key="index"
+          <swipeout-item v-for="(item, index) in info.recommend" :key="index"
             @on-move="swipeoutOpen(item)" @on-end="swipeoutClose(item)"
             transition-mode="follow">
             <div slot="right-menu">
@@ -224,12 +233,13 @@ export default {
         avatar: '/static/img/avatar.png',
         mobile: '',
         company: '',          // 所属企业
-        clash: 0
+        clash: 0,
+        linkman: [],            // 联系人
+        log: [],                // 跟进纪要
+        filter: [],             // 项目筛选表
+        recommend: [],          // 推荐资料
+        confirm: []             // 客户确认书
       },
-      linkman: [],            // 联系人
-      log: [],                // 跟进纪要
-      filter: [],             // 项目筛选表
-      recommend: [],          // 推荐资料
       checkCount: 0,
       showPrintPicker: false,
       printMode: printModeData,
@@ -256,18 +266,7 @@ export default {
                 vm.info[item] = res.data[item]
               }
             }
-            if (res.data.linkman) {
-              vm.linkman = res.data.linkman
-            }
-            if (res.data.log) {
-              vm.log = res.data.log
-            }
-            if (res.data.filter) {
-              vm.filter = res.data.filter
-            }
-            if (res.data.recommend) {
-              vm.recommend = res.data.recommend
-            }
+
             vm.$emit('on-view-loaded', vm.info.customer_name)
 
             if (vm.$isWechat()) {
@@ -344,9 +343,9 @@ export default {
           }, (res) => {
             vm.$vux.loading.hide()
             if (res.success) {
-              for (let i in vm.log) {
-                if (vm.log[i].id === id) {
-                  vm.log.splice(i, 1)
+              for (let i in vm.info.log) {
+                if (vm.info.log[i].id === id) {
+                  vm.info.log.splice(i, 1)
                   break
                 }
               }
@@ -366,7 +365,7 @@ export default {
     },
     getSelectedList () {
       let selectedList = []
-      this.filter.forEach((item, index) => {
+      this.info.filter.forEach((item, index) => {
         if (item.checked) {
           selectedList.push('' + item.building_id + ',' + item.unit_id)
         }
@@ -401,7 +400,7 @@ export default {
       }, (res) => {
         this.$vux.loading.hide()
         if (res.success) {
-          this.filter = res.data
+          this.info.filter = res.data
         } else {
           this.$vux.toast.show({
             text: res.message,
@@ -419,7 +418,7 @@ export default {
       }, (res) => {
         this.$vux.loading.hide()
         if (res.success) {
-          this.filter = res.data
+          this.info.filter = res.data
         } else {
           this.$vux.toast.show({
             text: res.message,
@@ -454,10 +453,10 @@ export default {
       } else {
         let bid = 0
         let uid = 0
-        for (let i = 0; i < vm.filter.length; i++) {
-          if (vm.filter[i].checked) {
-            bid = vm.filter[i].building_id
-            uid = vm.filter[i].unit_id
+        for (let i = 0; i < vm.info.filter.length; i++) {
+          if (vm.info.filter[i].checked) {
+            bid = vm.info.filter[i].building_id
+            uid = vm.info.filter[i].unit_id
             break
           }
         }
@@ -470,6 +469,7 @@ export default {
         }, (res) => {
           this.$vux.loading.hide()
           if (res.success) {
+            this.info.confirm = res.data
             this.$vux.toast.show({
               type: 'success',
               text: '客户确认书已生成。',
@@ -494,7 +494,7 @@ export default {
       }, (res) => {
         vm.$vux.loading.hide()
         if (res.success) {
-          vm.recommend = res.data
+          vm.info.recommend = res.data
           vm.goTab(3)
         } else {
           vm.$vux.toast.show({
@@ -530,9 +530,9 @@ export default {
           }, (res) => {
             vm.$vux.loading.hide()
             if (res.success) {
-              for (let i = vm.recommend.length - 1; i >= 0; i--) {
-                if (vm.recommend[i].id === id) {
-                  vm.recommend.splice(i, 1)
+              for (let i = vm.info.recommend.length - 1; i >= 0; i--) {
+                if (vm.info.recommend[i].id === id) {
+                  vm.info.recommend.splice(i, 1)
                 }
               }
             } else {

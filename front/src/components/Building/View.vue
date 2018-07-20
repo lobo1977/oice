@@ -490,7 +490,7 @@ export default {
     },
     toConfirm (cid, bid, uid) {
       this.$vux.loading.show()
-      this.$post('/api/customer/addConfirm', {
+      this.$post('/api/building/addConfirm', {
         cid: cid,
         bid: bid,
         uid: uid

@@ -8,6 +8,7 @@ use app\api\model\Linkman;
 use app\api\model\Filter;
 use app\api\model\User;
 use app\api\model\Recommend;
+use app\api\model\Confirm;
 
 class Customer extends Base
 {
@@ -102,6 +103,7 @@ class Customer extends Base
     $data->log = Log::getList('customer', $id, $user_id);
     $data->filter = Filter::query($id, $user_id);
     $data->recommend = Recommend::query($id, $user_id);
+    $data->confirm = Confirm::query($id, 0, $user_id);
 
     return $data;
   }

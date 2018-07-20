@@ -5,8 +5,8 @@ use think\Validate;
 use app\api\controller\Base;
 use app\api\model\Building as modelBuilding;
 use app\api\model\Customer;
+use app\api\model\Confirm;
 use app\api\model\File;
-
 
 class Building extends Base
 {
@@ -248,6 +248,18 @@ class Building extends Base
   public function remove($id) {
     $result = modelBuilding::remove($id, $this->user_id);
     if ($result == 1) {
+      return $this->succeed();
+    } else {
+      return $this->fail();
+    }
+  }
+
+  /**
+   * 生成客户确认书
+   */
+  public function addConfirm($cid, $bid, $uid) {
+    $result = Confirm::addNew($cid, $bid, $uid, $this->user_id);
+    if ($result > 0) {
       return $this->succeed();
     } else {
       return $this->fail();

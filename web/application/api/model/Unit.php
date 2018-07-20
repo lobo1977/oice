@@ -21,7 +21,11 @@ class Unit extends Base
    */
   public static function formatInfo($unit) {
     if ($unit != null) {
-      $unit->title = $unit->building_no;
+      if (!empty($unit->title)) {
+        $unit->title = $unit->title . $unit->building_no;
+      } else {
+        $unit->title = $unit->building_no;
+      }
       if ($unit->floor > 0) {
         $unit->title = $unit->title . $unit->floor . '层';
       } else if ($unit->floor < 0) {
