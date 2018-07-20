@@ -352,7 +352,7 @@ class User extends Base
       File::thumbImage($info, [60,200], $uploadPath);
       return $info->getFilename();
     } else {
-      return false;
+      self::exception($avatar->getError());
     }
   }
 }

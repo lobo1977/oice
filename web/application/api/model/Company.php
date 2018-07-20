@@ -642,7 +642,7 @@ class Company extends Base
       File::thumbImage($info, [60,200], $uploadPath);
       return $info->getFilename();
     } else {
-      return false;
+      self::exception($logo->getError());
     }
   }
 
@@ -658,7 +658,7 @@ class Company extends Base
       File::thumbImage($info, [60,200], $uploadPath);
       return $info->getFilename();
     } else {
-      return false;
+      self::exception($stamp->getError());
     }
   }
 }
