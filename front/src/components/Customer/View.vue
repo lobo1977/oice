@@ -117,13 +117,14 @@
       <group :gutter="0">
         <swipeout>
           <swipeout-item v-for="(item, index) in info.filter" :key="index" transition-mode="follow"
+            @on-open="swipeoutOpen(item)" @on-close="swipeoutClose(item)"
             @mousedown.native="itemMouseDown" @mouseup.native="itemMouseUp" 
             @touchstart.native="itemMouseDown" @touchend.native="itemMouseUp"
             @click.native="itemClick(item)">
             <div slot="right-menu">
-              <swipeout-button v-if="index > 0" @click.native="sortFilter(item, true)" type="primary">上移</swipeout-button>
-              <swipeout-button v-if="index < info.filter.length - 1" @click.native="sortFilter(item, false)" type="default">下移</swipeout-button>
-              <swipeout-button @click.native="removeFilter(item)" type="warn">删除</swipeout-button>
+              <swipeout-button v-if="index > 0" @click.native.stop="sortFilter(item, true)" type="primary">上移</swipeout-button>
+              <swipeout-button v-if="index < info.filter.length - 1" @click.native.stop="sortFilter(item, false)" type="default">下移</swipeout-button>
+              <swipeout-button @click.native.stop="removeFilter(item)" type="warn">删除</swipeout-button>
             </div>
             <cell slot="content" :title="item.title">
               <p slot="inline-desc" class="cell-desc">{{item.desc}}</p>
@@ -146,7 +147,7 @@
         </flexbox-item>
         <flexbox-item :span="4">
           <x-button type="primary" class="bottom-btn" @click.native="toConfirm" 
-            :disabled="info.id === 0 || checkCount != 1">
+            :disabled="info.id === 0 || checkCount != 1 || info.user_id != user.id">
             <x-icon type="checkmark-circled" class="btn-icon"></x-icon> 生成确认书
           </x-button>
         </flexbox-item>
@@ -163,12 +164,14 @@
       <group :gutter="0">
         <swipeout>
           <swipeout-item v-for="(item, index) in info.recommend" :key="index"
-            @on-move="swipeoutOpen(item)" @on-end="swipeoutClose(item)"
+            @on-open="swipeoutOpen(item)" @on-close="swipeoutClose(item)"
+            @mousedown.native="itemMouseDown" @mouseup.native="itemMouseUp" 
+            @touchstart.native="itemMouseDown" @touchend.native="itemMouseUp"
             transition-mode="follow">
             <div slot="right-menu">
               <swipeout-button @click.native="removeRecommend(item.id)" type="warn">删除</swipeout-button>
             </div>
-            <cell slot="content" :disabled="item.disabled" is-link @click.native="print(item)">
+            <cell slot="content" :disabled="item.disabled" is-link @click.native.stop="print(item)">
               <p slot="title">{{item.building}}
                 <span v-if="item.building_count > 1">等 {{item.building_count}} 个项目</span>
               </p>
@@ -384,6 +387,7 @@ export default {
       }
     },
     itemClick (item) {
+      if (this.mouseMove || item.disabled) return
       if (item.unit_id) {
         this.$router.push({name: 'Unit', params: {id: item.unit_id}})
       } else if (item.building_id) {
@@ -467,16 +471,16 @@ export default {
           bid: bid,
           uid: uid
         }, (res) => {
-          this.$vux.loading.hide()
+          vm.$vux.loading.hide()
           if (res.success) {
-            this.info.confirm = res.data
-            this.$vux.toast.show({
+            vm.info.confirm = res.data
+            vm.$vux.toast.show({
               type: 'success',
               text: '客户确认书已生成。',
               width: '12em'
             })
           } else {
-            this.$vux.toast.show({
+            vm.$vux.toast.show({
               text: res.message,
               width: '15em'
             })
@@ -511,7 +515,7 @@ export default {
       item.disabled = false
     },
     print (item) {
-      if (item.disabled) return
+      if (this.mouseMove || item.disabled) return
       if (item.mode === 0) {
         this.$router.push({name: 'RecommendView', params: {id: item.token}})
       } else {

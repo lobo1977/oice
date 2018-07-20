@@ -180,8 +180,8 @@ export default {
   beforeRouteEnter (to, from, next) {
     next(vm => {
       if (to.params.id) {
-        vm.id = parseInt(to.params.id)
-        if (!isNaN(vm.id)) {
+        vm.id = to.params.id
+        if (vm.id) {
           vm.$get('/api/customer/show?id=' + vm.id, (res) => {
             if (res.success) {
               vm.customer = res.data.customer

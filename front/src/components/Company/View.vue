@@ -40,12 +40,13 @@
       title="待审核成员" footerTitle="向左滑动条目完成操作" class="wait-group">
       <swipeout>
         <swipeout-item v-for="(item, index) in waitUser" :key="index" transition-mode="follow"
+          @on-open="swipeoutOpen(item)" @on-close="swipeoutClose(item)"
           @mousedown.native="itemMouseDown" @mouseup.native="itemMouseUp" 
           @touchstart.native="itemMouseDown" @touchend.native="itemMouseUp"
-          @click.native="itemClick(item.id)">
+          @click.native="itemClick(item)">
           <div slot="right-menu">
-            <swipeout-button @click.native="audit(item.id, 1)" type="primary">通过</swipeout-button>
-            <swipeout-button @click.native="audit(item.id, 0)" type="warn">驳回</swipeout-button>
+            <swipeout-button @click.native.stop="audit(item.id, 1)" type="primary">通过</swipeout-button>
+            <swipeout-button @click.native.stop="audit(item.id, 0)" type="warn">驳回</swipeout-button>
           </div>
           <cell slot="content" :title="item.title" :inline-desc="item.mobile">
             <img slot="icon" :src="item.avatar" class="cell-image">
@@ -195,6 +196,12 @@ export default {
         this.$refs.previewer.show(0)
       }
     },
+    swipeoutOpen (item) {
+      item.disabled = true
+    },
+    swipeoutClose (item) {
+      item.disabled = false
+    },
     itemMouseDown (event) {
       this.pageX = event.pageX
       this.pageY = event.pageY
@@ -206,7 +213,10 @@ export default {
         this.mouseMove = false
       }
     },
-    itemClick (id) {
+    itemClick (item) {
+      if (item.disabled || this.mouseMove) {
+
+      }
     },
     audit (userId, flag) {
       let vm = this

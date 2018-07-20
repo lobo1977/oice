@@ -15,13 +15,14 @@
       <group v-if="my.length > 0" title="切换企业">
         <swipeout>
           <swipeout-item v-for="(item, index) in my" :key="index" transition-mode="follow" 
+            @on-open="swipeoutOpen(item)" @on-close="swipeoutClose(item)"
             @mousedown.native="itemMouseDown" @mouseup.native="itemMouseUp" 
             @touchstart.native="itemMouseDown" @touchend.native="itemMouseUp"
-            @click.native="itemClick(item.id)">
+            @click.native="itemClick(item)">
             <div slot="right-menu">
-              <swipeout-button v-if="user && item.id != user.company_id" @click.native="setDefault(item.id)" type="primary">切换</swipeout-button>
-              <swipeout-button @click.native="view(item.id)" type="default">查看</swipeout-button>
-              <swipeout-button @click.native="quit(item.id, item.title)" type="warn">退出</swipeout-button>
+              <swipeout-button v-if="user && item.id != user.company_id" @click.native.stop="setDefault(item.id)" type="primary">切换</swipeout-button>
+              <swipeout-button @click.native.stop="view(item.id)" type="default">查看</swipeout-button>
+              <swipeout-button @click.native.stop="quit(item.id, item.title)" type="warn">退出</swipeout-button>
             </div>
             <div slot="content" class="vux-1px-t swipeout-item">
               {{item.title}}
@@ -166,6 +167,12 @@ export default {
         }
       })
     },
+    swipeoutOpen (item) {
+      item.disabled = true
+    },
+    swipeoutClose (item) {
+      item.disabled = false
+    },
     itemMouseDown (event) {
       this.pageX = event.pageX
       this.pageY = event.pageY
@@ -177,9 +184,10 @@ export default {
         this.mouseMove = false
       }
     },
-    itemClick (value) {
-      if (!this.mouseMove) {
-        this.setDefault(value)
+    itemClick (item) {
+      if (this.mouseMove || item.disabled) {
+      } else {
+        this.setDefault(item.id)
       }
     },
     setDefault (value) {
