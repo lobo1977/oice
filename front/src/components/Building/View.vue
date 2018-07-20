@@ -70,7 +70,7 @@
         <flexbox-item :span="2">
           <x-button type="default" class="bottom-btn"
             @click.native="favorite">
-            <x-icon type="star" class="btn-icon"></x-icon>
+            <x-icon type="star" class="btn-icon" :class="{green: info.isFavorite}"></x-icon>
           </x-button>
         </flexbox-item>
         <flexbox-item>

@@ -187,6 +187,10 @@ html, body {
   background-color: #fbf9fe;
 }
 
+.green {
+  fill: #09bb07;
+}
+
 .vux-header {
   .header-icon {
     fill:#fff;
