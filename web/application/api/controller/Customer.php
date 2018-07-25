@@ -141,9 +141,6 @@ class Customer extends Base
                   Filter::addBuilding($result, 0, intval($unit_id), $this->user_id);
                 }
               }
-            // 生成客户确认书
-            } else if ($flag == 'confirm' && ($bid || $uid)) {
-              Confirm::addNew($result, $bid, intval($uid), $this->user_id);
             }
           }
           return $this->succeed($result, $message);

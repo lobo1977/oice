@@ -7,6 +7,7 @@ use app\api\model\File;
 use app\api\model\Log;
 use app\api\model\Linkman;
 use app\api\model\Unit;
+use app\api\model\Confirm;
 
 class Building extends Base
 {
@@ -160,6 +161,11 @@ class Building extends Base
     $data->images = File::getList($id, 'building');
     $data->linkman = Linkman::getByOwnerId($id, 'building', $user_id);
     $data->unit = Unit::getByBuildingId($id, $user_id, $company_id);
+    if ($data->user_id == $user_id || $data->company_id == $company_id) {
+      $data->confirm = Confirm::query(0, $id, 0);
+    } else {
+      $data->confirm = Confirm::query(0, $id, $user_id);
+    }
     $data->isFavorite = false;
     if ($user_id) {
       if (db('favorite')->where('user_id', $user_id)

@@ -37,22 +37,17 @@
     </group>
 
     <flexbox :gutter="0" class="bottom-bar">
-      <flexbox-item :span="4">
+      <flexbox-item :span="5">
         <x-button type="warn" class="bottom-btn"
           @click.native="toCustomer(0)">
             <x-icon type="funnel" class="btn-icon"></x-icon> 加入筛选
         </x-button>
       </flexbox-item>
-      <flexbox-item :span="4">
+      <flexbox-item :span="5">
         <x-button type="primary" class="bottom-btn"
-          @click.native="toCustomer(1)">
-            <x-icon type="checkmark-circled" class="btn-icon"></x-icon> 客户确认
-        </x-button>
-      </flexbox-item>
-      <flexbox-item :span="2">
-        <x-button type="default" class="bottom-btn"
           @click.native="favorite">
           <x-icon type="star" class="btn-icon" :class="{green: info.isFavorite}"></x-icon>
+          {{favoriteText}}
         </x-button>
       </flexbox-item>
       <flexbox-item>
@@ -308,26 +303,6 @@ export default {
       })
     },
     toConfirm (cid, id) {
-      this.$vux.loading.show()
-      this.$post('/api/building/addConfirm', {
-        cid: cid,
-        bid: 0,
-        uid: id
-      }, (res) => {
-        this.$vux.loading.hide()
-        if (res.success) {
-          this.$vux.toast.show({
-            type: 'success',
-            text: '客户确认书已生成。',
-            width: '12em'
-          })
-        } else {
-          this.$vux.toast.show({
-            text: res.message,
-            width: '15em'
-          })
-        }
-      })
     },
     unitMenuClick (key, item) {
       let vm = this

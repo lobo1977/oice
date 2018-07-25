@@ -103,7 +103,7 @@ class Customer extends Base
     $data->log = Log::getList('customer', $id, $user_id);
     $data->filter = Filter::query($id, $user_id);
     $data->recommend = Recommend::query($id, $user_id);
-    $data->confirm = Confirm::query($id, 0, $user_id);
+    $data->confirm = Confirm::query($id, 0, 0);
 
     return $data;
   }

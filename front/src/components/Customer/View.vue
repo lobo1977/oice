@@ -59,7 +59,7 @@
           客户确认书
         </group-title>
         <cell v-for="(item, index) in info.confirm" :key="index"
-          :title="item.title" :link="{name: 'Confirm', params: {id: item.id}}" 
+          :title="item.title" :link="{name: 'ConfirmView', params: {id: item.id}}" 
           :inline-desc="item.desc"></cell>
       </group>
 

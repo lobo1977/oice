@@ -1,14 +1,14 @@
 <template>
   <div>
-    <swiper v-if="images.length" :auto="true" :loop="true" height="260px"
-      :show-dots="images.length > 1">
-      <swiper-item class="swiper-img" v-for="(item, index) in images" :key="index">
+    <swiper v-if="info.images.length" :auto="true" :loop="true" height="260px"
+      :show-dots="info.images.length > 1">
+      <swiper-item class="swiper-img" v-for="(item, index) in info.images" :key="index">
         <img :src="item.src" @click="preview(index)">
       </swiper-item>
     </swiper>
 
-    <div v-transfer-dom v-if="images.length">
-      <previewer :list="images" ref="previewer" :options="previewOptions"></previewer>
+    <div v-transfer-dom v-if="info.images.length">
+      <previewer :list="info.images" ref="previewer" :options="previewOptions"></previewer>
     </div>
 
     <sticky :offset="46">
@@ -16,6 +16,7 @@
         <tab-item @on-item-click="goTab(0)" :selected="tab === 0">基本信息</tab-item>
         <tab-item @on-item-click="goTab(1)" :selected="tab === 1">联系人</tab-item>
         <tab-item @on-item-click="goTab(2)" :selected="tab === 2">单元销控</tab-item>
+        <tab-item v-if="user != null && user.id > 0" @on-item-click="goTab(3)" :selected="tab === 3">确认书</tab-item>
       </tab>
     </sticky>
 
@@ -86,12 +87,12 @@
     </div>
 
     <div v-show="tab === 1">
-      <cell v-for="(item, index) in linkman" :key="index"
-          :title="item.title" :link="{name: 'Linkman', params: {id: item.id}}" 
-          :inline-desc="item.desc"></cell>
+      <cell v-for="(item, index) in info.linkman" :key="index"
+        :title="item.title" :link="{name: 'Linkman', params: {id: item.id}}" 
+        :inline-desc="item.desc"></cell>
       
       <div class="bottom-bar">
-        <x-button type="warn" class="bottom-btn" :disabled="info.id === 0"
+        <x-button type="primary" class="bottom-btn" :disabled="info.id === 0"
           :link="{name: 'LinkmanEdit', params: {id: 0, type: 'building', oid: info.id}}">
           <x-icon type="plus" class="btn-icon"></x-icon> 添加
         </x-button>
@@ -132,23 +133,23 @@
         </flexbox-item>
         <flexbox-item :span="4">
           <x-button type="primary" class="bottom-btn" :disabled="selectedUnit.length === 0"
-            @click.native="toCustomer(1)">
-            <x-icon type="checkmark-circled" class="btn-icon"></x-icon> 客户确认
-          </x-button>
-        </flexbox-item>
-        <flexbox-item :span="2">
-          <x-button type="default" class="bottom-btn" :disabled="selectedUnit.length === 0"
             @click.native="batchFavorite">
-            <x-icon type="star" class="btn-icon"></x-icon>
+            <x-icon type="star" class="btn-icon"></x-icon> 收藏
           </x-button>
         </flexbox-item>
         <flexbox-item>
           <x-button type="default" class="bottom-btn" :disabled="info.id === 0"
             :link="{name: 'UnitEdit', params: { id:0, bid: info.id }}">
-            <x-icon type="plus" class="btn-icon"></x-icon>
+            <x-icon type="plus" class="btn-icon"></x-icon> 添加
           </x-button>
         </flexbox-item>
       </flexbox>
+    </div>
+
+    <div v-show="tab === 3">
+      <cell v-for="(item, index) in info.confirm" :key="index"
+        :title="item.title" :link="{name: 'ConfirmView', params: {id: item.id}}" 
+        :inline-desc="item.desc"></cell>
     </div>
 
     <popup-picker ref="customerPicker" class="popup-picker" :show.sync="showCustomerPicker" 
@@ -232,11 +233,13 @@ export default {
         traffic: '',          // 交通状况
         environment: '',      // 周边环境
         user_id: 0,
-        isFavorite: false
+        isFavorite: false,
+        images: [],
+        linkman: [],
+        unit: [],
+        confirm: []
       },
-      images: [],
-      linkman: [],
-      unit: [],
+
       showCustomerPicker: false,
       myCustomer: [],
       selectCustomer: [],
@@ -289,15 +292,7 @@ export default {
             if (res.data.isFavorite) {
               vm.info.isFavorite = true
             }
-            if (res.data.images && res.data.images.length) {
-              vm.images = res.data.images
-            }
-            if (res.data.linkman) {
-              vm.linkman = res.data.linkman
-            }
-            if (res.data.unit) {
-              vm.unit = res.data.unit
-            }
+
             if (res.data.customer) {
               let customer = []
               for (let i in res.data.customer) {
@@ -322,9 +317,9 @@ export default {
                   ' ' + vm.info.location + ' ' + vm.info.price
               let shareImage = null
 
-              if (vm.images.length) {
+              if (vm.info.images.length) {
                 shareImage = window.location.protocol + '//' +
-                  window.location.host + vm.images[0].src
+                  window.location.host + vm.info.images[0].src
               }
 
               vm.$wechatShare(null, shareLink, vm.info.building_name, shareDesc, shareImage)
@@ -460,7 +455,7 @@ export default {
         }
       }
       if (this.customerFlag === 1) {
-        this.toConfirm(customerId, bid, uids)
+        this.toConfirm(customerId, bid)
       } else {
         this.toFilter(customerId, bid, uids)
       }
@@ -488,27 +483,8 @@ export default {
         }
       })
     },
-    toConfirm (cid, bid, uid) {
-      this.$vux.loading.show()
-      this.$post('/api/building/addConfirm', {
-        cid: cid,
-        bid: bid,
-        uid: uid
-      }, (res) => {
-        this.$vux.loading.hide()
-        if (res.success) {
-          this.$vux.toast.show({
-            type: 'success',
-            text: '客户确认书已生成。',
-            width: '12em'
-          })
-        } else {
-          this.$vux.toast.show({
-            text: res.message,
-            width: '15em'
-          })
-        }
-      })
+    toConfirm (cid, bid) {
+      this.$router.push({name: 'ConfirmEdit', params: {id: 0, bid: bid, cid: cid}})
     },
     batchFavorite () {
       if (this.user) {
@@ -651,7 +627,7 @@ export default {
               }, (res) => {
                 vm.$vux.loading.hide()
                 if (res.success) {
-                  vm.unit = res.data
+                  vm.info.unit = res.data
                   vm.selectedUnit = []
                 } else {
                   vm.$vux.toast.show({
@@ -669,25 +645,25 @@ export default {
   computed: {
     unitTree () {
       let tree = []
-      if (!this.unit || !this.unit.length) {
+      if (!this.info.unit || !this.info.unit.length) {
         return tree
       }
       let building = {}
       let floor = {}
       let b, f
-      for (let i in this.unit) {
-        if (b !== this.unit[i].building_no) {
-          b = this.unit[i].building_no
+      for (let i in this.info.unit) {
+        if (b !== this.info.unit[i].building_no) {
+          b = this.info.unit[i].building_no
           f = null
           building = {building: b, floor: []}
           tree.push(building)
         }
-        if (f !== this.unit[i].floor) {
-          f = this.unit[i].floor
+        if (f !== this.info.unit[i].floor) {
+          f = this.info.unit[i].floor
           floor = {floor: f, unit: []}
           building.floor.push(floor)
         }
-        floor.unit.push(this.unit[i])
+        floor.unit.push(this.info.unit[i])
       }
       return tree
     },

@@ -169,6 +169,30 @@ export default new Router({
         require(['../components/Recommend/View.vue'], resolve)
       }
     }, {
+      path: '/confirm/view/:id',
+      name: 'ConfirmView',
+      meta: {
+        title: '客户确认书',
+        showBack: true,
+        hideBar: true,
+        requiresAuth: true
+      },
+      component: function (resolve) {
+        require(['../components/Confirm/View.vue'], resolve)
+      }
+    }, {
+      path: '/confirm/edit/:id/:bid/:cid',
+      name: 'ConfirmEdit',
+      meta: {
+        title: '',
+        showBack: true,
+        hideBar: true,
+        requiresAuth: true
+      },
+      component: function (resolve) {
+        require(['../components/Confirm/Edit.vue'], resolve)
+      }
+    }, {
       path: '/my',
       name: 'My',
       meta: {
