@@ -14,7 +14,7 @@
         <cell title="租售" value-align="left" :value="info.rent_sell" v-if="info.rent_sell"></cell>
         <cell title="确认日期" value-align="left" :value="info.confirm_date|formatDate" v-if="info.confirm_date"></cell>
         <cell title="截止日期" value-align="left" :value="info.end_date|formatDate" v-if="info.end_date"></cell>
-        <cell title="确认书" :is-link="true" @click.native="download"></cell>
+        <cell title="确认书" value-align="left" value="点击下载" :is-link="true" @click.native="download"></cell>
       </group>
 
       <group title="备注" v-show="info.rem">

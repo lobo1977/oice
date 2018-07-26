@@ -272,13 +272,13 @@ class Confirm extends Base
       '<p>电话： <span style="text-decoration:underline">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span> &nbsp; &nbsp;' .
       '传真： <span style="text-decoration:underline">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span></p>' .
       '<p>确认日期：' . date_format(date_create($data->confirm_date), 'Y年m月d日') . '</p><p></p>' . 
-      '<p>&nbsp; &nbsp; 我公司代理客户' . $data->customer . '到委托方所属物业(' . $data->building . ')考察，所需面积约 ' . $data->acreage . ' 平方米(以最终签约面积为准)。' .
+      '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我公司代理客户' . $data->customer . '到委托方所属物业(' . $data->building . ')考察，所需面积约 ' . $data->acreage . ' 平方米(以最终签约面积为准)。' .
       '此客户系代理方与委托方确认之客户，此客户租赁事宜委托方不得与其它中介机构达成任何协议。' . 
       '双方应积极促成此客户成交，并做好相关的保密工作。上述客户（总公司或其所属子公司）与贵物业成交，' .
       '委托方于收到客户首付款后7个工作日内支付代理方全部佣金，佣金数额为' .
       ($data->rent_sell == '出租' ? '相当于客户壹个月的租金。' : '购房款总额的 1% □ &nbsp;2% □ &nbsp;3% □ &nbsp;。') .
-      '<p>&nbsp; &nbsp; 此确认书有效期为' . $data->period . '个月，若洽谈期超过' . $data->period . '个月，则本确认书有效期相应顺延。</p>' .
-      '<p>&nbsp; &nbsp; 谢谢合作！</p>' . 
+      '</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;此确认书有效期为' . $data->period . '个月，若洽谈期超过' . $data->period . '个月，则本确认书有效期相应顺延。</p>' .
+      '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;谢谢合作！</p>' . 
       '<p></p><p></p><table style="width:100%"><tr><td><p>委托方：' . $data->developer . '</p><p></p>' .
       '<p>代表签字：<span style="text-decoration:underline">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span></p></td>' .
       '<td><p>代理方：' . $data->company . '</p><p></p>' .
