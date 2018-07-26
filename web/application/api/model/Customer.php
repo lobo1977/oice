@@ -279,14 +279,9 @@ class Customer extends Base
       }
 
       if ($oldData->settle_date) {
-        $oldData->settle_date = substr($oldData->settle_date, 0, 10);
+        $oldData->settle_date = date_format(date_create($oldData->settle_date), 'Y-m-d');
       }
-
-      if (empty($data['settle_date'])) {
-        if ($oldData->settle_date) {
-          $summary = $summary . '入驻日期：' . $oldData->settle_date . ' ->\n';
-        }
-      } else if ($data['settle_date'] != $oldData->settle_date) {
+      if ($data['settle_date'] != $oldData->settle_date) {
         if ($oldData->settle_date) {
           $summary = $summary . '入驻日期：' . $oldData->settle_date . ' -> ' . $data['settle_date'] . '\n';
         } else {

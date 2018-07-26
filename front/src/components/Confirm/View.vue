@@ -12,8 +12,8 @@
           :link="{name: 'CustomerView', params: { id: info.customer_id }}"></cell>
         <cell title="面积" value-align="left" :value="info.acreage + ' 平方米'" v-if="info.acreage"></cell>
         <cell title="租售" value-align="left" :value="info.rent_sell" v-if="info.rent_sell"></cell>
-        <cell title="确认日期" value-align="left" :value="info.confirm_date" v-if="info.confirm_date"></cell>
-        <cell title="截止日期" value-align="left" :value="info.end_date" v-if="info.end_date"></cell>
+        <cell title="确认日期" value-align="left" :value="info.confirm_date|formatDate" v-if="info.confirm_date"></cell>
+        <cell title="截止日期" value-align="left" :value="info.end_date|formatDate" v-if="info.end_date"></cell>
         <cell title="确认书" :is-link="true" @click.native="download"></cell>
       </group>
 
@@ -86,21 +86,9 @@ export default {
       vm.$get('/api/confirm/detail?id=' + vm.id, res => {
         if (res.success) {
           for (let item in vm.info) {
-            vm.info[item] = res.data[item]
-          }
-
-          if (vm.info.confirm_date) {
-            vm.info.confirm_date = dateFormat(
-              new Date(Date.parse(vm.info.confirm_date.replace(/-/g, '/'))),
-              'YYYY-MM-DD'
-            )
-          }
-
-          if (vm.info.end_date) {
-            vm.info.end_date = dateFormat(
-              new Date(Date.parse(vm.info.end_date.replace(/-/g, '/'))),
-              'YYYY-MM-DD'
-            )
+            if (res.data[item] !== undefined && res.data[item] !== null) {
+              vm.info[item] = res.data[item]
+            }
           }
 
           if (!vm.info.acreage || vm.info.acreage === '0') {
@@ -132,7 +120,16 @@ export default {
       })
     }
   },
-  computed: {}
+  computed: {},
+  filters: {
+    formatDate (value) {
+      if (value) {
+        return dateFormat(new Date(Date.parse(value.replace(/-/g, '/'))), 'YYYY年M月D日')
+      } else {
+        return ''
+      }
+    }
+  }
 }
 </script>
 

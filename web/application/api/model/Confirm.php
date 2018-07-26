@@ -133,6 +133,9 @@ class Confirm extends Base
         }
       }
 
+      if ($oldData->confirm_date) {
+        $oldData->confirm_date = date_format(date_create($oldData->confirm_date), 'Y-m-d');
+      }
       if ($data['confirm_date'] != $oldData->confirm_date) {
         if ($oldData->confirm_date) {
           $summary = $summary . '确认日期：' . $oldData->confirm_date . ' -> ' . $data['confirm_date'] . '\n';
@@ -157,14 +160,6 @@ class Confirm extends Base
         }
       }
 
-      $log = [
-        "table" => 'customer',
-        "owner_id" => $oldData->customer_id,
-        "title" => '修改确认书',
-        "summary" => $summary,
-        "user_id" => $user_id
-      ];
-
       if (isset($data['building_id'])) {
         unset($data['building_id']);
       }
@@ -178,11 +173,20 @@ class Confirm extends Base
       }
 
       $result =  $oldData->save($data);
-      if ($result) {
+      if ($result && $summary) {
+        $confirmData = self::detail($oldData->id, 0, 0, $user_id, 0);
+
+        $log = [
+          "table" => 'customer',
+          "owner_id" => $oldData->customer_id,
+          "title" => '修改确认书',
+          "summary" => $confirmData->building . '\n' .$summary,
+          "user_id" => $user_id
+        ];
+
         Log::add($log);
 
         //生成PDF
-        $confirmData = self::detail($oldData->id, 0, 0, $user_id, 0);
         $oldData->file = self::toPdf($confirmData);
         $oldData->save();
       }
@@ -257,16 +261,14 @@ class Confirm extends Base
       ($data->rent_sell == '出租' ? '相当于客户壹个月的租金。' : '购房款总额的 1% □ &nbsp;2% □ &nbsp;3% □ &nbsp;。') .
       '<p>&nbsp; &nbsp; 此确认书有效期为' . $data->period . '个月，若洽谈期超过' . $data->period . '个月，则本确认书有效期相应顺延。</p>' .
       '<p>&nbsp; &nbsp; 谢谢合作！</p>' . 
-      '<p></p><p></p><table style="width:100%"><tr><td><p>委托方：' . $data->developer . '</p>' .
+      '<p></p><p></p><table style="width:100%"><tr><td><p>委托方：' . $data->developer . '</p><p></p>' .
       '<p>代表签字：<span style="text-decoration:underline">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span></p></td>' .
-      '<td><p>代理方：' . $data->company . '</p>' .
+      '<td><p>代理方：' . $data->company . '</p><p></p>' .
       '<p>代表签字：<span style="text-decoration:underline">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span></p></td></tr></table>' ,
         true, false, true, false, '');
     
     if ($data->stamp) {
       $pdf->Image($_SERVER['DOCUMENT_ROOT'] . '/upload/company/images/200/' . $data->stamp, 140, 190, 50, 50, '', '', '', false, 300, '', false, false, 0, false, false, false);
-    } else {
-      $pdf->Image($_SERVER['DOCUMENT_ROOT'] . '/static/img/stamp.png', 140, 190, 50, 50, '', '', '', false, 300, '', false, false, 0, false, false, false);
     }
 
     $path = $_SERVER['DOCUMENT_ROOT'] . '/upload/confirm';

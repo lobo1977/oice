@@ -247,14 +247,9 @@ class Building extends Base
       }
 
       if ($oldData->completion_date) {
-        $oldData->completion_date = substr($oldData->completion_date, 0, 10);
+        $oldData->completion_date = date_format(date_create($oldData->completion_date), 'Y-m-d');
       }
-
-      if (empty($data['completion_date'])) {
-        if ($oldData->completion_date) {
-          $summary = $summary . '竣工日期：' . $oldData->completion_date . ' ->\n';
-        }
-      } else if ($data['completion_date'] != $oldData->completion_date) {
+      if ($data['completion_date'] != $oldData->completion_date) {
         if ($oldData->completion_date) {
           $summary = $summary . '竣工日期：' . $oldData->completion_date . ' -> ' . $data['completion_date'] . '\n';
         } else {
