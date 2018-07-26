@@ -147,8 +147,6 @@ class Customer extends Base
         self::exception('客户不存在。');
       } else if ($oldData->user_id != $user_id) {
         self::exception('您没有权限修改此客户。');
-      } else if ($oldData->clash > 0) {
-        return $this->exception('撞单客户不可修改，请等待管理员处理。');
       }
     }
 

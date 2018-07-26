@@ -346,9 +346,7 @@ export default {
               title: '保存成功',
               content: res.message,
               onHide () {
-                if (vm.flag === 'confirm') {
-                  vm.$router.replace({name: 'ConfirmEdit', params: {id: 0, bid: vm.bid, cid: res.data}})
-                } else if (vm.id === 0) {
+                if (vm.id === 0) {
                   vm.id = res.data
                   vm.$router.replace({name: 'CustomerView', params: {id: vm.id}})
                 } else {
@@ -356,9 +354,10 @@ export default {
                 }
               }
             })
+          } else if (vm.flag === 'confirm') {
+            vm.$router.replace({name: 'ConfirmEdit', params: {id: 0, bid: vm.bid, cid: res.data}})
           } else if (vm.id === 0) {
-            vm.id = res.data
-            vm.$router.replace({name: 'CustomerView', params: {id: vm.id}})
+            vm.$router.replace({name: 'CustomerView', params: {id: res.data}})
           } else {
             vm.$router.back()
           }

@@ -77,8 +77,6 @@ class Customer extends Base
         $data = modelCustomer::get($id);
         if ($data == null) {
           return $this->exception('客户不存在。');
-        } else if ($data->clash > 0) {
-          return $this->exception('撞单客户不可修改，请等待管理员处理。');
         } else if ($data->user_id != $this->user_id) {
           return $this->exception('您没有权限修改这个客户。');
         } else {
@@ -129,7 +127,7 @@ class Customer extends Base
         if (is_numeric($result) && $result > 0) {
           $message = '';
           if (isset($data['clash']) && $data['clash'] > 0) {
-            $message = '撞单客户不可修改及跟进，请等候管理员处理。';
+            $message = '撞单客户不可跟进，请等候管理员处理。';
           } else {
             // 添加筛选
             if ($flag == 'filter') {
