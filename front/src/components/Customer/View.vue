@@ -1,5 +1,11 @@
 <template>
   <div>
+    <div v-if="showWarn && info.clash > 0" class="warn-box">
+      <icon type="warn"></icon>
+      <span>该客户为撞单客户，暂时不能跟进，请等候管理员处理。</span>
+      <icon type="clear" style="float:right;margin-top:5px;" @click.native="showWarn = false"></icon>
+    </div>
+
     <tab>
       <tab-item @on-item-click="goTab(0)" :selected="tab === 0">基本信息</tab-item>
       <tab-item @on-item-click="goTab(1)" :selected="tab === 1">跟进纪要</tab-item>
@@ -71,7 +77,7 @@
           </x-button>
         </flexbox-item>
         <flexbox-item :span="4">
-          <x-button type="warn" class="bottom-btn" :disabled="info.id === 0 || info.user_id != user.id || info.clash > 0"
+          <x-button type="warn" class="bottom-btn" :disabled="info.id === 0 || info.user_id != user.id"
             :link="{name:'CustomerEdit', params: { id: info.id }}">
             <x-icon type="compose" class="btn-icon"></x-icon> 修改
           </x-button>
@@ -186,7 +192,7 @@
 
 <script>
 import { Tab, TabItem, Flow, FlowState, FlowLine, Group, GroupTitle, Cell, Panel,
-  Swipeout, SwipeoutItem, SwipeoutButton, CheckIcon, Actionsheet,
+  Swipeout, SwipeoutItem, SwipeoutButton, CheckIcon, Actionsheet, Icon,
   Flexbox, FlexboxItem, XButton, dateFormat, Timeline, TimelineItem } from 'vux'
 import printModeData from '../../data/print_mode.json'
 
@@ -206,6 +212,7 @@ export default {
     SwipeoutButton,
     CheckIcon,
     Actionsheet,
+    Icon,
     Flexbox,
     FlexboxItem,
     XButton,
@@ -216,6 +223,7 @@ export default {
     return {
       tab: 0,
       user: null,
+      showWarn: true,
       info: {
         id: 0,
         customer_name: '',    // 名称
