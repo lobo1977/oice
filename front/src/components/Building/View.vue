@@ -23,7 +23,7 @@
     <div v-show="tab === 0">
       <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
         <cell title="项目类型" value-align="left" :value="info.building_type" v-show="info.building_type"></cell>
-        <cell title="地址" value-align="left" :value="info.address" v-show="info.address" 
+        <cell title="地址" value-align="left" :value="info.location + info.address" v-show="info.location || info.address" 
           :is-link="(info.longitude || info.latitude) != 0" @click.native="showMap = ((info.longitude || info.latitude) != 0)"></cell>
         <cell title="竣工日期" value-align="left" :value="info.completionDate|formatDate" v-show="info.completionDate"></cell>
         <cell title="租售" value-align="left" :value="info.rent_sell" v-show="info.rent_sell"></cell>
@@ -162,6 +162,7 @@
         :is-shown="showMap"
         :title="info.building_name"
         :address="info.address"
+        :district="info.location"
         :longitude="info.longitude" 
         :latitude="info.latitude" 
         @on-close="closeMap"></baidumap>

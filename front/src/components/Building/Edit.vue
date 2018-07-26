@@ -163,9 +163,10 @@
       <baidumap :get-point="false" :is-edit="true"
         :is-shown="showMap"
         :title="info.building_name"
+        :district="info.area"
         :address="info.address"
         :longitude="info.longitude" 
-        :latitude="info.latitude" 
+        :latitude="info.latitude"
         @on-close="closeMap" @on-confirm="setLocation"></baidumap>
     </popup>
 
@@ -430,6 +431,8 @@ export default {
       this.info.longitude = location.longitude
       this.info.latitude = location.latitude
       this.info.address = location.address
+      this.info.area = location.district
+      this.districtValue = [location.district, '']
     },
     save () {
       this.validateForm()

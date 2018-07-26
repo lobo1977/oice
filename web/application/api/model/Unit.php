@@ -183,14 +183,16 @@ class Unit extends Base
           ' -> ' . self::$status[$data['status']] . '\n';
       }
 
-      if ($oldData->end_date) {
-        $oldData->end_date = date_format(date_create($oldData->end_date), 'Y-m-d');
-      }
-      if ($data['end_date'] != $oldData->end_date) {
+      if (isset($data['end_date'])) {
         if ($oldData->end_date) {
-          $summary = $summary . '到期日：' . $oldData->end_date . ' -> ' . $data['end_date'] . '\n';
-        } else {
-          $summary = $summary . '到期日：' . $data['end_date'] . '\n';
+          $oldData->end_date = date_format(date_create($oldData->end_date), 'Y-m-d');
+        }
+        if ($data['end_date'] != $oldData->end_date) {
+          if ($oldData->end_date) {
+            $summary = $summary . '到期日：' . $oldData->end_date . ' -> ' . $data['end_date'] . '\n';
+          } else {
+            $summary = $summary . '到期日：' . $data['end_date'] . '\n';
+          }
         }
       }
 

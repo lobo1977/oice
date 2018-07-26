@@ -43,11 +43,15 @@ export default {
     },
     title: {
       type: String,
-      defalult: ''
+      default: ''
     },
     city: {
       type: String,
-      defalult: '北京'
+      default: '北京'
+    },
+    district: {
+      type: String,
+      defalult: ''
     },
     address: {
       type: String,
@@ -73,6 +77,7 @@ export default {
       map: null,
       location: {
         city: '',
+        district: '',
         address: '',
         longitude: 0,
         latitude: 0
@@ -96,7 +101,7 @@ export default {
   },
   methods: {
     confirm () {
-      if (this.longitude || this.latitude) {
+      if (this.location.longitude || this.location.latitude) {
         this.$emit('on-confirm', this.location)
       }
       this.close()
@@ -112,6 +117,13 @@ export default {
     isShown (val) {
       if (!val) return
       let vm = this
+
+      vm.location.longitude = vm.longitude
+      vm.location.latitude = vm.latitude
+      vm.location.city = vm.city
+      vm.location.district = vm.district
+      vm.location.address = vm.address
+
       if (vm.map == null) {
         vm.map = new BMap.Map('baidumap')
         vm.map.enableScrollWheelZoom(true)
@@ -123,42 +135,40 @@ export default {
             let pt = e.point
             vm.location.longitude = pt.lng
             vm.location.latitude = pt.lat
-            vm.location.city = ''
-            vm.location.address = ''
             let marker = new BMap.Marker(pt)
             vm.map.addOverlay(marker)
             geoc.getLocation(pt, (rs) => {
               var addComp = rs.addressComponents
-              vm.location.city = addComp.city
-              vm.location.address = addComp.district + addComp.street + addComp.streetNumber
+              if (addComp.city) {
+                vm.location.city = addComp.city
+              }
+              if (addComp.district) {
+                vm.location.district = addComp.district
+              }
+              if (addComp.street || addComp.streetNumber) {
+                vm.location.address = addComp.street + addComp.streetNumber
+              }
             })
           })
         }
       }
       setTimeout(() => {
-        if (vm.longitude || vm.latitude) {
-          vm.location.longitude = vm.longitude
-          vm.location.latitude = vm.latitude
-          vm.location.city = vm.city
-          vm.location.address = vm.address
-          let point = new BMap.Point(vm.longitude, vm.latitude)
+        if (vm.location.longitude || vm.location.latitude) {
+          let point = new BMap.Point(vm.location.longitude, vm.location.latitude)
           let marker = new BMap.Marker(point)
           vm.map.centerAndZoom(point, 14)
           vm.map.addOverlay(marker)
-          if (vm.title || vm.address) {
+          if (vm.title || vm.location.address) {
             let opts = {
               width: 200,
               height: 70,
               title: vm.title
             }
-            let infoWindow = new BMap.InfoWindow('地址：' + vm.address, opts)
+            let infoWindow = new BMap.InfoWindow('地址：' + (vm.location.district || '') + (vm.location.address || ''), opts)
             marker.addEventListener('click', () => {
               vm.map.openInfoWindow(infoWindow, point)
             })
           }
-        } else if (vm.location.longitude || vm.location.latitude) {
-          let point = new BMap.Point(vm.location.longitude, vm.location.latitude)
-          vm.map.centerAndZoom(point, 14)
         } else if (vm.location.city) {
           vm.map.centerAndZoom(vm.location.city, 14)
         }

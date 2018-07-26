@@ -246,14 +246,16 @@ class Building extends Base
         }
       }
 
-      if ($oldData->completion_date) {
-        $oldData->completion_date = date_format(date_create($oldData->completion_date), 'Y-m-d');
-      }
-      if ($data['completion_date'] != $oldData->completion_date) {
+      if (isset($data['completion_date'])) {
         if ($oldData->completion_date) {
-          $summary = $summary . '竣工日期：' . $oldData->completion_date . ' -> ' . $data['completion_date'] . '\n';
-        } else {
-          $summary = $summary . '竣工日期：' . $data['completion_date'] . '\n';
+          $oldData->completion_date = date_format(date_create($oldData->completion_date), 'Y-m-d');
+        }
+        if ($data['completion_date'] != $oldData->completion_date) {
+          if ($oldData->completion_date) {
+            $summary = $summary . '竣工日期：' . $oldData->completion_date . ' -> ' . $data['completion_date'] . '\n';
+          } else {
+            $summary = $summary . '竣工日期：' . $data['completion_date'] . '\n';
+          }
         }
       }
 

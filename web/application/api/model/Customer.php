@@ -278,14 +278,16 @@ class Customer extends Base
         }
       }
 
-      if ($oldData->settle_date) {
-        $oldData->settle_date = date_format(date_create($oldData->settle_date), 'Y-m-d');
-      }
-      if ($data['settle_date'] != $oldData->settle_date) {
+      if (isset($data['settle_date'])) {
         if ($oldData->settle_date) {
-          $summary = $summary . '入驻日期：' . $oldData->settle_date . ' -> ' . $data['settle_date'] . '\n';
-        } else {
-          $summary = $summary . '入驻日期：' . $data['settle_date'] . '\n';
+          $oldData->settle_date = date_format(date_create($oldData->settle_date), 'Y-m-d');
+        }
+        if ($data['settle_date'] != $oldData->settle_date) {
+          if ($oldData->settle_date) {
+            $summary = $summary . '入驻日期：' . $oldData->settle_date . ' -> ' . $data['settle_date'] . '\n';
+          } else {
+            $summary = $summary . '入驻日期：' . $data['settle_date'] . '\n';
+          }
         }
       }
 
@@ -297,19 +299,16 @@ class Customer extends Base
         }
       }
 
-      if ($oldData->end_date) {
-        $oldData->end_date = substr($oldData->end_date, 0, 10);
-      }
-
-      if (empty($data['end_date'])) {
+      if (isset($data['end_date'])) {
         if ($oldData->end_date) {
-          $summary = $summary . '到期日：' . $oldData->end_date . ' ->\n';
+          $oldData->end_date = date_format(date_create($oldData->end_date), 'Y-m-d');
         }
-      } else if ($data['end_date'] != $oldData->end_date) {
-        if ($oldData->end_date) {
-          $summary = $summary . '到期日：' . $oldData->end_date . ' -> ' . $data['end_datesettle_date'] . '\n';
-        } else {
-          $summary = $summary . '到期日：' . $data['end_date'] . '\n';
+        if ($data['end_date'] != $oldData->end_date) {
+          if ($oldData->end_date) {
+            $summary = $summary . '到期日：' . $oldData->end_date . ' -> ' . $data['end_date'] . '\n';
+          } else {
+            $summary = $summary . '到期日：' . $data['end_date'] . '\n';
+          }
         }
       }
 
