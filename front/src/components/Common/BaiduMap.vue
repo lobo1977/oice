@@ -1,12 +1,14 @@
 <template>
   <div style="height:100%">
-    <x-header style="width:100%;position:fixed;left:0;top:0;z-index:100;"
+    <x-header class="fix-top"
       :left-options="leftOptions" title="位置信息">
       <span slot="overwrite-left">
         <x-icon type="close" size="20" class="icon-close" @click="close"></x-icon>
       </span>
     </x-header>
-    <div id="baidumap" class="map">abc</div>
+    
+    <div id="baidumap" class="map"></div>
+
     <flexbox v-if="isEdit" :gutter="0" class="bottom-bar">
       <flexbox-item :span="6">
         <x-button type="primary" class="bottom-btn" :disabled="location.longitude === 0 && location.latitude === 0"
@@ -18,6 +20,11 @@
         </x-button>
       </flexbox-item>
     </flexbox>
+
+    <div v-if="!isEdit" class="fix-bottom">
+      <h4 style="font-size:1em;">{{title}}</h4>
+      <span style="font-size:0.9em;">{{'地址：' + district + address}}</span>
+    </div>
   </div>
 </template>
 
@@ -158,18 +165,7 @@ export default {
           let marker = new BMap.Marker(point)
           vm.map.centerAndZoom(point, 14)
           vm.map.addOverlay(marker)
-          if (vm.title || vm.location.address) {
-            let opts = {
-              width: 200,
-              height: 70,
-              title: vm.title
-            }
-            let infoWindow = new BMap.InfoWindow('地址：' + (vm.location.district || '') + (vm.location.address || ''), opts)
-            marker.addEventListener('click', () => {
-              vm.map.openInfoWindow(infoWindow, point)
-            })
-          }
-        } else if (vm.location.city) {
+        } else {
           vm.map.centerAndZoom(vm.location.city, 14)
         }
       }, 300)
@@ -184,6 +180,21 @@ export default {
   fill:#ccc;
 }
 .map {
-  height:99%;
+  height:100%;
+}
+
+.fix-top {
+  position:fixed;
+  top:0;
+  z-index:100;
+  width:100%;
+}
+
+.fix-bottom {
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background-color:#fff;
+  padding:10px 15px;
 }
 </style>
