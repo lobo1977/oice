@@ -125,4 +125,8 @@ class Index extends Base
     }
     return $this->succeed();
   }
+
+  public function token() {
+    return $this->succeed($this->formToken());
+  }
 }

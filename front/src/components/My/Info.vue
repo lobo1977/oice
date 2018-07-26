@@ -62,23 +62,16 @@ export default {
       vm.info.weixin = user.weixin
       vm.info.qq = user.qq
       vm.avatarSrc = user.avatar
-      // vm.$get('/api/my/edit', (res) => {
-      //   if (res.success) {
-      //     for (let item in vm.info) {
-      //       if (res.data[item] !== undefined && res.data[item] !== null) {
-      //         vm.info[item] = res.data[item]
-      //       }
-      //     }
-      //     if (res.data.avatar) {
-      //       vm.avatarSrc = res.data.avatar
-      //     }
-      //   } else {
-      //     vm.$vux.toast.show({
-      //       text: res.message,
-      //       width: '15em'
-      //     })
-      //   }
-      // })
+      vm.$get('/api/index/token', (res) => {
+        if (res.success) {
+          vm.info.__token__ = res.data
+        } else {
+          vm.$vux.toast.show({
+            text: res.message,
+            width: '15em'
+          })
+        }
+      })
     })
   },
   methods: {
