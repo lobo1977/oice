@@ -24,7 +24,7 @@
         :link="info.isAddin === 1 || (user && user.id == info.user_id) ? {name: 'CompanyUser', params: {id: info.id}} : null">
         <x-icon slot="icon" type="ios-people" class="cell-icon"></x-icon>
       </cell>
-      <cell title="公章" v-if="user && user.id == info.user_id" @click.native="previewStamp">
+      <cell title="公章" v-if="info.enable_stamp && user && user.id == info.user_id" @click.native="previewStamp">
         <x-icon slot="icon" type="ios-circle-filled" class="cell-icon"></x-icon>
         <div solt="default" style="height:60px;line-height:0;">
           <img v-show="info.stamp != null && info.stamp != ''" :src="info.stamp" style="height:60px;">
@@ -119,6 +119,7 @@ export default {
         full_name: '',
         logo: '',
         stamp: '',
+        enable_stamp: 1,
         area: '',
         address: '',
         rem: '',

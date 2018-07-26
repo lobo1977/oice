@@ -19,17 +19,21 @@
         <popup-picker title="所在地" :data="districtPickerList" @on-change="districtChange"
           :columns="2" :fixed-columns="1" v-model="districtValue" value-text-align="left"></popup-picker>
         <x-input name="address" title="详细地址" v-model="info.address" :max="100"></x-input>
-        <cell title="公章">
-          <div solt="default" style="height:60px;line-height:0;">
-            <img v-show="stampSrc != null && stampSrc != ''" :src="stampSrc" style="height:60px;">
-          </div>
-          <input id="inputStamp" type="file" name="stamp" class="upload" @change="loadStamp"
-              accept="image/png,image/gif">
-        </cell>
       </group>
 
       <group gutter="10px">
         <x-textarea name="rem" placeholder="企业介绍" :rows="5" v-model="info.rem" :max="500"></x-textarea>
+      </group>
+
+      <group gutter="10px">
+        <x-switch title="启用公章" inline-desc="在生成的确认书中自动添加公章" v-model="info.enable_stamp"></x-switch>
+        <cell title="公章" v-show="info.enable_stamp">
+          <div solt="default" style="height:60px;line-height:0;">
+            <img v-show="stampSrc != null && stampSrc != ''" :src="stampSrc" style="height:60px;">
+          </div>
+          <input id="inputStamp" type="file" name="stamp" class="upload" @change="loadStamp"
+            accept="image/png,image/gif">
+        </cell>
       </group>
 
       <group gutter="10px" label-width="4em" label-margin-right="1em" label-align="right">
@@ -80,6 +84,7 @@ export default {
         rem: '',
         join_way: 0,
         status: false,
+        enable_stamp: true,
         isAddin: false
       },
       logoSrc: null,
@@ -125,6 +130,7 @@ export default {
             }
             vm.joinWayText = vm.joinWayPickerList[vm.info.join_way].label
             vm.info.status = vm.info.status === 1
+            vm.info.enable_stamp = vm.info.enable_stamp === 1
             vm.$emit('on-view-loaded', vm.info.title)
           } else {
             vm.info.__token__ = res.data.__token__
@@ -186,6 +192,8 @@ export default {
         return
       }
       this.$vux.loading.show()
+      this.info.status = (this.info.status ? 1 : 0)
+      this.info.enable_stamp = (this.info.enable_stamp ? 1 : 0)
       this.$postFile('/api/company/edit?id=' + this.id, '#frmCompany', (res) => {
         if (res.success) {
           this.$updateUser((res2) => {
