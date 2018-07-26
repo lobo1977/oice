@@ -20,7 +20,7 @@
             @touchstart.native="itemMouseDown" @touchend.native="itemMouseUp"
             @click.native="itemClick(item)">
             <div slot="right-menu">
-              <swipeout-button @click.native.stop="view(item.id)" type="default">查看</swipeout-button>
+              <swipeout-button @click.native.stop="view(item.id)" type="primary">查看</swipeout-button>
               <swipeout-button @click.native.stop="quit(item.id, item.title)" type="warn">退出</swipeout-button>
             </div>
             <div slot="content" class="vux-1px-t swipeout-item">

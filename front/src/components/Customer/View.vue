@@ -62,7 +62,7 @@
 
       <group v-if="info.confirm.length">
         <group-title slot="title">
-          客户确认书
+          确认书
         </group-title>
         <cell v-for="(item, index) in info.confirm" :key="index"
           :title="item.title" :link="{name: 'ConfirmView', params: {id: item.id}}" 
@@ -154,7 +154,7 @@
         <flexbox-item :span="4">
           <x-button type="primary" class="bottom-btn" @click.native="toConfirm" 
             :disabled="info.id === 0 || checkCount != 1 || info.user_id != user.id">
-            <x-icon type="checkmark-circled" class="btn-icon"></x-icon> 生成确认书
+            <x-icon type="checkmark-circled" class="btn-icon"></x-icon> 云确认
           </x-button>
         </flexbox-item>
         <flexbox-item>
@@ -249,7 +249,7 @@ export default {
         log: [],                // 跟进纪要
         filter: [],             // 项目筛选表
         recommend: [],          // 推荐资料
-        confirm: []             // 客户确认书
+        confirm: []             // 确认书
       },
       checkCount: 0,
       showPrintPicker: false,

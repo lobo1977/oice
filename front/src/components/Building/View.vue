@@ -65,7 +65,7 @@
         <flexbox-item :span="4">
           <x-button type="primary" class="bottom-btn"
             @click.native="toCustomer(1)">
-              <x-icon type="checkmark-circled" class="btn-icon"></x-icon> 客户确认
+              <x-icon type="checkmark-circled" class="btn-icon"></x-icon> 云确认
           </x-button>
         </flexbox-item>
         <flexbox-item :span="2">
@@ -76,8 +76,8 @@
         </flexbox-item>
         <flexbox-item>
           <x-button type="default" class="bottom-btn" 
-            @click.native="showBuildingMenu = true">
-            <x-icon type="ios-more" class="btn-icon"></x-icon>
+            :link="{name:'BuildingEdit', params: { id: info.id }}">
+            <x-icon type="compose" class="btn-icon"></x-icon>
           </x-button>
         </flexbox-item>
       </flexbox>
@@ -522,26 +522,26 @@ export default {
       if (key === 'edit') {
         vm.$router.push({name: 'BuildingEdit', params: {id: vm.info.id}})
       } else if (key === 'delete' && vm.info.user_id === vm.user.id) {
-        vm.$vux.confirm.show({
-          title: '删除项目',
-          content: '确定要删除这个项目吗？',
-          onConfirm () {
-            vm.$vux.loading.show()
-            vm.$post('/api/building/remove', {
-              id: vm.info.id
-            }, (res) => {
-              vm.$vux.loading.hide()
-              if (res.success) {
-                vm.$router.back()
-              } else {
-                vm.$vux.toast.show({
-                  text: res.message,
-                  width: '13em'
-                })
-              }
-            })
-          }
-        })
+        // vm.$vux.confirm.show({
+        //   title: '删除项目',
+        //   content: '确定要删除这个项目吗？',
+        //   onConfirm () {
+        //     vm.$vux.loading.show()
+        //     vm.$post('/api/building/remove', {
+        //       id: vm.info.id
+        //     }, (res) => {
+        //       vm.$vux.loading.hide()
+        //       if (res.success) {
+        //         vm.$router.back()
+        //       } else {
+        //         vm.$vux.toast.show({
+        //           text: res.message,
+        //           width: '13em'
+        //         })
+        //       }
+        //     })
+        //   }
+        // })
       }
     },
     unitTouch (item, isTouch) {
