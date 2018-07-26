@@ -8,7 +8,7 @@
             <img v-show="avatarSrc != null && avatarSrc != ''" :src="avatarSrc" style="width:60px;height:60px;">
           </div>
           <input id="inputAvatar" type="file" name="avatar" class="upload" @change="loadAvatar"
-              accept="image/png,image/gif,image/jpeg">
+              accept="image/*">
         </cell>
         <x-input name="title" ref="input_name" title="姓名" v-model="info.title" :required="true" :max="30"
           @on-click-error-icon="nameError" :should-toast-error="false" @on-change="validateForm"></x-input>

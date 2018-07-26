@@ -153,7 +153,7 @@
           <x-button type="warn" class="bottom-btn">上传</x-button>
           <input type="hidden" name="id" :value="id">
           <input type="file" class="upload" name="images[]" multiple="multiple"
-            accept="image/png,image/gif,image/jpeg" @change="upload"/>
+            accept="image/*" @change="upload"/>
         </form>
       </div>
     </div>

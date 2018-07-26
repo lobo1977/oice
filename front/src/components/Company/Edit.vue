@@ -11,7 +11,7 @@
             <img v-show="logoSrc != null && logoSrc != ''" :src="logoSrc" style="height:60px;">
           </div>
           <input id="inputLogo" type="file" name="logo" class="upload" @change="loadLogo"
-              accept="image/png,image/gif,image/jpeg">
+              accept="image/*">
         </cell>
         <x-input name="title" ref="input_name" title="企业简称" v-model="info.title" :required="true" :max="10"
           @on-click-error-icon="nameError" :should-toast-error="false" @on-change="validateForm"></x-input>
@@ -32,7 +32,7 @@
             <img v-show="stampSrc != null && stampSrc != ''" :src="stampSrc" style="height:60px;">
           </div>
           <input id="inputStamp" type="file" name="stamp" class="upload" @change="loadStamp"
-            accept="image/png,image/gif">
+            accept="image/*">
         </cell>
       </group>
 
