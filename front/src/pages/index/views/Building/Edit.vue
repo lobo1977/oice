@@ -177,7 +177,7 @@
 import { Tab, TabItem, Group, Cell, Actionsheet, PopupPicker, Popup,
   Datetime, XInput, XNumber, XSwitch, XTextarea, XButton, dateFormat,
   Flexbox, FlexboxItem, Previewer, TransferDom } from 'vux'
-import Baidumap from '../Common/BaiduMap.vue'
+import Baidumap from '@/components/BaiduMap.vue'
 import typeData from '../../data/building_type.json'
 import districtData from '../../data/beijing_area.json'
 import rentSellData from '../../data/rent_sell.json'

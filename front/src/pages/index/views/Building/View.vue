@@ -180,8 +180,8 @@
 import { Swiper, SwiperItem, Previewer, TransferDom, Sticky, Tab, TabItem,
   Group, GroupTitle, Cell, Divider, Checker, CheckerItem, Actionsheet,
   Flexbox, FlexboxItem, XButton, PopupPicker, Popup, dateFormat } from 'vux'
-import Topalert from '../Common/Topalert.vue'
-import Baidumap from '../Common/BaiduMap.vue'
+import Topalert from '@/components/Topalert.vue'
+import Baidumap from '@/components/BaiduMap.vue'
 
 export default {
   directives: {

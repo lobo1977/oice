@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Building from '@/components/Building/Index'
-import Customer from '@/components/Customer/Index'
-import My from '@/components/My/Index'
-import Login from '@/components/Login'
-import Mobile from '@/components/Mobile'
+import Building from '../views/Building/Index'
+import Customer from '../views/Customer/Index'
+import My from '../views/My/Index'
+import Login from '../views/Login'
+import Mobile from '../views/Mobile'
 
 Vue.use(Router)
 
@@ -37,7 +37,7 @@ export default new Router({
         canShare: true
       },
       component: function (resolve) {
-        require(['../components/Building/View.vue'], resolve)
+        require(['../views/Building/View.vue'], resolve)
       }
     }, {
       path: '/building/edit/:id',
@@ -49,7 +49,7 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../components/Building/Edit.vue'], resolve)
+        require(['../views/Building/Edit.vue'], resolve)
       }
     }, {
       path: '/unit/view/:id',
@@ -61,7 +61,7 @@ export default new Router({
         canShare: true
       },
       component: function (resolve) {
-        require(['../components/Building/Unit.vue'], resolve)
+        require(['../views/Building/Unit.vue'], resolve)
       }
     }, {
       path: '/unit/edit/:id/:bid',
@@ -73,7 +73,7 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../components/Building/UnitEdit.vue'], resolve)
+        require(['../views/Building/UnitEdit.vue'], resolve)
       }
     }, {
       path: '/customer',
@@ -95,7 +95,7 @@ export default new Router({
         canShare: true
       },
       component: function (resolve) {
-        require(['../components/Customer/view.vue'], resolve)
+        require(['../views/Customer/view.vue'], resolve)
       }
     }, {
       path: '/customer/edit/:id',
@@ -107,7 +107,7 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../components/Customer/Edit.vue'], resolve)
+        require(['../views/Customer/Edit.vue'], resolve)
       }
     }, {
       path: '/customer/log/:id/:cid',
@@ -119,7 +119,7 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../components/Customer/Log.vue'], resolve)
+        require(['../views/Customer/Log.vue'], resolve)
       }
     }, {
       path: '/linkman/view/:id',
@@ -131,7 +131,7 @@ export default new Router({
         canShare: true
       },
       component: function (resolve) {
-        require(['../components/Linkman/view.vue'], resolve)
+        require(['../views/Linkman/view.vue'], resolve)
       }
     }, {
       path: '/linkman/edit/:id/:type/:oid',
@@ -143,7 +143,7 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../components/Linkman/Edit.vue'], resolve)
+        require(['../views/Linkman/Edit.vue'], resolve)
       }
     }, {
       path: '/recomend/index/:id',
@@ -155,7 +155,7 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../components/Recommend/Index.vue'], resolve)
+        require(['../views/Recommend/Index.vue'], resolve)
       }
     }, {
       path: '/recomend/view/:id',
@@ -166,7 +166,7 @@ export default new Router({
         canShare: true
       },
       component: function (resolve) {
-        require(['../components/Recommend/View.vue'], resolve)
+        require(['../views/Recommend/View.vue'], resolve)
       }
     }, {
       path: '/confirm/view/:id',
@@ -178,7 +178,7 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../components/Confirm/View.vue'], resolve)
+        require(['../views/Confirm/View.vue'], resolve)
       }
     }, {
       path: '/confirm/edit/:id/:bid/:cid',
@@ -190,7 +190,7 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../components/Confirm/Edit.vue'], resolve)
+        require(['../views/Confirm/Edit.vue'], resolve)
       }
     }, {
       path: '/my',
@@ -211,7 +211,7 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../components/My/Info.vue'], resolve)
+        require(['../views/My/Info.vue'], resolve)
       }
     }, {
       path: '/my/mobile',
@@ -223,7 +223,7 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../components/My/Mobile.vue'], resolve)
+        require(['../views/My/Mobile.vue'], resolve)
       }
     }, {
       path: '/my/company',
@@ -235,7 +235,7 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../components/Company/Index.vue'], resolve)
+        require(['../views/Company/Index.vue'], resolve)
       }
     }, {
       path: '/company/view/:id',
@@ -248,7 +248,7 @@ export default new Router({
         canShare: true
       },
       component: function (resolve) {
-        require(['../components/Company/View.vue'], resolve)
+        require(['../views/Company/View.vue'], resolve)
       }
     }, {
       path: '/company/edit/:id',
@@ -260,7 +260,7 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../components/Company/Edit.vue'], resolve)
+        require(['../views/Company/Edit.vue'], resolve)
       }
     }, {
       path: '/company/user/:id',
@@ -272,7 +272,7 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../components/Company/User.vue'], resolve)
+        require(['../views/Company/User.vue'], resolve)
       }
     }, {
       path: '/my/favorite',
@@ -284,7 +284,7 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../components/My/favorite.vue'], resolve)
+        require(['../views/My/favorite.vue'], resolve)
       }
     }, {
       path: '/my/password',
@@ -295,7 +295,7 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../components/My/Password.vue'], resolve)
+        require(['../views/My/Password.vue'], resolve)
       }
     }, {
       path: '/login',
@@ -326,7 +326,7 @@ export default new Router({
         hideBar: true
       },
       component: function (resolve) {
-        require(['../components/Common/404.vue'], resolve)
+        require(['@/components/404.vue'], resolve)
       }
     }
   ]

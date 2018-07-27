@@ -102,7 +102,7 @@
 
 <script>
 import { Previewer, TransferDom, LoadMore, Group, Cell, CellBox, XTable, Popup, dateFormat } from 'vux'
-import Baidumap from '../Common/BaiduMap.vue'
+import Baidumap from '@/components/BaiduMap.vue'
 
 export default {
   directives: {

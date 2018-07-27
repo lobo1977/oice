@@ -1,4 +1,4 @@
-aspnet_client/
-static/
-upload/
-index.html
+aspnet_client
+static
+upload
+*.html

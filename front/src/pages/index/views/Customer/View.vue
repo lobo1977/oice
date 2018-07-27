@@ -190,7 +190,7 @@
 import { Tab, TabItem, Flow, FlowState, FlowLine, Group, GroupTitle, Cell, Panel,
   Swipeout, SwipeoutItem, SwipeoutButton, CheckIcon, Actionsheet,
   Flexbox, FlexboxItem, XButton, dateFormat, Timeline, TimelineItem } from 'vux'
-import Topalert from '../Common/Topalert.vue'
+import Topalert from '@/components/Topalert.vue'
 import printModeData from '../../data/print_mode.json'
 
 export default {

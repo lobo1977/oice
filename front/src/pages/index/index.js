@@ -1,11 +1,11 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import FastClick from 'fastclick'
+import HttpRequest from '@/plugins/http'
+import Authenticate from '@/plugins/auth'
+import Wechat from '@/plugins/wechat'
 import App from './App'
-import HttpRequest from './plugins/http'
-import router from './plugins/router'
-import Authenticate from './plugins/auth'
-import Wechat from './plugins/wechat'
+import router from './router/index'
 import { LoadingPlugin, ToastPlugin, AlertPlugin, ConfirmPlugin } from 'vux'
 
 Vue.config.productionTip = false

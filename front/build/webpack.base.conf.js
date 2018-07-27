@@ -11,9 +11,10 @@ function resolve (dir) {
 
 let webpackConfig = {
   context: path.resolve(__dirname, '../'),
-  entry: {
-    app: './src/main.js'
-  },
+  // entry: {
+  //   app: './src/main.js'
+  // },
+  entry: utils.entries(),
   externals: {
     BMap: 'BMap',
     BMAP_STATUS_SUCCESS: 'BMAP_STATUS_SUCCESS'
