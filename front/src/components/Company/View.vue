@@ -72,7 +72,7 @@
     <flexbox v-if="info.id > 0 && user && user.id > 0 && user.id == info.user_id" :gutter="0" class="bottom-bar">
       <flexbox-item :span="5">
         <x-button type="warn" class="bottom-btn" @click.native="invite">
-          <x-icon type="log-in" class="btn-icon"></x-icon> 邀请
+          <x-icon type="log-in" class="btn-icon"></x-icon> 邀请同事
         </x-button>
       </flexbox-item>
       <flexbox-item :span="5">
