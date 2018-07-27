@@ -1,5 +1,8 @@
 <template>
   <div>
+    <topalert v-if="info.user_id == 0" type="info"
+      message="该项目尚未被认领，您可以通过修改完善项目信息完成认领。"></topalert>
+
     <swiper v-if="info.images.length" :auto="true" :loop="true" height="260px"
       :show-dots="info.images.length > 1">
       <swiper-item class="swiper-img" v-for="(item, index) in info.images" :key="index">
@@ -76,6 +79,7 @@
         </flexbox-item>
         <flexbox-item>
           <x-button type="default" class="bottom-btn" 
+            :disabled="info.user_id > 0 && info.user_id != user.id && info.company_id > 0 && info.company_id != user.company_id"
             :link="{name:'BuildingEdit', params: { id: info.id }}">
             <x-icon type="compose" class="btn-icon"></x-icon>
           </x-button>
@@ -174,6 +178,7 @@
 import { Swiper, SwiperItem, Previewer, TransferDom, Sticky, Tab, TabItem,
   Group, GroupTitle, Cell, Divider, Checker, CheckerItem, Actionsheet,
   Flexbox, FlexboxItem, XButton, PopupPicker, Popup, dateFormat } from 'vux'
+import Topalert from '../Common/Topalert.vue'
 import Baidumap from '../Common/BaiduMap.vue'
 
 export default {
@@ -199,12 +204,14 @@ export default {
     XButton,
     PopupPicker,
     Popup,
+    Topalert,
     Baidumap
   },
   data () {
     return {
       user: {
-        id: 0
+        id: 0,
+        company_id: 0
       },
       tab: 0,
       info: {
@@ -234,6 +241,7 @@ export default {
         traffic: '',          // 交通状况
         environment: '',      // 周边环境
         user_id: 0,
+        company_id: 0,
         isFavorite: false,
         images: [],
         linkman: [],

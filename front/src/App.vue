@@ -191,14 +191,6 @@ html, body {
   fill: #09bb07;
 }
 
-.warn-box {
-  margin:15px;
-  padding:15px;
-  border-radius: 5px;
-  background-color: antiquewhite;
-  font-size:.9em;
-}
-
 .vux-header {
   .header-icon {
     fill:#fff;

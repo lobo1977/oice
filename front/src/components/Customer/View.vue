@@ -1,11 +1,7 @@
 <template>
   <div>
-    <div v-if="showWarn && info.clash > 0" class="warn-box">
-      <icon type="warn"></icon>
-      <span>该客户为撞单客户，暂时不能跟进，请等候管理员处理。</span>
-      <icon type="clear" style="float:right;margin-top:5px;" @click.native="showWarn = false"></icon>
-    </div>
-
+    <topalert v-if="info.clash > 0" message="该客户已撞单，暂时不能跟进，请等候管理员处理。"></topalert>
+    
     <tab>
       <tab-item @on-item-click="goTab(0)" :selected="tab === 0">基本信息</tab-item>
       <tab-item @on-item-click="goTab(1)" :selected="tab === 1">跟进纪要</tab-item>
@@ -192,8 +188,9 @@
 
 <script>
 import { Tab, TabItem, Flow, FlowState, FlowLine, Group, GroupTitle, Cell, Panel,
-  Swipeout, SwipeoutItem, SwipeoutButton, CheckIcon, Actionsheet, Icon,
+  Swipeout, SwipeoutItem, SwipeoutButton, CheckIcon, Actionsheet,
   Flexbox, FlexboxItem, XButton, dateFormat, Timeline, TimelineItem } from 'vux'
+import Topalert from '../Common/Topalert.vue'
 import printModeData from '../../data/print_mode.json'
 
 export default {
@@ -212,12 +209,12 @@ export default {
     SwipeoutButton,
     CheckIcon,
     Actionsheet,
-    Icon,
     Flexbox,
     FlexboxItem,
     XButton,
     Timeline,
-    TimelineItem
+    TimelineItem,
+    Topalert
   },
   data () {
     return {
