@@ -5,6 +5,7 @@ use think\model\concern\SoftDelete;
 use app\api\model\Base;
 use app\api\model\File;
 use app\api\model\Log;
+use app\api\model\Company;
 use app\api\model\Linkman;
 use app\api\model\Unit;
 use app\api\model\Confirm;
@@ -403,11 +404,6 @@ class Building extends Base
         }
       }
 
-      if ($data['share'] != $oldData->share) {
-        $summary = $summary . '是否公开：' . self::$share[$oldData->share] . 
-          ' -> ' . self::$share[$data['share']] . '\n';
-      }
-
       if (isset($data['user_id'])) {
         unset($data['user_id']);
       }
@@ -421,6 +417,29 @@ class Building extends Base
         if (isset($data['share'])) {
           unset($data['share']);
         }
+      }
+
+      if (isset($data['company_id']) && $data['company_id'] != $oldData->company_id) {
+        $oldCompany = null;
+        $newCompany = null;
+        if ($oldData->company_id) {
+          $oldCompany = Company::get($oldData->company_id);
+        }
+        if ($data['company_id']) {
+          $newCompany = Company::get($data['company_id']);
+        }
+        if ($oldCompany && $newCompany) {
+          $summary = $summary . '所属企业：' . $oldCompany->full_name . '->' . $newCompany->full_name . '\n';
+        } else if ($oldCompany) {
+          $summary = $summary . '所属企业：' . $oldCompany->full_name . '->\n';
+        } else {
+          $summary = $summary . '所属企业：' . $newCompany->full_name . '\n';
+        }
+      }
+
+      if (isset($data['share']) && $data['share'] != $oldData->share) {
+        $summary = $summary . '是否公开：' . self::$share[$oldData->share] . 
+          ' -> ' . self::$share[$data['share']] . '\n';
       }
 
       $result =  $oldData->save($data);

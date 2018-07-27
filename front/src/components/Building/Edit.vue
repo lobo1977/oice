@@ -76,7 +76,7 @@
         <x-textarea :rows="3" v-model="info.environment" :max="500"></x-textarea>
       </group>
 
-      <group v-if="info.user_id == user.id" gutter="10px" label-width="4em" label-margin-right="1em" label-align="right">
+      <group v-if="info.user_id == 0 || info.user_id == user.id" gutter="10px" label-width="4em" label-margin-right="1em" label-align="right">
         <cell title="所属企业" @click.native="selectCompany" :is-link="companyPickerData.length != 1" 
           :value="companyText" value-align="left"></cell>
         <x-switch title="是否公开" inline-desc="是否全网可见" v-model="info.share"></x-switch>

@@ -203,11 +203,6 @@ class Unit extends Base
         }
       }
 
-      if ($data['share'] != $oldData->share) {
-        $summary = $summary . '是否公开：' . self::$share[$oldData->share] . 
-          ' -> ' . self::$share[$data['share']] . '\n';
-      }
-
       $log = [
         "table" => 'building',
         "owner_id" => $oldData->building_id,
@@ -231,6 +226,29 @@ class Unit extends Base
         if (isset($data['company_id'])) {
           unset($data['company_id']);
         }
+      }
+
+      if (isset($data['company_id']) && $data['company_id'] != $oldData->company_id) {
+        $oldCompany = null;
+        $newCompany = null;
+        if ($oldData->company_id) {
+          $oldCompany = Company::get($oldData->company_id);
+        }
+        if ($data['company_id']) {
+          $newCompany = Company::get($data['company_id']);
+        }
+        if ($oldCompany && $newCompany) {
+          $summary = $summary . '所属企业：' . $oldCompany->full_name . '->' . $newCompany->full_name . '\n';
+        } else if ($oldCompany) {
+          $summary = $summary . '所属企业：' . $oldCompany->full_name . '->\n';
+        } else {
+          $summary = $summary . '所属企业：' . $newCompany->full_name . '\n';
+        }
+      }
+
+      if (isset($data['share']) && $data['share'] != $oldData->share) {
+        $summary = $summary . '是否公开：' . self::$share[$oldData->share] . 
+          ' -> ' . self::$share[$data['share']] . '\n';
       }
 
       $result =  $oldData->save($data);
