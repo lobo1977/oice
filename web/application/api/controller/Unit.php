@@ -53,7 +53,8 @@ class Unit extends Base
         $data = modelUnit::get($id);
         if ($data == null) {
           return $this->exception('单元不存在。');
-        } else if ($data->user_id != $this->user_id) {
+        } else if ($data->user_id != $this->user_id && 
+          $data->company_id != $this->company_id) {
           return $this->exception('您没有权限修改这个单元。');
         }
         $data->__token__ = $form_token;
@@ -96,7 +97,7 @@ class Unit extends Base
         return $this->fail($validate->getError(), $form_token);
       } else {
         unset($data['__token__']);
-        $result = modelUnit::addUp($id, $data, $this->user_id);
+        $result = modelUnit::addUp($id, $data, $this->user_id, $this->company_id);
         if ($result) {
           return $this->succeed($result);
         } else {

@@ -61,6 +61,12 @@ class Building extends Base
       $companyList = \app\api\model\Company::my($this->user_id);
       if ($id > 0) {
         $data = modelBuilding::detail($id, $this->user_id, $this->company_id);
+        if ($data->user_id > 0 && 
+          $data->user_id != $this->user_id &&
+          $data->company_id > 0 &&
+          $data->company_id != $this->company_id) {
+          self::exception('您没有权限修改此房源。');
+        }
         $data->__token__ = $form_token;
         $data->companyList = $companyList;
         return $this->succeed($data);

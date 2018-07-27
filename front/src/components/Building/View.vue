@@ -96,7 +96,8 @@
         :inline-desc="item.desc"></cell>
       
       <div class="bottom-bar">
-        <x-button type="primary" class="bottom-btn" :disabled="info.id === 0"
+        <x-button type="primary" class="bottom-btn" :disabled="info.id === 0 ||
+          (info.user_id > 0 && info.user_id != user.id && info.company_id > 0 && info.company_id != user.company_id)"
           :link="{name: 'LinkmanEdit', params: {id: 0, type: 'building', oid: info.id}}">
           <x-icon type="plus" class="btn-icon"></x-icon> 添加
         </x-button>
@@ -142,7 +143,8 @@
           </x-button>
         </flexbox-item>
         <flexbox-item>
-          <x-button type="default" class="bottom-btn" :disabled="info.id === 0"
+          <x-button type="default" class="bottom-btn" :disabled="info.id === 0 ||
+            (info.user_id > 0 && info.user_id != user.id && info.company_id > 0 && info.company_id != user.company_id)"
             :link="{name: 'UnitEdit', params: { id:0, bid: info.id }}">
             <x-icon type="plus" class="btn-icon"></x-icon> 添加
           </x-button>

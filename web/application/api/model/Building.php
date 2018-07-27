@@ -190,9 +190,9 @@ class Building extends Base
       $oldData = self::get($id);
       if ($oldData == null) {
         self::exception('房源信息不存在。');
-      } else if ($oldData->share == 0 && 
-        $oldData->user_id > 0 && 
-        $oldData->user_id != $user_id && 
+      } else if ($oldData->user_id > 0 && 
+        $oldData->user_id != $user_id &&
+        $oldData->company_id > 0 &&
         $oldData->company_id != $company_id) {
         self::exception('您没有权限修改此房源。');
       }

@@ -99,8 +99,7 @@ class Unit extends Base
       $oldData = self::get($id);
       if ($oldData == null) {
         self::exception('单元不存在。');
-      } else if ($oldData->share == 0 &&
-        $oldData->user_id != $user_id && 
+      } else if ($oldData->user_id != $user_id && 
         $oldData->company_id != $company_id) {
         self::exception('您没有权限查看此单元。');
       }
