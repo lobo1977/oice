@@ -39,9 +39,9 @@ class File extends Base
     $parent = db($type)->where('id', $parent_id)->find();
 
     if ($parent) {
-      if ($parent['share'] == 0 && 
-        $parent['user_id'] > 0 && 
-        $parent['user_id'] != $user_id && 
+      if ($parent['user_id'] > 0 &&
+        $parent['user_id'] != $user_id &&
+        $parent['company_id'] > 0 &&
         $parent['company_id'] != $company_id) {
         self::exception('操作失败，您没有权限。');
       }
