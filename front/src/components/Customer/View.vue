@@ -1,6 +1,6 @@
 <template>
   <div>
-    <topalert v-if="info.clash > 0" message="该客户已撞单，暂时不能跟进，请等候管理员处理。"></topalert>
+    <topalert v-if="info.id > 0 && info.clash > 0" message="该客户已撞单，暂时不能跟进，请等候管理员处理。"></topalert>
     
     <tab>
       <tab-item @on-item-click="goTab(0)" :selected="tab === 0">基本信息</tab-item>

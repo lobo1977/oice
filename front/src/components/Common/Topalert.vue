@@ -60,6 +60,6 @@ export default {
   background-color: antiquewhite;
 }
 .top-alert.info {
-  background-color:rgba(240, 255, 250, 0.753);
+  background-color:rgb(254, 255, 215);
 }
 </style>

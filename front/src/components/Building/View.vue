@@ -1,6 +1,6 @@
 <template>
   <div>
-    <topalert v-if="info.user_id == 0" type="info"
+    <topalert v-if="info.id > 0 && info.user_id == 0" type="info"
       message="该项目尚未被认领，您可以通过修改完善项目信息完成认领。"></topalert>
 
     <swiper v-if="info.images.length" :auto="true" :loop="true" height="260px"
