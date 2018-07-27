@@ -323,6 +323,24 @@ class Customer extends Base
           ' -> ' . self::$status[$data['status']] . '\n';
       }
 
+      if (isset($data['company_id']) && $data['company_id'] != $oldData->company_id) {
+        $oldCompany = null;
+        $newCompany = null;
+        if ($oldData->company_id) {
+          $oldCompany = Company::get($oldData->company_id);
+        }
+        if ($data['company_id']) {
+          $newCompany = Company::get($data['company_id']);
+        }
+        if ($oldCompany && $newCompany) {
+          $summary = $summary . '所属企业：' . $oldCompany->full_name . '->' . $newCompany->full_name . '\n';
+        } else if ($oldCompany) {
+          $summary = $summary . '所属企业：' . $oldCompany->full_name . '->\n';
+        } else {
+          $summary = $summary . '所属企业：' . $newCompany->full_name . '\n';
+        }
+      }
+
       if ($data['share'] != $oldData->share) {
         $summary = $summary . '共享：' . self::$share[$oldData->share] . 
           ' -> ' . self::$share[$data['share']] . '\n';
