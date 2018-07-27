@@ -322,9 +322,11 @@ export default new Router({
       name: 'Logout'
     }, {
       path: '*',
-      hideBar: true,
+      meta: {
+        hideBar: true
+      },
       component: function (resolve) {
-        require(['../components/common/404.vue'], resolve)
+        require(['../components/Common/404.vue'], resolve)
       }
     }
   ]
