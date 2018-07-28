@@ -25,7 +25,7 @@
         <cell title="图片" is-link v-if="info.images && info.images.length" @click.native="preview(index)">
           <img class="th-image" v-for="(img, i) in info.images" :key="i" :src="img.msrc" v-if="i < 3" />
         </cell>
-        <cell title="地址" value-align="left" :value="info.address" v-if="info.address"
+        <cell title="地址" value-align="left" :value="info.address" v-if="info.area + info.address"
           :is-link="(info.longitude || info.latitude) != 0" @click.native="openMap(index)"></cell>
         <cell title="竣工日期" value-align="left" :value="info.completion_date|formatDate" v-if="info.completion_date"></cell>
         <cell title="楼层" value-align="left" :value="info.building_floor" v-if="info.building_floor"></cell>
@@ -92,6 +92,7 @@
       <baidumap :get-point="false"
         :is-shown="showMap"
         :title="map_title"
+        :district="map_district"
         :address="map_address"
         :longitude="longitude" 
         :latitude="latitude" 
@@ -139,6 +140,7 @@ export default {
       },
       showMap: false,
       map_title: '',
+      map_district: '',
       map_address: '',
       longitude: 0,
       latitude: 0
@@ -158,6 +160,7 @@ export default {
       let vm = this
       if (vm.list[index].longitude || vm.list[index].latitude) {
         vm.map_title = vm.list[index].building_name
+        vm.map_district = vm.list[index].area
         vm.map_address = vm.list[index].address
         vm.longitude = vm.list[index].longitude
         vm.latitude = vm.list[index].latitude

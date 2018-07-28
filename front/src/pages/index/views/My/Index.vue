@@ -53,7 +53,7 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      vm.user = vm.$store.state.oice.user
+      vm.user = vm.$store.state.oice.user || vm.user
     })
   },
   methods: {

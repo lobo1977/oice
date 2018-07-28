@@ -26,7 +26,7 @@
     <div v-show="tab === 0">
       <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
         <cell title="项目类型" value-align="left" :value="info.building_type" v-show="info.building_type"></cell>
-        <cell title="地址" value-align="left" :value="info.location + info.address" v-show="info.location || info.address" 
+        <cell title="地址" value-align="left" :value="info.area + info.address" v-show="info.area || info.address" 
           :is-link="(info.longitude || info.latitude) != 0" @click.native="showMap = ((info.longitude || info.latitude) != 0)"></cell>
         <cell title="竣工日期" value-align="left" :value="info.completionDate|formatDate" v-show="info.completionDate"></cell>
         <cell title="租售" value-align="left" :value="info.rent_sell" v-show="info.rent_sell"></cell>
@@ -167,8 +167,8 @@
       <baidumap :get-point="false"
         :is-shown="showMap"
         :title="info.building_name"
+        :district="info.area"
         :address="info.address"
-        :district="info.location"
         :longitude="info.longitude" 
         :latitude="info.latitude" 
         @on-close="closeMap"></baidumap>
@@ -220,7 +220,8 @@ export default {
         id: 0,
         building_name: '',    // 名称
         building_type: '',    // 类型
-        location: '',         // 位置
+        area: '',             // 城区
+        district: '',         // 商圈
         address: '',          // 地址
         longitude: 0,         // 经度
         latitude: 0,          // 纬度
@@ -272,7 +273,7 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      vm.user = vm.$store.state.oice.user
+      vm.user = vm.$store.state.oice.user || vm.user
 
       let id = parseInt(to.params.id)
       if (to.query.tab) {
@@ -292,12 +293,6 @@ export default {
             vm.info.building_type = res.data.type
             if (res.data.level) {
               vm.info.building_type += `（${res.data.level}级）`
-            }
-            if (res.data.area) {
-              vm.info.location = res.data.area
-            }
-            if (res.data.district) {
-              vm.info.location += res.data.district
             }
             vm.info.completionDate = res.data.completion_date
             if (res.data.isFavorite) {
@@ -325,7 +320,7 @@ export default {
             if (vm.$isWechat()) {
               let shareLink = window.location.href
               let shareDesc = (res.data.level ? res.data.level + '级' : '') + res.data.type +
-                  ' ' + vm.info.location + ' ' + vm.info.price
+                  ' ' + vm.info.area + vm.info.district + ' ' + vm.info.price
               let shareImage = null
 
               if (vm.info.images.length) {

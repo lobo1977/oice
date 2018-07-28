@@ -126,7 +126,7 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      vm.user = vm.$store.state.oice.user
+      vm.user = vm.$store.state.oice.user || vm.user
       let id = parseInt(to.params.id)
       if (!isNaN(id)) {
         vm.$get('/api/unit/detail?id=' + id, (res) => {

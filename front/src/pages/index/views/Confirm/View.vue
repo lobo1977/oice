@@ -74,7 +74,7 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      vm.user = vm.$store.state.oice.user
+      vm.user = vm.$store.state.oice.user || vm.user
 
       if (to.params.id) {
         vm.id = parseInt(to.params.id)
