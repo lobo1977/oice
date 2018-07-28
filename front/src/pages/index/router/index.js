@@ -16,6 +16,10 @@ export default new Router({
       path: '/',
       name: 'Home',
       redirect: '/building'
+    },
+    {
+      path: '/index.html',
+      redirect: '/building'
     }, {
       path: '/building',
       name: 'Building',
