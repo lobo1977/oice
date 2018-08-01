@@ -61,10 +61,10 @@ class Filter extends Base
    * 添加推荐项目
    */
   public static function addBuilding($user, $customer_id, $building_id, $unit_id) {
-    $customer = Customer::get($id);
+    $customer = Customer::get($customer_id);
     if ($customer == null) {
       self::exception('客户不存在。');
-    } else if (!self::allow($user, $customer, 'follow')) {
+    } else if (!Customer::allow($user, $customer, 'follow')) {
       self::exception('您没有权限跟进此客户。');
     }
 
@@ -135,10 +135,10 @@ class Filter extends Base
    * 删除推荐项目
    */
   public static function removeBuilding($user, $customer_id, $building_id, $unit_id) {
-    $customer = Customer::get($id);
+    $customer = Customer::get($customer_id);
     if ($customer == null) {
       self::exception('客户不存在。');
-    } else if (!self::allow($user, $customer, 'follow')) {
+    } else if (!Customer::allow($user, $customer, 'follow')) {
       self::exception('您没有权限跟进此客户。');
     }
 

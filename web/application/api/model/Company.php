@@ -123,6 +123,9 @@ class Company extends Base
     $list = self::alias('a')
       ->join('invite b', 'a.id = b.company_id and b.status = 0')
       ->where('b.mobile', $user->mobile)
+      ->where('a.id', 'NOT IN', function ($query) use($user) {
+        $query->table('tbl_user_company')->where('user_id', $user->id)->field('company_id');
+      })
       ->field('a.id,a.title,a.logo,a.area,a.address,a.create_time')
       ->order('a.id', 'asc')
       ->select();

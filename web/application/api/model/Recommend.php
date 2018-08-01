@@ -134,7 +134,7 @@ class Recommend extends Base
         if (count($unit) > 0) {
           $building['units'][] = $unit;
         }
-        $images = File::getList($building['building_id'], 'building');
+        $images = File::getList(null, $building['building_id'], 'building');
         if ($images) {
           $building['images'] = $images->toArray();
         }

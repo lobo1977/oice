@@ -17,7 +17,7 @@ class Log extends Base
   public static function allow($user, $log, $operate, $customer = null) {
     if ($log == null || $user == null) {
       return false;
-    } else if ($log->system) {
+    } else if (isset($log->system) && $log->system) {
       return false;
     }
     if ($log->table == 'customer' && 
