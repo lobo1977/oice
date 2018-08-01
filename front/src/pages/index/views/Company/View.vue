@@ -36,7 +36,7 @@
       <p class="group-padding">{{ info.rem }}</p>
     </group>
 
-    <group v-if="info.id > 0 && user && user.id > 0 && user.id == info.user_id && waitUser.length" 
+    <group v-if="info.allowPass && waitUser.length" 
       title="待审核成员" footerTitle="向左滑动条目完成操作" class="wait-group">
       <swipeout>
         <swipeout-item v-for="(item, index) in waitUser" :key="index" transition-mode="follow"
@@ -55,7 +55,7 @@
       </swipeout>
     </group>
 
-    <div v-if="info.id > 0 && user && user.id > 0 && user.id != info.user_id" class="bottom-bar">
+    <div v-if="!info.allowInvite" class="bottom-bar">
       <x-button v-if="info.isAddin === false && info.join_way < 2" type="primary" class="bottom-btn" @click.native="addin">
         <x-icon type="log-in" class="btn-icon"></x-icon>
         <span v-if="info.join_way < 2">加入</span>
@@ -69,20 +69,20 @@
       </x-button>
     </div>
 
-    <flexbox v-if="info.id > 0 && user && user.id > 0 && user.id == info.user_id" :gutter="0" class="bottom-bar">
+    <flexbox v-if="info.allowInvite || info.allowEdit || info.allowDelete" :gutter="0" class="bottom-bar">
       <flexbox-item :span="5">
-        <x-button type="warn" class="bottom-btn" @click.native="invite">
+        <x-button type="warn" class="bottom-btn" @click.native="invite" :disabled="!info.allowInvite">
           <x-icon type="log-in" class="btn-icon"></x-icon> 邀请同事
         </x-button>
       </flexbox-item>
       <flexbox-item :span="5">
         <x-button type="primary" class="bottom-btn" 
-          :link="{name: 'CompanyEdit', params: {id: info.id}}">
+          :link="{name: 'CompanyEdit', params: {id: info.id}}" :disabled="!info.allowEdit">
           <x-icon type="compose" class="btn-icon"></x-icon> 修改
         </x-button>
       </flexbox-item>
       <flexbox-item :span="2">
-        <x-button type="default" class="bottom-btn" @click.native="remove">
+        <x-button type="default" class="bottom-btn" @click.native="remove" :disabled="!info.allowDelete">
           <x-icon type="trash-a" class="btn-icon"></x-icon>
         </x-button>
       </flexbox-item>
@@ -127,7 +127,11 @@ export default {
         addin: 0,
         wait: 0,
         isAddin: false,
-        user_id: 0
+        user_id: 0,
+        allowEdit: false,
+        allowInvite: false,
+        allowPass: false,
+        allowDelete: false
       },
       waitUser: [],
       pageX: null,

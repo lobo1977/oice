@@ -44,8 +44,9 @@ class Oauth extends Base
       session('oauth', $platform);
       session('oauth_openid', $token['openid']);
       if ($oauth->user_id) {
-        $user = User::loginSuccess($oauth->user_id, $token['openid']);
+        $user = User::getById($oauth->user_id);
         if ($user != null) {
+          User::loginSuccess($user, $token['openid']);
           if ($oauth->nickname && empty($user->title)) {
             $user->title = $oauth->nickname;
           }

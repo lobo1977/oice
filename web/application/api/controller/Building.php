@@ -4,6 +4,7 @@ namespace app\api\controller;
 use think\Validate;
 use app\api\controller\Base;
 use app\api\model\Building as modelBuilding;
+use app\api\model\Company;
 use app\api\model\Customer;
 use app\api\model\Confirm;
 use app\api\model\File;
@@ -21,7 +22,7 @@ class Building extends Base
   public function index() {
     $params = input('post.');
     if ($params) {
-      $list = modelBuilding::search($params, $this->user_id, $this->company_id);
+      $list = modelBuilding::search($this->user, $params);
       return $this->succeed($list);
     } else {
       return;
@@ -33,9 +34,9 @@ class Building extends Base
    */
   public function detail($id = 0) {
     if ($id) {
-      $data = modelBuilding::detail($id, $this->user_id, $this->company_id);
+      $data = modelBuilding::detail($this->user, $id);
       if ($data != null) {
-        $data->customer = Customer::search(['status' => '0,1,2', 'clash' => false], $this->user_id, $this->company_id);
+        $data->customer = Customer::search($this->user, ['status' => '0,1,2', 'clash' => false]);
       }
       return $this->succeed($data);
     } else {
@@ -47,7 +48,7 @@ class Building extends Base
    * 获取图片列表
    */
   public function images($id) {
-    $images = File::getList($id, 'building');
+    $images = File::getList($this->user, 'building', $id);
     return $this->succeed($images);
   }
 
@@ -58,15 +59,9 @@ class Building extends Base
   public function edit($id) {
     if ($this->request->isGet()) {
       $form_token = $this->formToken();
-      $companyList = \app\api\model\Company::my($this->user_id);
+      $companyList = Company::my($this->user);
       if ($id > 0) {
-        $data = modelBuilding::detail($id, $this->user_id, $this->company_id);
-        if ($data->user_id > 0 && 
-          $data->user_id != $this->user_id &&
-          $data->company_id > 0 &&
-          $data->company_id != $this->company_id) {
-          self::exception('您没有权限修改此房源。');
-        }
+        $data = modelBuilding::detail($this->user, $id);
         $data->__token__ = $form_token;
         $data->companyList = $companyList;
         return $this->succeed($data);
@@ -92,7 +87,7 @@ class Building extends Base
       } else {
         $form_token = $this->formToken();
         unset($data['__token__']);
-        $result = modelBuilding::addUp($id, $data, $this->user_id, $this->company_id);
+        $result = modelBuilding::addUp($this->user, $id, $data);
         if ($result) {
           return $this->succeed($result);
         } else {
@@ -120,7 +115,7 @@ class Building extends Base
     } else {
       $form_token = $this->formToken();
       unset($data['__token__']);
-      $result = modelBuilding::addUpEngInfo($id, $data, $this->user_id, $this->company_id);
+      $result = modelBuilding::addUpEngInfo($this->user, $id, $data);
       if ($result) {
         return $this->succeed($form_token);
       } else {
@@ -135,10 +130,9 @@ class Building extends Base
   public function uploadImage($id) {
     $files = request()->file('images');
     if ($files) {
-      $result = File::uploadImage('building', $id, $files, 
-        $this->user_id, $this->company_id);
+      $result = File::uploadImage($this->user, 'building', $id, $files);
       if ($result >= 1) {
-        $images = File::getList($id, 'building');
+        $images = File::getList($this->user, 'building', $id);
         return $this->succeed($images);
       } else {
         return $this->fail();
@@ -154,10 +148,9 @@ class Building extends Base
   public function uploadUnitImage($id) {
     $files = request()->file('images');
     if ($files) {
-      $result = File::uploadImage('unit', $id, $files, 
-        $this->user_id, $this->company_id);
+      $result = File::uploadImage($this->user, 'unit', $id, $files);
       if ($result >= 1) {
-        $images = File::getList($id, 'unit');
+        $images = File::getList($this->user, 'unit', $id);
         return $this->succeed($images);
       } else {
         return $this->fail();
@@ -171,7 +164,7 @@ class Building extends Base
    * 设置默认图片
    */
   public function setDefaultImage($image_id) {
-    $result = File::setDefault($image_id, $this->user_id, $this->company_id);
+    $result = File::setDefault($this->user, $image_id);
     if ($result == 1) {
       return $this->succeed();
     } else {
@@ -183,7 +176,7 @@ class Building extends Base
    * 移除图片
    */
   public function removeImage($image_id) {
-    $result = File::removeImage($image_id, $this->user_id, $this->company_id);
+    $result = File::removeImage($this->user, $image_id);
     if ($result == 1) {
       return $this->succeed();
     } else {
@@ -195,7 +188,7 @@ class Building extends Base
    * 添加到收藏夹
    */
   public function favorite($id) {
-    $result = modelBuilding::favorite($id, 0, $this->user_id);
+    $result = modelBuilding::favorite($this->user, $id);
     if ($result == 1) {
       return $this->succeed();
     } else {
@@ -207,7 +200,7 @@ class Building extends Base
    * 从收藏夹删除
    */
   public function unFavorite($id) {
-    $result = modelBuilding::unFavorite($id, 0, $this->user_id);
+    $result = modelBuilding::unFavorite($this->user, $id);
     if ($result == 1) {
       return $this->succeed();
     } else {
@@ -221,7 +214,7 @@ class Building extends Base
   public function batchFavorite($ids) {
     $result = 0;
     foreach ($ids as $id) {
-      $result += modelBuilding::favorite(0, $id, $this->user_id);
+      $result += modelBuilding::favorite($this->user, 0, $id);
     }
     if ($result > 0) {
       return $this->succeed();
@@ -238,7 +231,7 @@ class Building extends Base
     foreach ($ids as $id) {
       $arrIds = explode(',', $id);
       if (count($arrIds) == 2) {
-        $result += modelBuilding::unFavorite(intval($arrIds[0]), intval($arrIds[1]), $this->user_id);
+        $result += modelBuilding::unFavorite($this->user, intval($arrIds[0]), intval($arrIds[1]));
       }
     }
     if ($result > 0) {
@@ -252,22 +245,9 @@ class Building extends Base
    * 删除项目
    */
   public function remove($id) {
-    $result = modelBuilding::remove($id, $this->user_id);
+    $result = modelBuilding::remove($this->user, $id);
     if ($result == 1) {
       return $this->succeed();
-    } else {
-      return $this->fail();
-    }
-  }
-
-  /**
-   * 生成客户确认书
-   */
-  public function addConfirm($cid, $bid, $uid) {
-    $result = Confirm::addNew($cid, $bid, $uid, $this->user_id);
-    if ($result > 0) {
-      $confirm = Confirm::query(0, $bid, $this->user_id);
-      return $this->succeed($confirm);
     } else {
       return $this->fail();
     }

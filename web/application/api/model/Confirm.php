@@ -4,12 +4,9 @@ namespace app\api\model;
 use think\model\concern\SoftDelete;
 use app\api\model\Base;
 use app\api\model\Log;
-use app\api\model\User;
-use app\api\model\Customer;
 use app\api\model\Company;
 use app\api\model\Building;
-use app\api\model\Unit;
-use app\api\model\File;
+use app\api\model\Customer;
 
 class Confirm extends Base
 {
@@ -18,27 +15,49 @@ class Confirm extends Base
   protected $deleteTime = 'delete_time';
 
   /**
+   * 权限检查
+   */
+  public static function allow($user, $confirm, $operate) {
+    if ($user == null) {
+      return false;
+    }
+    if ($confirm == 'view') {
+      return $confirm->user_id == $user->id ||
+        $confirm->building_company_id == $user->company_id;
+    } else if ($operate == 'edit' || $operate = 'delete') {
+      return $confirm->user_id == $user->id &&
+        $confirm->company_id == $user->company_id;
+    } else {
+      return false;
+    }
+  }
+
+  /**
    * 客户确认列表
    */
-  public static function query($customer_id, $building_id, $user_id) {
+  public static function query($user, $customer_id, $building_id) {
+    $user_id = 0;
+    $company_id = 0;
+    if ($user) {
+      $user_id = $user->id;
+      $company_id = $user->company_id;
+    }
+
     $list = self::alias('a')
       ->join('customer c', 'a.customer_id = c.id')
-      ->leftJoin('unit u', 'a.unit_id = u.id AND a.unit_id > 0')
-      ->join('building b', 'a.building_id = b.id OR u.building_id = b.id');
+      ->join('building b', 'a.building_id = b.id');
 
     if ($customer_id) {
-      $list->where('a.customer_id', $customer_id);
-    }
-
-    if ($building_id) {
-      $list->where('a.building_id', $building_id);
-    }
-
-    if ($user_id) {
+      $list->where('a.customer_id', $customer_id)
+        ->where('a.user_id', $user_id);
+    } else if ($building_id) {
+      $list->where('a.building_id', $building_id)
+        ->where('(b.user_id = ' . $user_id . ' OR b.company_id = ' . $company_id . ')');
+    } else {
       $list->where('a.user_id', $user_id);
     }
 
-    $result = $list->field('a.*,b.building_name,u.building_no,u.floor,u.room,c.customer_name')
+    $result = $list->field('a.*,b.building_name,c.customer_name')
       ->order('a.create_time', 'desc')
       ->select();
 
@@ -47,7 +66,6 @@ class Confirm extends Base
         $confirm->title = $confirm->customer_name;
       } else {
         $confirm->title = $confirm->building_name;
-        Unit::formatInfo($confirm);
       }
       $confirm->desc = $confirm->create_time;
     }
@@ -58,7 +76,7 @@ class Confirm extends Base
   /**
    * 客户确认书详情
    */
-  public static function detail($id, $building_id, $customer_id, $user_id, $company_id) {
+  public static function detail($user, $id, $building_id = 0, $customer_id = 0) {
     if ($id) {
       $confirm = self::alias('a')
         ->join('building b', ' a.building_id = b.id')
@@ -66,32 +84,32 @@ class Confirm extends Base
         ->leftJoin('company o', 'a.company_id = o.id')
         ->leftJoin('company m', 'b.company_id = m.id')
         ->where('a.id', $id)
-        ->field('a.*,b.building_name as building,b.developer,b.user_id as building_user_id,' .
+        ->field('a.*,b.building_name as building,b.developer,' .
           'c.customer_name as customer,o.full_name as company,o.enable_stamp,o.stamp,' .
           'm.id as building_company_id,m.full_name as building_company,' .
           'm.enable_stamp as building_enable_stamp,m.stamp as building_stamp')
         ->find();
-      if ($confirm) {
-        if ($user_id != $confirm->user_id && 
-          $confirm->building_user_id != $user_id &&
-          $company_id != $confirm->building_company_id) {
-          self::exception('您没有权限查看这个确认书。');
-        } else {
-          if ($confirm->confirm_date && $confirm->period) {
-            $confirm->end_date = date('Y-m-d', strtotime('+' . $confirm->period . ' months', strtotime($confirm->confirm_date)));
-          }
-          if ($confirm->building_company) {
-            $confirm->developer = $confirm->building_company;
-          }
-          return $confirm;
-        }
-      } else {
+      if ($confirm == null) {
         self::exception('确认书不存在。');
+      } else if (!self::allow($user, $confirm, 'view')) {
+        self::exception('您没有权限查看这个确认书。');
+      } else {
+        $confirm->allowEdit = self::allow($user, $confirm, 'edit');
+        $confirm->allowDelete = self::allow($user, $confirm, 'delete');
+        if ($confirm->confirm_date && $confirm->period) {
+          $confirm->end_date = date('Y-m-d', strtotime('+' . $confirm->period . ' months', strtotime($confirm->confirm_date)));
+        }
+        if ($confirm->building_company) {
+          $confirm->developer = $confirm->building_company;
+        }
+        return $confirm;
       }
     } else if ($building_id && $customer_id) {
       $customer = Customer::get($customer_id);
       if ($customer == null) {
         self::exception('客户不存在。');
+      } else if (!Customer::allow($user, $customer, 'confirm')) {
+        self::exception('您没有权限添加确认书。');
       }
       $building = Building::get($building_id);
       if ($building == null) {
@@ -111,7 +129,6 @@ class Confirm extends Base
       $confirm->building = $building->building_name;
       $confirm->developer = $building->developer;
       $confirm->customer = $customer->customer_name;
-      $confirm->user_id = $user_id;
       $confirm->rent_sell = '出租';
       $confirm->confirm_date = date("Y-m-d");
 
@@ -124,13 +141,18 @@ class Confirm extends Base
   /**
    * 添加/修改客户确认书
    */
-  public static function addup($id, $data, $user_id) {
+  public static function addup($user, $id, $data) {
+    $user_id = 0;
+    if ($user) {
+      $user_id = $user->id;
+    }
+
     if ($id) {
       $oldData = self::get($id);
       if ($oldData == null) {
         self::exception('确认书不存在。');
-      } else if ($oldData->user_id != $user_id) {
-        self::exception('您没有权限查看此确认书。');
+      } else if (!self::allow($user, $oldData, 'edit')) {
+        self::exception('您没有权限修改此确认书。');
       }
 
       $summary = '';
@@ -192,17 +214,16 @@ class Confirm extends Base
 
       $result =  $oldData->save($data);
       if ($result && $summary) {
-        $confirmData = self::detail($oldData->id, 0, 0, $user_id, 0);
+        $confirmData = self::detail($user, $oldData->id);
 
         $log = [
           "table" => 'customer',
           "owner_id" => $oldData->customer_id,
           "title" => '修改确认书',
-          "summary" => $confirmData->building . '\n' .$summary,
-          "user_id" => $user_id
+          "summary" => $confirmData->building . '\n' .$summary
         ];
 
-        Log::add($log);
+        Log::add($user, $log);
 
         //生成PDF
         $oldData->file = self::toPdf($confirmData);
@@ -213,6 +234,8 @@ class Confirm extends Base
       $customer = Customer::get($data['customer_id']);
       if ($customer == null) {
         self::exception('客户不存在。');
+      } else if (!Customer::allow($user, $customer, 'confirm')) {
+        self::exception('您没有权限添加确认书。');
       }
       $building = Building::get($data['building_id']);
       if ($building == null) {
@@ -229,21 +252,20 @@ class Confirm extends Base
 
       if ($result) {
         $summary = $building->building_name;
-        Log::add([
+        Log::add($user, [
           "table" => "customer",
           "owner_id" => $customer->id,
           "title" => '生成客户确认书',
-          "summary" => $summary,
-          "user_id" => $user_id
+          "summary" => $summary
         ]);
 
-        //生成PDF
-        $confirmData = self::detail($confirm->id, 0, 0, $user_id, 0);
+        // 生成PDF
+        $confirmData = self::detail($user, $confirm->id);
         $confirm->file = self::toPdf($confirmData);
         $confirm->save();
 
         // 更改客户为确认状态
-        Customer::changeStatus($customer->id, 3, $user_id);
+        Customer::changeStatus($user, $customer->id, 3);
         
         return $confirm->id;
       } else {

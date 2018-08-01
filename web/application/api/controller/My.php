@@ -17,7 +17,7 @@ class My extends Base
    * 我的收藏
    */
   public function favorite($page = 1) {
-    $list = Building::myFavorite($this->user_id, $page);
+    $list = Building::myFavorite($this->user, $page);
     return $this->succeed($list);
   }
 
@@ -25,7 +25,7 @@ class My extends Base
    * 我的客户
    */
   public function customer() {
-    $list = Customer::search(['status' => '0,1,2', 'clash' => false], $this->user_id, $this->company_id);
+    $list = Customer::search($this->user, ['status' => '0,1,2', 'clash' => false]);
     return $this->succeed($list);
   }
 
@@ -60,7 +60,7 @@ class My extends Base
         return $this->fail($validate->getError(), $form_token);
       } else {
         unset($data['__token__']);
-        $result = User::updateInfo($data, $avatar, $this->user_id);
+        $result = User::updateInfo($this->user, $data, $avatar);
         if ($result) {
           return $this->succeed($this->getUser(true));
         } else {
@@ -75,7 +75,7 @@ class My extends Base
    */
   public function mobile($mobile, $verifyCode) {
     if ($mobile && $verifyCode) {
-      $result = User::changeMobile($this->user_id, $mobile, $verifyCode);
+      $result = User::changeMobile($this->user, $mobile, $verifyCode);
       return $this->succeed($this->getUser(true));
     } else {
       return;
@@ -88,7 +88,7 @@ class My extends Base
   public function changePwd() {
     if (input('?post.password')) {
       $password = input('post.password');
-      $result = User::changePassword($this->user_id, $password);
+      $result = User::changePassword($this->user, $password);
       if ($result == 1) {
         return $this->succeed();
       } else {

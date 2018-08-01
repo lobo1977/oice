@@ -19,14 +19,14 @@
     <flexbox :gutter="0" class="bottom-bar">
       <flexbox-item :span="6">
         <x-button type="default" class="bottom-btn" 
-          :disabled="info.id === 0 || (info.user_id > 0 && info.user_id != user.id)"
+          :disabled="!info.allowEdit"
           :link="{name:'LinkmanEdit', params: {id: info.id, type: info.type, oid: info.owner_id}}">
           <x-icon type="compose" class="btn-icon"></x-icon> 修改
         </x-button>
       </flexbox-item>
       <flexbox-item>
         <x-button type="warn" class="bottom-btn" @click.native="remove"
-          :disabled="info.id === 0 || (info.user_id > 0 && info.user_id != user.id)">
+          :disabled="!info.allowDelete">
           <x-icon type="trash-a" class="btn-icon"></x-icon> 删除
         </x-button>
       </flexbox-item>
@@ -62,7 +62,9 @@ export default {
         qq: '',             // QQ
         rem: '',            // 备注
         status: '',         // 状态
-        user_id: 0
+        user_id: 0,
+        allowEdit: false,
+        allowDelete: false
       }
     }
   },

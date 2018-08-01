@@ -186,15 +186,15 @@ export default {
     itemClick (item) {
       if (this.mouseMove || item.disabled) {
       } else {
-        this.setDefault(item.id)
+        this.setActive(item.id)
       }
     },
-    setDefault (value) {
+    setActive (value) {
       if (this.user && value === this.user.company_id) {
         return
       }
       this.$vux.loading.show()
-      this.$post('/api/company/setDefault', {
+      this.$post('/api/company/setActive', {
         id: value
       }, (res) => {
         this.$vux.loading.hide()

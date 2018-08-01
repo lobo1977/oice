@@ -4,6 +4,7 @@ namespace app\api\controller;
 use think\Validate;
 use app\api\controller\Base;
 use app\api\model\Customer as modelCustomer;
+use app\api\model\Company;
 use app\api\model\Filter;
 use app\api\model\Recommend;
 use app\api\model\Confirm;
@@ -23,7 +24,7 @@ class Customer extends Base
     $params = input('post.');
 
     if ($params) {
-      $list = modelCustomer::search($params, $this->user_id, $this->company_id);
+      $list = modelCustomer::search($this->user, $params);
 
       foreach($list as $key=>$customer) {
         $customer->title = '【' . modelCustomer::$status[$customer->status] . '】' . $customer->customer_name;
@@ -59,7 +60,7 @@ class Customer extends Base
    */
   public function detail($id = 0) {
     if ($id) {
-      $data = modelCustomer::detail($id, $this->user_id, $this->company_id);
+      $data = modelCustomer::detail($this->user, $id);
       return $this->succeed($data);
     } else {
       return;
@@ -72,18 +73,12 @@ class Customer extends Base
   public function edit($id = 0, $flag = '', $bid = 0, $uid = '') {
     if ($this->request->isGet()) {
       $form_token = $this->formToken();
-      $companyList = \app\api\model\Company::my($this->user_id);
+      $companyList = Company::my($this->user);
       if ($id > 0) {
-        $data = modelCustomer::get($id);
-        if ($data == null) {
-          return $this->exception('客户不存在。');
-        } else if ($data->user_id != $this->user_id) {
-          return $this->exception('您没有权限修改这个客户。');
-        } else {
-          $data->__token__ = $form_token;
-          $data->companyList = $companyList;
-          return $this->succeed($data);
-        }
+        $data = modelCustomer::detail($this->user, $id);
+        $data->__token__ = $form_token;
+        $data->companyList = $companyList;
+        return $this->succeed($data);
       } else {
         return $this->succeed([
           "__token__" => $form_token, 
@@ -123,7 +118,7 @@ class Customer extends Base
         return $this->fail($validate->getError(), ['token' => $form_token]);
       } else {
         unset($data['__token__']);
-        $result = modelCustomer::addUp($id, $data, $this->user_id, $this->company_id);
+        $result = modelCustomer::addUp($this->user, $id, $data);
         if (is_numeric($result) && $result > 0) {
           $message = '';
           if (isset($data['clash']) && $data['clash'] > 0) {
@@ -132,11 +127,11 @@ class Customer extends Base
             // 添加筛选
             if ($flag == 'filter') {
               if ($bid) {
-                Filter::addBuilding($result, $bid, 0, $this->user_id);
+                Filter::addBuilding($this->user, $result, $bid, 0);
               } else if ($uid) {
                 $arrIds = explode(',', $uid);
                 foreach ($arrIds as $unit_id) {
-                  Filter::addBuilding($result, 0, intval($unit_id), $this->user_id);
+                  Filter::addBuilding($this->user, $result, 0, intval($unit_id));
                 }
               }
             }
@@ -161,7 +156,7 @@ class Customer extends Base
    * 删除客户
    */
   public function remove($id) {
-    $result = modelCustomer::remove($id, $this->user_id);
+    $result = modelCustomer::remove($this->user, $id);
     if ($result == 1) {
       return $this->succeed();
     } else {
@@ -175,28 +170,10 @@ class Customer extends Base
   public function log($id = 0, $cid = 0) {
     if ($this->request->isGet()) {
       $form_token = $this->formToken();
-
       if ($id > 0) {
-        $data = Log::get($id);
-        if ($data == null) {
-          return $this->exception('跟进信息不存在。');
-        } else {
-          if ($data->system == 1) {
-            return $this->exception('系统日志不可修改。');
-          } else if ($data->user_id != $this->user_id) {
-            return $this->exception('您没有权限修改此项跟进。');
-          }
-          $data->__token__ = $form_token;
-          return $this->succeed($data);
-        }
-      } else if ($cid > 0) {
-        $data = modelCustomer::get($cid);
-        if ($data) {
-          $data->__token__ = $form_token;
-          return $this->succeed($data);
-        } else {
-          return $this->exception('客户信息不存在。');
-        }
+        $data = Log::edit($this->user, $id);
+        $data->__token__ = $form_token;
+        return $this->succeed($data);
       } else {
         return $this->succeed(['__token__' => $form_token]);
       }
@@ -222,7 +199,7 @@ class Customer extends Base
         } else if (isset($data['owner_id'])) {
           unset($data['owner_id']);
         }
-        Log::addUp($id, $data, $this->user_id);
+        Log::addUp($this->user, $id, $data);
         return $this->succeed();
       }
     }
@@ -232,7 +209,7 @@ class Customer extends Base
    * 删除跟进纪要
    */
   public function removeLog($id) {
-    $result = Log::remove($id, $this->user_id);
+    $result = Log::remove($this->user, $id);
     if ($result == 1) {
       return $this->succeed();
     } else {
@@ -249,33 +226,20 @@ class Customer extends Base
     if ($bids) {
       $arrIds = explode(',', $bids);
       foreach ($arrIds as $building_id) {
-        $result = Filter::addBuilding($cid, intval($building_id), 0, $this->user_id);
+        $result = Filter::addBuilding($this->user, $cid, intval($building_id), 0);
       }
     }
     
     if ($uids) {
       $arrIds = explode(',', $uids);
       foreach ($arrIds as $unit_id) {
-        $result += Filter::addBuilding($cid, 0, intval($unit_id), $this->user_id);
+        $result += Filter::addBuilding($this->user, $cid, 0, intval($unit_id));
       }
     }
     
     if ($result > 0) {
-      $list = Filter::query($cid, $this->user_id);
+      $list = Filter::query($this->user, $cid);
       return $this->succeed($list);
-    } else {
-      return $this->fail();
-    }
-  }
-
-  /**
-   * 生成客户确认书
-   */
-  public function addConfirm($cid, $bid, $uid) {
-    $result = Confirm::addNew($cid, $bid, $uid, $this->user_id);
-    if ($result > 0) {
-      $confirm = Confirm::query($cid, 0, $this->user_id);
-      return $this->succeed($confirm);
     } else {
       return $this->fail();
     }
@@ -285,9 +249,9 @@ class Customer extends Base
    * 删除筛选
    */
   public function removeFilter($id, $building_id, $unit_id) {
-    $result = Filter::removeBuilding($id, $building_id, $unit_id, $this->user_id);
+    $result = Filter::removeBuilding($this->user, $id, $building_id, $unit_id);
     if ($result == 1) {
-      $list = Filter::query($id, $this->user_id);
+      $list = Filter::query($this->user, $id);
       return $this->succeed($list);
     } else {
       return $this->fail();
@@ -298,9 +262,9 @@ class Customer extends Base
    * 移动筛选
    */
   public function sortFilter($id, $building_id, $unit_id, $up = 0) {
-    $result = Filter::sort($id, $building_id, $unit_id, $this->user_id, $up);
+    $result = Filter::sort($this->user, $id, $building_id, $unit_id, $up);
     if ($result == 1) {
-      $list = Filter::query($id, $this->user_id);
+      $list = Filter::query($this->user, $id);
       return $this->succeed($list);
     } else {
       return $this->fail();
@@ -311,9 +275,9 @@ class Customer extends Base
    * 生成推荐资料
    */
   public function recommend($cid, $mode, $ids) {
-    $result = Recommend::addNew($cid, $mode, $ids, $this->user_id);
+    $result = Recommend::addNew($this->user, $cid, $mode, $ids);
     if ($result) {
-      $list = Recommend::query($cid, $this->user_id);
+      $list = Recommend::query($this->user, $cid);
       return $this->succeed($list);
     } else {
       return $this->fail();
@@ -324,7 +288,7 @@ class Customer extends Base
    * 删除资料
    */
   public function removeRecommend($id) {
-    $result = Recommend::remove($id, $this->user_id);
+    $result = Recommend::remove($this->user, $id);
     if ($result) {
       return $this->succeed();
     } else {

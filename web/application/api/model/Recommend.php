@@ -15,11 +15,11 @@ class Recommend extends Base
   /**
    * 客户推荐表
    */
-  public static function query($cid, $uid) {
+  public static function query($user, $customer_id) {
     $list = self::alias('a')
       ->leftJoin('recom_building b', 'a.id = b.recom_id')
-      ->where('a.customer_id', $cid)
-      ->where('a.user_id', $uid)
+      ->where('a.customer_id', $customer_id)
+      ->where('a.user_id', $user->id)
       ->field('a.id,a.mode,a.token,a.create_time,count(b.id) as building_count')
       ->group('a.id')
       ->order('a.create_time', 'desc')
@@ -57,7 +57,7 @@ class Recommend extends Base
     $manager = User::where('id', $recommend->user_id)
       ->field('title,avatar,mobile,email')
       ->find();
-    $manager = User::formatUserInfo($manager);
+    $manager = User::formatData($manager);
 
     if ($customer) {
       $company = Company::where('id', $customer->company_id)
@@ -157,13 +157,23 @@ class Recommend extends Base
   /**
    * 生成推荐资料
    */
-  public static function addNew($cid, $mode, $ids, $uid) {
+  public static function addNew($user, $customer_id, $mode, $ids) {
+    $customer = Customer::get($customer_id);
+    if (!Customer::allow($user, $customer, 'follow')) {
+      self::exception('您没有权限生成资料。');
+    }
+
+    $user_id = 0;
+    if ($user) {
+      $user_id = $user->id;
+    }
+
     $time = time();
     $recommend = new Recommend;
-    $recommend->customer_id = $cid;
+    $recommend->customer_id = $customer_id;
     $recommend->mode = $mode;
-    $recommend->user_id = $uid;
-    $recommend->token = md5(strval($cid) . '_' . strval($uid) . '_' . strval($time));
+    $recommend->user_id = $user_id;
+    $recommend->token = md5(strval($customer_id) . '_' . strval($user_id) . '_' . strval($time));
     $result = $recommend->save();
     if ($result) {
       $recom_id = $recommend->id;
@@ -178,11 +188,10 @@ class Recommend extends Base
           ])->insert();
         }
       }
-      Log::add([
+      Log::add($user, [
         "table" => "customer",
-        "owner_id" => $cid,
-        "title" => '生成推荐资料',
-        "user_id" => $uid
+        "owner_id" => $customer_id,
+        "title" => '生成推荐资料'
       ]);
     }
 
@@ -192,22 +201,30 @@ class Recommend extends Base
   /**
    * 删除推荐资料
    */
-  public static function remove($id, $user_id) {
+  public static function remove($user, $id) {
+    $user_id = 0;
+    if ($user) {
+      $user_id = $user->id;
+    }
+
     $recommend = self::get($id);
     if ($recommend == null) {
       return true;
-    }else if ($recommend->user_id != $user_id) {
-      self::exception('您没有权限删除这份资料。');
+    } else {
+      $customer = Customer::get($recommend->customer_id);
+      if (!Customer::allow($user, $customer, 'follow') || $recommend->user_id != $user_id) {
+        self::exception('您没有权限删除这份资料。');
+      }
     }
+
     $log = [
       "table" => 'customer',
       "owner_id" => $recommend->customer_id,
-      "title" => '删除资料',
-      "user_id" => $user_id
+      "title" => '删除资料'
     ];
     $result = $recommend->delete();
     if ($result) {
-      Log::add($log);
+      Log::add($user, $log);
     }
     return $result;
   }
@@ -215,17 +232,34 @@ class Recommend extends Base
   /**
    * 删除资料项目
    */
-  public static function removeBuilding($id, $bid, $uid) {
-    $recommend = self::get($id);
-    if ($recommend == null) {
-      return true;
-    } else if ($recommend->user_id != $user_id) {
-      self::exception('您没有权限修改这份资料。');
+  public static function removeBuilding($user, $recom_id, $id) {
+    $user_id = 0;
+    if ($user) {
+      $user_id = $user->id;
     }
 
-    return db('recom_building')
-      ->where('id', $bid)
-      ->where('recom_id', $id)
+    $recommend = self::get($recom_id);
+    if ($recommend == null) {
+      self::exception('资料不存在或已被删除。');
+    } else {
+      $customer = Customer::get($recommend->customer_id);
+      if (!Customer::allow($user, $customer, 'follow') || $recommend->user_id != $user_id) {
+        self::exception('您没有权限修改这份资料。');
+      }
+    }
+
+    $result =  db('recom_building')
+      ->where('id', $id)
+      ->where('recom_id', $recom_id)
       ->delete();
+      
+    if ($result) {
+      Log::add($user, [
+        "table" => 'customer',
+        "owner_id" => $recommend->customer_id,
+        "title" => '编辑推荐资料'
+      ]);
+    }
+    return $result;
   }
 }

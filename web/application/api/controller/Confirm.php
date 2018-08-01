@@ -4,6 +4,7 @@ namespace app\api\controller;
 use think\Validate;
 use app\api\controller\Base;
 use app\api\model\Confirm as modelConfirm;
+use app\api\model\Company;
 
 class Confirm extends Base
 {
@@ -17,7 +18,7 @@ class Confirm extends Base
    */
   public function detail($id = 0) {
     if ($id) {
-      $data = modelConfirm::detail($id, 0, 0, $this->user_id, $this->company_id);
+      $data = modelConfirm::detail($this->user, $id);
       return $this->succeed($data);
     } else {
       return;
@@ -30,8 +31,8 @@ class Confirm extends Base
   public function edit($id = 0, $bid = 0, $cid = 0) {
     if ($this->request->isGet()) {
       $form_token = $this->formToken();
-      $companyList = \app\api\model\Company::my($this->user_id);
-      $data = modelConfirm::detail($id, $bid, $cid, $this->user_id, $this->company_id);
+      $companyList = Company::my($this->user);
+      $data = modelConfirm::detail($this->user, $id, $bid, $cid);
       $data->__token__ = $form_token;
       $data->companyList = $companyList;
       return $this->succeed($data);
@@ -52,7 +53,7 @@ class Confirm extends Base
         return $this->fail($validate->getError(), $form_token);
       } else {
         unset($data['__token__']);
-        $result = modelConfirm::addUp($id, $data, $this->user_id);
+        $result = modelConfirm::addUp($this->user, $id, $data);
         if ($result) {
           return $this->succeed($result);
         } else {
@@ -66,7 +67,7 @@ class Confirm extends Base
    * 下载客户确认书
    */
   public function pdf($id = 0) {
-    $data = modelConfirm::detail($id, 0, 0, $this->user_id, $this->company_id);
+    $data = modelConfirm::detail($this->user, $id);
     if ($data->file) {
       $path = '/upload/confirm/' . $data->file;
     } else {

@@ -51,7 +51,8 @@
         </x-button>
       </flexbox-item>
       <flexbox-item>
-        <x-button type="default" class="bottom-btn" 
+        <x-button type="default" class="bottom-btn"
+          :disabled="!info.allowNew && !info.allowEdit && !info.allowDelete"
           @click.native="showUnitMenu = true">
           <x-icon type="ios-more" class="btn-icon"></x-icon>
         </x-button>
@@ -111,7 +112,10 @@ export default {
         end_date: '',      // 到日期
         rem: '',           // 备注
         user_id: 0,
-        isFavorite: false
+        isFavorite: false,
+        allowNew: false,
+        allowEdit: false,
+        allowDelete: false
       },
       previewOptions: {
       },
@@ -343,18 +347,17 @@ export default {
       return this.info.isFavorite ? '取消收藏' : '收藏'
     },
     unitMenu () {
-      if (this.info.user_id && this.user && this.info.user_id === this.user.id) {
-        return {
-          new: '添加',
-          edit: '修改',
-          delete: '删除'
-        }
-      } else {
-        return {
-          new: '添加',
-          edit: '修改'
-        }
+      let menu = {}
+      if (this.info.allowNew) {
+        menu.new = '添加'
       }
+      if (this.info.allowEdit) {
+        menu.edit = '修改'
+      }
+      if (this.info.allowDelete) {
+        menu.delete = '删除'
+      }
+      return menu
     }
   }
 }

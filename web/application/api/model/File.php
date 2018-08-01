@@ -4,6 +4,8 @@ namespace app\api\model;
 use think\model\concern\SoftDelete;
 use app\api\model\Base;
 use app\api\model\Log;
+use app\api\model\Building;
+use app\api\model\Unit;
 
 class File extends Base
 {
@@ -12,9 +14,24 @@ class File extends Base
   protected $deleteTime = 'delete_time';
 
   /**
+   * 权限检查
+   */
+  public static function allow($user, $type, $id, $operate) {
+    if ($type == 'building') {
+      $building = Building::get($id);
+      return Building::allow($user, $building, $operate);
+    } else if ($type == 'unit') {
+      $unit = Unit::get($id);
+      return Unit::allow($user, $unit, $operate);
+    } else {
+      return true;
+    }
+  }
+
+  /**
    * 查询列表
    */
-  public static function getList($parent_id, $type) {
+  public static function getList($user, $type, $parent_id) {
     $query = self::where('parent_id', $parent_id);
     if ($type) {
       $query = $query->where('type', $type);
@@ -35,16 +52,14 @@ class File extends Base
   /**
    * 上传图片
    */
-  public static function uploadImage($type, $parent_id, $files, $user_id = 0, $company_id = 0) {
-    $parent = db($type)->where('id', $parent_id)->find();
+  public static function uploadImage($user, $type, $parent_id, $files) {
+    if (!self::allow($user, $type, $parent_id, 'edit')) {
+      self::exception('操作失败，您没有权限。');
+    }
 
-    if ($parent) {
-      if ($parent['user_id'] > 0 &&
-        $parent['user_id'] != $user_id &&
-        $parent['company_id'] > 0 &&
-        $parent['company_id'] != $company_id) {
-        self::exception('操作失败，您没有权限。');
-      }
+    $user_id = 0;
+    if ($user) {
+      $user_id = $user->id;
     }
 
     $count = self::where('type', $type)
@@ -77,12 +92,11 @@ class File extends Base
         $result += $newData->save();
 
         if ($result) {
-          Log::add([
+          Log::add($user, [
             "table" => $type,
             "owner_id" => $parent_id,
             "title" => '上传图片',
-            "summary" => $newData->title,
-            "user_id" => $user_id
+            "summary" => $newData->title
           ]);
         }
       } else {
@@ -96,30 +110,25 @@ class File extends Base
   /**
    * 设置默认图片
    */
-  public static function setDefault($id, $user_id, $company_id = 0) {
+  public static function setDefault($user, $id) {
     $file = self::get($id);
     if ($file == null) {
       self::exception('图片不存在。');
     }
 
-    $parent = db($file->getAttr('type'))->where('id', $file->parent_id)->find();
-    if ($parent) {
-      if ($parent['share'] == 0 && 
-        $parent['user_id'] > 0 && 
-        $parent['user_id'] != $user_id && 
-        $parent['company_id'] != $company_id) {
-        self::exception('操作失败，您没有权限。');
-      }
-    }
-
     if ($file->default == 1) return 1;
+
+    $type = $file->getAttr('type');
+
+    if (!self::allow($user, $type, $file->parent_id, 'edit')) {
+      self::exception('操作失败，您没有权限。');
+    }
 
     $log = [
       "table" => $file->getAttr('type'),
       "owner_id" => $file->parent_id,
       "title" => '更改封面图',
-      "summary" => $file->title,
-      "user_id" => $user_id
+      "summary" => $file->title
     ];
     $before = self::where('parent_id', $file->parent_id)
       ->where('type', $file->getAttr('type'))
@@ -132,7 +141,7 @@ class File extends Base
     $file->default = 1;
     $result = $file->save();
     if ($result) {
-      Log::add($log);
+      Log::add($user, $log);
     }
     return $result;
   }
@@ -140,20 +149,16 @@ class File extends Base
   /**
    * 删除图片
    */
-  public static function removeImage($id, $user_id, $company_id = 0) {
+  public static function removeImage($user, $id) {
     $file = self::get($id);
     if ($file == null) {
       return true;
     }
 
-    $parent = db($file->getAttr('type'))->where('id', $file->parent_id)->find();
-    if ($parent) {
-      if ($parent['share'] == 0 && 
-        $parent['user_id'] > 0 && 
-        $parent['user_id'] != $user_id && 
-        $parent['company_id'] != $company_id) {
-        self::exception('操作失败，您没有权限。');
-      }
+    $type = $file->getAttr('type');
+
+    if (!self::allow($user, $type, $file->parent_id, 'edit')) {
+      self::exception('操作失败，您没有权限。');
     }
 
     if ($file->default == 1) {
@@ -164,12 +169,11 @@ class File extends Base
       "table" => $file->getAttr('type'),
       "owner_id" => $file->parent_id,
       "title" => '删除图片',
-      "summary" => $file->title,
-      "user_id" => $user_id
+      "summary" => $file->title
     ];
     $result = $file->delete();
     if ($result) {
-      Log::add($log);
+      Log::add($user, $log);
     }
     return $result;
   }

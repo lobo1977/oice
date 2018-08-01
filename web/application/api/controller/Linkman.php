@@ -17,7 +17,7 @@ class Linkman extends Base
    */
   public function detail($id = 0) {
     if ($id) {
-      $data = modelLinkman::detail($id, $this->user_id, $this->company_id);
+      $data = modelLinkman::detail($this->user, $id);
       return $this->succeed($data);
     } else {
       return;
@@ -32,12 +32,7 @@ class Linkman extends Base
       $form_token = $this->formToken();
 
       if ($id > 0) {
-        $data = modelLinkman::get($id);
-        if ($data == null) { 
-          return $this->exception('联系人不存在。');
-        } else if ($data->user_id > 0 && $data->user_id != $this->user_id) {
-          return $this->exception('您没有权限修改此联系人。');
-        }
+        $data = modelLinkman::detail($this->user, $id);
         $data->__token__ = $form_token;
         return $this->succeed($data);
       } else {
@@ -67,7 +62,7 @@ class Linkman extends Base
         return $this->fail($validate->getError(), $form_token);
       } else {
         unset($data['__token__']);
-        $result = modelLinkman::addUp($id, $data, $this->user_id);
+        $result = modelLinkman::addUp($this->user, $id, $data);
         if ($result) {
           return $this->succeed($result);
         } else {
@@ -81,7 +76,7 @@ class Linkman extends Base
    * 删除联系人
    */
   public function remove($id) {
-    $result = modelLinkman::remove($id, $this->user_id);
+    $result = modelLinkman::remove($this->user, $id);
     if ($result == 1) {
       return $this->succeed();
     } else {

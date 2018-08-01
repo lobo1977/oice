@@ -107,7 +107,7 @@ class Index extends Base
    * 更新 Token
    */
   public function updateToken() {
-    $newToken = User::updateToken($this->user_id, $this->user['token']);
+    $newToken = User::updateToken($this->user);
     if ($newToken) {
       return $this->succeed($newToken);
     } else {
@@ -119,13 +119,13 @@ class Index extends Base
    * 退出登录
    */
   public function logout() {
-    $token = request()->header('User-Token');
-    if ($token) {
-      User::logout($token);
-    }
+    User::logout($this->user);
     return $this->succeed();
   }
 
+  /**
+   * 表单令牌
+   */
   public function token() {
     return $this->succeed($this->formToken());
   }

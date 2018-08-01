@@ -21,9 +21,45 @@ class Customer extends Base
   private static $IGNORE_WORDS = '/北京|上海|深圳|广州|中国|美国|日本|德国|英国|法国|（|）|\(|\)/';
   
   /**
+   * 权限检查
+   */
+  public static function allow($user, $customer, $operate) {
+    if ($user == null) {
+      return false;
+    } else if ($customer == null && $operate != 'new') {
+      return false;
+    }
+    if ($operate == 'view') {
+      if ($customer->share) {
+        return $customer->user_id == $user->id ||
+          $customer->company_id == $user->company_id;
+      } else {
+        return $customer->user_id == $user->id;
+      }
+    } else if ($operate == 'new') {
+      return true;
+    } else if ($operate == 'edit') {
+      return $customer->user_id == $user->id &&
+        $customer->company_id == $user->company_id;
+    } else if ($operate == 'follow') {
+      return $customer->user_id == $user->id &&
+        $customer->company_id == $user->company_id && !$customer->clash;
+    } else if ($operate == 'confirm') {
+      return $customer->user_id == $user->id &&
+        $customer->company_id == $user->company_id && !$customer->clash;
+    } else if ($operate == 'delete') {
+      return ($customer->user_id == $user->id &&
+        $customer->company_id == $user->company_id) ||
+        ($user->isAdmin && $customer->clash > 0);
+    } else {
+      return false;
+    }
+  }
+
+  /**
    * 检索客户信息
    */
-  public static function search($filter, $user_id = 0, $company_id = 0) {
+  public static function search($user, $filter) {
     if (!isset($filter['page'])) {
       $filter['page'] = 1;
     }
@@ -32,16 +68,17 @@ class Customer extends Base
       $filter['page_size'] = 10;
     }
 
-    if (!$user_id) {
-      $user_id = 0;
-    }
+    $user_id = 0;
+    $company_id = 0;
 
-    if (!$company_id) {
-      $company_id = 0;
+    if ($user) {
+      $user_id = $user->id;
+      $company_id = $user->company_id;
     }
     
     $list = self::where('city', self::$city)
-      ->where('user_id = ' . $user_id . ' OR (share = 1 AND company_id > 0 AND company_id = ' . $company_id . ')');
+      ->where('user_id = ' . $user_id . ' OR ' .
+        '(share = 1 AND company_id > 0 AND company_id = ' . $company_id . ')');
 
     if (isset($filter['keyword']) && $filter['keyword'] != '') {
       $list->where('customer_name', 'like', '%' . $filter['keyword'] . '%');
@@ -70,7 +107,7 @@ class Customer extends Base
   /**
    * 获取客户详细信息
    */
-  public static function detail($id, $user_id = 0, $company_id = 0) {
+  public static function detail($user, $id) {
     $data = self::alias('a')
       ->leftJoin('user b','b.id = a.user_id')
       ->leftJoin('company c','c.id = a.company_id')
@@ -80,12 +117,8 @@ class Customer extends Base
 
     if ($data == null) {
       self::exception('客户不存在。');
-    }
-
-    if ($data->user_id != $user_id) {
-      if (!($data->share == 1 && $data->company_id == $company_id)) {
-        self::exception('您没有权限查看此客户。');
-      }
+    } else if (!self::allow($user, $data, 'view')) {
+      self::exception('您没有权限查看此客户。');
     }
 
     if ($data->min_acreage && $data->max_acreage) {
@@ -98,12 +131,16 @@ class Customer extends Base
       $data->acreage = '';
     }
 
-    User::formatUserInfo($data);
-    $data->linkman = Linkman::getByOwnerId($id, 'customer', $user_id);
-    $data->log = Log::getList('customer', $id, $user_id);
-    $data->filter = Filter::query($id, $user_id);
-    $data->recommend = Recommend::query($id, $user_id);
-    $data->confirm = Confirm::query($id, 0, 0);
+    User::formatData($data);
+    $data->allowEdit = self::allow($user, $data, 'edit');
+    $data->allowFollow = self::allow($user, $data, 'follow');
+    $data->allowConfirm = self::allow($user, $data, 'confirm');
+    $data->allowDelete = self::allow($user, $data, 'detete');
+    $data->linkman = Linkman::getByOwnerId($user, 'customer', $id);
+    $data->log = Log::getList($user, 'customer', $id);
+    $data->filter = Filter::query($user, $id);
+    $data->recommend = Recommend::query($user, $id);
+    $data->confirm = Confirm::query($user, $id, 0);
 
     return $data;
   }
@@ -138,14 +175,20 @@ class Customer extends Base
   /**
    * 添加/修改客户信息
    */
-  public static function addUp($id, $data, $user_id, $company_id = 0) {
+  public static function addUp($user, $id, $data) {
     $oldData = null;
+    $user_id = 0;
+    $company_id = 0;
+    if ($user) {
+      $user_id = $user->id;
+      $company_id = $user->company_id;
+    }
 
     if ($id) {
       $oldData = self::get($id);
       if ($oldData == null) {
         self::exception('客户不存在。');
-      } else if ($oldData->user_id != $user_id) {
+      } else if (!self::allow($user, $oldData, 'edit')) {
         self::exception('您没有权限修改此客户。');
       }
     }
@@ -167,21 +210,22 @@ class Customer extends Base
           $message = '客户资料和您的' . self::$status[$clash->status] . '客户：<strong>' .
             $clash->customer_name . '</strong> 信息重复，请检查。';
         } else {
-          Log::add([
+          Log::add($user, [
             "table" => "customer",
             "owner_id" => $clash->id,
             "title" => '客户撞单',
-            "summary" => $data['customer_name'] . ' ' . $mobile,
-            "user_id" => $user_id
+            "summary" => $data['customer_name'] . ' ' . $mobile
           ]);
 
           if ($clash->status == 5) {
-            self::transfer($clash->id, $user_id, $user_id, $data);
+            self::transfer($user, $clash->id, $user_id, $data);
             $message = '客户资料和<strong>' . $clash->user . '</strong>的' . self::$status[$clash->status] . '客户：<strong>' .
-              $clash->customer_name . '</strong> 发生撞单，旧客户已自动转交给您并转为' . self::$status[$data['status']] . '客户，请及时跟进。';
+              $clash->customer_name . '</strong> 发生撞单，旧客户已自动转交给您并转为' . 
+                self::$status[$data['status']] . '客户，请及时跟进。';
           } else {
             $message = '客户资料和<strong>' . $clash->user . '</strong>的' . self::$status[$clash->status] . '客户：<strong>' .
-              $clash->customer_name . '</strong> 发生撞单，您可以选择<strong>放弃登记</strong>或<strong>申请转交或并行</strong>，由管理员按照<strong>核查撞单及覆盖原则</strong>处理。点击<strong>确定</strong>申请转交或并行。';
+              $clash->customer_name . '</strong> 发生撞单，您可以选择<strong>放弃登记</strong>或<strong>申请转交或并行</strong>，' .
+              '由管理员按照<strong>核查撞单及覆盖原则</strong>处理。点击<strong>确定</strong>申请转交或并行。';
             $resultData['confirm'] = true;
           }
         }
@@ -348,21 +392,20 @@ class Customer extends Base
 
       $result =  $oldData->save($data);
       if ($result && $summary) {
-        Log::add([
+        Log::add($user, [
           "table" => "customer",
           "owner_id" => $id,
           "title" => '修改客户信息',
-          "summary" => $summary,
-          "user_id" => $user_id
+          "summary" => $summary
         ]);
       }
       return $id;
+    } else if (!self::allow($user, null, 'new')) {
+      self::exception('您没有权限添加客户。');
     } else {
       $data['city'] = self::$city;
       $data['user_id'] = $user_id;
-      if (!isset($data['company_id']) && $company_id) {
-        $data['company_id'] = $company_id;
-      } else if (!$data['company_id'] && $company_id) {
+      if ((!isset($data['company_id']) || !$data['company_id']) && $company_id) {
         $data['company_id'] = $company_id;
       }
 
@@ -385,18 +428,17 @@ class Customer extends Base
       $result = $newData->save();
 
       if ($result) {
-        Log::add([
+        Log::add($user, [
           "table" => "customer",
           "owner_id" => $newData->id,
           "title" => '登记客户',
-          "summary" => $newData->customer_name,
-          "user_id" => $user_id
+          "summary" => $newData->customer_name
         ]);
 
         if ($linkman) {
           $linkman['type'] = 'customer';
           $linkman['owner_id'] = $newData->id;
-          Linkman::addUp(0, $linkman, $user_id);
+          Linkman::addUp($user, 0, $linkman);
         }
 
         return $newData->id;
@@ -409,11 +451,11 @@ class Customer extends Base
   /**
    * 变更客户状态
    */
-  public static function changeStatus($id, $status, $user_id) {
+  public static function changeStatus($user, $id, $status) {
     $customer = self::get($id);
     if ($customer == null) {
       return true;
-    } else if ($customer->user_id != $user_id) {
+    } else if (!self::allow($user, $customer, 'edit')) {
       self::exception('您没有权限。');
     } else if ($customer->status == $status) {
       return true;
@@ -423,21 +465,20 @@ class Customer extends Base
       "table" => 'customer',
       "owner_id" => $customer->id,
       "title" => '修改客户状态',
-      "summary" => self::$status[$customer->status] . ' -> ' . self::$status[$status],
-      "user_id" => $user_id
+      "summary" => self::$status[$customer->status] . ' -> ' . self::$status[$status]
     ];
 
     $customer->status = $status;
     $result = $customer->save();
     if ($result) {
-      Log::add($log);
+      Log::add($user, $log);
     }
 
     return $result;
   }
 
   // 转交客户
-  public static function transfer($id, $to_user, $user_id, $data = null) {
+  public static function transfer($user, $id, $to_user, $data = null) {
     $customer = self::alias('a')
       ->join('user u', "a.user_id = u.id")
       ->field('a.id,a.user_id,a.status,u.title')->find();
@@ -462,12 +503,11 @@ class Customer extends Base
     }
     $result = $customer->save();
     if ($result) {
-      Log::add([
+      Log::add($user, [
         "table" => 'customer',
         "owner_id" => $customer->id,
         "title" => '转交客户',
-        "summary" => $summary,
-        "user_id" => $user_id
+        "summary" => $summary
       ]);
     }
 
@@ -477,23 +517,22 @@ class Customer extends Base
   /**
    * 删除客户
    */
-  public static function remove($id, $user_id) {
+  public static function remove($user, $id) {
     $customer = self::get($id);
     if ($customer == null) {
       return true;
-    } else if ($customer->user_id != $user_id) {
+    } else if (!self::allow($user, $customer, 'delete')) {
       self::exception('您没有权限删除此客户。');
     }
     $log = [
       "table" => 'customer',
       "owner_id" => $customer->id,
       "title" => '删除客户',
-      "summary" => $customer->customer_name,
-      "user_id" => $user_id
+      "summary" => $customer->customer_name
     ];
     $result = $customer->delete();
     if ($result) {
-      Log::add($log);
+      Log::add($user, $log);
     }
     return $result;
   }

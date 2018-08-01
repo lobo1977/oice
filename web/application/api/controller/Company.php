@@ -4,7 +4,6 @@ namespace app\api\controller;
 use think\Validate;
 use app\api\controller\Base;
 use app\api\model\Company as modelCompany;
-use app\api\model\File;
 
 class Company extends Base
 {
@@ -18,13 +17,13 @@ class Company extends Base
   */
   public function index() {
     // 已加入企业
-    $myList = modelCompany::my($this->user_id);
+    $myList = modelCompany::my($this->user);
     // 待加入企业
-    $waitList = modelCompany::my($this->user_id, 0);
+    $waitList = modelCompany::my($this->user, 0);
     // 收到邀请的企业
-    $inviteList = modelCompany::inviteMe($this->user->mobile);
+    $inviteList = modelCompany::inviteMe($this->user);
     // 我创建的企业
-    $createList = modelCompany::myCreate($this->user_id);
+    $createList = modelCompany::myCreate($this->user);
 
     return $this->succeed([
       'my'=> $myList, 
@@ -38,7 +37,7 @@ class Company extends Base
    * 检索公开企业
    */
   public function search($keyword) {
-    $list = modelCompany::search($keyword);
+    $list = modelCompany::search($this->user, $keyword);
     return $this->succeed($list);
   }
 
@@ -47,7 +46,7 @@ class Company extends Base
    */
   public function detail($id = 0) {
     if ($id) {
-      $data = modelCompany::detail($id, $this->user_id);
+      $data = modelCompany::detail($this->user, $id);
       return $this->succeed($data);
     } else {
       return;
@@ -61,13 +60,9 @@ class Company extends Base
     if ($this->request->isGet()) {
       $form_token = $this->formToken();
       if ($id > 0) {
-        $data = modelCompany::detail($id, $this->user_id);
-        if ($data->user_id != $this->user_id) {
-          return $this->exception('您没有权限修改此企业。');
-        } else {
-          $data->__token__ = $form_token;
-          return $this->succeed($data);
-        }
+        $data = modelCompany::detail($this->user, $id);
+        $data->__token__ = $form_token;
+        return $this->succeed($data);
       } else {
         return $this->succeed([
           "__token__" => $form_token
@@ -90,7 +85,7 @@ class Company extends Base
         return $this->fail($validate->getError(), $form_token);
       } else {
         unset($data['__token__']);
-        $result = modelCompany::addUp($id, $data, $logo, $stamp, $this->user_id);
+        $result = modelCompany::addUp($this->user, $id, $data, $logo, $stamp);
         if ($result) {
           return $this->succeed($result);
         } else {
@@ -104,7 +99,7 @@ class Company extends Base
    * 删除企业
    */
   public function remove($id) {
-    $result = modelCompany::remove($id, $this->user_id);
+    $result = modelCompany::remove($this->user, $id);
     if ($result) {
       return $this->succeed();
     } else {
@@ -115,8 +110,8 @@ class Company extends Base
   /**
    * 切换企业
    */
-  public function setDefault($id) {
-    $result = modelCompany::setDefault($id, $this->user_id);
+  public function setActive($id) {
+    $result = modelCompany::setActive($this->user, $id);
     if ($result) {
       return $this->succeed($this->getUser(true));
     } else {
@@ -128,7 +123,7 @@ class Company extends Base
    * 加入企业
    */
   public function addin($id) {
-    $result = modelCompany::addin($id, $this->user_id);
+    $result = modelCompany::addin($this->user, $id);
     if ($result === 0 || $result == 1) {
       return $this->succeed($result);
     } else {
@@ -140,7 +135,7 @@ class Company extends Base
    * 退出企业
    */
   public function quit($id) {
-    $result = modelCompany::quit($id, $this->user_id);
+    $result = modelCompany::quit($this->user, $id);
     if ($result) {
       return $this->succeed($this->getUser(true));
     } else {
@@ -152,7 +147,7 @@ class Company extends Base
    * 邀请加入
    */
   public function invite($id, $mobile) {
-    $result = modelCompany::invite($id, $mobile, $this->user_id);
+    $result = modelCompany::invite($this->user, $id, $mobile);
     if ($result) {
       return $this->succeed();
     } else {
@@ -164,7 +159,7 @@ class Company extends Base
    * 加入企业审核通过
    */
   public function passAddin($id, $user_id) {
-    $result = modelCompany::passAddin($id, $user_id, $this->user_id);
+    $result = modelCompany::passAddin($this->user, $id, $user_id);
     if ($result) {
       return $this->succeed();
     } else {
@@ -176,7 +171,7 @@ class Company extends Base
    * 驳回加入企业/移除企业成员
    */
   public function rejectAddin($id, $user_id) {
-    $result = modelCompany::rejectAddin($id, $user_id, $this->user_id);
+    $result = modelCompany::rejectAddin($this->user, $id, $user_id);
     if ($result) {
       return $this->succeed();
     } else {
@@ -188,7 +183,7 @@ class Company extends Base
    * 企业成员列表
    */
   public function user($id, $page) {
-    $result = modelCompany::Member($id, 1, $this->user_id, $page);
+    $result = modelCompany::Member($this->user, $id, 1, $page);
     return $this->succeed($result);
   }
 }

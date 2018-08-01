@@ -14,12 +14,12 @@
       <previewer :list="info.images" ref="previewer" :options="previewOptions"></previewer>
     </div>
 
-    <sticky :offset="46">
+    <sticky :offset="46" v-if="user != null && user.id > 0">
       <tab>
         <tab-item @on-item-click="goTab(0)" :selected="tab === 0">基本信息</tab-item>
         <tab-item @on-item-click="goTab(1)" :selected="tab === 1">联系人</tab-item>
         <tab-item @on-item-click="goTab(2)" :selected="tab === 2">单元销控</tab-item>
-        <tab-item v-if="user != null && user.id > 0" @on-item-click="goTab(3)" :selected="tab === 3">确认书</tab-item>
+        <tab-item @on-item-click="goTab(3)" :selected="tab === 3">确认书</tab-item>
       </tab>
     </sticky>
 
@@ -78,8 +78,7 @@
           </x-button>
         </flexbox-item>
         <flexbox-item>
-          <x-button type="default" class="bottom-btn" 
-            :disabled="info.user_id > 0 && info.user_id != user.id && info.company_id > 0 && info.company_id != user.company_id"
+          <x-button type="default" class="bottom-btn" :disabled="!info.allowEdit"
             :link="{name:'BuildingEdit', params: { id: info.id }}">
             <x-icon type="compose" class="btn-icon"></x-icon>
           </x-button>
@@ -96,8 +95,7 @@
         :inline-desc="item.desc"></cell>
       
       <div class="bottom-bar">
-        <x-button type="primary" class="bottom-btn" :disabled="info.id === 0 ||
-          (info.user_id > 0 && info.user_id != user.id && info.company_id > 0 && info.company_id != user.company_id)"
+        <x-button type="primary" class="bottom-btn" :disabled="!info.allowEdit"
           :link="{name: 'LinkmanEdit', params: {id: 0, type: 'building', oid: info.id}}">
           <x-icon type="plus" class="btn-icon"></x-icon> 添加
         </x-button>
@@ -143,8 +141,7 @@
           </x-button>
         </flexbox-item>
         <flexbox-item>
-          <x-button type="default" class="bottom-btn" :disabled="info.id === 0 ||
-            (info.user_id > 0 && info.user_id != user.id && info.company_id > 0 && info.company_id != user.company_id)"
+          <x-button type="default" class="bottom-btn" :disabled="!info.allowEdit"
             :link="{name: 'UnitEdit', params: { id:0, bid: info.id }}">
             <x-icon type="plus" class="btn-icon"></x-icon> 添加
           </x-button>
@@ -246,6 +243,8 @@ export default {
         user_id: 0,
         company_id: 0,
         isFavorite: false,
+        allowEdit: false,
+        allowDelete: false,
         images: [],
         linkman: [],
         unit: [],
@@ -571,7 +570,7 @@ export default {
         vm.unitTouchEvent = 0
         if (!isTouch || (Math.abs(vm.moveX - vm.touchX) <= 5 && Math.abs(vm.moveY - vm.touchY) <= 5)) {
           vm.menuUnit = item
-          vm.showUnitMenu = true
+          vm.showUnitMenu = true && vm.unitMenu != null
         }
       }, 500)
     },
@@ -674,33 +673,39 @@ export default {
       return tree
     },
     buildingMenu () {
-      if (this.info.user_id && this.user && this.info.user_id === this.user.id) {
-        return {
-          edit: '修改',
-          delete: '删除'
-        }
-      } else {
-        return {
-          edit: '修改'
-        }
+      let menu = {}
+      if (this.info.allowEdit) {
+        menu.edit = '修改'
       }
+      if (this.info.allowDelete) {
+        menu.delete = '删除'
+      }
+      return menu
     },
     unitMenu () {
-      if (this.menuUnit && this.user) {
-        if (this.menuUnit.user_id === this.user.id) {
-          return {
-            view: '查看',
-            edit: '修改',
-            delete: '删除'
+      if (this.menuUnit) {
+        let menu = null
+        if (this.menuUnit.allowView) {
+          if (menu == null) {
+            menu = {}
           }
-        } else {
-          return {
-            view: '查看',
-            edit: '修改'
-          }
+          menu.view = '查看'
         }
+        if (this.menuUnit.allowEdit) {
+          if (menu == null) {
+            menu = {}
+          }
+          menu.edit = '修改'
+        }
+        if (this.menuUnit.allowDelete) {
+          if (menu == null) {
+            menu = {}
+          }
+          menu.delete = '删除'
+        }
+        return menu
       } else {
-        return []
+        return null
       }
     },
     favoriteText () {

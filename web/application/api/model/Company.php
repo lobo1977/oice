@@ -5,8 +5,8 @@ use think\facade\Validate;
 use think\model\concern\SoftDelete;
 use app\common\Sms;
 use app\api\model\Base;
-use app\api\model\User;
 use app\api\model\Log;
+use app\api\model\User;
 
 class Company extends Base
 {
@@ -16,23 +16,6 @@ class Company extends Base
 
   public static $joinWay = ['开放加入','需管理员审核加入', '需通过邀请加入'];
   public static $status = ['公开','隐藏'];
-
-  /**
-   * 格式化列表信息
-   */
-  protected static function formatList($list, $count = true) {
-    foreach($list as $company) {
-      if ($company->logo) {
-        $company->logo = '/upload/company/images/60/' . $company->logo;
-      } else {
-        $company->logo = '/static/img/null.png';
-      }
-      if ($count) {
-        self::setAddinCount($company);
-      }
-    }
-    return $list;
-  }
 
   /**
    * 获取加入成员统计
@@ -57,9 +40,46 @@ class Company extends Base
   }
 
   /**
+   * 格式化列表信息
+   */
+  protected static function formatList($list, $count = true) {
+    foreach($list as $company) {
+      if ($company->logo) {
+        $company->logo = '/upload/company/images/60/' . $company->logo;
+      } else {
+        $company->logo = '/static/img/null.png';
+      }
+      if ($count) {
+        self::setAddinCount($company);
+      }
+    }
+    return $list;
+  }
+
+  /**
+   * 权限检查
+   */
+  public static function allow($user, $company, $operate) {
+    if ($user == null) {
+      return false;
+    } else if ($company == null && $operate != 'new') {
+      return false;
+    }
+    if ($operate == 'view' || $operate == 'new') {
+      return true;
+    } else if ($operate == 'edit' || $operate == 'invite' || $operate == 'pass') {
+      return $company->user_id == $user->id;
+    } else if ($operate == 'delete') {
+      return false;
+    } else {
+      return false;
+    }
+  }
+
+  /**
    * 检索公开企业
    */
-  public static function search($keyword, $page = 1) {
+  public static function search($user, $keyword, $page = 1) {
     $list = self::where('status', 1);
 
     if ($keyword) {
@@ -77,11 +97,15 @@ class Company extends Base
   /**
    * 已加入的企业
    */
-  public static function my($user_id = 0, $status = 1) {
+  public static function my($user, $status = 1) {
+    $user_id = 0;
+    if ($user) {
+      $user_id = $user->id;
+    }
     $list = self::alias('a')
       ->join('user_company b', 'a.id = b.company_id and b.status = ' . $status)
       ->where('b.user_id', $user_id)
-      ->field('a.id,a.title,a.logo,a.area,a.address,a.create_time,b.default')
+      ->field('a.id,a.title,a.logo,a.area,a.address,a.create_time,b.active')
       ->order('a.id', 'asc')
       ->select();
 
@@ -91,10 +115,14 @@ class Company extends Base
   /**
    * 邀请待加入的企业
    */
-  public static function inviteMe($mobile) {
+  public static function inviteMe($user) {
+    if (!$user) {
+      return null;
+    }
+
     $list = self::alias('a')
       ->join('invite b', 'a.id = b.company_id and b.status = 0')
-      ->where('b.mobile', $mobile)
+      ->where('b.mobile', $user->mobile)
       ->field('a.id,a.title,a.logo,a.area,a.address,a.create_time')
       ->order('a.id', 'asc')
       ->select();
@@ -105,7 +133,11 @@ class Company extends Base
   /**
    * 我创建的企业
    */
-  public static function myCreate($user_id = 0) {
+  public static function myCreate($user) {
+    $user_id = 0;
+    if ($user) {
+      $user_id = $user->id;
+    }
     $list = self::where('user_id', $user_id)
       ->field('id,title,logo,area,address,status,create_time')
       ->order('id', 'asc')
@@ -117,7 +149,7 @@ class Company extends Base
   /**
    * 获取企业成员
    */
-  public static function Member($id, $status = 0, $user_id = 0, $page = 0) {
+  public static function Member($user, $id, $status = 0, $page = 0) {
     $list = User::alias('a')
       ->join('user_company b', 'a.id = b.user_id and b.status = ' . $status)
       ->where('b.company_id', $id)
@@ -131,7 +163,7 @@ class Company extends Base
     $list = $list->select();
 
     foreach($list as $user) {
-      User::formatUserInfo($user);
+      User::formatData($user);
     }
     return $list;
   }
@@ -139,18 +171,24 @@ class Company extends Base
   /**
    * 获取企业详细信息
    */
-  public static function detail($id, $user_id = 0) {
+  public static function detail($user, $id) {
     $data = self::get($id);
     if ($data == null) {
       self::exception('企业不存在。');
+    } else if (!self::allow($user, $data, 'view')) {
+      self::exception('您没有权限查看该企业。');
     }
+    $data->allowEdit = self::allow($user, $data, 'edit');
+    $data->allowInvite = self::allow($user, $data, 'invite');
+    $data->allowPass = self::allow($user, $data, 'passs');
+    $data->allowDelete = self::allow($user, $data, 'delete');
     $data->isAddin = false;
-    if ($user_id) {
-      $joinStatus = self::getJoinStatus($id, $user_id);
+    if ($user) {
+      $joinStatus = self::getJoinStatus($user, $id);
       if ($joinStatus) {
         $data->isAddin = $joinStatus['status'];
       }
-      if ($user_id == $data->user_id) {
+      if ($data->allowPass) {
         $data->waitUser = self::Member($id);
       }
     }
@@ -167,12 +205,17 @@ class Company extends Base
   /**
    * 添加/修改企业信息
    */
-  public static function addUp($id, $data, $logo, $stamp, $user_id) {
+  public static function addUp($user, $id, $data, $logo, $stamp) {
+    $user_id = 0;
+    if ($user) {
+      $user_id = $user->id;
+    }
+
     if ($id) {
       $oldData = self::get($id);
       if ($oldData == null) {
         self::exception('企业不存在。');
-      }else if ($oldData->user_id != $user_id) {
+      }else if (!self::allow($user, $oldData, 'edit')) {
         self::exception('您没有权限修改此企业。');
       }
 
@@ -247,15 +290,16 @@ class Company extends Base
       $result =  $oldData->save($data);
 
       if ($result && $summary) {
-        Log::add([
+        Log::add($user, [
           "table" => "company",
           "owner_id" => $id,
           "title" => '修改企业信息',
-          "summary" => $summary,
-          "user_id" => $user_id
+          "summary" => $summary
         ]);
       }
       return $id;
+    } else if (!self::allow($user, null, 'new')) {
+      self::exception('您没有权限添加企业。');
     } else {
       $data['city'] = self::$city;
       $data['user_id'] = $user_id;
@@ -278,16 +322,15 @@ class Company extends Base
       $result = $newData->save();
 
       if ($result) {
-        Log::add([
+        Log::add($user, [
           "table" => "company",
           "owner_id" => $newData->id,
           "title" => '添加企业',
-          "summary" => $newData->title,
-          "user_id" => $user_id
+          "summary" => $newData->title
         ]);
 
         // 自动加入企业
-        self::addin($newData->id, $user_id);
+        self::addin($user, $newData->id);
         
         return $newData->id;
       } else {
@@ -299,25 +342,27 @@ class Company extends Base
   /**
    * 删除企业
    */
-  public static function remove($id, $user_id) {
+  public static function remove($user, $id) {
     $company = self::get($id);
-    $joinStatus = self::getJoinStatus($id, $user_id);
     if ($company != null) {
-      if ($company->user_id != $user_id) {
+      if (self::allow($user, $company, 'delete')) {
         self::exception('您没有权限删除此企业。');
-      } else if ($joinStatus) {
+      }
+      
+      $joinStatus = self::getJoinStatus($user, $id);
+      
+      if ($joinStatus) {
         self::exception('已加入的企业不能删除。');
       }
       $log = [
         "table" => 'company',
         "owner_id" => $company->id,
         "title" => '删除企业',
-        "summary" => $company->title,
-        "user_id" => $user_id
+        "summary" => $company->title
       ];
       $result = $company->delete();
       if ($result) {
-        Log::add($log);
+        Log::add($user, $log);
       }
       return $result;
     }
@@ -327,7 +372,7 @@ class Company extends Base
   /**
    * 发出邀请
    */
-  public static function invite($id, $mobile, $user_id) {
+  public static function invite($user, $id, $mobile) {
     if (!Validate::checkRule($mobile, 'mobile')) {
       self::exception('手机号码无效。');
     }
@@ -335,18 +380,18 @@ class Company extends Base
     $company = self::get($id);
     if ($company == null) {
       self::exception('企业不存在。');
-    } else if ($company->user_id != $user_id) {
+    } else if (!self::allow($user, $company, 'invite')) {
       self::exception('您没有权限发出邀请。');
     }
 
-    $user = User::get($user_id);
-    if ($user == null) {
-      self::exception('邀请人不存在。');
+    $user_id = 0;
+    if ($user) {
+      $user_id = $user->id;
     }
 
     $inviteUser = User::where('mobile', $mobile)->find();
     if ($inviteUser != null) {
-      $joinStatus = self::getJoinStatus($id, $inviteUser->id);
+      $joinStatus = self::getJoinStatus($inviteUser,$id);
       if ($joinStatus != null) {
         self::exception('对方已加入企业，无需邀请。');
       }
@@ -362,18 +407,18 @@ class Company extends Base
     $result = db('invite')->insert($data);
 
     if ($result) {
-      // 发送短信
-      $sender = new Sms();
-      $smsResult = $sender->sendInvite($mobile, $user->title, $company->title);
-
       $log = [
         "table" => 'company',
         "owner_id" => $id,
         "title" => '邀请用户加入企业',
-        "summary" => $company->title . ' 用户：' . $mobile,
-        "user_id" => $user_id
+        "summary" => $company->title . ' 用户：' . $mobile
       ];
-      Log::add($log);
+      Log::add($user, $log);
+
+      // 发送短信
+      $sender = new Sms();
+      $smsResult = $sender->sendInvite($mobile, $user->title, $company->title);
+
       return $result;
     } else {
       return false;
@@ -383,35 +428,37 @@ class Company extends Base
   /**
    * 切换企业
    */
-  public static function setDefault($id, $user_id) {
+  public static function setActive($user, $id) {
     $company = self::get($id);
     if ($company == null) {
       self::exception('企业不存在。');
+    } else if ($user == null) {
+      self::exception('用户无效。');
     }
-
-    $joinStatus = self::getJoinStatus($id, $user_id);
+    
+    $user_id = $user->id;
+    $joinStatus = self::getJoinStatus($user, $id);
     if ($joinStatus) {
-      if ($joinStatus['default'] == 1) return 1;
+      if ($joinStatus['active'] == 1) return 1;
 
       db('user_company')
         ->where('user_id', $user_id)
-        ->where('default', 1)
-        ->update(['default' => 0]);
+        ->where('active', 1)
+        ->update(['active' => 0]);
 
       $result = db('user_company')
         ->where('user_id', $user_id)
         ->where('company_id', $id)
-        ->update(['default' => 1]);
+        ->update(['active' => 1]);
 
       if ($result) {
         $log = [
           "table" => 'company',
           "owner_id" => $id,
           "title" => '切换企业',
-          "summary" => $company->title,
-          "user_id" => $user_id
+          "summary" => $company->title
         ];
-        Log::add($log);
+        Log::add($user, $log);
       }
       return $result;
     } else {
@@ -422,23 +469,21 @@ class Company extends Base
   /**
    * 加入企业
    */
-  public static function addin($id, $user_id) {
+  public static function addin($user, $id) {
     $company = self::get($id);
     if ($company == null) {
       self::exception('企业不存在。');
+    } else if ($user == null) {
+      self::exception('用户无效。');
     }
 
-    $user = User::get($user_id);
-    if ($user == null) {
-      self::exception('用户不存在。');
-    }
-
-    $joinStatus = self::getJoinStatus($id, $user_id);
+    $user_id = $user->id;
+    $joinStatus = self::getJoinStatus($user, $id);
     if ($joinStatus != null) {
       return $joinStatus['status'];
     }
 
-    $default = 0;
+    $active = 0;
     $status = 1;
     $invite = db('invite')->where('company_id', $id)
       ->where('mobile', $user->mobile)
@@ -446,24 +491,24 @@ class Company extends Base
     
     if ($company->user_id != $user_id) {
       if ($company->join_way > 1 && $invite == null) {
-        self::exception('企业需要通过邀请加入。');
+        self::exception('该企业需要通过邀请加入。');
       } else if ($company->join_way == 1) {
         $status = 0;
       }
     }
 
-    $hasDefault = db('user_company')
+    $hasActive = db('user_company')
       ->where('user_id', $user_id)
-      ->where('default', 1)->find();
+      ->where('active', 1)->find();
 
-    if ($hasDefault == null) {
-      $default = 1;
+    if ($hasActive == null) {
+      $active = 1;
     }
 
     $joinData = [ 
       'user_id' => $user_id, 
       'company_id' => $id, 
-      'default' => $default,
+      'active' => $active,
       'status' => $status,
       'create_time' => date("Y-m-d H:i:s",time())
     ];
@@ -480,10 +525,9 @@ class Company extends Base
         "table" => 'company',
         "owner_id" => $id,
         "title" => '加入企业',
-        "summary" => $company->title,
-        "user_id" => $user_id
+        "summary" => $company->title
       ];
-      Log::add($log);
+      Log::add($user, $log);
       return $status;
     } else {
       return false;
@@ -493,14 +537,17 @@ class Company extends Base
   /**
    * 退出企业
    */
-  public static function quit($id, $user_id) {
+  public static function quit($user, $id) {
     $company = self::get($id);
     if ($company == null) {
       self::exception('企业不存在。');
-    } else if ($company->user_id == $user_id) {
+    } else if ($user == null) {
+      self::exception('用户无效。');
+    } else if ($company->user_id == $user->id) {
       self::exception('不能退出由您创建的企业。');
     }
 
+    $user_id = $user->id;
     $result = db('user_company')
       ->where('user_id', $user_id)
       ->where('company_id', $id)->delete();
@@ -510,26 +557,25 @@ class Company extends Base
         "table" => 'company',
         "owner_id" => $id,
         "title" => '退出企业',
-        "summary" => $company->title,
-        "user_id" => $user_id
+        "summary" => $company->title
       ];
-      Log::add($log);
+      Log::add($user, $log);
 
-      $default = db('user_company')
+      $active = db('user_company')
         ->where('user_id', $user_id)
-        ->where('default', 1)->find();
+        ->where('active', 1)->find();
       
-      if ($default == null) {
-        $default = db('user_company')
+      if ($active == null) {
+        $active = db('user_company')
         ->where('user_id', $user_id)
         ->order('create_time', 'desc')
         ->find();
 
-        if ($default != null) {
+        if ($active != null) {
           db('user_company')
-            ->where('user_id', $default['user_id'])
-            ->where('company_id', $default['company_id'])
-            ->update(['default' => 1]);
+            ->where('user_id', $active['user_id'])
+            ->where('company_id', $active['company_id'])
+            ->update(['active' => 1]);
         }
       }
     }
@@ -539,20 +585,20 @@ class Company extends Base
   /**
    * 获取加入企业状态
    */
-  public static function getJoinStatus($id, $user_id) {
+  public static function getJoinStatus($user, $id) {
     return db('user_company')
-      ->where('user_id', $user_id)
+      ->where('user_id', $user->id)
       ->where('company_id', $id)->find();
   }
 
   /**
    * 加入企业审核通过
    */
-  public static function passAddin($id, $user_id, $manager_id) {
+  public static function passAddin($manager, $id, $user_id) {
     $company = self::get($id);
     if ($company == null) {
       self::exception('企业不存在。');
-    } else if ($company->user_id != $manager_id) {
+    } else if (!self::allow($manager, $company, 'pass')) {
       self::exception('您没有权限审核。');
     }
 
@@ -561,9 +607,9 @@ class Company extends Base
       self::exception('用户不存在。');
     }
 
-    $joinStatus = self::getJoinStatus($id, $user_id);
+    $joinStatus = self::getJoinStatus($user, $id);
     if ($joinStatus == null) {
-      self::exception('加入申请不存在。');
+      self::exception('该用户没有加入申请。');
     }
 
     if ($joinStatus['status'] == 1) {
@@ -579,10 +625,9 @@ class Company extends Base
         "table" => 'company',
         "owner_id" => $id,
         "title" => '加入企业审核通过',
-        "summary" => $user->title . ' ' . $user->mobile,
-        "user_id" => $manager_id
+        "summary" => $user->title . ' ' . $user->mobile
       ];
-      Log::add($log);
+      Log::add($manager, $log);
     }
     return $result;
   }
@@ -590,11 +635,11 @@ class Company extends Base
   /**
    * 驳回加入企业/移除企业成员
    */
-  public static function rejectAddin($id, $user_id, $manager_id) {
+  public static function rejectAddin($manager, $id, $user_id) {
     $company = self::get($id);
     if ($company == null) {
       self::exception('企业不存在。');
-    } else if ($company->user_id != $manager_id) {
+    } else if (!self::allow($manager, $company, 'pass')) {
       self::exception('您没有权限。');
     }
 
@@ -603,9 +648,9 @@ class Company extends Base
       self::exception('用户不存在。');
     }
 
-    $joinStatus = self::getJoinStatus($id, $user_id);
+    $joinStatus = self::getJoinStatus($user, $id);
     if ($joinStatus == null) {
-      self::exception('加入申请不存在。');
+      self::exception('该用户没有加入申请。');
     }
 
     $operate = '驳回加入企业';
@@ -622,10 +667,9 @@ class Company extends Base
         "table" => 'company',
         "owner_id" => $id,
         "title" => $operate,
-        "summary" => $user->title . ' ' . $user->mobile,
-        "user_id" => $manager_id
+        "summary" => $user->title . ' ' . $user->mobile
       ];
-      Log::add($log);
+      Log::add($manager, $log);
     }
     return $result;
   }

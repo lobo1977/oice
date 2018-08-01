@@ -15,8 +15,12 @@ class User extends Base
   /**
    * 格式化用户信息
    */
-  public static function formatUserInfo($user) {
+  public static function formatData($user) {
     if ($user == null) return null;
+    if (isset($user->company_admin)) {
+      $user->isAdmin = $user->id == $user->company_admin;
+      unset($user->company_admin);
+    }
     if ($user->avatar) {
       $find = strpos($user->avatar, 'http');
       if ($find == false || $find > 0) {
@@ -31,17 +35,18 @@ class User extends Base
   /**
    * 根据 id 获取用户信息
    */
-  public static function getById($user_id) {
+  public static function getById($id) {
     $data = self::alias('a')
-      ->leftJoin('user_company b', 'a.id = b.user_id and b.default = 1 and b.status = 1')
+      ->leftJoin('user_company b', 'a.id = b.user_id and b.active = 1 and b.status = 1')
       ->leftJoin('company c', 'b.company_id = c.id')
-      ->where('a.id', $user_id)
+      ->where('a.id', $id)
       ->where('a.status', 0)
-      ->field('a.id,a.type,a.title,a.avatar,a.mobile,a.email,a.qq,a.weixin,b.company_id,c.title as company,c.logo')
+      ->field('a.id,a.title,a.avatar,a.mobile,a.email,a.qq,a.weixin,' . 
+        'b.company_id,c.title as company,c.user_id as company_admin')
       ->find();
     
     if ($data) {
-      return self::formatUserInfo($data);
+      return self::formatData($data);
     } else {
       return null;
     }
@@ -88,7 +93,8 @@ class User extends Base
     } else {
       $user->login_fail = 0;
       $user->save();
-      return self::loginSuccess($user->id, $account, false);
+      $user = self::getById($user->id);
+      return self::loginSuccess($user, $account, false);
     }
   }
 
@@ -109,7 +115,8 @@ class User extends Base
         } else {
           $user->login_fail = 0;
           $user->save();
-          return self::loginSuccess($user->id, $mobile, false);
+          $user = self::getById($user->id);
+          return self::loginSuccess($user, $mobile, false);
         }
       } else {
         $user = new User();
@@ -124,7 +131,8 @@ class User extends Base
           }
         }
         if ($user->save()) {
-          return self::loginSuccess($user->id, $mobile, true);
+          $user = self::getById($user->id);
+          return self::loginSuccess($user, $mobile, true);
         } else {
           self::exception('系统异常，请稍后再试。');
         }
@@ -135,14 +143,17 @@ class User extends Base
   /**
    * 更新 token
    */
-  public static function updateToken($id, $token = null) {
-    $newToken = self::genToken($id);
-    if ($token == null) {
+  public static function updateToken($user) {
+    if ($user == null) {
+      self::exception('用户不存在。');
+    }
+    $newToken = self::genToken($user->id);
+    if (empty($user->token)) {
       $result = db('token')->insert($newToken);
     } else {
       $result = db('token')
-        ->where('user_id', $id)
-        ->where('token', $token)
+        ->where('user_id', $user->id)
+        ->where('token', $user->token)
         ->update($newToken);
     }
     if ($result) {
@@ -156,10 +167,9 @@ class User extends Base
   /**
    * 更新用户信息
    */
-  public static function updateInfo($data, $avatar, $user_id) {
-    $user = self::get($user_id);
+  public static function updateInfo($user, $data, $avatar) {
     if ($user == null) {
-      self::exception('账号不存在。');
+      self::exception('用户不存在。');
     } else {
       $summary = '';
 
@@ -205,12 +215,11 @@ class User extends Base
 
       $result = $user->save($data);
       if ($result) {
-        Log::add([
+        Log::add($user, [
           "table" => "user",
-          "owner_id" => $user_id,
+          "owner_id" => $user->id,
           "title" => '修改账号信息',
-          "summay" => $summary,
-          "user_id" => $user_id
+          "summay" => $summary
         ]);
       }
       return true;
@@ -220,19 +229,18 @@ class User extends Base
   /**
    * 修改密码
    */
-  public static function changePassword($user_id, $password) {
-    $user = self::get($user_id);
+  public static function changePassword($user, $password) {
     if ($user == null) {
-      self::exception('账号不存在。');
+      self::exception('用户不存在。');
     } else {
+      $user->salt = substr(md5(strval(time())), 0, 5);
       $user->password = self::genPassword($password, $user->salt);
       $result = $user->save();
       if ($result) {
-        Log::add([
+        Log::add($user, [
           "table" => "user",
-          "owner_id" => $user_id,
-          "title" => '修改密码',
-          "user_id" => $user_id
+          "owner_id" => $user->id,
+          "title" => '修改密码'
         ]);
       }
       return $result;
@@ -242,31 +250,29 @@ class User extends Base
   /**
    * 更换手机号码
    */
-  public static function changeMobile($user_id, $mobile, $verify_code) {
+  public static function changeMobile($user, $mobile, $verify_code) {
     $checkResult = Verify::check($mobile, $verify_code);
     if (!$checkResult) {
       self::exception('验证码错误。');
     }
 
-    $find = self::where('mobile', $mobile)->find();
-    if ($find && $find->id != $user_id) {
-      self::exception('该手机号已被占用。');
+    if ($user == null) {
+      self::exception('用户不存在。');
     }
 
-    $user = self::get($user_id);
-    if ($user == null) {
-      self::exception('账号不存在。');
+    $find = self::where('mobile', $mobile)->find();
+    if ($find && $find->id != $user->id) {
+      self::exception('该手机号已被占用。');
     }
 
     $user->mobile = $mobile;
     $result = $user->save();
     if ($result) {
-      Log::add([
+      Log::add($user, [
         "table" => "user",
-        "owner_id" => $user_id,
+        "owner_id" => $user->id,
         "title" => '绑定手机',
-        "summary" => $mobile,
-        "user_id" => $user_id
+        "summary" => $mobile
       ]);
     }
     return $result;
@@ -275,17 +281,14 @@ class User extends Base
   /**
    * 退出登录
    */
-  public static function logout($token) {
-    $user = self::getUserByToken($token);
-
+  public static function logout($user) {
     if ($user) {
-      if (db('token')->where('token', $token)
+      if (db('token')->where('token', $user->token)
         ->where('user_id', $user->id)->delete()) {
-        Log::add([
+        Log::add($user, [
           "table" => "user",
           "owner_id" => $user->id,
-          "title" => '退出',
-          "user_id" => $user->id
+          "title" => '退出'
         ]);
       }
     }
@@ -296,27 +299,18 @@ class User extends Base
   /**
    * 登录成功
    */
-  public static function loginSuccess($user_id, $summary, $isReg = false) {
-    $log = [
-      "table" => "user",
-      "owner_id" => $user_id,
-      "title" => '登录',
-      "summary" => $summary,
-      "user_id" => $user_id
-    ];
-
-    if ($isReg) {
-      $log['title'] = '注册';
-    }
-    
-    $token = self::genToken($user_id);
+  public static function loginSuccess($user, $summary, $isReg = false) {
+    $token = self::genToken($user->id);
     db('token')->insert($token);
-
-    Log::add($log);
-
-    $user = self::getById($user_id);
     $user->token = $token["token"];
     $user->expire_time = strtotime($token["expire_time"]);
+
+    Log::add($user, [
+      "table" => "user",
+      "owner_id" => $user->id,
+      "title" => ($isReg ? '注册' : '登录'),
+      "summary" => $summary
+    ]);
 
     return $user;
   }

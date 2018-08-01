@@ -2,20 +2,21 @@
 namespace app\api\model;
 
 use app\api\model\Base;
-use app\api\model\Unit;
 use app\api\model\Log;
+use app\api\model\Customer;
+use app\api\model\Unit;
 
 class Filter extends Base
 {
   /**
    * 客户筛选表
    */
-  public static function query($cid, $uid) {
+  public static function query($user, $customer_id) {
     $list = self::alias('a')
       ->leftJoin('unit u', 'a.unit_id = u.id AND a.unit_id > 0')
       ->join('building b', 'a.building_id = b.id OR u.building_id = b.id')
-      ->where('a.customer_id', $cid)
-      ->where('a.user_id', $uid)
+      ->where('a.customer_id', $customer_id)
+      ->where('a.user_id', $user->id)
       ->field('a.building_id,b.building_name,b.level,b.area,b.district,b.address,b.price,
         a.unit_id,u.building_no,u.floor,u.room,u.acreage,u.rent_price,u.sell_price')
       ->order('a.sort', 'asc')
@@ -59,22 +60,38 @@ class Filter extends Base
   /**
    * 添加推荐项目
    */
-  public static function addBuilding($cid, $bid, $unit_id, $uid) {
-    if (!self::where('customer_id', $cid)
-      ->where('building_id', $bid)
-      ->where('unit_id', $unit_id)
-      ->where('user_id', $uid)->find()) {
+  public static function addBuilding($user, $customer_id, $building_id, $unit_id) {
+    $customer = Customer::get($id);
+    if ($customer == null) {
+      self::exception('客户不存在。');
+    } else if (!self::allow($user, $customer, 'follow')) {
+      self::exception('您没有权限跟进此客户。');
+    }
 
-      $maxSort = self::where('customer_id', $cid)
-        ->where('user_id', $uid)->max('sort');
+    if (!self::where('customer_id', $customer_id)
+      ->where('building_id', $building_id)
+      ->where('unit_id', $unit_id)
+      ->where('user_id', $user->id)->find()) {
+
+      $maxSort = self::where('customer_id', $customer_id)
+        ->where('user_id', $user->id)->max('sort');
 
       $filter = new Filter;
-      $filter->customer_id = $cid;
-      $filter->building_id = $bid;
+      $filter->customer_id = $customer_id;
+      $filter->building_id = $building_id;
       $filter->unit_id = $unit_id;
-      $filter->user_id = $uid;
+      $filter->user_id = $user->id;
       $filter->sort = $maxSort + 1;
       $result = $filter->save();
+
+      if ($result) {
+        Log::add($user, [
+          "table" => 'customer',
+          "owner_id" => $customer->id,
+          "title" => '筛选项目'
+        ]);
+      }
+
       return $result;
     } else {
       return 1;
@@ -84,11 +101,11 @@ class Filter extends Base
   /**
    * 项目排序
    */
-  public static function sort($cid, $bid, $unit_id, $uid, $up) {
-    $data = self::where('customer_id', $cid)
-      ->where('building_id', $bid)
+  public static function sort($user, $customer_id, $building_id, $unit_id, $up) {
+    $data = self::where('customer_id', $customer_id)
+      ->where('building_id', $building_id)
       ->where('unit_id', $unit_id)
-      ->where('user_id', $uid)->find();
+      ->where('user_id', $user->id)->find();
 
     if ($data) {
       $oldSort = $data->sort;
@@ -98,8 +115,8 @@ class Filter extends Base
         $newSort = $oldSort + 1;
       }
 
-      $nearData = self::where('customer_id', $cid)
-        ->where('user_id', $uid)
+      $nearData = self::where('customer_id', $customer_id)
+        ->where('user_id', $user->id)
         ->where('sort', $newSort)
         ->find();
 
@@ -117,11 +134,18 @@ class Filter extends Base
   /**
    * 删除推荐项目
    */
-  public static function removeBuilding($cid, $bid, $unit_id, $uid) {
-    $data = self::where('customer_id', $cid)
-      ->where('building_id', $bid)
+  public static function removeBuilding($user, $customer_id, $building_id, $unit_id) {
+    $customer = Customer::get($id);
+    if ($customer == null) {
+      self::exception('客户不存在。');
+    } else if (!self::allow($user, $customer, 'follow')) {
+      self::exception('您没有权限跟进此客户。');
+    }
+
+    $data = self::where('customer_id', $customer_id)
+      ->where('building_id', $building_id)
       ->where('unit_id', $unit_id)
-      ->where('user_id', $uid)->find();
+      ->where('user_id', $user->id)->find();
     
     if ($data == null) {
       return true;
@@ -130,11 +154,21 @@ class Filter extends Base
     $sort = $data->sort;
 
     // 重新排序
-    db('filter')->where('customer_id', $cid)
-      ->where('user_id', $uid)
+    db('filter')->where('customer_id', $customer_id)
+      ->where('user_id', $user->id)
       ->where('sort', '>', $sort)
       ->setDec('sort', 1);
 
-    return $data->delete();
+    $result = $data->delete();
+
+    if ($result) {
+      Log::add($user, [
+        "table" => 'customer',
+        "owner_id" => $customer->id,
+        "title" => '筛选项目'
+      ]);
+    }
+
+    return $result;
   }
 }

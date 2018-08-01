@@ -21,7 +21,7 @@ class Building extends Base
   /**
    * 格式化列表数据
    */
-  protected static function formatListData($list) {
+  protected static function formatList($list) {
     foreach($list as $key=>$building) {
       $building->title = $building->building_name;
       $building->desc = (empty($building->level) ? '' : $building->level . '级 ') .
@@ -34,11 +34,45 @@ class Building extends Base
     }
     return $list;
   }
+
+  /**
+   * 权限检查
+   */
+  public static function allow($user, $building, $operate) {
+    if ($building == null && $operate != 'new') {
+      return false;
+    }
+    if ($operate == 'view') {
+      if ($building->share || $building->user_id == 0) {
+        return true;
+      } else if ($user == null) {
+        return false;
+      } else {
+        return $building->user_id == $user->id ||
+          $building->company_id == $user->company_id;
+      }
+    } else if ($operate == 'new') {
+      return $user != null;
+    } else if ($operate == 'edit') {
+      if ($user == null) {
+        return false;
+      } else {
+        return $building->user_id == 0 || 
+          (($user->isAdmin || $building->user_id == $user->id) &&
+          $building->company_id == $user->company_id) || 
+          ($building->user_id == $user->id && $building->company_id == 0);
+      }
+    } else if ($operate == 'delete') {
+      return false;
+    } else {
+      return false;
+    }
+  }
   
   /**
    * 检索房源信息
    */
-  public static function search($filter, $user_id = 0, $company_id = 0) {
+  public static function search($user, $filter) {
     if (!isset($filter['page'])) {
       $filter['page'] = 1;
     }
@@ -46,11 +80,20 @@ class Building extends Base
     if (!isset($filter['page_size'])) {
       $filter['page_size'] = 10;
     }
+
+    $user_id = 0;
+    $company_id = 0;
+
+    if ($user) {
+      $user_id = $user->id;
+      $company_id = $user->company_id;
+    }
     
     $list = self::alias('a')
       ->leftJoin('file b',"b.parent_id = a.id AND b.type = 'building' AND b.default = 1")
       ->where('a.city', self::$city)
-      ->where('a.share = 1 OR a.user_id = 0 OR (a.user_id = ' . $user_id . ') OR (a.company_id > 0 AND a.company_id = ' . $company_id . ')');
+      ->where('a.share = 1 OR a.user_id = 0 OR (a.user_id = ' . $user_id . ') OR' . 
+        ' (a.company_id > 0 AND a.company_id = ' . $company_id . ')');
     
     if (isset($filter['keyword']) && $filter['keyword'] != '') {
       $list->where('a.building_name|a.pinyin', 'like', $filter['keyword'] . '%');
@@ -76,20 +119,24 @@ class Building extends Base
       ->order('a.update_time', 'desc')->order('a.id', 'desc')
       ->select();
 
-    return self::formatListData($result);
+    return self::formatList($result);
   }
 
   /**
    * 检索收藏的房源信息
    */
-  public static function myFavorite($uid, $page = 1) {
+  public static function myFavorite($user, $page = 1) {
+    if ($user == null) {
+      return null;
+    }
+
     $pageSize = 10;
 
     $list = db('favorite')->alias('a')
       ->leftJoin('unit u', 'a.unit_id = u.id AND a.unit_id > 0')
       ->join('building b', 'a.building_id = b.id OR u.building_id = b.id')
       ->leftJoin("file f", "f.parent_id = b.id and f.type = 'building' and f.default = 1")
-      ->where('a.user_id', $uid)
+      ->where('a.user_id', $user->id)
       ->field('a.building_id,b.building_name,b.level,b.area,b.district,b.address,b.price,f.file,
         a.unit_id,u.building_no,u.floor,u.room,u.acreage,u.rent_price,u.sell_price')
       ->page($page, $pageSize)
@@ -148,29 +195,24 @@ class Building extends Base
   /**
    * 获取房源详细信息
    */
-  public static function detail($id, $user_id = 0, $company_id = 0) {
+  public static function detail($user, $id) {
     $data = self::get($id);
     if ($data == null) {
       self::exception('房源信息不存在。');
-    } else if ($data->share == 0 && 
-      $data->user_id > 0 && 
-      $data->user_id != $user_id && 
-      $data->company_id != $company_id) {
+    } else if (!self::allow($user, $data, 'view')) {
       self::exception('您没有权限查看此房源。');
     }
     $data->engInfo = db('building_en')->where('id', $id)->find();
-    $data->images = File::getList($id, 'building');
-    $data->linkman = Linkman::getByOwnerId($id, 'building', $user_id);
-    $data->unit = Unit::getByBuildingId($id, $user_id, $company_id);
-    if ($data->user_id == $user_id || $data->company_id == $company_id) {
-      $data->confirm = Confirm::query(0, $id, 0);
-    } else {
-      $data->confirm = Confirm::query(0, $id, $user_id);
-    }
+    $data->images = File::getList($user, 'building', $id);
+    $data->allowEdit = self::allow($user, $data, 'edit');
+    $data->allowDelete = self::allow($user, $data, 'delete');
     $data->isFavorite = false;
-    if ($user_id) {
-      if (db('favorite')->where('user_id', $user_id)
-        ->where('building_id', $id)->find() != null) {
+    if ($user) {
+      $data->linkman = Linkman::getByOwnerId($user, 'building', $id);
+      $data->unit = Unit::getByBuildingId($user, $id);
+      $data->confirm = Confirm::query($user, 0, $id);
+      if (db('favorite')->where('user_id', $user->id)
+        ->where('building_id', $id)->find()) {
           $data->isFavorite = true;
       }
     }
@@ -180,21 +222,22 @@ class Building extends Base
   /**
    * 添加/修改房源信息
    */
-  public static function addUp($id, $data, $user_id, $company_id = 0) {
+  public static function addUp($user, $id, $data) {
     if (empty($data['completion_date'])) {
       unset($data['completion_date']);
     }
 
     $data['pinyin'] = \my\Pinyin::convertInitalPinyin($data['building_name']);
+    $user_id = 0;
+    if ($user) {
+      $user_id = $user->id;
+    }
 
     if ($id) {
       $oldData = self::get($id);
       if ($oldData == null) {
         self::exception('房源信息不存在。');
-      } else if ($oldData->user_id > 0 && 
-        $oldData->user_id != $user_id &&
-        $oldData->company_id > 0 &&
-        $oldData->company_id != $company_id) {
+      } else if (!self::allow($user, $oldData, 'edit')) {
         self::exception('您没有权限修改此房源。');
       }
 
@@ -444,15 +487,16 @@ class Building extends Base
 
       $result =  $oldData->save($data);
       if ($result && $summary) {
-        Log::add([
+        Log::add($user, [
           "table" => "building",
           "owner_id" => $id,
           "title" => '修改房源信息',
-          "summary" => $summary,
-          "user_id" => $user_id
+          "summary" => $summary
         ]);
       }
       return $id;
+    } else if (!self::allow($user, null, 'new')) {
+      self::exception('您没有权限添加房源。');
     } else {
       $data['city'] = self::$city;
       $data['user_id'] = $user_id;
@@ -461,12 +505,11 @@ class Building extends Base
       $result = $newData->save();
 
       if ($result) {
-        Log::add([
+        Log::add($user, [
           "table" => "building",
           "owner_id" => $newData->id,
           "title" => '登记房源',
-          "summary" => $newData->building_name,
-          "user_id" => $user_id
+          "summary" => $newData->building_name
         ]);
         return $newData->id;
       } else {
@@ -478,14 +521,11 @@ class Building extends Base
   /**
    * 添加修改英文信息
    */
-  public static function addUpEngInfo($id, $data, $user_id, $company_id = 0) {
+  public static function addUpEngInfo($user, $id, $data) {
     $building = self::get($id);
     if ($building == null) {
       self::exception('房源信息不存在。');
-    } else if ($building->user_id > 0 &&
-      $building->user_id != $user_id &&
-      $building->company_id > 0 &&
-      $building->company_id != $company_id) {
+    } else if (!self::allow($user, $building, 'edit')) {
       self::exception('您没有权限修改此房源。');
     }
 
@@ -611,12 +651,11 @@ class Building extends Base
     }
 
     if ($result && $summary) {
-      Log::add([
+      Log::add($user, [
         "table" => "building",
         "owner_id" => $id,
         "title" => '修改房源英文信息',
-        "summary" => $summary,
-        "user_id" => $user_id
+        "summary" => $summary
       ]);
       return $result;
     } else {
@@ -627,7 +666,11 @@ class Building extends Base
   /**
    * 添加资料夹
    */
-  public static function favorite($building_id, $unit_id, $user_id) {
+  public static function favorite($user, $building_id, $unit_id = 0) {
+    if (!$user) {
+      return false;
+    }
+    $user_id = $user->id;
     if (!db('favorite')->where('user_id', $user_id)
       ->where('building_id', $building_id)
       ->where('unit_id', $unit_id)->find()) {
@@ -645,7 +688,11 @@ class Building extends Base
   /**
    * 从资料夹删除
    */
-  public static function unFavorite($building_id, $unit_id, $user_id) {
+  public static function unFavorite($user, $building_id, $unit_id = 0) {
+    if (!$user) {
+      return false;
+    }
+    $user_id = $user->id;
     return db('favorite')
       ->where('user_id', $user_id)
       ->where('building_id', $building_id)
@@ -655,23 +702,23 @@ class Building extends Base
   /**
    * 删除房源
    */
-  public static function remove($id, $user_id) {
+  public static function remove($user, $id) {
     $building = self::get($id);
     if ($building == null) {
       return true;
-    }else if ($building->user_id != $user_id) {
+    } else if (!self::allow($user, $building, 'delete')) {
       self::exception('您没有权限删除此房源。');
     }
+    
     $log = [
       "table" => 'building',
       "owner_id" => $building->id,
       "title" => '删除房源',
-      "summary" => $building->building_name,
-      "user_id" => $user_id
+      "summary" => $building->building_name
     ];
     $result = $building->delete();
     if ($result) {
-      Log::add($log);
+      Log::add($user, $log);
     }
     return $result;
   }

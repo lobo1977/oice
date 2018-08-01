@@ -5,6 +5,7 @@ use think\model\concern\SoftDelete;
 use app\api\model\Base;
 use app\api\model\Log;
 use app\api\model\File;
+use app\api\model\Building;
 use app\api\model\Linkman;
 
 class Unit extends Base
@@ -15,6 +16,38 @@ class Unit extends Base
 
   public static $status = ['在驻','空置','已出'];
   public static $share = ['隐藏','公开'];
+
+  /**
+   * 权限检查
+   */
+  public static function allow($user, $unit, $operate, $building = null) {
+    if ($user == null || $unit == null) {
+      return false;
+    }
+    if ($building == null) {
+      $building = Building::get($unit->building_id);
+    }
+
+    if ($operate == 'view') {
+      return Building::allow($user, $building, 'view') && 
+        ($unit->share || $unit->user_id == $user->id ||
+        $unit->company_id == $user->company_id);
+    } else if ($operate == 'new') {
+      return Building::allow($user, $building, 'edit');
+    } else if ($operate == 'edit') {
+      return Building::allow($user, $building, 'edit') && 
+        ((($user->isAdmin || $unit->user_id == $user->id) &&
+        $unit->company_id == $user->company_id) || 
+        ($unit->user_id == $user->id && $unit->company_id == 0));
+    } else if ($operate == 'delete') {
+      return Building::allow($user, $building, 'edit') && 
+        ((($user->isAdmin || $unit->user_id == $user->id) &&
+        $unit->company_id == $user->company_id) || 
+        ($unit->user_id == $user->id && $unit->company_id == 0));
+    } else {
+      return false;
+    }
+  }
 
   /**
    * 格式化单元信息
@@ -40,9 +73,20 @@ class Unit extends Base
   /**
    * 通过房源ID获取单元列表
    */
-  public static function getByBuildingId($id, $user_id = 0, $company_id = 0) {
+  public static function getByBuildingId($user, $id) {
+    $user_id = 0;
+    $company_id = 0;
+
+    if ($user) {
+      $user_id = $user->id;
+      $company_id = $user->company_id;
+    }
+
+    $building = Building::get($id);
+
     $list = self::where('building_id', $id)
-      ->where('share = 1 OR (user_id = ' . $user_id . ') OR (company_id > 0 AND company_id = ' . $company_id . ')')
+      ->where('share = 1 OR (user_id = ' . $user_id . ') OR ' . 
+        '(company_id > 0 AND company_id = ' . $company_id . ')')
       ->order('building_no', 'asc')
       ->order('floor', 'desc')
       ->order('room', 'asc')
@@ -51,6 +95,9 @@ class Unit extends Base
     
     foreach($list as $key=>$unit) {
       self::formatInfo($unit);
+      $unit->allowView = self::allow($user, $unit, 'view', $building);
+      $unit->allowEdit = self::allow($user, $unit, 'edit', $building);
+      $unit->allowDelete = self::allow($user, $unit, 'delete', $building);
     }
     
     return $list;
@@ -59,7 +106,7 @@ class Unit extends Base
   /**
    * 根据ID获取单元信息
    */
-  public static function detail($id, $user_id = 0, $company_id = 0) {
+  public static function detail($user, $id) {
     $unit = self::alias('a')
       ->join('building b', 'a.building_id = b.id')
       ->where('a.id', $id)
@@ -68,17 +115,19 @@ class Unit extends Base
 
     if ($unit == null) {
       self::exception('单元不存在。');
-    } else if ($unit->share == 0 &&
-      $unit->user_id != $user_id && 
-      $unit->company_id != $company_id) {
+    } else if (!self::allow($user, $unit, 'view')) {
       self::exception('您没有权限查看此单元。');
     } else {
-      $unit->images = File::getList($id, 'unit');
-      $unit->linkman = Linkman::getByOwnerId($id, 'unit', $user_id);
+      $building = Building::get($unit->building_id);
+      $unit->images = File::getList($user, 'unit', $id);
+      $unit->linkman = Linkman::getByOwnerId($user, 'unit', $id);
+      $unit->allowNew = self::allow($user, $unit, 'new', $building);
+      $unit->allowEdit = self::allow($user, $unit, 'edit', $building);
+      $unit->allowDelete = self::allow($user, $unit, 'delete', $building);
       $unit->isFavorite = false;
       self::formatInfo($unit);
-      if ($user_id) {
-        if (db('favorite')->where('user_id', $user_id)
+      if ($user) {
+        if (db('favorite')->where('user_id', $user->id)
           ->where('unit_id', $id)->find() != null) {
             $unit->isFavorite = true;
         }
@@ -90,18 +139,22 @@ class Unit extends Base
   /**
    * 添加/修改单元信息
    */
-  public static function addUp($id, $data, $user_id, $company_id = 0) {
+  public static function addUp($user, $id, $data) {
     if (empty($data['end_date'])) {
       unset($data['end_date']);
+    }
+
+    $user_id = 0;
+    if ($user) {
+      $user_id = $user->id;
     }
 
     if ($id) {
       $oldData = self::get($id);
       if ($oldData == null) {
         self::exception('单元不存在。');
-      } else if ($oldData->user_id != $user_id && 
-        $oldData->company_id != $company_id) {
-        self::exception('您没有权限查看此单元。');
+      } else if (!self::allow($user, $oldData, 'edit')) {
+        self::exception('您没有权限修改此单元。');
       }
 
       $summary = '';
@@ -207,8 +260,7 @@ class Unit extends Base
         "table" => 'building',
         "owner_id" => $oldData->building_id,
         "title" => '修改单元',
-        "summary" => $summary,
-        "user_id" => $user_id
+        "summary" => $summary
       ];
 
       if (isset($data['building_id'])) {
@@ -253,7 +305,7 @@ class Unit extends Base
 
       $result =  $oldData->save($data);
       if ($result && $summary) {
-        Log::add($log);
+        Log::add($user, $log);
       }
       return $id;
     } else {
@@ -286,21 +338,25 @@ class Unit extends Base
       }
 
       $newData = new Unit($data);
+
+      if (!self::allow($user, $newData, 'new')) {
+        self::exception('您没有权限添加单元。');
+      }
+
       $result = $newData->save();
 
       if ($result) {
-        Log::add([
+        Log::add($user, [
           "table" => 'building',
           "owner_id" => $data['building_id'],
           "title" => '添加单元',
-          "summary" => $summary,
-          "user_id" => $user_id
+          "summary" => $summary
         ]);
 
         if ($linkman) {
           $linkman['type'] = 'unit';
           $linkman['owner_id'] = $newData->id;
-          Linkman::addUp(0, $linkman, $user_id);
+          Linkman::addUp($user, 0, $linkman);
         }
 
         return $newData->id;
@@ -313,11 +369,11 @@ class Unit extends Base
   /**
    * 删除单元
    */
-  public static function remove($id, $user_id) {
+  public static function remove($user, $id) {
     $unit = self::get($id);
     if ($unit == null) {
       return true;
-    } else if ($unit->user_id != $user_id) {
+    } else if (!self::allow($user, $unit, 'delete')) {
       self::exception('您没有权限删除此单元。');
     }
 
@@ -327,12 +383,11 @@ class Unit extends Base
       "table" => 'building',
       "owner_id" => $unit->building_id,
       "title" => '删除单元',
-      "summary" => $unit->title,
-      "user_id" => $user_id
+      "summary" => $unit->title
     ];
     $result = $unit->delete();
     if ($result) {
-      Log::add($log);
+      Log::add($user, $log);
     }
     return $result;
   }

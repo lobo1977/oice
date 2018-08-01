@@ -24,7 +24,7 @@
       <div class="bottom-bar">
         <x-button type="primary" class="bottom-btn"
           :link="{name:'ConfirmEdit', params: { id: info.id, bid: 0, cid: 0 }}"
-          :disabled="user.id != info.user_id">
+          :disabled="!info.allowEdit">
           <x-icon type="compose" class="btn-icon"></x-icon> 修改
         </x-button>
       </div>
@@ -68,7 +68,9 @@ export default {
         rem: '', // 备注
         user_id: 0,
         company_id: 0,
-        company: ''
+        company: '',
+        allowEdit: false,
+        allowDelete: false
       }
     }
   },

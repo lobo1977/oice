@@ -42,7 +42,7 @@
 
       <group>
         <group-title slot="title">联系人
-          <router-link style="float:right;color:#333;" 
+          <router-link style="float:right;color:#333;" v-if="info.allowEdit"
             :to="{name: 'LinkmanEdit', params: {id: 0, type: 'customer', oid: info.id}}">+ 添加</router-link>
         </group-title>
         <cell v-for="(item, index) in info.linkman" :key="index"
@@ -67,19 +67,19 @@
 
       <flexbox :gutter="0" class="bottom-bar">
         <flexbox-item :span="6">
-          <x-button type="primary" class="bottom-btn" :disabled="info.id === 0 || info.clash > 0"
+          <x-button type="primary" class="bottom-btn" :disabled="!info.allowFollow"
             :link="{name:'Favorite', query: { cid: info.id }}">
             <x-icon type="search" class="btn-icon"></x-icon> 筛选项目
           </x-button>
         </flexbox-item>
         <flexbox-item :span="4">
-          <x-button type="warn" class="bottom-btn" :disabled="info.id === 0 || info.user_id != user.id"
+          <x-button type="warn" class="bottom-btn" :disabled="!info.allowEdit"
             :link="{name:'CustomerEdit', params: { id: info.id }}">
             <x-icon type="compose" class="btn-icon"></x-icon> 修改
           </x-button>
         </flexbox-item>
         <flexbox-item :span="2">
-          <x-button type="default" class="bottom-btn" :disabled="info.id === 0 || info.user_id != user.id"
+          <x-button type="default" class="bottom-btn" :disabled="!info.allowDelete"
             @click.native="remove">
             <x-icon type="trash-a" class="btn-icon"></x-icon>
           </x-button>
@@ -93,11 +93,11 @@
           <h4>
             <span>{{item.title}}</span>
             <span @click="editLog(item.id)">
-              <x-icon v-if="item.system === 0 && item.user_id == user.id" 
+              <x-icon v-if="item.allowEdit" 
                 type="compose" size="20"></x-icon>
             </span>
             <span @click="removeLog(item.id)">
-              <x-icon v-if="item.system === 0 && item.user_id == user.id" 
+              <x-icon v-if="item.allowDelete" 
                 type="android-cancel" size="20"></x-icon>
             </span>
           </h4>
@@ -108,7 +108,7 @@
       </timeline>
 
       <div class="bottom-bar">
-        <x-button type="warn" class="bottom-btn" :disabled="info.id === 0 || info.clash > 0"
+        <x-button type="warn" class="bottom-btn" :disabled="!info.allowFollow"
           :link="{name: 'CustomerLog', params: {id:0, cid: info.id}}">
           <x-icon type="plus" class="btn-icon"></x-icon> 添加
         </x-button>
@@ -123,14 +123,14 @@
             @mousedown.native="itemMouseDown" @mouseup.native="itemMouseUp" 
             @touchstart.native="itemMouseDown" @touchend.native="itemMouseUp"
             @click.native="itemClick(item)">
-            <div slot="right-menu">
+            <div slot="right-menu" v-if="info.allowFollow">
               <swipeout-button v-if="index > 0" @click.native.stop="sortFilter(item, true)" type="primary">上移</swipeout-button>
               <swipeout-button v-if="index < info.filter.length - 1" @click.native.stop="sortFilter(item, false)" type="default">下移</swipeout-button>
               <swipeout-button @click.native.stop="removeFilter(item)" type="warn">删除</swipeout-button>
             </div>
             <cell slot="content" :title="item.title">
               <p slot="inline-desc" class="cell-desc">{{item.desc}}</p>
-              <div solt="default">
+              <div solt="default" v-if="info.allowFollow">
                 <check-icon :value.sync="item.checked" @update:value="check"></check-icon>
               </div>
             </cell>
@@ -143,18 +143,18 @@
       <flexbox :gutter="0" class="bottom-bar">
         <flexbox-item :span="4">
           <x-button type="warn" class="bottom-btn" @click.native="toRecommend" 
-            :disabled="info.id === 0 || checkCount <= 0">
+            :disabled="!info.allowFollow || checkCount <= 0">
             <x-icon type="share" class="btn-icon"></x-icon> 生成推荐资料
           </x-button>
         </flexbox-item>
         <flexbox-item :span="4">
           <x-button type="primary" class="bottom-btn" @click.native="toConfirm" 
-            :disabled="info.id === 0 || checkCount != 1 || info.user_id != user.id">
+            :disabled="!info.allowConfirm || checkCount != 1">
             <x-icon type="checkmark-circled" class="btn-icon"></x-icon> 云确认
           </x-button>
         </flexbox-item>
         <flexbox-item>
-          <x-button type="default" class="bottom-btn" :disabled="info.id === 0 || info.clash > 0"
+          <x-button type="default" class="bottom-btn" :disabled="!info.allowFollow"
             :link="{name:'Favorite', query: { cid: info.id }}">
             <x-icon type="plus" class="btn-icon"></x-icon> 添加筛选
           </x-button>
@@ -170,7 +170,7 @@
             @mousedown.native="itemMouseDown" @mouseup.native="itemMouseUp" 
             @touchstart.native="itemMouseDown" @touchend.native="itemMouseUp"
             transition-mode="follow">
-            <div slot="right-menu">
+            <div slot="right-menu" v-if="info.allowFollow">
               <swipeout-button @click.native="removeRecommend(item.id)" type="warn">删除</swipeout-button>
             </div>
             <cell slot="content" :disabled="item.disabled" is-link @click.native.stop="print(item)">
@@ -242,6 +242,10 @@ export default {
         mobile: '',
         company: '',          // 所属企业
         clash: 0,
+        allowEdit: false,
+        allowFollow: false,
+        allowConfirm: false,
+        allowDelete: false,
         linkman: [],            // 联系人
         log: [],                // 跟进纪要
         filter: [],             // 项目筛选表
@@ -461,35 +465,16 @@ export default {
         })
       } else {
         let bid = 0
-        let uid = 0
         for (let i = 0; i < vm.info.filter.length; i++) {
           if (vm.info.filter[i].checked) {
             bid = vm.info.filter[i].building_id
-            uid = vm.info.filter[i].unit_id
             break
           }
         }
-        if (bid === 0 && uid === 0) return
-        vm.$vux.loading.show()
-        vm.$post('/api/customer/addConfirm', {
-          cid: vm.info.id,
-          bid: bid,
-          uid: uid
-        }, (res) => {
-          vm.$vux.loading.hide()
-          if (res.success) {
-            vm.info.confirm = res.data
-            vm.$vux.toast.show({
-              type: 'success',
-              text: '客户确认书已生成。',
-              width: '12em'
-            })
-          } else {
-            vm.$vux.toast.show({
-              text: res.message,
-              width: '15em'
-            })
-          }
+        if (bid === 0) return
+        this.$router.push({
+          name: 'ConfirmEdit',
+          params: {id: 0, bid: bid, cid: vm.info.id}
         })
       }
     },

@@ -3,10 +3,10 @@ namespace app\api\controller;
 
 use think\Validate;
 use app\api\controller\Base;
-use app\api\model\File;
-use app\api\model\Building as modelBuilding;
 use app\api\model\Unit as modelUnit;
+use app\api\model\Building;
 use app\api\model\Customer;
+use app\api\model\Company;
 
 class Unit extends Base
 {
@@ -20,7 +20,7 @@ class Unit extends Base
    */
   public function buildingUnit($id) {
     if ($id) {
-      $data = modelUnit::getByBuildingId($id, $this->user_id, $this->company_id);
+      $data = modelUnit::getByBuildingId($this->user, $id);
       return $this->succeed($data);
     } else {
       return;
@@ -32,9 +32,9 @@ class Unit extends Base
    */
   public function detail($id = 0) {
     if ($id) {
-      $data = modelUnit::detail($id, $this->user_id, $this->company_id);
+      $data = modelUnit::detail($this->user, $id);
       if ($data != null) {
-        $data->customer = Customer::search(['status' => '0,1,2', 'clash' => false], $this->user_id, $this->company_id);
+        $data->customer = Customer::search($this->user, ['status' => '0,1,2', 'clash' => false]);
       }
       return $this->succeed($data);
     } else {
@@ -48,17 +48,10 @@ class Unit extends Base
   public function edit($id = 0) {
     if ($this->request->isGet()) {
       $form_token = $this->formToken();
-      $companyList = \app\api\model\Company::my($this->user_id);
+      $companyList = Company::my($this->user);
       if ($id > 0) {
-        $data = modelUnit::get($id);
-        if ($data == null) {
-          return $this->exception('单元不存在。');
-        } else if ($data->user_id != $this->user_id && 
-          $data->company_id != $this->company_id) {
-          return $this->exception('您没有权限修改这个单元。');
-        }
+        $data = modelUnit::detail($this->user, $id);
         $data->__token__ = $form_token;
-        $data->images = File::getList($id, 'unit');
         $data->companyList = $companyList;
         return $this->succeed($data);
       } else {
@@ -97,7 +90,7 @@ class Unit extends Base
         return $this->fail($validate->getError(), $form_token);
       } else {
         unset($data['__token__']);
-        $result = modelUnit::addUp($id, $data, $this->user_id, $this->company_id);
+        $result = modelUnit::addUp($this->user, $id, $data);
         if ($result) {
           return $this->succeed($result);
         } else {
@@ -111,7 +104,7 @@ class Unit extends Base
    * 添加到收藏夹
    */
   public function favorite($id) {
-    $result = modelBuilding::favorite(0, $id, $this->user_id);
+    $result = Building::favorite($this->user, 0, $id);
     if ($result == 1) {
       return $this->succeed();
     } else {
@@ -123,7 +116,7 @@ class Unit extends Base
    * 从收藏夹删除
    */
   public function unFavorite($id) {
-    $result = modelBuilding::unFavorite(0, $id, $this->user_id);
+    $result = Building::unFavorite($this->user, 0, $id);
     if ($result == 1) {
       return $this->succeed();
     } else {
@@ -135,10 +128,10 @@ class Unit extends Base
    * 删除单元
    */
   public function remove($id, $bid) {
-    $result = modelUnit::remove($id, $this->user_id);
+    $result = modelUnit::remove($this->user, $id);
     if ($result == 1) {
       if ($bid) {
-        $data = modelUnit::getByBuildingId($bid, $this->user_id, $this->company_id);
+        $data = modelUnit::getByBuildingId($this->user, $bid);
         return $this->succeed($data);
       } else {
         return $this->succeed();
