@@ -18,10 +18,10 @@
     </actionsheet>
 
     <keep-alive>
-      <router-view v-if="$route.meta.keepAlive" @on-component-mounted="componentMounted" 
+      <router-view v-if="$route.meta.keepAlive && !$route.query.reload" @on-component-mounted="componentMounted" 
         @on-view-loaded="changeTitle"></router-view>
     </keep-alive>
-    <router-view v-if="!$route.meta.keepAlive" @on-component-mounted="componentMounted" 
+    <router-view v-if="!$route.meta.keepAlive || $route.query.reload" @on-component-mounted="componentMounted" 
         @on-view-loaded="changeTitle"></router-view>
 
     <tabbar style="position:fixed;" icon-class="vux-center" v-if="!this.$route.meta.hideBar" slot="bottom">
