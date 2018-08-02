@@ -106,9 +106,11 @@ class Wechat extends Base
   /**
    * JS-SDK 接口配置
    */
-  public function config($url) {
-    if (!Utils::isWechat() || !$url) {
+  public function config($url = '') {
+    if (!Utils::isWechat()) {
       return $this->fail('非微信客户端。');
+    } else if (!$url) {
+      return $this->fail('URL 参数为空。');
     }
 
     $url = htmlspecialchars_decode($url);
@@ -137,7 +139,7 @@ class Wechat extends Base
    */
   public function login($redirect = '') {
     if ($redirect) {
-      session('redirect', $redirect);
+      session('redirect', urldecode($redirect));
     }
 
     $wechatUrl = '';
@@ -166,7 +168,7 @@ class Wechat extends Base
         $redirect = '';
         if (session('redirect')) {
           $redirect = session('redirect');
-          session('redirect', 'null');
+          session('redirect', null);
         }
 
         $user = Oauth::login('wechat', $data);

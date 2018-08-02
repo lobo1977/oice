@@ -86,11 +86,8 @@ export default {
     }
 
     Vue.logout = (cb) => {
-      let user = Vue.getUser()
-      if (user) {
-        Vue.get('/api/logout')
-        delete localStorage.user
-      }
+      Vue.get('/api/logout')
+      delete localStorage.user
       if (cb) cb()
     }
 

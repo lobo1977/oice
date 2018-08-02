@@ -63,9 +63,10 @@ store.registerModule('oice', {
 router.beforeEach(function (to, from, next) {
   store.commit('updateLoadingStatus', {isLoading: true})
   if (to.name === 'Logout') {
-    Vue.logout()
-    store.commit('setUser', {user: null})
-    next({name: 'Login', replace: true})
+    Vue.logout(() => {
+      store.commit('setUser', {user: null})
+      next({name: 'Login', replace: true})
+    })
   } else if (to.name === 'WechatLogin') {
     let query = to.query
     if (query.code && query.state) {
@@ -75,7 +76,7 @@ router.beforeEach(function (to, from, next) {
       }, (res) => {
         if (res.success) {
           if (res.data && res.data.id) {
-            localStorage.user = JSON.stringify(res.data)
+            store.commit('setUser', {user: res.data})
             if (res.data.redirect) {
               next({path: res.data.redirect, replace: true})
             } else {
@@ -95,19 +96,16 @@ router.beforeEach(function (to, from, next) {
     let query = to.query
     Vue.set(query, 'index', 'true')
     next({name: to.name, params: to.params, query: query, replace: true})
-  } else if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (store.state.oice.user == null) {
-      if (Vue.isWechat()) {
-        document.location.href = '/api/wechat/login?redirect=' + encodeURI(to.fullPath)
-        next(false)
-      } else {
-        next({
-          name: 'Login',
-          query: {redirect: to.fullPath}
-        })
-      }
+  } else if (to.matched.some(record => record.meta.requiresAuth) &&
+    store.state.oice.user == null) {
+    if (Vue.isWechat()) {
+      document.location.href = '/api/wechat/login?redirect=' + encodeURI(to.fullPath)
+      next(false)
     } else {
-      next()
+      next({
+        name: 'Login',
+        query: {redirect: to.fullPath}
+      })
     }
   } else {
     next()

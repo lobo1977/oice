@@ -119,7 +119,9 @@ class Index extends Base
    * 退出登录
    */
   public function logout() {
-    User::logout($this->user);
+    if ($this->getUser() != null) {
+      User::logout($this->user);
+    }
     return $this->succeed();
   }
 
