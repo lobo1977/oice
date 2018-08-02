@@ -50,9 +50,16 @@
           :inline-desc="item.desc"></cell>
       </group>
 
-      <group v-if="info.user_id > 0" title="客户经理">
+      <group v-if="info.manager" title="客户经理">
         <cell :title="info.manager" :inline-desc="info.company || info.mobile">
           <img slot="icon" :src="info.avatar" class="cell-image">
+        </cell>
+      </group>
+
+      <group v-if="info.clashCustomer" title="被撞单客户">
+        <cell :title="info.clashCustomer.name"
+          :link="{name: 'CustomerView', params: {id: info.clashCustomer.id}}"
+          :inline-desc="info.clashCustomer.manager + ' ' + info.clashCustomer.update_time">
         </cell>
       </group>
 
@@ -65,11 +72,21 @@
           :inline-desc="item.desc"></cell>
       </group>
 
+      <actionsheet v-if="info.clash > 0 && info.allowClash" v-model="showClashMenu" 
+        :menus="menuClash" @on-click-menu="clashMenuClick"></actionsheet>
+
       <flexbox :gutter="0" class="bottom-bar">
         <flexbox-item :span="6">
-          <x-button type="primary" class="bottom-btn" :disabled="!info.allowFollow"
+          <x-button type="primary" class="bottom-btn"
+            v-if="!info.clash || !info.allowClash"
+            :disabled="!info.allowFollow"
             :link="{name:'Favorite', query: { cid: info.id }}">
             <x-icon type="search" class="btn-icon"></x-icon> 筛选项目
+          </x-button>
+          <x-button type="primary" class="bottom-btn" 
+            v-if="info.clash > 0 && info.allowClash"
+            @click.native="showClashMenu = true">
+            <x-icon type="flash-off" class="btn-icon"></x-icon> 撞单处理
           </x-button>
         </flexbox-item>
         <flexbox-item :span="4">
@@ -236,25 +253,44 @@ export default {
         end_date: '',         // 到日期
         rem: '',              // 备注
         status: 0,            // 状态
-        user_id: 0,
+        clash: 0,             // 撞单
         manager: '',          // 客户经理
         avatar: '/static/img/avatar.png',
         mobile: '',
         company: '',          // 所属企业
-        clash: 0,
         allowEdit: false,
         allowFollow: false,
         allowConfirm: false,
+        allowClash: false,
         allowDelete: false,
         linkman: [],            // 联系人
         log: [],                // 跟进纪要
         filter: [],             // 项目筛选表
         recommend: [],          // 推荐资料
-        confirm: []             // 确认书
+        confirm: [],            // 确认书
+        clashCustomer: null
       },
       checkCount: 0,
       showPrintPicker: false,
       printMode: printModeData,
+      showClashMenu: false,
+      menuClash: [
+        {
+          label: '强行转交',
+          type: 'primary',
+          value: 0
+        },
+        {
+          label: '并行处理',
+          type: 'default',
+          value: 1
+        },
+        {
+          label: '驳回',
+          type: 'warn',
+          value: 2
+        }
+      ],
       pageX: null,
       pageY: null,
       mouseMove: false
@@ -263,7 +299,7 @@ export default {
   beforeRouteEnter (to, from, next) {
     next(vm => {
       vm.user = vm.$store.state.oice.user || vm.user
-      if (to.query.tab) {
+      if (to.query.tab || to.query.tab === 0) {
         vm.tab = parseInt(to.query.tab)
         if (isNaN(vm.tab)) {
           vm.tab = 0
@@ -271,41 +307,60 @@ export default {
       }
       let id = parseInt(to.params.id)
       if (!isNaN(id)) {
-        vm.$get('/api/Customer/detail?id=' + id, (res) => {
-          if (res.success) {
-            for (let item in vm.info) {
-              if (res.data[item] !== undefined && res.data[item] !== null) {
-                vm.info[item] = res.data[item]
-              }
-            }
-
-            vm.$emit('on-view-loaded', vm.info.customer_name)
-
-            if (vm.$isWechat()) {
-              let shareLink = window.location.href
-              let shareDesc = vm.info.lease_buy + vm.info.demand + ' ' + vm.info.acreage
-              let shareImage = window.location.protocol + '//' +
-                window.location.host + '/static/img/logo.png'
-
-              vm.$wechatShare(null, shareLink, vm.info.customer_name, shareDesc, shareImage)
-            }
-          } else {
-            vm.info.id = 0
-            vm.$vux.toast.show({
-              text: res.message,
-              width: '15em'
-            })
-          }
-        })
-      } else {
-        vm.tab = 0
+        vm.getInfo(id)
       }
     })
   },
+  beforeRouteUpdate (to, from, next) {
+    let vm = this
+    if (to.query.tab || to.query.tab === 0) {
+      vm.tab = parseInt(to.query.tab)
+      if (isNaN(vm.tab)) {
+        vm.tab = 0
+      }
+    }
+    let id = parseInt(to.params.id)
+    if (!isNaN(id)) {
+      if (id !== vm.info.id) {
+        vm.getInfo(id)
+      }
+    }
+    next()
+  },
   methods: {
     goTab (tab) {
-      this.$router.replace({name: 'CustomerView', id: this.info.id, query: { tab: tab }})
-      this.tab = tab
+      this.$router.replace({name: 'CustomerView', params: {id: this.info.id}, query: {tab: tab}})
+    },
+    getInfo (id) {
+      let vm = this
+      vm.$vux.loading.show()
+      vm.$get('/api/Customer/detail?id=' + id, (res) => {
+        vm.$vux.loading.hide()
+        if (res.success) {
+          for (let item in vm.info) {
+            if (res.data[item] !== undefined && res.data[item] !== null) {
+              vm.info[item] = res.data[item]
+            }
+          }
+
+          vm.$emit('on-view-loaded', vm.info.customer_name)
+
+          if (vm.$isWechat()) {
+            let shareLink = window.location.href
+            let shareDesc = vm.info.lease_buy + vm.info.demand + ' ' + vm.info.acreage
+            let shareImage = window.location.protocol + '//' +
+              window.location.host + '/static/img/logo.png'
+
+            vm.$wechatShare(null, shareLink, vm.info.customer_name, shareDesc, shareImage)
+          }
+        } else {
+          vm.info.id = 0
+          vm.$vux.toast.show({
+            text: res.message,
+            width: '15em'
+          })
+        }
+      })
     },
     remove () {
       if (this.user) {
@@ -494,6 +549,53 @@ export default {
           vm.$vux.toast.show({
             text: res.message,
             width: '15em'
+          })
+        }
+      })
+    },
+    clashMenuClick (key, item) {
+      let vm = this
+      if (item.value === 2) {
+        vm.$vux.confirm.show({
+          title: '驳回',
+          content: '当前客户信息将被删除，确定要驳回处理吗？',
+          onConfirm () {
+            vm.clashPass(item.value)
+          }
+        })
+      } else if (item.value === 0) {
+        vm.$vux.confirm.show({
+          title: '强行转交',
+          content: '被撞单客户将转交给当前用户，当前客户信息将被删除，确定要强行转交吗？',
+          onConfirm () {
+            vm.clashPass(item.value)
+          }
+        })
+      } else {
+        vm.clashPass(item.value)
+      }
+    },
+    clashPass (operate) {
+      let vm = this
+      vm.$vux.loading.show()
+      vm.$post('/api/customer/clashPass', {
+        id: vm.info.id,
+        operate: operate
+      }, (res) => {
+        vm.$vux.loading.hide()
+        if (res.success) {
+          this.$vux.toast.show({
+            type: 'success',
+            text: '撞单处理完成。',
+            width: '15em',
+            onHide () {
+              vm.$router.push({name: 'Customer', query: {reload: 1}})
+            }
+          })
+        } else {
+          vm.$vux.toast.show({
+            text: res.message,
+            width: '16em'
           })
         }
       })

@@ -30,27 +30,27 @@ class Customer extends Base
       return false;
     }
     if ($operate == 'view') {
-      if ($customer->share) {
-        return $customer->user_id == $user->id ||
-          $customer->company_id == $user->company_id;
-      } else {
-        return $customer->user_id == $user->id;
-      }
+      return $customer->user_id == $user->id || 
+        ($customer->share && $customer->company_id == $user->company_id);
     } else if ($operate == 'new') {
       return true;
     } else if ($operate == 'edit') {
       return $customer->user_id == $user->id &&
         $customer->company_id == $user->company_id;
-    } else if ($operate == 'follow') {
+    } else if ($operate == 'follow') {    // 跟进
       return $customer->user_id == $user->id &&
         $customer->company_id == $user->company_id && !$customer->clash;
-    } else if ($operate == 'confirm') {
+    } else if ($operate == 'confirm') {   // 确认
       return $customer->user_id == $user->id &&
         $customer->company_id == $user->company_id && !$customer->clash;
-    } else if ($operate == 'delete') {
+    } else if ($operate == 'clash') {     // 撞单处理
+      return $user->isAdmin && $customer->clash &&
+        $customer->company_id == $user->company_id;
+    } else if ($operate == 'delete') {    // 删除
       return ($customer->user_id == $user->id &&
         $customer->company_id == $user->company_id) ||
-        ($user->isAdmin && $customer->clash > 0);
+        ($user->isAdmin && $customer->clash &&
+        $customer->company_id == $user->company_id);
     } else {
       return false;
     }
@@ -96,8 +96,10 @@ class Customer extends Base
       }
     }
 
-    $result = $list->field('id,customer_name,logo,area,address,demand,lease_buy,min_acreage,max_acreage,budget,status,clash')
+    $result = $list->field('id,customer_name,area,address,demand,lease_buy,min_acreage,max_acreage,budget,status,clash')
       ->page($filter['page'], $filter['page_size'])
+      ->order('clash', 'desc')
+      ->order('update_time', 'desc')
       ->order('id', 'desc')
       ->select();
 
@@ -112,7 +114,10 @@ class Customer extends Base
       ->leftJoin('user b','b.id = a.user_id')
       ->leftJoin('company c','c.id = a.company_id')
       ->where('a.id', $id)
-      ->field('a.*,b.title as manager,b.avatar,b.mobile,c.title as company')
+      ->field('a.id,a.customer_name,a.area,a.address,a.demand,a.lease_buy,' .
+        'a.district,a.min_acreage,a.max_acreage,a.budget,a.settle_date,a.current_area,' .
+        'a.end_date,a.rem,a.status,a.clash,a.share,a.user_id,a.company_id,' .
+        'b.title as manager,b.avatar,b.mobile,c.title as company')
       ->find();
 
     if ($data == null) {
@@ -135,12 +140,19 @@ class Customer extends Base
     $data->allowEdit = self::allow($user, $data, 'edit');
     $data->allowFollow = self::allow($user, $data, 'follow');
     $data->allowConfirm = self::allow($user, $data, 'confirm');
-    $data->allowDelete = self::allow($user, $data, 'detete');
+    $data->allowClash = self::allow($user, $data, 'clash');
+    $data->allowDelete = self::allow($user, $data, 'delete');
     $data->linkman = Linkman::getByOwnerId($user, 'customer', $id);
     $data->log = Log::getList($user, 'customer', $id);
     $data->filter = Filter::query($user, $id);
     $data->recommend = Recommend::query($user, $id);
     $data->confirm = Confirm::query($user, $id, 0);
+    if ($data->clash && $data->allowClash) {
+      $data->clashCustomer = self::alias('a')
+        ->leftJoin('user b','b.id = a.user_id')
+        ->where('a.id', $data->clash)
+        ->field('a.id,a.customer_name as name,a.update_time,b.title as manager')->find();
+    }
 
     return $data;
   }
@@ -161,6 +173,7 @@ class Customer extends Base
       ->where('a.id', '<>', $id)
       ->where('a.company_id', $company_id)
       ->where('a.clash', ['exp', 'IS NULL'], ['=', 0], 'or')
+      ->where('a.parallel', ['exp', 'IS NULL'], ['=', 0], 'or')
       ->where(function ($query) use($keyword, $mobile) {
           $query->where('a.customer_name', 'like', '%' . $keyword . '%');
           if ($mobile) {
@@ -179,9 +192,17 @@ class Customer extends Base
     $oldData = null;
     $user_id = 0;
     $company_id = 0;
+    $checkClash = true;
+
     if ($user) {
       $user_id = $user->id;
       $company_id = $user->company_id;
+    }
+
+    if (isset($data['clash']) && $data['clash'] > 0) {
+      $checkClash = false;
+      // 撞单客户强制公开
+      $data['share'] = 1;
     }
 
     if ($id) {
@@ -191,12 +212,15 @@ class Customer extends Base
       } else if (!self::allow($user, $oldData, 'edit')) {
         self::exception('您没有权限修改此客户。');
       }
+      if ($oldData->clash || $oldData->parallel) {
+        $checkClash = false;
+      }
     }
 
     $mobile = isset($data['mobile']) ? $data['mobile'] : '';
 
     // 撞单检查
-    if (!isset($data['clash']) || $data['clash'] == 0) {
+    if ($checkClash) {
       $clash = self::clashCheck($id, $data['customer_name'], $mobile, $company_id);
       
       if ($clash) {
@@ -232,9 +256,6 @@ class Customer extends Base
 
         return ['message' => $message, 'data' => $resultData];
       }
-    } else {
-      // 撞单客户强制公开
-      $data['share'] = 1;
     }
 
     if (empty($data['settle_date'])) {
@@ -503,6 +524,55 @@ class Customer extends Base
     }
     $result = $customer->save();
     if ($result) {
+      Log::add($user, [
+        "table" => 'customer',
+        "owner_id" => $customer->id,
+        "title" => '转交客户',
+        "summary" => $summary
+      ]);
+    }
+
+    return $result;
+  }
+
+  /**
+   * 撞单处理
+   */
+  public static function clashPass($user, $id, $operate) {
+    $customer = self::get($id);
+
+    if ($customer == null) {
+      self::exception('客户不存在。');
+    } else if (!$customer->clash) {
+      self::exception('非撞单客户无需处理。');
+    } else if (!self::allow($user, $customer, 'clash')) {
+      self::exception('您没有权限处理这个撞单客户。');
+    }
+
+    $result = false;
+    $clashCustomer = self::get($customer->clash);
+
+    if ($clashCustomer == null) {
+      self::exception('被撞单客户不存在。');
+    } else if ($operate == 0) {   // 强行转交
+      $summary = '撞单客户强行转交';
+      $result = self::transfer($user, $clashCustomer->id, $customer->user_id, ['status' => 1]);
+      if ($result) {
+        self::remove($user, $id);
+      }
+    } else if ($operate == 1) {   // 并行处理
+      $summary = '撞单客户并行处理';
+      $customer->parallel = $clashCustomer->id;
+      $customer->clash = 0;
+      $result = $customer->save();
+    } else if ($operate == 2) {   // 驳回
+      $summary = '撞单客户驳回';
+      $result = self::remove($user, $id);
+    }
+
+    if ($result) {
+      // TODO: 发送通知
+
       Log::add($user, [
         "table" => 'customer',
         "owner_id" => $customer->id,

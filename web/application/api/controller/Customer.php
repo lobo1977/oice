@@ -29,7 +29,7 @@ class Customer extends Base
       foreach($list as $key=>$customer) {
         $customer->title = '【' . modelCustomer::$status[$customer->status] . '】' . $customer->customer_name;
         if ($customer->clash) {
-          $customer->title = $customer->title . '（撞单）';
+          $customer->title = $customer->title . '<span style="color:red">（撞单）</span>';
         }
         $customer->desc = (empty($customer->lease_buy) ? '' : $customer->lease_buy) . 
           (empty($customer->demand) ? '' : $customer->demand . ' ');
@@ -149,6 +149,18 @@ class Customer extends Base
           return $this->fail();
         }
       }
+    }
+  }
+
+  /**
+   * 撞单处理
+   */
+  public function clashPass($id, $operate) {
+    $result = modelCustomer::clashPass($this->user, $id, $operate);
+    if ($result) {
+      return $this->succeed();
+    } else {
+      return $this->fail();
     }
   }
 
