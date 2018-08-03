@@ -11,7 +11,8 @@
 
     <div v-transfer-dom>
       <x-dialog v-model="showStamp" hide-on-blur>
-        <img :src="info.stampView" style="margin:20px 0;max-width:100%">
+        <img :src="info.stampView" style="margin:20px 0;max-width:100%"
+          @click="showStamp = false">
       </x-dialog>
     </div>
 

@@ -9,8 +9,9 @@
     </group>
 
     <div v-transfer-dom>
-      <x-dialog v-model="showAvatar" hide-on-blur>
-        <img :src="info.avatarView" style="max-width:100%"></x-dialog>
+      <x-dialog v-model="showAvatar" hide-on-blur class="avatar-view">
+        <img :src="info.avatarView" style="max-width:100%" 
+          @click="showAvatar = false"></x-dialog>
     </div>
 
     <group gutter="10px" label-width="4em" label-margin-right="1em" label-align="right">
@@ -116,4 +117,8 @@ export default {
 </script>
 
 <style lang="less">
+.avatar-view .weui-dialog {
+  background-color:transparent;
+  border-radius:0;
+}
 </style>
