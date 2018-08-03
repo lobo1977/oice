@@ -21,8 +21,9 @@
         <p class="group-padding">{{info.rem}}</p>
       </group>
 
-      <group v-if="info.manager" title="客户经理">
-        <cell :title="info.manager" :inline-desc="info.mobile">
+      <group v-if="info.user_id" title="客户经理">
+        <cell :title="info.manager" :inline-desc="info.mobile"
+          :link="{name: 'UserView', params: {id: info.user_id}}">
           <img slot="icon" :src="info.avatar" class="cell-image">
         </cell>
       </group>

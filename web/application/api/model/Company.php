@@ -150,28 +150,6 @@ class Company extends Base
   }
 
   /**
-   * 获取企业成员
-   */
-  public static function Member($user, $id, $status = 0, $page = 0) {
-    $list = User::alias('a')
-      ->join('user_company b', 'a.id = b.user_id and b.status = ' . $status)
-      ->where('b.company_id', $id)
-      ->field('a.id,a.title,a.avatar,a.mobile')
-      ->order('b.create_time', 'asc');
-
-    if ($page > 0) {
-      $list = $list->page($page, 10);
-    }
-
-    $list = $list->select();
-
-    foreach($list as $user) {
-      User::formatData($user);
-    }
-    return $list;
-  }
-
-  /**
    * 获取企业详细信息
    */
   public static function detail($user, $id, $operate = 'view') {
@@ -205,7 +183,7 @@ class Company extends Base
           $data->isAddin = $joinStatus['status'];
         }
         if ($data->allowPass) {
-          $data->waitUser = self::Member($id);
+          $data->waitUser = User::companyMember($user, $id);
         }
       }
       self::setAddinCount($data);

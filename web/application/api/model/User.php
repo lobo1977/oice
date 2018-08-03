@@ -11,6 +11,7 @@ class User extends Base
   use SoftDelete;
   protected $pk = 'id';
   protected $deleteTime = 'delete_time';
+  public static $status = ['正常','冻结'];
 
   /**
    * 格式化用户信息
@@ -21,7 +22,7 @@ class User extends Base
       $user->isAdmin = $user->id == $user->company_admin;
       unset($user->company_admin);
     }
-    if ($user->avatar) {
+    if (isset($user->avatar) && $user->avatar) {
       $find = strpos($user->avatar, 'http');
       if ($find == false || $find > 0) {
         $user->avatar = '/upload/user/images/60/' . $user->avatar;
@@ -30,6 +31,28 @@ class User extends Base
       $user->avatar = '/static/img/avatar.png';
     }
     return $user;
+  }
+
+  /**
+   * 获取企业成员
+   */
+  public static function companyMember($user, $id, $status = 0, $page = 0) {
+    $list = self::alias('a')
+      ->join('user_company b', 'a.id = b.user_id and b.status = ' . $status)
+      ->where('b.company_id', $id)
+      ->field('a.id,a.title,a.avatar,a.mobile')
+      ->order('b.create_time', 'asc');
+
+    if ($page > 0) {
+      $list = $list->page($page, 10);
+    }
+
+    $list = $list->select();
+
+    foreach($list as $member) {
+      self::formatData($member);
+    }
+    return $list;
   }
   
   /**

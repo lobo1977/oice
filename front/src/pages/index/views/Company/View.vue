@@ -23,14 +23,14 @@
         <x-icon slot="icon" type="location" class="cell-icon"></x-icon>
       </cell>
       <cell v-if="info.addin > 0" title="成员" :value="info.addin"
-        :link="info.isAddin === 1 ? {name: 'CompanyUser', params: {id: info.id}} : null">
+        :link="info.isAddin === 1 ? {name: 'CompanyMember', params: {id: info.id}} : null">
         <x-icon slot="icon" type="ios-people" class="cell-icon"></x-icon>
       </cell>
-      <cell title="公章" @click.native="previewStamp"
+      <cell title="公章"
         v-if="info.enable_stamp && info.allowEdit && info.stamp != null && info.stamp != ''">
         <x-icon slot="icon" type="ios-circle-filled" class="cell-icon"></x-icon>
         <div solt="default" style="height:60px;line-height:0;">
-          <img :src="info.stamp" style="height:60px;">
+          <img :src="info.stamp" style="height:60px;" @click.stop="previewStamp">
         </div>
       </cell>
     </group>

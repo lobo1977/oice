@@ -50,8 +50,9 @@
           :inline-desc="item.desc"></cell>
       </group>
 
-      <group v-if="info.manager" title="客户经理">
-        <cell :title="info.manager" :inline-desc="info.company || info.mobile">
+      <group v-if="info.user_id" title="客户经理">
+        <cell :title="info.manager" :inline-desc="info.company || info.mobile"
+          :link="{name: 'UserView', params: {id: info.user_id}}">
           <img slot="icon" :src="info.avatar" class="cell-image">
         </cell>
       </group>
@@ -253,6 +254,7 @@ export default {
         rem: '',              // 备注
         status: 0,            // 状态
         clash: 0,             // 撞单
+        user_id: 0,
         manager: '',          // 客户经理
         avatar: '/static/img/avatar.png',
         mobile: '',

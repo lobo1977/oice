@@ -267,8 +267,8 @@ export default new Router({
         require(['../views/Company/Edit.vue'], resolve)
       }
     }, {
-      path: '/company/user/:id',
-      name: 'CompanyUser',
+      path: '/company/member/:id',
+      name: 'CompanyMember',
       meta: {
         title: '企业成员',
         showBack: true,
@@ -276,7 +276,19 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../views/Company/User.vue'], resolve)
+        require(['../views/Company/Member.vue'], resolve)
+      }
+    }, {
+      path: '/user/view/:id',
+      name: 'UserView',
+      meta: {
+        title: '',
+        showBack: true,
+        hideBar: true,
+        requiresAuth: true
+      },
+      component: function (resolve) {
+        require(['../views/User/View.vue'], resolve)
       }
     }, {
       path: '/my/favorite',

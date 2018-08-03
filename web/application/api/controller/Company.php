@@ -178,12 +178,4 @@ class Company extends Base
       return $this->fail();
     }
   }
-
-  /**
-   * 企业成员列表
-   */
-  public function user($id, $page) {
-    $result = modelCompany::Member($this->user, $id, 1, $page);
-    return $this->succeed($result);
-  }
 }

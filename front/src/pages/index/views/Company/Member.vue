@@ -2,7 +2,8 @@
   <div>
     <group :gutter="0">
       <cell v-for="(item, index) in list" :key="index" 
-        :title="item.title" :inline-desc="item.mobile">
+        :title="item.title" :inline-desc="item.mobile"
+        :link="{name: 'UserView', params: {id: item.id}}">
         <img slot="icon" :src="item.avatar" class="cell-image" />
       </cell>
     </group>
@@ -49,7 +50,7 @@ export default {
         this.list = []
       }
       this.isLoading = true
-      this.$post('/api/company/user', {
+      this.$post('/api/user/companyMember', {
         id: this.id,
         page: this.page
       }, (res) => {
