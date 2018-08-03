@@ -177,6 +177,7 @@ class Company extends Base
       $data->allowPass = self::allow($user, $data, 'passs');
       $data->allowDelete = self::allow($user, $data, 'delete');
       $data->isAddin = false;
+      $data->isInvtie = false;
       if ($user) {
         $joinStatus = self::getJoinStatus($user, $id);
         if ($joinStatus) {
@@ -184,6 +185,13 @@ class Company extends Base
         }
         if ($data->allowPass) {
           $data->waitUser = User::companyMember($user, $id);
+        }
+        if (db('invite')
+          ->where('mobile', $user->mobile)
+          ->where('company_id', $id)
+          ->where('status', 0)
+          ->find()) {
+          $data->isInvtie = true;  
         }
       }
       self::setAddinCount($data);

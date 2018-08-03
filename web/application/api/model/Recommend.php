@@ -109,7 +109,7 @@ class Recommend extends Base
         $unit['rent_price'] = $building['rent_price'];
         $unit['sell_price'] = $building['sell_price'];
         $unit['decoration'] = $building['decoration'];
-        $unitImages = File::getList($building['unit_id'], 'unit');
+        $unitImages = File::getList(null, 'unit', $building['unit_id']);
 
         foreach($treeList as $key => $item) {
           if ($item['building_id'] == $building['building_id']) {
@@ -134,7 +134,7 @@ class Recommend extends Base
         if (count($unit) > 0) {
           $building['units'][] = $unit;
         }
-        $images = File::getList(null, $building['building_id'], 'building');
+        $images = File::getList(null, 'building', $building['building_id']);
         if ($images) {
           $building['images'] = $images->toArray();
         }

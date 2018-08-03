@@ -60,10 +60,13 @@
     </group>
 
     <div v-if="!info.allowInvite" class="bottom-bar">
-      <x-button v-if="info.isAddin === false && info.join_way < 2" type="primary" class="bottom-btn" @click.native="addin">
+      <x-button v-if="info.isAddin === false" type="primary" class="bottom-btn" 
+        :disabled="info.join_way == 2 && !info.isInvtie"
+        @click.native="addin">
         <x-icon type="log-in" class="btn-icon"></x-icon>
-        <span v-if="info.join_way < 2">加入</span>
-        <span v-if="info.join_way > 1">需通过邀请加入</span>
+        <span v-if="info.join_way < 2 && !info.isInvtie">加入</span>
+        <span v-if="info.join_way == 2 && !info.isInvtie">需通过邀请加入</span>
+        <span v-if="info.isInvtie">接受邀请</span>
       </x-button>
       <x-button v-if="info.isAddin === 1" type="warn" class="bottom-btn" @click.native="quit">
         <x-icon type="log-out" class="btn-icon"></x-icon> 退出
@@ -132,6 +135,7 @@ export default {
         addin: 0,
         wait: 0,
         isAddin: false,
+        isInvtie: false,
         allowEdit: false,
         allowInvite: false,
         allowPass: false,
