@@ -33,9 +33,11 @@ class Unit extends Base
   public function detail($id = 0) {
     if ($id) {
       $data = modelUnit::detail($this->user, $id);
-      if ($data != null) {
+      if ($this->user != null) {
         $data->customer = Customer::search($this->user, ['status' => '0,1,2', 'clash' => false]);
       }
+      unset($data->user_id);
+      unset($data->company_id);
       return $this->succeed($data);
     } else {
       return;
@@ -50,7 +52,7 @@ class Unit extends Base
       $form_token = $this->formToken();
       $companyList = Company::my($this->user);
       if ($id > 0) {
-        $data = modelUnit::detail($this->user, $id);
+        $data = modelUnit::detail($this->user, $id, 'edit');
         $data->__token__ = $form_token;
         $data->companyList = $companyList;
         return $this->succeed($data);

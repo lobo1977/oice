@@ -109,7 +109,7 @@ class Customer extends Base
   /**
    * 获取客户详细信息
    */
-  public static function detail($user, $id) {
+  public static function detail($user, $id, $operate = 'view') {
     $data = self::alias('a')
       ->leftJoin('user b','b.id = a.user_id')
       ->leftJoin('company c','c.id = a.company_id')
@@ -122,38 +122,39 @@ class Customer extends Base
 
     if ($data == null) {
       self::exception('客户不存在。');
-    } else if (!self::allow($user, $data, 'view')) {
-      self::exception('您没有权限查看此客户。');
+    } else if (!self::allow($user, $data, $operate)) {
+      self::exception('您没有权限' . ($operate == 'view' ? '查看' : '修改') . '此客户。');
     }
 
-    if ($data->min_acreage && $data->max_acreage) {
-      $data->acreage = $data->min_acreage . ' 至 ' . $data->max_acreage . ' 平米';
-    } else if ($data->min_acreage) {
-      $data->acreage = $data->min_acreage . ' 平米以上';
-    } else if ($data->max_acreage) {
-      $data->acreage = $data->max_acreage . ' 平米以内';
-    } else {
-      $data->acreage = '';
-    }
+    if ($operate == 'view') {
+      if ($data->min_acreage && $data->max_acreage) {
+        $data->acreage = $data->min_acreage . ' 至 ' . $data->max_acreage . ' 平米';
+      } else if ($data->min_acreage) {
+        $data->acreage = $data->min_acreage . ' 平米以上';
+      } else if ($data->max_acreage) {
+        $data->acreage = $data->max_acreage . ' 平米以内';
+      } else {
+        $data->acreage = '';
+      }
 
-    User::formatData($data);
-    $data->allowEdit = self::allow($user, $data, 'edit');
-    $data->allowFollow = self::allow($user, $data, 'follow');
-    $data->allowConfirm = self::allow($user, $data, 'confirm');
-    $data->allowClash = self::allow($user, $data, 'clash');
-    $data->allowDelete = self::allow($user, $data, 'delete');
-    $data->linkman = Linkman::getByOwnerId($user, 'customer', $id);
-    $data->log = Log::getList($user, 'customer', $id);
-    $data->filter = Filter::query($user, $id);
-    $data->recommend = Recommend::query($user, $id);
-    $data->confirm = Confirm::query($user, $id, 0);
-    if ($data->clash && $data->allowClash) {
-      $data->clashCustomer = self::alias('a')
-        ->leftJoin('user b','b.id = a.user_id')
-        ->where('a.id', $data->clash)
-        ->field('a.id,a.customer_name as name,a.update_time,b.title as manager')->find();
+      User::formatData($data);
+      $data->allowEdit = self::allow($user, $data, 'edit');
+      $data->allowFollow = self::allow($user, $data, 'follow');
+      $data->allowConfirm = self::allow($user, $data, 'confirm');
+      $data->allowClash = self::allow($user, $data, 'clash');
+      $data->allowDelete = self::allow($user, $data, 'delete');
+      $data->linkman = Linkman::getByOwnerId($user, 'customer', $id);
+      $data->log = Log::getList($user, 'customer', $id);
+      $data->filter = Filter::query($user, $id);
+      $data->recommend = Recommend::query($user, $id);
+      $data->confirm = Confirm::query($user, $id, 0);
+      if ($data->clash && $data->allowClash) {
+        $data->clashCustomer = self::alias('a')
+          ->leftJoin('user b','b.id = a.user_id')
+          ->where('a.id', $data->clash)
+          ->field('a.id,a.customer_name as name,a.update_time,b.title as manager')->find();
+      }
     }
-
     return $data;
   }
 

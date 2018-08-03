@@ -60,7 +60,7 @@ class Company extends Base
     if ($this->request->isGet()) {
       $form_token = $this->formToken();
       if ($id > 0) {
-        $data = modelCompany::detail($this->user, $id);
+        $data = modelCompany::detail($this->user, $id, 'edit');
         $data->__token__ = $form_token;
         return $this->succeed($data);
       } else {

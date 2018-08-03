@@ -75,7 +75,7 @@ class Customer extends Base
       $form_token = $this->formToken();
       $companyList = Company::my($this->user);
       if ($id > 0) {
-        $data = modelCustomer::detail($this->user, $id);
+        $data = modelCustomer::detail($this->user, $id, 'edit');
         $data->__token__ = $form_token;
         $data->companyList = $companyList;
         return $this->succeed($data);

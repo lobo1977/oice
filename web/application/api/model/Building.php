@@ -42,7 +42,9 @@ class Building extends Base
     if ($building == null && $operate != 'new') {
       return false;
     }
-    if ($operate == 'view') {
+    if ($operate == 'share') {
+      return true;
+    } else if ($operate == 'view') {
       if ($building->share || $building->user_id == 0) {
         return true;
       } else if ($user == null) {
@@ -195,25 +197,38 @@ class Building extends Base
   /**
    * 获取房源详细信息
    */
-  public static function detail($user, $id) {
-    $data = self::get($id);
+  public static function detail($user, $id, $operate = 'view') {
+    $data = self::where('id', $id)
+      ->field('id,building_name,type,level,area,district,address,longitude,latitude,' .
+        'completion_date,rent_sell,price,acreage,floor,floor_area,floor_height,bearing,' .
+        'developer,manager,fee,electricity_fee,car_seat,rem,facility,equipment,traffic,environment,' .
+        'share,user_id,company_id')->find();
+
     if ($data == null) {
       self::exception('房源信息不存在。');
-    } else if (!self::allow($user, $data, 'view')) {
-      self::exception('您没有权限查看此房源。');
+    } else if (!self::allow($user, $data, $operate)) {
+      self::exception('您没有权限' . ($operate == 'edit' ? '编辑' : '查看') . '此房源。');
     }
-    $data->engInfo = db('building_en')->where('id', $id)->find();
+
+    $data->engInfo = db('building_en')->where('id', $id)
+      ->field('name,location,situation,developer,manager,' .
+        'network,elevator,hvac,amenities,	tenants')->find();
+
     $data->images = File::getList($user, 'building', $id);
-    $data->allowEdit = self::allow($user, $data, 'edit');
-    $data->allowDelete = self::allow($user, $data, 'delete');
-    $data->isFavorite = false;
-    if ($user) {
-      $data->linkman = Linkman::getByOwnerId($user, 'building', $id);
-      $data->unit = Unit::getByBuildingId($user, $id);
-      $data->confirm = Confirm::query($user, 0, $id);
-      if (db('favorite')->where('user_id', $user->id)
-        ->where('building_id', $id)->find()) {
-          $data->isFavorite = true;
+
+    if ($operate == 'view') {
+      $data->isFavorite = false;
+      $data->allowEdit = self::allow($user, $data, 'edit');
+      $data->allowDelete = self::allow($user, $data, 'delete');
+      
+      if ($user) {
+        $data->linkman = Linkman::getByOwnerId($user, 'building', $id);
+        $data->unit = Unit::getByBuildingId($user, $id);
+        $data->confirm = Confirm::query($user, 0, $id);
+        if (db('favorite')->where('user_id', $user->id)
+          ->where('building_id', $id)->find()) {
+            $data->isFavorite = true;
+        }
       }
     }
     return $data;

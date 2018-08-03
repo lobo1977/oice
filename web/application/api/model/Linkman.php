@@ -42,6 +42,7 @@ class Linkman extends Base
     
     $list = self::where('type', $type)
       ->where('owner_id', $id)
+      ->field('id,title,department,job,mobile,status')
       ->order('id', 'asc')
       ->select();
 
@@ -57,16 +58,21 @@ class Linkman extends Base
   /**
    * 根据ID 获取联系人信息
    */
-  public static function detail($user, $id) {
-    $linkman = self::get($id);
+  public static function detail($user, $id, $operate = 'view') {
+    $linkman = self::where('id', $id)
+      ->field('id,type,owner_id,title,department,job,mobile,tel,' .
+        'email,weixin,qq,rem,status,user_id')
+      ->find();
     
     if ($linkman == null) {
       self::exception('联系人不存在。');
-    } else if (!self::allow($user, $linkman->getAttr('type'), $linkman->owner_id, 'view')) {
-      self::exception('您没有权限查看此联系人。');
+    } else if (!self::allow($user, $linkman->getAttr('type'), $linkman->owner_id, $operate)) {
+      self::exception('您没有权限' . ($operate == 'view' ? '查看' : '修改') . '此联系人。');
     }
-    $linkman->allowEdit = self::allow($user, $linkman->getAttr('type'), $linkman->owner_id, 'edit');
-    $linkman->allowDelete = $linkman->allowEdit;
+    if ($operate == 'view') {
+      $linkman->allowEdit = self::allow($user, $linkman->getAttr('type'), $linkman->owner_id, 'edit');
+      $linkman->allowDelete = $linkman->allowEdit;
+    }
     return $linkman;
   }
 

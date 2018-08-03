@@ -87,6 +87,7 @@ class Unit extends Base
     $list = self::where('building_id', $id)
       ->where('share = 1 OR (user_id = ' . $user_id . ') OR ' . 
         '(company_id > 0 AND company_id = ' . $company_id . ')')
+      ->field('id,building_no,floor,room,acreage,status,share,user_id,company_id')
       ->order('building_no', 'asc')
       ->order('floor', 'desc')
       ->order('room', 'asc')
@@ -106,30 +107,35 @@ class Unit extends Base
   /**
    * 根据ID获取单元信息
    */
-  public static function detail($user, $id) {
+  public static function detail($user, $id, $operate = 'view') {
     $unit = self::alias('a')
       ->join('building b', 'a.building_id = b.id')
       ->where('a.id', $id)
-      ->field('a.*,b.building_name')
+      ->field('a.id,building_id,b.building_name,a.building_no,a.floor,a.room,a.face,' .
+        'a.acreage,a.rent_sell,a.rent_price,a.sell_price,a.decoration,a.status,' . 
+        'a.end_date,a.rem,a.share,a.user_id,a.company_id')
       ->find();
 
     if ($unit == null) {
       self::exception('单元不存在。');
-    } else if (!self::allow($user, $unit, 'view')) {
-      self::exception('您没有权限查看此单元。');
+    } else if (!self::allow($user, $unit, $operate)) {
+      self::exception('您没有权限' . ($operate == 'view' ? '查看' : '修改') . '此单元。');
     } else {
-      $building = Building::get($unit->building_id);
       $unit->images = File::getList($user, 'unit', $id);
-      $unit->linkman = Linkman::getByOwnerId($user, 'unit', $id);
-      $unit->allowNew = self::allow($user, $unit, 'new', $building);
-      $unit->allowEdit = self::allow($user, $unit, 'edit', $building);
-      $unit->allowDelete = self::allow($user, $unit, 'delete', $building);
-      $unit->isFavorite = false;
       self::formatInfo($unit);
-      if ($user) {
-        if (db('favorite')->where('user_id', $user->id)
-          ->where('unit_id', $id)->find() != null) {
-            $unit->isFavorite = true;
+
+      if ($operate == 'view') {
+        $building = Building::get($unit->building_id);
+        $unit->linkman = Linkman::getByOwnerId($user, 'unit', $id);
+        $unit->allowNew = self::allow($user, $unit, 'new', $building);
+        $unit->allowEdit = self::allow($user, $unit, 'edit', $building);
+        $unit->allowDelete = self::allow($user, $unit, 'delete', $building);
+        $unit->isFavorite = false;
+        if ($user) {
+          if (db('favorite')->where('user_id', $user->id)
+            ->where('unit_id', $id)->find() != null) {
+              $unit->isFavorite = true;
+          }
         }
       }
     }

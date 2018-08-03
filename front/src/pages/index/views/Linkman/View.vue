@@ -18,7 +18,7 @@
 
     <flexbox :gutter="0" class="bottom-bar">
       <flexbox-item :span="6">
-        <x-button type="default" class="bottom-btn" 
+        <x-button type="primary" class="bottom-btn" 
           :disabled="!info.allowEdit"
           :link="{name:'LinkmanEdit', params: {id: info.id, type: info.type, oid: info.owner_id}}">
           <x-icon type="compose" class="btn-icon"></x-icon> 修改
@@ -47,7 +47,6 @@ export default {
   },
   data () {
     return {
-      user: null,
       info: {
         id: 0,
         type: '',
@@ -62,7 +61,6 @@ export default {
         qq: '',             // QQ
         rem: '',            // 备注
         status: '',         // 状态
-        user_id: 0,
         allowEdit: false,
         allowDelete: false
       }
@@ -70,7 +68,6 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      vm.user = vm.$store.state.oice.user || vm.user
       let id = parseInt(to.params.id)
       if (!isNaN(id)) {
         vm.$get('/api/linkman/detail?id=' + id, (res) => {
@@ -106,34 +103,27 @@ export default {
   },
   methods: {
     remove () {
-      if (this.user) {
-        let vm = this
-        this.$vux.confirm.show({
-          title: '删除联系人',
-          content: '确定要删除联系人 <strong>' + vm.info.title + '</strong> 吗？',
-          onConfirm () {
-            vm.$vux.loading.show({text: '请稍后...'})
-            vm.$post('/api/linkman/remove', {
-              id: vm.info.id
-            }, (res) => {
-              vm.$vux.loading.hide()
-              if (res.success) {
-                vm.$router.back()
-              } else {
-                vm.$vux.toast.show({
-                  text: res.message,
-                  width: '13em'
-                })
-              }
-            })
-          }
-        })
-      } else {
-        this.$router.push({
-          name: 'Login',
-          query: { redirect: this.$route.fullPath }
-        })
-      }
+      let vm = this
+      this.$vux.confirm.show({
+        title: '删除联系人',
+        content: '确定要删除联系人 <strong>' + vm.info.title + '</strong> 吗？',
+        onConfirm () {
+          vm.$vux.loading.show({text: '请稍后...'})
+          vm.$post('/api/linkman/remove', {
+            id: vm.info.id
+          }, (res) => {
+            vm.$vux.loading.hide()
+            if (res.success) {
+              vm.$router.back()
+            } else {
+              vm.$vux.toast.show({
+                text: res.message,
+                width: '13em'
+              })
+            }
+          })
+        }
+      })
     }
   }
 }

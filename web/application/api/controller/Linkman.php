@@ -30,9 +30,8 @@ class Linkman extends Base
   public function edit($id) {
     if ($this->request->isGet()) {
       $form_token = $this->formToken();
-
       if ($id > 0) {
-        $data = modelLinkman::detail($this->user, $id);
+        $data = modelLinkman::detail($this->user, $id, 'edit');
         $data->__token__ = $form_token;
         return $this->succeed($data);
       } else {

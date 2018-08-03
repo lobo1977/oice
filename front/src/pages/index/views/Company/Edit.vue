@@ -54,7 +54,7 @@
 
 <script>
 import { Group, Cell, PopupPicker, Actionsheet, XInput, XSwitch, XTextarea, XButton } from 'vux'
-import { mapState, mapActions } from 'vuex'
+import { mapActions } from 'vuex'
 import districtData from '../../data/beijing_area.json'
 import joinWayData from '../../data/join_way.json'
 
@@ -71,7 +71,6 @@ export default {
   },
   data () {
     return {
-      isAddin: false,
       id: 0,
       formValidate: false,
       info: {
@@ -84,8 +83,7 @@ export default {
         rem: '',
         join_way: 0,
         status: false,
-        enable_stamp: true,
-        isAddin: false
+        enable_stamp: true
       },
       logoSrc: null,
       stampSrc: null,
@@ -213,11 +211,6 @@ export default {
         }
       })
     }
-  },
-  computed: {
-    ...mapState({
-      user: state => state.oice.user
-    })
   }
 }
 </script>

@@ -40,7 +40,7 @@
         <p class="group-padding">{{ info.rem }}</p>
       </group>
 
-      <group>
+      <group v-if="info.linkman.length || info.allowEdit">
         <group-title slot="title">联系人
           <router-link style="float:right;color:#333;" v-if="info.allowEdit"
             :to="{name: 'LinkmanEdit', params: {id: 0, type: 'customer', oid: info.id}}">+ 添加</router-link>
@@ -236,7 +236,6 @@ export default {
   data () {
     return {
       tab: 0,
-      user: null,
       showWarn: true,
       info: {
         id: 0,
@@ -298,7 +297,6 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      vm.user = vm.$store.state.oice.user || vm.user
       if (to.query.tab || to.query.tab === 0) {
         vm.tab = parseInt(to.query.tab)
         if (isNaN(vm.tab)) {
@@ -363,34 +361,27 @@ export default {
       })
     },
     remove () {
-      if (this.user) {
-        let vm = this
-        vm.$vux.confirm.show({
-          title: '删除客户',
-          content: '确定要删除客户 <strong>' + vm.info.customer_name + '</strong> 吗？',
-          onConfirm () {
-            vm.$vux.loading.show()
-            vm.$post('/api/customer/remove', {
-              id: vm.info.id
-            }, (res) => {
-              vm.$vux.loading.hide()
-              if (res.success) {
-                vm.$router.back()
-              } else {
-                vm.$vux.toast.show({
-                  text: res.message,
-                  width: '13em'
-                })
-              }
-            })
-          }
-        })
-      } else {
-        this.$router.push({
-          name: 'Login',
-          query: { redirect: this.$route.fullPath }
-        })
-      }
+      let vm = this
+      vm.$vux.confirm.show({
+        title: '删除客户',
+        content: '确定要删除客户 <strong>' + vm.info.customer_name + '</strong> 吗？',
+        onConfirm () {
+          vm.$vux.loading.show()
+          vm.$post('/api/customer/remove', {
+            id: vm.info.id
+          }, (res) => {
+            vm.$vux.loading.hide()
+            if (res.success) {
+              vm.$router.back()
+            } else {
+              vm.$vux.toast.show({
+                text: res.message,
+                width: '13em'
+              })
+            }
+          })
+        }
+      })
     },
     editLog (id) {
       this.$router.push({

@@ -35,7 +35,22 @@ class Building extends Base
   public function detail($id = 0) {
     if ($id) {
       $data = modelBuilding::detail($this->user, $id);
-      if ($data != null) {
+      if ($data != null && $this->user) {
+        $data->customer = Customer::search($this->user, ['status' => '0,1,2', 'clash' => false]);
+      }
+      return $this->succeed($data);
+    } else {
+      return;
+    }
+  }
+
+  /**
+   * 分享房源信息
+   */
+  public function share($id = 0) {
+    if ($id) {
+      $data = modelBuilding::detail($this->user, $id, 'share');
+      if ($data != null && $this->user) {
         $data->customer = Customer::search($this->user, ['status' => '0,1,2', 'clash' => false]);
       }
       return $this->succeed($data);
@@ -61,7 +76,7 @@ class Building extends Base
       $form_token = $this->formToken();
       $companyList = Company::my($this->user);
       if ($id > 0) {
-        $data = modelBuilding::detail($this->user, $id);
+        $data = modelBuilding::detail($this->user, $id, 'edit');
         $data->__token__ = $form_token;
         $data->companyList = $companyList;
         return $this->succeed($data);

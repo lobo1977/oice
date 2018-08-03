@@ -68,9 +68,6 @@ export default {
   },
   data () {
     return {
-      user: {
-        id: 0
-      },
       id: 0,
       formValidate: false,
       building: {
@@ -87,7 +84,6 @@ export default {
         confirm_date: null, // 确认日期
         period: 3, // 有效期（月)
         rem: '', // 备注
-        user_id: 0,
         company_id: 0
       },
       showCompanyPicker: false,
@@ -103,8 +99,6 @@ export default {
         vm.rentSellPickerData.push(rentSellData[1])
         vm.rentSellPickerData.push(rentSellData[2])
       }
-
-      vm.user = vm.$store.state.oice.user || vm.user
 
       if (to.params.id) {
         vm.id = parseInt(to.params.id)

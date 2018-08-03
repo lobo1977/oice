@@ -9,8 +9,10 @@
       </div>
     </masker>
 
-    <div v-transfer-dom v-if="user && user.id == info.user_id">
-      <previewer :list="images" ref="previewer" :options="previewOptions"></previewer>
+    <div v-transfer-dom>
+      <x-dialog v-model="showStamp" hide-on-blur>
+        <img :src="info.stampView" style="margin:20px 0;max-width:100%">
+      </x-dialog>
     </div>
 
     <group gutter="0">
@@ -21,13 +23,14 @@
         <x-icon slot="icon" type="location" class="cell-icon"></x-icon>
       </cell>
       <cell v-if="info.addin > 0" title="成员" :value="info.addin"
-        :link="info.isAddin === 1 || (user && user.id == info.user_id) ? {name: 'CompanyUser', params: {id: info.id}} : null">
+        :link="info.isAddin === 1 ? {name: 'CompanyUser', params: {id: info.id}} : null">
         <x-icon slot="icon" type="ios-people" class="cell-icon"></x-icon>
       </cell>
-      <cell title="公章" v-if="info.enable_stamp && user && user.id == info.user_id" @click.native="previewStamp">
+      <cell title="公章" @click.native="previewStamp"
+        v-if="info.enable_stamp && info.allowEdit && info.stamp != null && info.stamp != ''">
         <x-icon slot="icon" type="ios-circle-filled" class="cell-icon"></x-icon>
         <div solt="default" style="height:60px;line-height:0;">
-          <img v-show="info.stamp != null && info.stamp != ''" :src="info.stamp" style="height:60px;">
+          <img :src="info.stamp" style="height:60px;">
         </div>
       </cell>
     </group>
@@ -91,9 +94,9 @@
 </template>
 
 <script>
-import { Masker, Group, Previewer, TransferDom,
+import { Masker, Group, TransferDom, XDialog,
   Swipeout, SwipeoutItem, SwipeoutButton, Cell, Flexbox, FlexboxItem, XButton } from 'vux'
-import { mapState, mapActions } from 'vuex'
+import { mapActions } from 'vuex'
 
 export default {
   directives: {
@@ -102,7 +105,7 @@ export default {
   components: {
     Masker,
     Group,
-    Previewer,
+    XDialog,
     Swipeout,
     SwipeoutItem,
     SwipeoutButton,
@@ -119,6 +122,7 @@ export default {
         full_name: '',
         logo: '',
         stamp: '',
+        stampView: '',
         enable_stamp: 1,
         area: '',
         address: '',
@@ -127,19 +131,16 @@ export default {
         addin: 0,
         wait: 0,
         isAddin: false,
-        user_id: 0,
         allowEdit: false,
         allowInvite: false,
         allowPass: false,
         allowDelete: false
       },
+      showStamp: false,
       waitUser: [],
       pageX: null,
       pageY: null,
-      mouseMove: false,
-      images: [],
-      previewOptions: {
-      }
+      mouseMove: false
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -167,11 +168,8 @@ export default {
             vm.waitUser = res.data.waitUser
           }
 
-          if (res.data.stamp) {
-            vm.images.push({
-              src: res.data.stamp.replace('/60/', '/200/'),
-              msrc: res.data.stamp
-            })
+          if (vm.info.stamp) {
+            vm.info.stampView = vm.info.stamp.replace('/60/', '/200/')
           }
 
           vm.$emit('on-view-loaded', vm.info.title)
@@ -197,8 +195,8 @@ export default {
       })
     },
     previewStamp () {
-      if (this.images.length) {
-        this.$refs.previewer.show(0)
+      if (this.info.stampView) {
+        this.showStamp = true
       }
     },
     swipeoutOpen (item) {
@@ -380,11 +378,6 @@ export default {
         }
       })
     }
-  },
-  computed: {
-    ...mapState({
-      user: state => state.oice.user
-    })
   }
 }
 </script>

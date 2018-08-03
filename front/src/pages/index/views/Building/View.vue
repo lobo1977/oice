@@ -28,12 +28,12 @@
         <cell title="项目类型" value-align="left" :value="info.building_type" v-show="info.building_type"></cell>
         <cell title="地址" value-align="left" :value="info.area + info.address" v-show="info.area || info.address" 
           :is-link="(info.longitude || info.latitude) != 0" @click.native="showMap = ((info.longitude || info.latitude) != 0)"></cell>
-        <cell title="竣工日期" value-align="left" :value="info.completionDate|formatDate" v-show="info.completionDate"></cell>
+        <cell title="竣工日期" value-align="left" :value="info.completion_date|formatDate" v-show="info.completion_date"></cell>
         <cell title="租售" value-align="left" :value="info.rent_sell" v-show="info.rent_sell"></cell>
         <cell title="价格" value-align="left" :value="info.price" v-show="info.price"></cell>
         <cell title="楼层" value-align="left" :value="info.floor" v-show="info.floor"></cell>
-        <cell title="层面积" value-align="left" :value="info.floorArea + ' 平方米'" v-show="info.floorArea > 0"></cell>
-        <cell title="层高" value-align="left" :value="info.floorHeight + ' 米'" v-show="info.floorHeight > 0 && info.floorHeight != 2"></cell>
+        <cell title="层面积" value-align="left" :value="info.floor_area + ' 平方米'" v-show="info.floor_area > 0"></cell>
+        <cell title="层高" value-align="left" :value="info.floor_height + ' 米'" v-show="info.floor_height > 0 && info.floor_height !== 2"></cell>
         <cell title="楼板承重" value-align="left" :value="info.bearing + ' 千克/平方米'" v-show="info.bearing > 0"></cell>
         <cell title="开发商" value-align="left" :value="info.developer" v-show="info.developer"></cell>
         <cell title="物业管理" value-align="left" :value="info.manager" v-show="info.manager"></cell>
@@ -209,8 +209,7 @@ export default {
   data () {
     return {
       user: {
-        id: 0,
-        company_id: 0
+        id: 0
       },
       tab: 0,
       info: {
@@ -222,13 +221,13 @@ export default {
         address: '',          // 地址
         longitude: 0,         // 经度
         latitude: 0,          // 纬度
-        completionDate: '',   // 竣工日期
+        completion_date: '',   // 竣工日期
         rent_sell: '',        // 租售
         price: '',            // 价格
         acreage: 0,           // 建筑面积
         floor: '',            // 楼层
-        floorArea: 0,         // 层面积
-        floorHeight: 0,       // 层高
+        floor_area: 0,         // 层面积
+        floor_height: 0,       // 层高
         bearing: 0,           // 楼板承重
         developer: '',        // 开发商
         manager: '',          // 物业管理
@@ -241,7 +240,6 @@ export default {
         traffic: '',          // 交通状况
         environment: '',      // 周边环境
         user_id: 0,
-        company_id: 0,
         isFavorite: false,
         allowEdit: false,
         allowDelete: false,
@@ -293,11 +291,9 @@ export default {
             if (res.data.level) {
               vm.info.building_type += `（${res.data.level}级）`
             }
-            vm.info.completionDate = res.data.completion_date
             if (res.data.isFavorite) {
               vm.info.isFavorite = true
             }
-
             if (res.data.customer) {
               let customer = []
               for (let i in res.data.customer) {
@@ -349,7 +345,7 @@ export default {
       this.$refs.previewer.show(index)
     },
     favorite () {
-      if (!this.user) {
+      if (!this.user || this.user.id === 0) {
         this.$router.push({
           name: 'Login',
           query: { redirect: this.$route.fullPath }
@@ -402,7 +398,7 @@ export default {
     selectUnit () {
     },
     toCustomer (flag) {
-      if (!this.user) {
+      if (!this.user || this.user.id === 0) {
         this.$router.push({
           name: 'Login',
           query: { redirect: this.$route.fullPath }
@@ -492,7 +488,7 @@ export default {
       this.$router.push({name: 'ConfirmEdit', params: {id: 0, bid: bid, cid: cid}})
     },
     batchFavorite () {
-      if (this.user) {
+      if (this.user && this.user.id > 0) {
         if (this.selectedUnit.length <= 0) {
           return
         }
@@ -525,7 +521,7 @@ export default {
       let vm = this
       if (key === 'edit') {
         vm.$router.push({name: 'BuildingEdit', params: {id: vm.info.id}})
-      } else if (key === 'delete' && vm.info.user_id === vm.user.id) {
+      } else if (key === 'delete' && vm.info.allowDelete) {
         // vm.$vux.confirm.show({
         //   title: '删除项目',
         //   content: '确定要删除这个项目吗？',
@@ -619,8 +615,7 @@ export default {
           vm.$router.push({name: 'Unit', params: {id: unitId}})
         } else if (key === 'edit') {
           vm.$router.push({name: 'UnitEdit', params: {id: unitId, bid: this.info.id}})
-        } else if (key === 'delete' &&
-          vm.menuUnit.user_id === vm.user.id) {
+        } else if (key === 'delete') {
           vm.$vux.confirm.show({
             title: '删除单元',
             content: '确定要删除这个单元吗？',

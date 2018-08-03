@@ -4,6 +4,7 @@ namespace app\api\model;
 use think\model\concern\SoftDelete;
 use app\api\model\Base;
 use app\api\model\Log;
+use app\api\model\User;
 use app\api\model\Company;
 use app\api\model\Building;
 use app\api\model\Customer;
@@ -21,7 +22,7 @@ class Confirm extends Base
     if ($user == null) {
       return false;
     }
-    if ($confirm == 'view') {
+    if ($operate == 'view') {
       return $confirm->user_id == $user->id ||
         $confirm->building_company_id == $user->company_id;
     } else if ($operate == 'edit' || $operate = 'delete') {
@@ -57,7 +58,7 @@ class Confirm extends Base
       $list->where('a.user_id', $user_id);
     }
 
-    $result = $list->field('a.*,b.building_name,c.customer_name')
+    $result = $list->field('a.id,a.create_time,b.building_name,c.customer_name')
       ->order('a.create_time', 'desc')
       ->select();
 
@@ -76,31 +77,39 @@ class Confirm extends Base
   /**
    * 客户确认书详情
    */
-  public static function detail($user, $id, $building_id = 0, $customer_id = 0) {
+  public static function detail($user, $id, $building_id = 0, $customer_id = 0, $operate = 'view') {
     if ($id) {
       $confirm = self::alias('a')
-        ->join('building b', ' a.building_id = b.id')
+        ->join('building b', 'a.building_id = b.id')
         ->join('customer c', 'a.customer_id = c.id')
         ->leftJoin('company o', 'a.company_id = o.id')
         ->leftJoin('company m', 'b.company_id = m.id')
+        ->join('user u','u.id = a.user_id')
         ->where('a.id', $id)
-        ->field('a.*,b.building_name as building,b.developer,' .
-          'c.customer_name as customer,o.full_name as company,o.enable_stamp,o.stamp,' .
-          'm.id as building_company_id,m.full_name as building_company,' .
-          'm.enable_stamp as building_enable_stamp,m.stamp as building_stamp')
+        ->field('a.id,a.customer_id,a.building_id,a.acreage,a.rent_sell,' .
+          'a.confirm_date,a.period,a.rem,a.file,a.user_id,a.company_id,' .
+          'b.building_name as building,b.developer,' .
+          'c.customer_name as customer,' .
+          'o.full_name as company,o.enable_stamp,o.stamp,' .
+          'b.company_id as building_company_id,m.full_name as building_company,' .
+          'm.enable_stamp as building_enable_stamp,m.stamp as building_stamp,' .
+          'u.title as manager,u.avatar,u.mobile')
         ->find();
       if ($confirm == null) {
         self::exception('确认书不存在。');
-      } else if (!self::allow($user, $confirm, 'view')) {
-        self::exception('您没有权限查看这个确认书。');
+      } else if (!self::allow($user, $confirm, $operate)) {
+        self::exception('您没有权限' . ($operate == 'view' ? '查看' : '修改') . '这个确认书。');
       } else {
-        $confirm->allowEdit = self::allow($user, $confirm, 'edit');
-        $confirm->allowDelete = self::allow($user, $confirm, 'delete');
         if ($confirm->confirm_date && $confirm->period) {
           $confirm->end_date = date('Y-m-d', strtotime('+' . $confirm->period . ' months', strtotime($confirm->confirm_date)));
         }
         if ($confirm->building_company) {
           $confirm->developer = $confirm->building_company;
+        }
+        if ($operate == 'view') {
+          User::formatData($confirm);
+          $confirm->allowEdit = self::allow($user, $confirm, 'edit');
+          $confirm->allowDelete = self::allow($user, $confirm, 'delete');
         }
         return $confirm;
       }

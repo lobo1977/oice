@@ -21,6 +21,12 @@
         <p class="group-padding">{{info.rem}}</p>
       </group>
 
+      <group v-if="info.manager" title="客户经理">
+        <cell :title="info.manager" :inline-desc="info.mobile">
+          <img slot="icon" :src="info.avatar" class="cell-image">
+        </cell>
+      </group>
+
       <div class="bottom-bar">
         <x-button type="primary" class="bottom-btn"
           :link="{name:'ConfirmEdit', params: { id: info.id, bid: 0, cid: 0 }}"
@@ -51,9 +57,6 @@ export default {
   },
   data () {
     return {
-      user: {
-        id: 0
-      },
       info: {
         id: '',
         building_id: 0, // 项目
@@ -66,9 +69,11 @@ export default {
         confirm_date: null, // 确认日期
         end_date: null, // 截止日期
         rem: '', // 备注
-        user_id: 0,
-        company_id: 0,
         company: '',
+        user_id: 0,
+        manager: '',
+        avatar: '',
+        mobile: '',
         allowEdit: false,
         allowDelete: false
       }
@@ -76,8 +81,6 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      vm.user = vm.$store.state.oice.user || vm.user
-
       if (to.params.id) {
         vm.id = parseInt(to.params.id)
         if (isNaN(vm.id)) {

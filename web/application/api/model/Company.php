@@ -174,34 +174,42 @@ class Company extends Base
   /**
    * 获取企业详细信息
    */
-  public static function detail($user, $id) {
-    $data = self::get($id);
+  public static function detail($user, $id, $operate = 'view') {
+    $data = self::where('id', $id)
+      ->field('id,title,full_name,logo,stamp,enable_stamp,area,address,rem,' .
+        'user_id,join_way,status')
+      ->find();
+
     if ($data == null) {
       self::exception('企业不存在。');
-    } else if (!self::allow($user, $data, 'view')) {
-      self::exception('您没有权限查看该企业。');
+    } else if (!self::allow($user, $data, $operate)) {
+      self::exception('您没有权限' . ($operate == 'view' ? '查看' : '修改') . '该企业。');
     }
-    $data->allowEdit = self::allow($user, $data, 'edit');
-    $data->allowInvite = self::allow($user, $data, 'invite');
-    $data->allowPass = self::allow($user, $data, 'passs');
-    $data->allowDelete = self::allow($user, $data, 'delete');
-    $data->isAddin = false;
-    if ($user) {
-      $joinStatus = self::getJoinStatus($user, $id);
-      if ($joinStatus) {
-        $data->isAddin = $joinStatus['status'];
-      }
-      if ($data->allowPass) {
-        $data->waitUser = self::Member($id);
-      }
-    }
+    
     if ($data->logo) {
       $data->logo = '/upload/company/images/200/' . $data->logo;
     }
     if ($data->stamp) {
       $data->stamp = '/upload/company/images/60/' . $data->stamp;
     }
-    self::setAddinCount($data);
+
+    if ($operate == 'view') {
+      $data->allowEdit = self::allow($user, $data, 'edit');
+      $data->allowInvite = self::allow($user, $data, 'invite');
+      $data->allowPass = self::allow($user, $data, 'passs');
+      $data->allowDelete = self::allow($user, $data, 'delete');
+      $data->isAddin = false;
+      if ($user) {
+        $joinStatus = self::getJoinStatus($user, $id);
+        if ($joinStatus) {
+          $data->isAddin = $joinStatus['status'];
+        }
+        if ($data->allowPass) {
+          $data->waitUser = self::Member($id);
+        }
+      }
+      self::setAddinCount($data);
+    }    
     return $data;
   }
 

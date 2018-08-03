@@ -19,6 +19,14 @@ class Confirm extends Base
   public function detail($id = 0) {
     if ($id) {
       $data = modelConfirm::detail($this->user, $id);
+      unset($data->period);
+      unset($data->file);
+      unset($data->building_company_id);
+      unset($data->building_company);
+      unset($data->enable_stamp);
+      unset($data->stamp);
+      unset($data->building_enable_stamp);
+      unset($data->building_stamp);
       return $this->succeed($data);
     } else {
       return;
@@ -32,9 +40,19 @@ class Confirm extends Base
     if ($this->request->isGet()) {
       $form_token = $this->formToken();
       $companyList = Company::my($this->user);
-      $data = modelConfirm::detail($this->user, $id, $bid, $cid);
+      $data = modelConfirm::detail($this->user, $id, $bid, $cid, 'edit');
       $data->__token__ = $form_token;
       $data->companyList = $companyList;
+      unset($data->file);
+      unset($data->building_company_id);
+      unset($data->building_company);
+      unset($data->enable_stamp);
+      unset($data->stamp);
+      unset($data->building_enable_stamp);
+      unset($data->building_stamp);
+      unset($data->manager);
+      unset($data->avatar);
+      unset($data->mobile);
       return $this->succeed($data);
     } else {
       $validate = Validate::make([

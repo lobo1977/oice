@@ -1,14 +1,14 @@
 <template>
   <div>
     <swiper :auto="true" :loop="true" height="260px"
-      :show-dots="images.length > 1" v-show="images.length > 0">
-      <swiper-item class="swiper-img" v-for="(item, index) in images" :key="index">
+      :show-dots="info.images.length > 1" v-show="info.images.length > 0">
+      <swiper-item class="swiper-img" v-for="(item, index) in info.images" :key="index">
         <img :src="item.src" @click="preview(index)">
       </swiper-item>
     </swiper>
 
     <div v-transfer-dom>
-      <previewer :list="images" ref="previewer" :options="previewOptions"></previewer>
+      <previewer :list="info.images" ref="previewer" :options="previewOptions"></previewer>
     </div>
 
     <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
@@ -19,19 +19,19 @@
       <cell title="出售价格" value-align="left" :value="info.sell_price + ' 元/平方米'" v-if="info.sell_price"></cell>
       <cell title="装修状况" value-align="left" :value="info.decoration" v-if="info.decoration"></cell>
       <cell title="状态" value-align="left" :value="info.statusText" v-if="info.statusText"></cell>
-      <cell title="到期日" value-align="left" :value="info.end_date" v-if="info.end_date"></cell>
+      <cell title="到期日" value-align="left" :value="info.end_date|formatDate" v-if="info.end_date"></cell>
     </group>
 
     <group title="备注" v-show="info.rem">
       <p class="group-padding">{{info.rem}}</p>
     </group>
 
-    <group>
+    <group v-if="info.linkman.length || info.allowEdit">
       <group-title slot="title">联系人
-        <router-link style="float:right;color:#333;" 
+        <router-link style="float:right;color:#333;" v-if="info.allowEdit"
           :to="{name: 'LinkmanEdit', params: {id: 0, type: 'unit', oid: info.id}}">+ 添加</router-link>
       </group-title>
-      <cell v-for="(item, index) in linkman" :key="index"
+      <cell v-for="(item, index) in info.linkman" :key="index"
         :title="item.title" :link="{name: 'Linkman', params: {id: item.id}}" 
         :inline-desc="item.desc"></cell>
     </group>
@@ -92,7 +92,9 @@ export default {
   },
   data () {
     return {
-      user: null,
+      user: {
+        id: 0
+      },
       info: {
         id: 0,
         title: '',
@@ -111,16 +113,15 @@ export default {
         statusText: '',
         end_date: '',      // 到日期
         rem: '',           // 备注
-        user_id: 0,
         isFavorite: false,
         allowNew: false,
         allowEdit: false,
-        allowDelete: false
+        allowDelete: false,
+        images: [],
+        linkman: []
       },
       previewOptions: {
       },
-      images: [],
-      linkman: [],
       showCustomerPicker: false,
       myCustomer: [],
       selectCustomer: [],
@@ -141,17 +142,8 @@ export default {
               }
             }
             vm.info.title = vm.info.building_name + vm.info.title
-            if (vm.info.end_date) {
-              vm.info.end_date = vm.info.end_date ? dateFormat(new Date(Date.parse(vm.info.end_date.replace(/-/g, '/'))), 'YYYY年M月D日') : ''
-            }
             if (res.data.isFavorite) {
               vm.info.isFavorite = true
-            }
-            if (res.data.images) {
-              vm.images = res.data.images
-            }
-            if (res.data.linkman) {
-              vm.linkman = res.data.linkman
             }
             if (res.data.customer) {
               let customer = []
@@ -178,9 +170,9 @@ export default {
                 vm.info.decoration
               let shareImage = null
 
-              if (vm.images.length) {
+              if (vm.info.images.length) {
                 shareImage = window.location.protocol + '//' +
-                  window.location.host + vm.images[0].src
+                  window.location.host + vm.info.images[0].src
               }
 
               vm.$wechatShare(null, shareLink, vm.info.title, shareDesc, shareImage)
@@ -203,7 +195,7 @@ export default {
       this.$refs.previewer.show(index)
     },
     favorite () {
-      if (!this.user) {
+      if (!this.user || this.user.id === 0) {
         this.$router.push({
           name: 'Login',
           query: { redirect: this.$route.fullPath }
@@ -251,7 +243,7 @@ export default {
       }
     },
     toCustomer (flag) {
-      if (!this.user) {
+      if (!this.user || this.user.id === 0) {
         this.$router.push({
           name: 'Login',
           query: { redirect: this.$route.fullPath }
@@ -314,7 +306,7 @@ export default {
         vm.$router.push({name: 'UnitEdit', params: {id: 0, bid: vm.info.building_id}})
       } else if (key === 'edit') {
         vm.$router.push({name: 'UnitEdit', params: {id: vm.info.id, bid: vm.info.building_id}})
-      } else if (key === 'delete' && vm.info.user_id === vm.user.id) {
+      } else if (key === 'delete') {
         vm.remove()
       }
     },
@@ -340,6 +332,15 @@ export default {
           })
         }
       })
+    }
+  },
+  filters: {
+    formatDate (value) {
+      if (value) {
+        return dateFormat(new Date(Date.parse(value.replace(/-/g, '/'))), 'YYYY年M月D日')
+      } else {
+        return ''
+      }
     }
   },
   computed: {
