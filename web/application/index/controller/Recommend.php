@@ -118,8 +118,10 @@ class Recommend extends Base
   }
 
   private function pdfA($pdf, $data) {
-    $pdf->AddPage();
-    $pdf->writeHTML($this->fetch('company'));
+    if ($data['company']->rem) {
+      $pdf->AddPage();
+      $pdf->writeHTML($this->fetch('company'));
+    }
     $pdf->AddPage();
     $pdf->writeHTML($this->fetch('area'));
     $pdf->AddPage();
@@ -136,8 +138,10 @@ class Recommend extends Base
   }
 
   private function pdfB($pdf, $data) {
-    $pdf->AddPage();
-    $pdf->writeHTML($this->fetch('company'));
+    if ($data['company']->rem) {
+      $pdf->AddPage();
+      $pdf->writeHTML($this->fetch('company'));
+    }
     $pdf->AddPage();
     $pdf->writeHTML($this->fetch('area'));
     $pdf->AddPage();
