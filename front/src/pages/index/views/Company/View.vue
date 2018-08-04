@@ -64,7 +64,8 @@
         :disabled="info.join_way == 2 && !info.isInvtie"
         @click.native="addin">
         <x-icon type="log-in" class="btn-icon"></x-icon>
-        <span v-if="info.join_way < 2 && !info.isInvtie">加入</span>
+        <span v-if="info.join_way == 0 && !info.isInvtie">立即加入</span>
+        <span v-if="info.join_way == 1 && !info.isInvtie">申请加入</span>
         <span v-if="info.join_way == 2 && !info.isInvtie">需通过邀请加入</span>
         <span v-if="info.isInvtie">接受邀请</span>
       </x-button>

@@ -78,8 +78,6 @@ export default {
               vm.info.avatarView = vm.info.avatar.replace('/60/', '/200/')
             }
 
-            vm.$emit('on-view-loaded', vm.info.title)
-
             if (vm.$isWechat()) {
               let shareLink = window.location.href
               let shareDesc = '商办云经纪人'
@@ -96,8 +94,6 @@ export default {
             })
           }
         })
-      } else {
-        vm.$emit('on-view-loaded', '用户信息')
       }
     })
   },

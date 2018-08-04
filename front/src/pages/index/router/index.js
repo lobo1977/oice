@@ -282,7 +282,7 @@ export default new Router({
       path: '/user/view/:id',
       name: 'UserView',
       meta: {
-        title: '',
+        title: '用户信息',
         showBack: true,
         hideBar: true,
         requiresAuth: true
