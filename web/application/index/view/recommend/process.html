@@ -1,35 +1,21 @@
-<div class="page">
-  {include file="../application/index/view/recommend/page_top.html" /}
-
-  <div class="main">
-    <div class="title">选址进度表</div>
-    <table border="0" cellpadding="0" cellspacing="0" class="process-table">
-      <thead>
-        <tr>
-          <th style="width:140px;background-color:#fff;">进度</th>
-          {for start="1" end="16"}
-            <th style="width:40px;background-color:#fff;">{$i}</th>
-          {/for}
-        </tr>
-      </thead>
-      <tbody>
-        {foreach $process as $key=>$vo}
-          <tr>
-              <td>{$vo.title}</td>
-              {for start="1" end="16"}
-                <td>
-                  {if in_array($i, $vo.step)}
-                    <img src="/static/img/color_bar.jpg" width="40" height="8" alt="">
-                  {else /}
-                    &nbsp;
-                  {/if}
-                </td>
-              {/for}
-          </tr>
-        {/foreach}
-      </tbody>
-    </table>
-  </div>
-
-  {include file="../application/index/view/recommend/page_foot.html" /}
-</div>
+<h3>选址进度表</h3>
+<table border="0" cellpadding="0" cellspacing="0" style="width:100%;text-align:center;">
+  <tr>
+    <th style="width:20%;height:30px;border-right:1px solid #000;">进度</th>
+    {for start="1" end="16"}
+      <th style="width:5.33%;border-right:1px solid #000;">{$i}</th>
+    {/for}
+  </tr>
+  {foreach $process as $key=>$vo}
+    <tr>
+      <td style="height:26px;border-right:1px solid #000;">{$vo.title}</td>
+      {for start="1" end="16"}
+        {if in_array($i, $vo.step)}
+          <td style="border-right:1px solid #000;"><img src="/static/img/color_bar.jpg" width="40" height="8" alt=""></td>
+        {else /}
+          <td style="border-right:1px solid #000;">&nbsp;</td>
+        {/if}
+      {/for}
+    </tr>
+  {/foreach}
+</table>

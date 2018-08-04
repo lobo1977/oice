@@ -1,498 +1,360 @@
-{foreach $data.list as $key=>$vo}
-    {if $key % 3 == 0}
-        <div class="page">
-            {include file="../application/index/view/recommend/page_top.html" /}
-            <div class="main">
-                <div class="title">物业对比表</div>
-                <table border="0" cellspacing="0" class="table-compare">
+<h3 style="text-align:center;">物业对比表</h3>
+<table border="1" cellspacing="0" cellpadding="2" style="width:100%;text-align:center;">
+    <tr>
+        <td style="background-color:#c0c0c0;width:10%">项目名称</td>
+        <td style="width:30%">{$vo.building_name}</td>
+        <td style="width:30%">{if $vo2 != null}{$vo2['building_name']}{/if}</td>
+        <td style="width:30%">{if $vo3 != null}{$vo3['building_name']}{/if}</td>
+    </tr>
+    <!--<tr>
+        <td style="background-color:#c0c0c0;">图片</td>
+        <td>
+            {if count($vo.images) > 0}
+                {foreach $vo.images as $imgKey1=>$img1}
+                    {if $imgKey1 < 3}
+                        <img src="{$img1.src}" border="1" class="building_image">
+                    {/if}
+                {/foreach}
+            {/if}
+        </td>
+        <td>
+            {if $vo2 != null}
+                {if count($vo2['images']) > 0}
+                    {foreach $vo2['images'] as $imgKey2=>$img2}
+                        {if $imgKey2 < 3}
+                            <img src="{$img2.src}" border="1" class="building_image">
+                        {/if}
+                    {/foreach}
+                {/if}
+            {/if}
+        </td>
+        <td>
+            {if $vo3 != null}
+                {if count($vo3['images']) > 0}
+                    {foreach $vo3['images'] as $imgKey3=>$img3}
+                        {if $imgKey3 < 3}
+                            <img src="{$img3.src}" border="1" class="building_image">
+                        {/if}
+                    {/foreach}
+                {/if}
+            {/if}
+        </td>
+    </tr>-->
+    <tr>
+        <td style="background-color:#c0c0c0;">城区</td>
+        <td>{$vo.area}</td>
+        <td>{if $vo2 != null}{$vo2['area']}{/if}</td>
+        <td>{if $vo3 != null}{$vo3['area']}{/if}</td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">地址</td>
+        <td>{$vo.address}</td>
+        <td>{if $vo2 != null}{$vo2['address']}{/if}</td>
+        <td>{if $vo3 != null}{$vo3['address']}{/if}</td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">楼层数</td>
+        <td>{$vo.building_floor}</td>
+        <td>{if $vo2 != null}{$vo2['building_floor']}{/if}</td>
+        <td>{if $vo3 != null}{$vo3['building_floor']}{/if}</td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">标准层面积</td>
+        <td>{if $vo.floor_area > 0}{$vo.floor_area} 平方米{/if}</td>
+        <td>{if $vo2 != null && $vo2['floor_area'] > 0}{$vo2['floor_area']} 平方米{/if}</td>
+        <td>{if $vo3 != null && $vo3['floor_area'] > 0}{$vo3['floor_area']} 平方米{/if}</td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">层高</td>
+        <td>{if $vo.floor_height > 0}{$vo.floor_height} 米{/if}</td>
+        <td>{if $vo2 != null && $vo2['floor_height'] > 0}{$vo2['floor_height']} 米{/if}</td>
+        <td>{if $vo3 != null && $vo3['floor_height'] > 0}{$vo3['floor_height']} 米{/if}</td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">楼板承重</td>
+        <td>{if $vo.bearing > 0}{$vo.bearing} 千克/平方米{/if}</td>
+        <td>{if $vo2 != null && $vo2['bearing'] > 0}{$vo2['bearing']} 千克/平方米{/if}</td>
+        <td>{if $vo3 != null && $vo3['bearing'] > 0}{$vo3['bearing']} 千克/平方米{/if}</td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">竣工日期</td>
+        <td>{$vo.completion_date|date='Y年m月d日'}</td>
+        <td>{if $vo2 != null}{$vo2['completion_date']|date='Y年m月d日'}{/if}</td>
+        <td>{if $vo3 != null}{$vo3['completion_date']|date='Y年m月d日'}{/if}</td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">开发商</td>
+        <td>{$vo.developer}</td>
+        <td>{if $vo2 != null}{$vo2['developer']}{/if}</td>
+        <td>{if $vo3 != null}{$vo3['developer']}{/if}</td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">物业管理</td>
+        <td>{$vo.manager}</td>
+        <td>{if $vo2 != null}{$vo2['manager']}{/if}</td>
+        <td>{if $vo3 != null}{$vo3['manager']}{/if}</td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">物业费</td>
+        <td>{$vo.fee}</td>
+        <td>{if $vo2 != null}{$vo2['fee']}{/if}</td>
+        <td>{if $vo3 != null}{$vo3['fee']}{/if}</td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">电费</td>
+        <td>{$vo.electricity_fee}</td>
+        <td>{if $vo2 != null}{$vo2['electricity_fee']}{/if}</td>
+        <td>{if $vo3 != null}{$vo3['electricity_fee']}{/if}</td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">停车位</td>
+        <td>{$vo.car_seat}</td>
+        <td>{if $vo2 != null}{$vo2['car_seat']}{/if}</td>
+        <td>{if $vo3 != null}{$vo3['car_seat']}{/if}</td>
+    </tr>
+    <!-- <tr>
+        <td style="background-color:#c0c0c0;">项目说明</td>
+        <td style="text-align:left;">{$vo.rem}</td>
+        <td style="text-align:left;">{if $vo2 != null}{$vo2['rem']}{/if}</td>
+        <td style="text-align:left;">{if $vo3 != null}{$vo3['rem']}{/if}</td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">交通状况</td>
+        <td style="text-align:left;">{$vo.traffic}</td>
+        <td style="text-align:left;">{if $vo2 != null}{$vo2['traffic']}{/if}</td>
+        <td style="text-align:left;">{if $vo3 != null}{$vo3['traffic']}{/if}</td>
+    </tr> -->
+    <tr>
+        <td style="background-color:#c0c0c0;">楼宇设备</td>
+        <td style="text-align:left;">{$vo.equipment}</td>
+        <td style="text-align:left;">{if $vo2 != null}{$vo2['equipment']}{/if}</td>
+        <td style="text-align:left;">{if $vo3 != null}{$vo3['equipment']}{/if}</td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">配套设施</td>
+        <td style="text-align:left;">{$vo.facility}</td>
+        <td style="text-align:left;">{if $vo2 != null}{$vo2['facility']}{/if}</td>
+        <td style="text-align:left;">{if $vo3 != null}{$vo3['facility']}{/if}</td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">楼层</td>
+        <td>
+            {assign name="percent" value="100" /}
+            {if count($vo.units) > 0}
+                {assign name="units1" value="$vo.units|count" /}
+                <table border="0" style="width:100%;">
                     <tr>
-                        <td class="thead" style="width:13%">项目名称</td>
-                        <td style="width:29%">{$vo.building_name}</td>
-                        {if count($data.list) > $key + 1}
-                            <td style="width:29%">{$data.list[$key + 1]['building_name']}</td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td style="width:29%">{$data.list[$key + 2]['building_name']}</td>
-                        {/if}
-                    </tr>
-                    <!--<tr>
-                        <td class="thead">图片</td>
-                        <td class="image">
-                            {if count($vo.images) > 0}
-                                {foreach $vo.images as $imgKey1=>$img1}
-                                    {if $imgKey1 < 3}
-                                        <img src="{$img1.src}" border="1" class="building_image">
-                                    {/if}
-                                {/foreach}
-                            {/if}
-                        </td>
-                        {if count($data.list) > $key + 1}
-                            <td class="image">
-                                {if count($data.list[$key + 1]['images']) > 0}
-                                    {foreach $data.list[$key + 1]['images'] as $imgKey2=>$img2}
-                                        {if $imgKey2 < 3}
-                                            <img src="{$img2.src}" border="1" class="building_image">
-                                        {/if}
-                                    {/foreach}
-                                {/if}
-                            </td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td>
-                                {if count($data.list[$key + 2]['images']) > 0}
-                                    {foreach $data.list[$key + 2]['images'] as $imgKey3=>$img3}
-                                        {if $imgKey3 < 3}
-                                            <img src="{$img3.src}" border="1" class="building_image">
-                                        {/if}
-                                    {/foreach}
-                                {/if}
-                            </td>
-                        {/if}
-                    </tr>-->
-                    <tr>
-                        <td class="thead">城区</td>
-                        <td>{$vo.area}</td>
-                        {if count($data.list) > $key + 1}
-                            <td>{$data.list[$key + 1]['area']}</td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td>{$data.list[$key + 2]['area']}</td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">地址</td>
-                        <td>{$vo.address}</td>
-                        {if count($data.list) > $key + 1}
-                            <td>{$data.list[$key + 1]['address']}</td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td>{$data.list[$key + 2]['address']}</td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">楼层数</td>
-                        <td>{$vo.building_floor}</td>
-                        {if count($data.list) > $key + 1}
-                            <td>{$data.list[$key + 1]['building_floor']}</td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td>{$data.list[$key + 2]['building_floor']}</td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">标准层面积</td>
-                        <td>
-                            {if $vo.floor_area > 0}
-                                {$vo.floor_area} 平方米
-                            {/if}
-                        </td>
-                        {if count($data.list) > $key + 1}
-                            <td>
-                                {if $data.list[$key + 1]['floor_area'] > 0}
-                                    {$data.list[$key + 1]['floor_area']} 平方米
-                                {/if}
-                            </td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td>
-                                {if $data.list[$key + 2]['floor_area'] > 0}
-                                    {$data.list[$key + 2]['floor_area']} 平方米
-                                {/if}
-                            </td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">层高</td>
-                        <td>
-                            {if $vo.floor_height > 0}
-                                {$vo.floor_height} 米
-                            {/if}
-                        </td>
-                        {if count($data.list) > $key + 1}
-                            <td>
-                                {if $data.list[$key + 1]['floor_height'] > 0}
-                                    {$data.list[$key + 1]['floor_height']} 米
-                                {/if}
-                            </td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td>
-                                {if $data.list[$key + 2]['floor_height'] > 0}
-                                    {$data.list[$key + 2]['floor_height']} 米
-                                {/if}
-                            </td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">楼板承重</td>
-                        <td>
-                            {if $vo.bearing > 0}
-                                {$vo.bearing} 千克/平方米
-                            {/if}
-                        </td>
-                        {if count($data.list) > $key + 1}
-                            <td>
-                                {if $data.list[$key + 1]['bearing'] > 0}
-                                    {$data.list[$key + 1]['bearing']} 千克/平方米
-                                {/if}
-                            </td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td>
-                                {if $data.list[$key + 2]['bearing'] > 0}
-                                    {$data.list[$key + 2]['bearing']} 千克/平方米
-                                {/if}
-                            </td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">竣工日期</td>
-                        <td>{$vo.completion_date|date='Y年m月d日'}</td>
-                        {if count($data.list) > $key + 1}
-                            <td>{$data.list[$key + 1]['completion_date']|date='Y年m月d日'}</td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td>{$data.list[$key + 2]['completion_date']|date='Y年m月d日'}</td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">开发商</td>
-                        <td>{$vo.developer}</td>
-                        {if count($data.list) > $key + 1}
-                            <td>{$data.list[$key + 1]['developer']}</td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td>{$data.list[$key + 2]['developer']}</td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">物业管理</td>
-                        <td>{$vo.manager}</td>
-                        {if count($data.list) > $key + 1}
-                            <td>{$data.list[$key + 1]['manager']}</td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td>{$data.list[$key + 2]['manager']}</td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">物业费</td>
-                        <td>{$vo.fee}</td>
-                        {if count($data.list) > $key + 1}
-                            <td>{$data.list[$key + 1]['fee']}</td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td>{$data.list[$key + 2]['fee']}</td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">电费</td>
-                        <td>{$vo.electricity_fee}</td>
-                        {if count($data.list) > $key + 1}
-                            <td>{$data.list[$key + 1]['electricity_fee']}</td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td>{$data.list[$key + 2]['electricity_fee']}</td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">停车位</td>
-                        <td>{$vo.car_seat}</td>
-                        {if count($data.list) > $key + 1}
-                            <td>{$data.list[$key + 1]['car_seat']}</td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td>{$data.list[$key + 2]['car_seat']}</td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">项目说明</td>
-                        <td class="left">{$vo.rem}</td>
-                        {if count($data.list) > $key + 1}
-                            <td class="left">{$data.list[$key + 1]['rem']}</td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td class="left">{$data.list[$key + 2]['rem']}</td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">交通状况</td>
-                        <td class="left">{$vo.traffic}</td>
-                        {if count($data.list) > $key + 1}
-                            <td class="left">{$data.list[$key + 1]['traffic']}</td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td class="left">{$data.list[$key + 2]['traffic']}</td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">楼宇设备</td>
-                        <td class="left">{$vo.equipment}</td>
-                        {if count($data.list) > $key + 1}
-                            <td class="left">{$data.list[$key + 1]['equipment']}</td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td class="left">{$data.list[$key + 2]['equipment']}</td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">配套设施</td>
-                        <td class="left">{$vo.facility}</td>
-                        {if count($data.list) > $key + 1}
-                            <td class="left">{$data.list[$key + 1]['facility']}</td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td class="left">{$data.list[$key + 2]['facility']}</td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">楼层</td>
-                        <td class="unit">
-                            {assign name="percent" value="100" /}
-                            {if count($vo.units) > 0}
-                                {assign name="units1" value="$vo.units|count" /}
-                                <table>
-                                    <tr>
-                                        {foreach $vo.units as $unitKey1=>$unit1}
-                                            <td style="width:{$percent/$units1}%">{$unit1.floor}</td>
-                                        {/foreach}
-                                    </tr>
-                                </table>
-                            {/if}
-                        </td>
-                        {if count($data.list) > $key + 1}
-                            <td class="unit">
-                                {if count($data.list[$key + 1]['units']) > 0}
-                                    {assign name="units2" value="$data.list[$key + 1]['units']|count" /}
-                                    <table>
-                                        <tr>
-                                            {foreach $data.list[$key + 1]['units'] as $unitKey2=>$unit2}
-                                                <td style="width:{$percent/$units2}%">{$unit2.floor}</td>
-                                            {/foreach}
-                                        </tr>
-                                    </table>
-                                {/if}
-                            </td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td class="unit">
-                                {if count($data.list[$key + 2]['units']) > 0}
-                                    {assign name="units3" value="$data.list[$key + 2]['units']|count" /}
-                                    <table>
-                                        <tr>
-                                            {foreach $data.list[$key + 2]['units'] as $unitKey3=>$unit3}
-                                                <td style="width:{$percent/$units3}%">{$unit3.floor}</td>
-                                            {/foreach}
-                                        </tr>
-                                    </table>
-                                {/if}
-                            </td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">房号</td>
-                        <td class="unit">
-                            {if count($vo.units) > 0}
-                                <table>
-                                    <tr>
-                                        {foreach $vo.units as $unitKey1=>$unit1}
-                                            <td style="width:{$percent/$units1}%">{$unit1.room}</td>
-                                        {/foreach}
-                                    </tr>
-                                </table>
-                            {/if}
-                        </td>
-                        {if count($data.list) > $key + 1}
-                            <td class="unit">
-                                {if count($data.list[$key + 1]['units']) > 0}
-                                    <table>
-                                        <tr>
-                                            {foreach $data.list[$key + 1]['units'] as $unitKey2=>$unit2}
-                                                <td style="width:{$percent/$units2}%">{$unit2.room}</td>
-                                            {/foreach}
-                                        </tr>
-                                    </table>
-                                {/if}
-                            </td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td class="unit">
-                                {if count($data.list[$key + 2]['units']) > 0}
-                                    <table>
-                                        <tr>
-                                            {foreach $data.list[$key + 2]['units'] as $unitKey3=>$unit3}
-                                                <td style="width:{$percent/$units3}%">{$unit3.room}</td>
-                                            {/foreach}
-                                        </tr>
-                                    </table>
-                                {/if}
-                            </td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">面积</td>
-                        <td class="unit">
-                            {if count($vo.units) > 0}
-                                <table>
-                                    <tr>
-                                        {foreach $vo.units as $unitKey1=>$unit1}
-                                            <td style="width:{$percent/$units1}%">{$unit1.acreage}</td>
-                                        {/foreach}
-                                    </tr>
-                                </table>
-                            {/if}
-                        </td>
-                        {if count($data.list) > $key + 1}
-                            <td class="unit">
-                                {if count($data.list[$key + 1]['units']) > 0}
-                                    <table>
-                                        <tr>
-                                            {foreach $data.list[$key + 1]['units'] as $unitKey2=>$unit2}
-                                                <td style="width:{$percent/$units2}%">{$unit2.acreage}</td>
-                                            {/foreach}
-                                        </tr>
-                                    </table>
-                                {/if}
-                            </td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td class="unit">
-                                {if count($data.list[$key + 2]['units']) > 0}
-                                    <table>
-                                        <tr>
-                                            {foreach $data.list[$key + 2]['units'] as $unitKey3=>$unit3}
-                                                <td style="width:{$percent/$units3}%">{$unit3.acreage}</td>
-                                            {/foreach}
-                                        </tr>
-                                    </table>
-                                {/if}
-                            </td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">租金</td>
-                        <td class="unit">
-                            {if count($vo.units) > 0}
-                                <table>
-                                    <tr>
-                                        {foreach $vo.units as $unitKey1=>$unit1}
-                                            <td style="width:{$percent/$units1}%">{$unit1.rent_price}</td>
-                                        {/foreach}
-                                    </tr>
-                                </table>
-                            {/if}
-                        </td>
-                        {if count($data.list) > $key + 1}
-                            <td class="unit">
-                                {if count($data.list[$key + 1]['units']) > 0}
-                                    <table>
-                                        <tr>
-                                            {foreach $data.list[$key + 1]['units'] as $unitKey2=>$unit2}
-                                                <td style="width:{$percent/$units2}%">{$unit2.rent_price}</td>
-                                            {/foreach}
-                                        </tr>
-                                    </table>
-                                {/if}
-                            </td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td class="unit">
-                                {if count($data.list[$key + 2]['units']) > 0}
-                                    <table>
-                                        <tr>
-                                            {foreach $data.list[$key + 2]['units'] as $unitKey3=>$unit3}
-                                                <td style="width:{$percent/$units3}%">{$unit3.rent_price}</td>
-                                            {/foreach}
-                                        </tr>
-                                    </table>
-                                {/if}
-                            </td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">朝向</td>
-                        <td class="unit">
-                            {if count($vo.units) > 0}
-                                <table>
-                                    <tr>
-                                        {foreach $vo.units as $unitKey1=>$unit1}
-                                            <td style="width:{$percent/$units1}%">{$unit1.face}</td>
-                                        {/foreach}
-                                    </tr>
-                                </table>
-                            {/if}
-                        </td>
-                        {if count($data.list) > $key + 1}
-                            <td class="unit">
-                                {if count($data.list[$key + 1]['units']) > 0}
-                                    <table>
-                                        <tr>
-                                            {foreach $data.list[$key + 1]['units'] as $unitKey2=>$unit2}
-                                                <td style="width:{$percent/$units2}%">{$unit2.face}</td>
-                                            {/foreach}
-                                        </tr>
-                                    </table>
-                                {/if}
-                            </td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td class="unit">
-                                {if count($data.list[$key + 2]['units']) > 0}
-                                    <table>
-                                        <tr>
-                                            {foreach $data.list[$key + 2]['units'] as $unitKey3=>$unit3}
-                                                <td style="width:{$percent/$units3}%">{$unit3.face}</td>
-                                            {/foreach}
-                                        </tr>
-                                    </table>
-                                {/if}
-                            </td>
-                        {/if}
-                    </tr>
-                    <tr>
-                        <td class="thead">交付状况</td>
-                        <td class="unit">
-                            {if count($vo.units) > 0}
-                                <table>
-                                    <tr>
-                                        {foreach $vo.units as $unitKey1=>$unit1}
-                                            <td style="width:{$percent/$units1}%">{$unit1.decoration}</td>
-                                        {/foreach}
-                                    </tr>
-                                </table>
-                            {/if}
-                        </td>
-                        {if count($data.list) > $key + 1}
-                            <td class="unit">
-                                {if count($data.list[$key + 1]['units']) > 0}
-                                    <table>
-                                        <tr>
-                                            {foreach $data.list[$key + 1]['units'] as $unitKey2=>$unit2}
-                                                <td style="width:{$percent/$units2}%">{$unit2.decoration}</td>
-                                            {/foreach}
-                                        </tr>
-                                    </table>
-                                {/if}
-                            </td>
-                        {/if}
-                        {if count($data.list) > $key + 2}
-                            <td class="unit">
-                                {if count($data.list[$key + 2]['units']) > 0}
-                                    <table>
-                                        <tr>
-                                            {foreach $data.list[$key + 2]['units'] as $unitKey3=>$unit3}
-                                                <td style="width:{$percent/$units3}%">{$unit3.decoration}</td>
-                                            {/foreach}
-                                        </tr>
-                                    </table>
-                                {/if}
-                            </td>
-                        {/if}
+                        {foreach $vo.units as $unitKey1=>$unit1}
+                            <td style="width:{$percent/$units1}%">{$unit1.floor}</td>
+                        {/foreach}
                     </tr>
                 </table>
-                <div style="padding:5px;">说明：上述资料及数据虽力求精确但仅供参考，一切以最终合同为准！</div>
-            </div>
-            {include file="../application/index/view/recommend/page_foot.html" /}
-        </div>
-    {/if}
-{/foreach}
+            {/if}
+        </td>
+        <td>
+            {if $vo2 != null && count($vo2['units']) > 0}
+                {assign name="units2" value="$vo2['units']|count" /}
+                <table border="0" style="width:100%;">
+                    <tr>
+                        {foreach $vo2['units'] as $unitKey2=>$unit2}
+                            <td style="width:{$percent/$units2}%">{$unit2.floor}</td>
+                        {/foreach}
+                    </tr>
+                </table>
+            {/if}
+        </td>
+        <td>
+            {if $vo3 != null && count($vo3['units']) > 0}
+                {assign name="units3" value="$vo3['units']|count" /}
+                <table border="0" style="width:100%;">
+                    <tr>
+                        {foreach $vo3['units'] as $unitKey3=>$unit3}
+                            <td style="width:{$percent/$units3}%">{$unit3.floor}</td>
+                        {/foreach}
+                    </tr>
+                </table>
+            {/if}
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">房号</td>
+        <td>
+            {if count($vo.units) > 0}
+                <table border="0" style="width:100%;">
+                    <tr>
+                        {foreach $vo.units as $unitKey1=>$unit1}
+                            <td style="width:{$percent/$units1}%">{$unit1.room}</td>
+                        {/foreach}
+                    </tr>
+                </table>
+            {/if}
+        </td>
+        <td>
+            {if $vo2 != null && count($vo2['units']) > 0}
+                <table border="0" style="width:100%;">
+                    <tr>
+                        {foreach $vo2['units'] as $unitKey2=>$unit2}
+                            <td style="width:{$percent/$units2}%">{$unit2.room}</td>
+                        {/foreach}
+                    </tr>
+                </table>
+            {/if}
+        </td>
+        <td>
+            {if $vo3 != null && count($vo3['units']) > 0}
+                <table border="0" style="width:100%;">
+                    <tr>
+                        {foreach $vo3['units'] as $unitKey3=>$unit3}
+                            <td style="width:{$percent/$units3}%">{$unit3.room}</td>
+                        {/foreach}
+                    </tr>
+                </table>
+            {/if}
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">面积</td>
+        <td>
+            {if count($vo.units) > 0}
+                <table border="0" style="width:100%;">
+                    <tr>
+                        {foreach $vo.units as $unitKey1=>$unit1}
+                            <td style="width:{$percent/$units1}%">{$unit1.acreage}</td>
+                        {/foreach}
+                    </tr>
+                </table>
+            {/if}
+        </td>
+        <td>
+            {if $vo2 != null && count($vo2['units']) > 0}
+                <table border="0" style="width:100%;">
+                    <tr>
+                        {foreach $vo2['units'] as $unitKey2=>$unit2}
+                            <td style="width:{$percent/$units2}%">{$unit2.acreage}</td>
+                        {/foreach}
+                    </tr>
+                </table>
+            {/if}
+        </td>
+        <td>
+            {if $vo3 != null && count($vo3['units']) > 0}
+                <table border="0" style="width:100%;">
+                    <tr>
+                        {foreach $vo3['units'] as $unitKey3=>$unit3}
+                            <td style="width:{$percent/$units3}%">{$unit3.acreage}</td>
+                        {/foreach}
+                    </tr>
+                </table>
+            {/if}
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">租金</td>
+        <td>
+            {if count($vo.units) > 0}
+                <table border="0" style="width:100%;">
+                    <tr>
+                        {foreach $vo.units as $unitKey1=>$unit1}
+                            <td style="width:{$percent/$units1}%">{$unit1.rent_price}</td>
+                        {/foreach}
+                    </tr>
+                </table>
+            {/if}
+        </td>
+        <td>
+            {if $vo2 != null && count($vo2['units']) > 0}
+                <table border="0" style="width:100%;">
+                    <tr>
+                        {foreach $vo2['units'] as $unitKey2=>$unit2}
+                            <td style="width:{$percent/$units2}%">{$unit2.rent_price}</td>
+                        {/foreach}
+                    </tr>
+                </table>
+            {/if}
+        </td>
+        <td>
+            {if $vo3 != null && count($vo3['units']) > 0}
+                <table border="0" style="width:100%;">
+                    <tr>
+                        {foreach $vo3['units'] as $unitKey3=>$unit3}
+                            <td style="width:{$percent/$units3}%">{$unit3.rent_price}</td>
+                        {/foreach}
+                    </tr>
+                </table>
+            {/if}
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">朝向</td>
+        <td>
+            {if count($vo.units) > 0}
+                <table border="0" style="width:100%;">
+                    <tr>
+                        {foreach $vo.units as $unitKey1=>$unit1}
+                            <td style="width:{$percent/$units1}%">{$unit1.face}</td>
+                        {/foreach}
+                    </tr>
+                </table>
+            {/if}
+        </td>
+        <td>
+            {if $vo2 != null && count($vo2['units']) > 0}
+                <table border="0" style="width:100%;">
+                    <tr>
+                        {foreach $vo2['units'] as $unitKey2=>$unit2}
+                            <td style="width:{$percent/$units2}%">{$unit2.face}</td>
+                        {/foreach}
+                    </tr>
+                </table>
+            {/if}
+        </td>
+        <td>
+            {if $vo3 != null && count($vo3['units']) > 0}
+                <table border="0" style="width:100%;">
+                    <tr>
+                        {foreach $vo3['units'] as $unitKey3=>$unit3}
+                            <td style="width:{$percent/$units3}%">{$unit3.face}</td>
+                        {/foreach}
+                    </tr>
+                </table>
+            {/if}
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color:#c0c0c0;">交付状况</td>
+        <td>
+            {if count($vo.units) > 0}
+                <table border="0" style="width:100%;">
+                    <tr>
+                        {foreach $vo.units as $unitKey1=>$unit1}
+                            <td style="width:{$percent/$units1}%">{$unit1.decoration}</td>
+                        {/foreach}
+                    </tr>
+                </table>
+            {/if}
+        </td>
+        <td>
+            {if $vo2 != null && count($vo2['units']) > 0}
+                <table border="0" style="width:100%;">
+                    <tr>
+                        {foreach $vo2['units'] as $unitKey2=>$unit2}
+                            <td style="width:{$percent/$units2}%">{$unit2.decoration}</td>
+                        {/foreach}
+                    </tr>
+                </table>
+            {/if}
+        </td>
+        <td>
+            {if $vo3 != null && count($vo3['units']) > 0}
+                <table border="0" style="width:100%;">
+                    <tr>
+                        {foreach $vo3['units'] as $unitKey3=>$unit3}
+                            <td style="width:{$percent/$units3}%">{$unit3.decoration}</td>
+                        {/foreach}
+                    </tr>
+                </table>
+            {/if}
+        </td>
+    </tr>
+</table>
+<p style="padding:5px;">说明：上述资料及数据虽力求精确但仅供参考，一切以最终合同为准！</p>

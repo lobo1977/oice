@@ -1,69 +1,47 @@
-{assign name="row" value="0" /}
-{foreach $data.list as $key=>$vo}
-    {if $row % 16 == 0 }
-        {if $row > 0 }
-            </tbody></table></div>
-            {include file="../application/index/view/recommend/page_foot.html" /}
-            </div>
-        {/if}
-        <div class="page">
-        {include file="../application/index/view/recommend/page_top.html" /}
-        <div class="main">
-        {if $row > 0 }
-            <div class="title">物业推荐一览表(续)</div>
-        {else /}
-        <div class="title">物业推荐一览表</div>
-        {/if}
-        <table border="0" cellpadding="0" cellspacing="0" class="unit_list">
-        <thead>
-        <tr><th style="width:40px;">序号</th>
-        <th style="width:260px;">物业名称</th>
-        <th style="width:210px;">地理位置</th>
-        <th style="width:100px;">单元</th>
-        <th style="width:60px;">面积㎡</th>
-        <th style="width:80px;">租金</th></tr>
-        </thead>
-        <tbody>
-    {/if}
+<h3 style="text-align:center">物业推荐一览表</h3>
+<table border="0" cellpadding="2" cellspacing="0" style="text-align:center;border-bottom:1px solid #000;">
     <tr>
-        {assign name="rowspan" value="$vo.units|count" /}
-        {if $rowspan > 0}
-            <td rowspan="{$rowspan}">{$key + 1}</td>
-            <td rowspan="{$rowspan}" style="font-weight:bold;text-align:left;">
-              {$vo.building_name}
-              {if $vo.eng != null && $vo.eng.name != ''}
-              <br  /><span style="font-size:9pt">{$vo.eng.name}</span>
-              {/if}
-            </td>
-            <td rowspan="{$rowspan}">{$vo.address}</td>
-            <td>{$vo.units[0]["unit"]}</td>
-            <td>{$vo.units[0]["acreage"]}</td>
-            <td>{$vo.units[0]["rent_price"]}</td>
-        {else /}
-            <td>{$key + 1}</td>
-            <td style="font-weight:bold;text-align:left;">{$vo.building_name}</td>
-            <td>{$vo.address}</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-        {/if}
-        {assign name="row" value="$row + 1" /}
+        <th style="width:6%;border-bottom:1px solid #000;">序号</th>
+        <th style="width:30%;border-bottom:1px solid #000;">物业名称</th>
+        <th style="width:25%;border-bottom:1px solid #000;">地理位置</th>
+        <th style="width:15%;border-bottom:1px solid #000;">单元</th>
+        <th style="width:10%;border-bottom:1px solid #000;">面积㎡</th>
+        <th style="width:14%;border-bottom:1px solid #000;">租金</th>
     </tr>
-    {if $rowspan > 1}
-        {foreach $vo.units as $uKey=>$unit}
-            {if $uKey > 0}
-                <tr>
-                    <td>{$unit.unit}</td>
-                    <td>{$unit.acreage}</td>
-                    <td>{$unit.rent_price}</td>
-                </tr>
-                {assign name="row" value="$row + 1" /}
+    {foreach $data.list as $key=>$vo}
+        {assign name="rowspan" value="$vo.units|count" /}
+        <tr>
+            {if $rowspan > 0}
+                <td rowspan="{$rowspan}">{$key + 1}</td>
+                <td rowspan="{$rowspan}" style="text-align:left;">{$vo.building_name}
+                    {if $vo.eng != null && $vo.eng.name != ''}
+                    <br/><span style="font-size:9pt">{$vo.eng.name}</span>
+                    {/if}
+                </td>
+                <td rowspan="{$rowspan}">{$vo.address}</td>
+                <td>{$vo.units[0]["unit"]}</td>
+                <td>{$vo.units[0]["acreage"]}</td>
+                <td>{$vo.units[0]["rent_price"]}</td>
+            {else /}
+                <td>{$key + 1}</td>
+                <td style="text-align:left;">{$vo.building_name}</td>
+                <td>{$vo.address}</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
             {/if}
-        {/foreach}
-    {/if}
-{/foreach}
-</tbody></table>
-<div style="padding-top:10px;">说明：租金为含物业费报价（元/天/平方米），上述资料及数据虽力求精确但仅供参考，一切以最终合同为准！</div>
-</div>
-{include file="../application/index/view/recommend/page_foot.html" /}
-</div>
+        </tr>
+        {if $rowspan > 1}
+            {foreach $vo.units as $uKey=>$unit}
+                {if $uKey > 0}
+                    <tr>
+                        <td>{$unit.unit}</td>
+                        <td>{$unit.acreage}</td>
+                        <td>{$unit.rent_price}</td>
+                    </tr>
+                {/if}
+            {/foreach}
+        {/if}
+    {/foreach}
+</table>
+<p>说明：租金为含物业费报价（元/天/平方米），上述资料及数据虽力求精确但仅供参考，一切以最终合同为准！</p>

@@ -1,82 +1,58 @@
-{foreach $data.list as $key=>$vo}
-    <div class="page">
-        {include file="../application/index/view/recommend/page_top.html" /}
-        <div class="main">
-            <div class="building_info" style="width:350px;float:left;">
-                {if count($vo.images) > 0}
-                    <div style="text-align:center">
-                        <img src="{$vo.images[0]['src']}" border="1" style="margin-top:40px;">
-                    </div>
+<table border="0" cellpadding="5" cellspacing="0" style="width:100%;">
+    <tr>
+        <td style="width:50%">
+            {if count($vo.images) > 0}
+                <img src="{$vo.images[0]['src']}" border="1">
+            {/if}
+            {if $vo.eng != null}
+                {if $vo.eng.name != ''}
+                    <h3>{$vo.eng.name}</h3>
                 {/if}
-                {if $vo.eng != null}
-                    {if $vo.eng.name != ''}
-                        <div class="building_title">{$vo.eng.name}</div>
-                    {/if}
-                    {if $vo.eng.location != ''}
-                        <strong>Location: </strong><span>{$vo.eng.location}</span><br />
-                    {/if}
-                    {if $vo.eng.situation != ''}
-                        <strong>Building situation: </strong><span>{$vo.eng.situation}</span><br />
-                    {/if}
-                    {if $vo.eng.developer != ''}
-                        <strong>Investors: </strong><span>{$vo.eng.developer}</span><br />
-                    {/if}
-                    {if $vo.eng.manager != ''}
-                        <strong>Management company: </strong><span>{$vo.eng.manager}</span><br />
-                    {/if}
-                    {if $vo.eng.network != ''}
-                        <strong>Communication: </strong><span>{$vo.eng.network}</span><br />
-                    {/if}
-                    {if $vo.eng.elevator != ''}
-                        <strong>Elevator: </strong><span>{$vo.eng.elevator}</span><br />
-                    {/if}
-                    {if $vo.eng.hvac != ''}
-                        <strong>HVAC system: </strong><span>{$vo.eng.hvac}</span><br />
-                    {/if}
-                    {if $vo.eng.amenities != ''}
-                        <strong>Amenities: </strong><span>{$vo.eng.amenities}</span><br />
-                    {/if}
-                    {if $vo.eng.tenants != ''}
-                        <strong>Existing tenants: </strong><span>{$vo.eng.tenants}</span>
-                    {/if}
+                <p style="line-height:28px;">{if $vo.eng.location != ''}<span>Location: &nbsp;</span><span>{$vo.eng.location}</span><br />
                 {/if}
-            </div>
-            <div class="building_info" style="width:380px;float:right;">
-                <div class="building_title" style="padding-top:40px;">{$vo.building_name}</div>
-                {if $vo.address != ''}
-                    <strong>地理位置：</strong><span>{$vo.address}</span><br />
+                {if $vo.eng.situation != ''}<span>Building situation: &nbsp;</span><span>{$vo.eng.situation}</span><br />
                 {/if}
-                {if $vo.completion_date != ''}
-                    <strong>竣工日期：</strong><span>{$vo.completion_date|date='Y年m月d日'}</span><br />
+                {if $vo.eng.developer != ''}<span>Investors: &nbsp;</span><span>{$vo.eng.developer}</span><br />
                 {/if}
-                {if $vo.developer != ''}
-                    <strong>开 发 商：</strong><span>{$vo.developer}</span><br />
+                {if $vo.eng.manager != ''}<span>Management company: &nbsp;</span><span>{$vo.eng.manager}</span><br />
                 {/if}
-                {if $vo.manager != ''}
-                    <strong>物业管理：</strong><span>{$vo.manager}</span><br />
+                {if $vo.eng.network != ''}<span>Communication: &nbsp;</span><span>{$vo.eng.network}</span><br />
                 {/if}
-                {if $vo.rem != ''}
-                    <strong>项目说明：</strong><span>{$vo.rem}</span><br />
+                {if $vo.eng.elevator != ''}<span>Elevator: &nbsp;</span><span>{$vo.eng.elevator}</span><br />
                 {/if}
-                {if $vo.traffic != ''}
-                    <strong>交通状况：</strong><span>{$vo.traffic}</span><br />
+                {if $vo.eng.hvac != ''}<span>HVAC system: &nbsp;</span><span>{$vo.eng.hvac}</span><br />
                 {/if}
-                {if $vo.equipment != ''}
-                    <strong>楼宇设备：</strong><span>{$vo.equipment}</span><br />
+                {if $vo.eng.amenities != ''}<span>Amenities: &nbsp;</span><span>{$vo.eng.amenities}</span><br />
                 {/if}
-                {if $vo.facility != ''}
-                    <strong>配套设施：</strong><span>{$vo.facility}</span><br />
+                {if $vo.eng.tenants != ''}<span>Existing tenants: &nbsp;</span><span>{$vo.eng.tenants}</span>
                 {/if}
-                {if $vo.environment != ''}
-                    <!-- <strong>周边环境：</strong><span>{$vo.environment}</span> -->
-                {/if}
-                {if count($vo.images) > 1}
-                    <div style="text-align:center">
-                        <img src="{$vo.images[1]['src']}" border="1" style="margin-top:20px;">
-                    </div>
-                {/if}
-            </div>
-        </div>
-        {include file="../application/index/view/recommend/page_foot.html" /}
-    </div>
-{/foreach}
+                </p>
+            {/if}
+        </td>
+        <td style="width:50%"><h3>{$vo.building_name}</h3>
+            <p style="line-height:26px;">{if $vo.address != ''}<span>地理位置：&nbsp;</span><span>{$vo.address}</span><br />
+            {/if}
+            {if $vo.completion_date != ''}<span>竣工日期：&nbsp;</span><span>{$vo.completion_date|date='Y年m月d日'}</span><br />
+            {/if}
+            {if $vo.developer != ''}<span>开 发 商：&nbsp;</span><span>{$vo.developer}</span><br />
+            {/if}
+            {if $vo.manager != ''}<span>物业管理：&nbsp;</span><span>{$vo.manager}</span><br />
+            {/if}
+            {if $vo.rem != ''}<span>项目说明：&nbsp;</span><span>{$vo.rem}</span><br />
+            {/if}
+            {if $vo.traffic != ''}<span>交通状况：&nbsp;</span><span>{$vo.traffic}</span><br />
+            {/if}
+            {if $vo.equipment != ''}<span>楼宇设备：&nbsp;</span><span>{$vo.equipment}</span><br />
+            {/if}
+            {if $vo.facility != ''}<span>配套设施：&nbsp;</span><span>{$vo.facility}</span><br />
+            {/if}
+            {if $vo.environment != ''}
+                <!-- <span>周边环境：</span><span>{$vo.environment}</span> -->
+            {/if}
+            </p>
+            {if count($vo.images) > 1}
+                <img src="{$vo.images[1]['src']}" border="1">
+            {/if}
+        </td>
+    </tr>
+</table>

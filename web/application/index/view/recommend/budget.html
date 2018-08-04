@@ -1,47 +1,38 @@
-<div class="page">
-  {include file="../application/index/view/recommend/page_top.html" /}
-  <div class="main">
-      <div class="title">财务预算</div>
-      <div>
-          公司名称：{$data.customer.customer_name}<br />
-          项目名称：<br />
-          分析时间：从　　　　年　　月　　日签约至　　　　年　　月　　日交第一期租金止<br />
-          报表形式：（一）资金流量总览<br />
-          　　　　　（二）支出分类总览<br />
-          租赁面积：　　　　平方米<br />
-          成交价格：USD　　　　建筑面积/月/平方米（包含USD　　　　管理费/月/平方米）<br />		
-          免 租 期：<br />
-      </div>
-      <div style="padding-top:20px;padding-bottom:10px;">（一）资金流量总览</div>
-      <table border="1" cellpadding="0" cellspacing="1">
-        <thead>
-          <tr>
-              <th style="width:120px;">&nbsp</th>
-              <th style="width:120px;">&nbsp</th>
-              <th style="width:120px;">&nbsp</th>
-              <th style="width:120px;">&nbsp</th>
-              <th style="width:120px;">&nbsp</th>
-              <th style="width:120px;">&nbsp</th>
-          </tr>
-        </thead>
-        <tbody>
-          {for start="0" end="13" name="r"}
-              <tr>
-                  {for start="0" end="6" name="c"}
-                      <td>&nbsp;</td>
-                  {/for}
-              </tr>
-          {/for}
-        </tbody>
-      </table>
-      <div style="padding-left:52px;padding-top:20px;text-align:left;">
-          <span style="font-weight:bold;">说明：</span><br />
-          1. 以上数目单位以人民币计算。<br />
-          2. 该大厦的第一个月租金含管理费从入住第一天交付，不是免租期后交付。<br />
-          3. 除了租线费以外，电话费按实际每月话费量由电话局收取。<br />	
-          4. 以上时间及计费按一般正常情况计算，若延误付款发展商有可能收取滞纳金。<br />
-          5. 优惠条件只是假设，实际条件有待双方谈判后才定。<br />
-      </div>
-  </div>
-  {include file="../application/index/view/recommend/page_foot.html" /}
-</div>
+<h3>财务预算</h3>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 公司名称：{$data.customer.customer_name}
+    <br/>&nbsp; &nbsp; &nbsp; &nbsp; 项目名称：
+    <br/>&nbsp; &nbsp; &nbsp; &nbsp; 分析时间：从 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 年 &nbsp; &nbsp; &nbsp; &nbsp;月 &nbsp; &nbsp; &nbsp; &nbsp;日签约至 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 年 &nbsp; &nbsp; &nbsp; &nbsp;月 &nbsp; &nbsp; &nbsp; &nbsp;日交第一期租金止
+    <br/>&nbsp; &nbsp; &nbsp; &nbsp; 报表形式：（一）资金流量总览、（二）支出分类总览
+    <br/>&nbsp; &nbsp; &nbsp; &nbsp; 租赁面积：&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 平方米
+    <br/>&nbsp; &nbsp; &nbsp; &nbsp; 成交价格：&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 建筑面积/月/平方米（包含 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 管理费/月/平方米）
+    <br/>&nbsp; &nbsp; &nbsp; &nbsp; 免 &nbsp;租 &nbsp;期：
+</p>
+<h4>（一）资金流量总览</h4>
+<table border="1" cellpadding="2" cellspacing="0" width="100%">
+<thead>
+    <tr style="background-color:#c0c0c0;">
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+    </tr>
+</thead>
+<tbody>
+    {for start="0" end="13" name="r"}
+        <tr>
+            {for start="0" end="6" name="c"}
+                <td>&nbsp;</td>
+            {/for}
+        </tr>
+    {/for}
+</tbody>
+</table>
+<p>说明：<br />
+    1. 以上数目单位以人民币计算。<br />
+    2. 该大厦的第一个月租金含管理费从入住第一天交付，不是免租期后交付。<br />
+    3. 除了租线费以外，电话费按实际每月话费量由电话局收取。<br />	
+    4. 以上时间及计费按一般正常情况计算，若延误付款发展商有可能收取滞纳金。<br />
+    5. 优惠条件只是假设，实际条件有待双方谈判后才定。<br />
+</p>
