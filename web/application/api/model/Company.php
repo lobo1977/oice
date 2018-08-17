@@ -672,6 +672,48 @@ class Company extends Base
   }
 
   /**
+   * 设置上级
+   */
+  private static function setSuperior($user, $user_id) {
+    $company = self::get($comopany_id);
+    if ($company == null) {
+      self::exception('企业不存在。');
+    } else if ($user == null) {
+      self::exception('用户无效。');
+    }
+
+    $superior = User::get($user_id);
+    if ($superior == null) {
+      self::exception('用户不存在。');
+    }
+
+    $joinStatus = self::getJoinStatus($user, $user->company_id);
+    if ($joinStatus != null) {
+      if ($joinStatus['superior_id'] == $user_id) {
+        return true;
+      } else {
+        $result = db('user_company')
+          ->where('user_id', $user->id)
+          ->where('company_id', $user->company_id)
+          ->update(['superior_id' => $user_id]);
+        
+        if ($result) {
+          $log = [
+            "table" => 'user',
+            "owner_id" => $user->id,
+            "title" => '设置上级',
+            "summary" => $superior->title
+          ];
+          Log::add($user, $log);
+        }
+        return $result;
+      }
+    } else {
+      self::exception('您还没有加入企业，不能设置上级。');
+    }
+  }
+
+  /**
    * 上传Logo
    */
   private static function uploadLogo($logo) {

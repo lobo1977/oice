@@ -178,4 +178,16 @@ class Company extends Base
       return $this->fail();
     }
   }
+
+  /**
+   * 设置上级
+   */
+  public function setSuperior($user_id) {
+    $result = modelCompany::setSuperior($this->user, $user_id);
+    if ($result) {
+      return $this->succeed();
+    } else {
+      return $this->fail();
+    }
+  }
 }

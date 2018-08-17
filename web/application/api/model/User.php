@@ -65,7 +65,7 @@ class User extends Base
       ->where('a.id', $id)
       ->where('a.status', 0)
       ->field('a.id,a.title,a.avatar,a.mobile,a.email,a.qq,a.weixin,' . 
-        'b.company_id,c.title as company,c.user_id as company_admin')
+        'b.company_id,b.superior_id,c.title as company,c.user_id as company_admin')
       ->find();
     
     if ($data) {
