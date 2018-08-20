@@ -21,6 +21,12 @@
       <cell title="QQ" value-align="left" :value="info.qq" v-if="info.qq"></cell>
     </group>
 
+    <div class="bottom-bar">
+      <x-button v-if="info.canSetSuperior" type="primary" class="bottom-btn" @click.native="setSuperior">
+        <x-icon type="android-contact" class="btn-icon"></x-icon> 指定为我的上级
+      </x-button>
+    </div>
+
     <flexbox :gutter="0" class="bottom-bar">
       <flexbox-item :span="6">
       </flexbox-item>
@@ -32,7 +38,7 @@
 
 <script>
 import { Group, Cell, Flexbox, FlexboxItem, XButton, TransferDom, XDialog } from 'vux'
-import { mapState } from 'vuex'
+import { mapActions } from 'vuex'
 
 export default {
   directives: {
@@ -57,7 +63,9 @@ export default {
         email: '',       // 电子邮箱
         weixin: '',      // 微信
         qq: '',          // QQ
-        company: ''
+        company: '',
+        isSuperior: false,
+        canSetSuperior: false
       },
       showAvatar: false
     }
@@ -98,16 +106,42 @@ export default {
     })
   },
   methods: {
+    ...mapActions([
+      'setUser'
+    ]),
     previewAvatar () {
       if (this.info.avatarView) {
         this.showAvatar = true
       }
+    },
+    setSuperior () {
+      let vm = this
+      vm.$vux.loading.show()
+      vm.$post('/api/company/setSuperior', {
+        user_id: vm.info.id
+      }, (res) => {
+        vm.$vux.loading.hide()
+        if (res.success) {
+          if (res.data) {
+            vm.setUser(res.data)
+            vm.info.isSuperior = true
+            vm.info.canSetSuperior = false
+            vm.$vux.alert.show({
+              title: '提示',
+              content: '您已将 <strong> ' + vm.info.title + '</strong> 指定为上级，您的客户资料将对其可见。'
+            })
+          }
+        } else {
+          this.info.__token__ = res.data
+          this.$vux.toast.show({
+            text: res.message,
+            width: '15em'
+          })
+        }
+      })
     }
   },
   computed: {
-    ...mapState({
-      user: state => state.oice.user
-    })
   }
 }
 </script>

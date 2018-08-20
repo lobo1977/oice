@@ -222,7 +222,7 @@ class Building extends Base
       $data->allowDelete = self::allow($user, $data, 'delete');
       
       if ($user) {
-        $data->linkman = Linkman::getByOwnerId($user, 'building', $id);
+        $data->linkman = Linkman::getByOwnerId($user, 'building', $id, true);
         $data->unit = Unit::getByBuildingId($user, $id);
         $data->confirm = Confirm::query($user, 0, $id);
         if (db('favorite')->where('user_id', $user->id)

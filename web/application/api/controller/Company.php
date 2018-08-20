@@ -185,7 +185,7 @@ class Company extends Base
   public function setSuperior($user_id) {
     $result = modelCompany::setSuperior($this->user, $user_id);
     if ($result) {
-      return $this->succeed();
+      return $this->succeed($this->getUser(true));
     } else {
       return $this->fail();
     }

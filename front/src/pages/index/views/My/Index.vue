@@ -3,7 +3,7 @@
     <masker color="255,255,255" :opacity="1" style="margin:10px;height:140px;border-radius:2px;">
       <div slot="content" class="user-info" @click="eidt">
         <div style="height:60px;">
-          <h4>{{user.company}}</h4>
+          <h4 @click.stop="goCompany">{{user.company}}</h4>
         </div>
         <img v-if="user.avatar && user.avatar.length > 0" :src="user.avatar" />
         <h2>{{user.title}}</h2>
@@ -11,16 +11,21 @@
       </div>
     </masker>
     <group gutter="0">
-      <cell title="我的企业" :link="{name:'Company'}" :is-link="true" :value="user.company">
-        <x-icon slot="icon" type="android-people" class="cell-icon"></x-icon>
-      </cell>
-      <cell title="我的收藏" :link="{name:'Favorite'}" :is-link="true">
+      <cell title="我的收藏" :link="{name:'Favorite'}">
         <x-icon slot="icon" type="android-star" class="cell-icon"></x-icon>
       </cell>
-      <cell title="修改密码" :link="{name:'Password'}" :is-link="true">
+      <cell v-if="user.superior_id > 0" title="我的上级" 
+        :link="{name:'UserView', params: {id: user.superior_id}}"
+        :value="user.superior">
+        <x-icon slot="icon" type="android-contact" class="cell-icon"></x-icon>
+      </cell>
+      <cell title="切换企业" :link="{name:'Company'}" :value="user.company">
+        <x-icon slot="icon" type="android-people" class="cell-icon"></x-icon>
+      </cell>
+      <cell title="修改密码" :link="{name:'Password'}">
         <x-icon slot="icon" type="android-lock" class="cell-icon"></x-icon>
       </cell>
-      <cell title="退出登录" :link="{name:'Logout'}" :is-link="true">
+      <cell title="退出登录" :link="{name:'Logout'}">
         <x-icon slot="icon" type="android-exit" class="cell-icon"></x-icon>
       </cell>
     </group>
@@ -47,7 +52,9 @@ export default {
         company: '',
         logo: '',
         mobile: '',
-        email: ''
+        email: '',
+        superior_id: 0,
+        superior: ''
       }
     }
   },
@@ -57,6 +64,9 @@ export default {
     })
   },
   methods: {
+    goCompany () {
+      this.$router.push({name: 'CompanyView', params: {id: this.user.company_id}})
+    },
     eidt () {
       this.$router.push({name: 'Info'})
     }

@@ -672,10 +672,26 @@ class Company extends Base
   }
 
   /**
+   * 获取用户上级
+   */
+  public static function getSuperior($company_id, $user_id) {
+    $joinStatus = db('user_company')
+      ->where('company_id', $company_id)
+      ->where('user_id', $user_id)
+      ->find();
+
+    if ($joinStatus) {
+      return $joinStatus['superior_id'];
+    } else {
+      return 0;
+    }
+  }
+
+  /**
    * 设置上级
    */
-  private static function setSuperior($user, $user_id) {
-    $company = self::get($comopany_id);
+  public static function setSuperior($user, $user_id) {
+    $company = self::get($user->company_id);
     if ($company == null) {
       self::exception('企业不存在。');
     } else if ($user == null) {

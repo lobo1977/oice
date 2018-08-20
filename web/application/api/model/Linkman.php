@@ -35,8 +35,8 @@ class Linkman extends Base
   /**
    * 通过所有者ID获取联系人列表
    */
-  public static function getByOwnerId($user, $type, $id) {
-    if (!self::allow($user, $type, $id, 'view')) {
+  public static function getByOwnerId($user, $type, $id, $allow = false) {
+    if (!$allow && !self::allow($user, $type, $id, 'view')) {
       self::exception('您没有权限查看联系人。');
     }
     

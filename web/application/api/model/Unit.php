@@ -126,7 +126,7 @@ class Unit extends Base
 
       if ($operate == 'view') {
         $building = Building::get($unit->building_id);
-        $unit->linkman = Linkman::getByOwnerId($user, 'unit', $id);
+        $unit->linkman = Linkman::getByOwnerId($user, 'unit', $id, true);
         $unit->allowNew = self::allow($user, $unit, 'new', $building);
         $unit->allowEdit = self::allow($user, $unit, 'edit', $building);
         $unit->allowDelete = self::allow($user, $unit, 'delete', $building);

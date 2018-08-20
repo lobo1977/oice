@@ -9,6 +9,7 @@ use app\api\model\Filter;
 use app\api\model\User;
 use app\api\model\Recommend;
 use app\api\model\Confirm;
+use app\api\model\Company;
 
 class Customer extends Base
 {
@@ -29,9 +30,13 @@ class Customer extends Base
     } else if ($customer == null && $operate != 'new') {
       return false;
     }
+
+    $superior_id = Company::getSuperior($customer->company_id, $customer->user_id);
+
     if ($operate == 'view') {
       return $customer->user_id == $user->id || 
-        ($customer->share && $customer->company_id == $user->company_id);
+        ($customer->share && $customer->company_id == $user->company_id) || 
+        ($customer->company_id == $user->company_id && $user->id == $superior_id);
     } else if ($operate == 'new') {
       return true;
     } else if ($operate == 'edit') {
@@ -76,31 +81,35 @@ class Customer extends Base
       $company_id = $user->company_id;
     }
     
-    $list = self::where('city', self::$city)
-      ->where('user_id = ' . $user_id . ' OR ' .
-        '(share = 1 AND company_id > 0 AND company_id = ' . $company_id . ')');
+    $list = self::alias('a')
+      ->leftJoin('user_company b', 'a.user_id = b.user_id and a.company_id = b.company_id and b.status = 1')
+      ->where('a.city', self::$city)
+      ->where('a.user_id = ' . $user_id .
+        ' OR (a.share = 1 AND a.company_id > 0 AND a.company_id = ' . $company_id . ')' .
+        ' OR (a.company_id > 0 AND a.company_id = ' . $company_id . ' AND b.superior_id = ' . $user_id . ')');
 
     if (isset($filter['keyword']) && $filter['keyword'] != '') {
-      $list->where('customer_name', 'like', '%' . $filter['keyword'] . '%');
+      $list->where('a.customer_name', 'like', '%' . $filter['keyword'] . '%');
     }
 
     if (isset($filter['status']) && $filter['status'] != '') {
-      $list->where('status', 'in', $filter['status']);
+      $list->where('a.status', 'in', $filter['status']);
     }
 
     if (isset($filter['clash'])) {
       if ($filter['clash']) {
-        $list->where('clash', '>', 0);
+        $list->where('a.clash', '>', 0);
       } else {
-        $list->where('clash', ['exp', 'IS NULL'], ['=', 0], 'or');
+        $list->where('a.clash', ['exp', 'IS NULL'], ['=', 0], 'or');
       }
     }
 
-    $result = $list->field('id,customer_name,area,address,demand,lease_buy,min_acreage,max_acreage,budget,status,clash')
+    $result = $list->field('a.id,a.customer_name,a.area,a.address,a.demand,' .
+      'a.lease_buy,a.min_acreage,a.max_acreage,a.budget,a.status,a.clash')
       ->page($filter['page'], $filter['page_size'])
-      ->order('clash', 'desc')
-      ->order('update_time', 'desc')
-      ->order('id', 'desc')
+      ->order('a.clash', 'desc')
+      ->order('a.update_time', 'desc')
+      ->order('a.id', 'desc')
       ->select();
 
     return $result;
@@ -143,7 +152,7 @@ class Customer extends Base
       $data->allowConfirm = self::allow($user, $data, 'confirm');
       $data->allowClash = self::allow($user, $data, 'clash');
       $data->allowDelete = self::allow($user, $data, 'delete');
-      $data->linkman = Linkman::getByOwnerId($user, 'customer', $id);
+      $data->linkman = Linkman::getByOwnerId($user, 'customer', $id, true);
       $data->log = Log::getList($user, 'customer', $id);
       $data->filter = Filter::query($user, $id);
       $data->recommend = Recommend::query($user, $id);

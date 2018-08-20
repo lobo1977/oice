@@ -62,10 +62,12 @@ class User extends Base
     $data = self::alias('a')
       ->leftJoin('user_company b', 'a.id = b.user_id and b.active = 1 and b.status = 1')
       ->leftJoin('company c', 'b.company_id = c.id')
+      ->leftJoin('user u', 'b.superior_id = u.id')
       ->where('a.id', $id)
       ->where('a.status', 0)
       ->field('a.id,a.title,a.avatar,a.mobile,a.email,a.qq,a.weixin,' . 
-        'b.company_id,b.superior_id,c.title as company,c.user_id as company_admin')
+        'b.company_id,b.superior_id,u.title as superior,' .
+        'c.title as company,c.user_id as company_admin')
       ->find();
     
     if ($data) {
