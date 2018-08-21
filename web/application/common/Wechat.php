@@ -33,6 +33,17 @@ class Wechat {
 	public function getMessage() {
 		return $this->errmsg;
 	}
+
+	private function parseError($res, $function) {
+		if (isset($res['errcode'])) {
+			$this->errcode = $res['errcode'];
+		}
+		if (isset($res['errmsg'])) {
+			$this->errmsg = $res['errmsg'];
+			Log::error('[ Wechat ' . $function . ' ] ' .
+				$this->errmsg . '(' . $this->errcode . ')');
+		}
+	}
 	
 	/**
 	 * 获取微信 access_token
@@ -51,13 +62,7 @@ class Wechat {
 				$token = $res['access_token'];
 				cache('wx_token', $token, 5400);	//token 有效期为两小时，缓存设定为1小时30分钟
 			} else {
-				if (isset($res['errcode'])) {
-					$this->errcode = $res['errcode'];
-				}
-				if (isset($res['errmsg'])) {
-					$this->errmsg = $res['errmsg'];
-					Log::error('[ Wechat getAccessToken ] ' . $res['errmsg']);
-				}
+				$this->parseError($res, 'getAccessToken');
 			}
 		}
 		return $token;
@@ -82,13 +87,7 @@ class Wechat {
 					$ticket = $res['ticket'];
 					cache('wx_ticket', $ticket, 5400);
 				} else {
-					if (isset($res['errcode'])) {
-						$this->errcode = $res['errcode'];
-					}
-					if (isset($res['errmsg'])) {
-						$this->errmsg = $res['errmsg'];
-						Log::error('[ Wechat getJssdkTicket ] ' . $res['errmsg']);
-					}
+					$this->parseError($res, 'getJssdkTicket');
 				}
 			}
 		}
@@ -126,8 +125,7 @@ class Wechat {
 			if ($this->errcode == 0) {
 				return true;
 			} else {
-				Log::error('[ Wechat menuCreate ] ' . $res['errmsg']);
-				$this->errmsg = $res['errmsg'];
+				$this->parseError($res, 'menuCreate');
 				return false;
 			}
 		} else {
@@ -155,13 +153,7 @@ class Wechat {
 					return null;
 				}
 			} else {
-				if (isset($res['errcode'])) {
-					$this->errcode = $res['errcode'];
-				}
-				if (isset($res['errmsg'])) {
-					$this->errmsg = $res['errmsg'];
-					Log::error('[ Wechat getUserInfo ] ' . $res['errmsg']);
-				}
+				$this->parseError($res, 'getUserInfo');
 				return null;
 			}
 		} else {
@@ -188,10 +180,7 @@ class Wechat {
 		if ($this->errcode == 0) {
 			return $res['short_url'];
 		} else {
-			if (isset($res['errmsg'])) {
-				$this->errmsg = $res['errmsg'];
-				Log::error('[ Wechat getShortUrl ] ' . $res['errmsg']);
-			}
+			$this->parseError($res, 'getShortUrl');
 			return $longUrl;
 		}
 	}
@@ -223,7 +212,12 @@ class Wechat {
 		$jsondata = urldecode(json_encode($msg));
 		$res = $this->https_request($url, $jsondata);
 		$res = json_decode(htmlspecialchars_decode($res), true);
-		return $res;
+		if ($this->errcode == 0) {
+			return true;
+		} else {
+			$this->parseError($res, 'sendMsg');
+			return false;
+		}
 	}
 	
 	/**
@@ -782,11 +776,6 @@ class Wechat {
 		Log::info('[ Wechat ] ' . $log_content);
 	}
 
-	private function trace_http() {
-		$this->logger("REMOTE_ADDR:".$_SERVER["REMOTE_ADDR"].(strstr($_SERVER["REMOTE_ADDR"],'101.226')? " FROM WeiXin": " Unknown IP"));
-		$this->logger("QUERY_STRING:".$_SERVER["QUERY_STRING"]);
-	}
-
 	/**
 	 * 构造HTTP请求
 	 */
@@ -824,14 +813,8 @@ class Wechat {
 		if (isset($res['access_token'])) {
 			return $res;
 		} else {
-			if (isset($res['errcode'])) {
-				$this->errcode = $res['errcode'];
-			}
-			if (isset($res['errmsg'])) {
-				$this->errmsg = $res['errmsg'];
-				Log::error('[ Wechat getUserToken ] ' . $res['errmsg']);
-			}
-			return false;
+			$this->parseError($res, 'getUserToken');
+			return null;
 		}
 	}
 }
