@@ -2,16 +2,23 @@
 namespace app\api\model;
 
 use think\model\concern\SoftDelete;
+use app\common\Wechat;
 use app\api\model\Base;
 use app\api\model\Log;
 use app\api\model\Verify;
+use app\api\model\Oauth;
 
 class User extends Base
 {
   use SoftDelete;
+  protected $wechat;
   protected $pk = 'id';
   protected $deleteTime = 'delete_time';
   public static $status = ['正常','冻结'];
+
+  protected function initialize() {
+    $this->wechat = new Wechat();
+  }
 
   /**
    * 格式化用户信息
@@ -339,6 +346,35 @@ class User extends Base
 
     return $user;
   }
+
+  /**
+   * 向用户发送消息
+   */
+	public function pushMessage($user_id, $message, $url) {
+    $user = self::get($user_id);
+
+    if ($user == null) {
+      self::exception('用户不存在。');
+    }
+
+    // 推送微信消息
+    $Oauth = Oauth::getInfo($user_id, 'wechat');
+    if ($Oauth == null) {
+      return false;
+    }
+
+    $openid = $Oauth->openid;
+		$weixinMsg = urlencode($message);
+		
+		if ($url) {
+			if (!strpos($url, "w.url.cn")) {
+				$url = $this->weixin->getShortUrl($url);
+			}
+			$weixinMsg = $weixinMsg . $url;
+		}
+
+    return $this->weixin->sendTextMsg($openId, $weixinMsg);
+	}
 
   /**
    * 生成密码

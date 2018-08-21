@@ -91,4 +91,12 @@ class Oauth extends Base
     }
     return false;
   }
+
+  /**
+   * 根据用户ID 平台类型获取信息
+   */
+  public static function getInfo($user_id, $platform) {
+    return self::where('user_id', $user_id)
+      ->where('platform', $platform)->find();
+  }
 }

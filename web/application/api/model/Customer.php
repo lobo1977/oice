@@ -41,13 +41,16 @@ class Customer extends Base
       return true;
     } else if ($operate == 'edit') {
       return $customer->user_id == $user->id &&
-        $customer->company_id == $user->company_id;
+        $customer->company_id == $user->company_id && 
+        (!$customer->clash || $oldData->parallel);
     } else if ($operate == 'follow') {    // 跟进
       return $customer->user_id == $user->id &&
-        $customer->company_id == $user->company_id && !$customer->clash;
+        $customer->company_id == $user->company_id && 
+        (!$customer->clash || $oldData->parallel);
     } else if ($operate == 'confirm') {   // 确认
       return $customer->user_id == $user->id &&
-        $customer->company_id == $user->company_id && !$customer->clash;
+        $customer->company_id == $user->company_id && 
+        (!$customer->clash || $oldData->parallel);
     } else if ($operate == 'clash') {     // 撞单处理
       return $user->isAdmin && $customer->clash &&
         $customer->company_id == $user->company_id;
@@ -209,12 +212,6 @@ class Customer extends Base
       $company_id = $user->company_id;
     }
 
-    if (isset($data['clash']) && $data['clash'] > 0) {
-      $checkClash = false;
-      // 撞单客户强制公开
-      $data['share'] = 1;
-    }
-
     if ($id) {
       $oldData = self::get($id);
       if ($oldData == null) {
@@ -225,13 +222,15 @@ class Customer extends Base
       if ($oldData->clash || $oldData->parallel) {
         $checkClash = false;
       }
+    } else if (!self::allow($user, null, 'new')) {
+      self::exception('您没有权限添加客户。');
     }
 
     $mobile = isset($data['mobile']) ? $data['mobile'] : '';
 
     // 撞单检查
-    if ($checkClash) {
-      $clash = self::clashCheck($id, $data['customer_name'], $mobile, $company_id);
+    if ($checkClash && isset($data['company_id']) && $data['company_id'] > 0) {
+      $clash = self::clashCheck($id, $data['customer_name'], $mobile, $data['company_id']);
       
       if ($clash) {
         $message = '';
@@ -266,6 +265,12 @@ class Customer extends Base
 
         return ['message' => $message, 'data' => $resultData];
       }
+    }
+
+    if (isset($data['clash']) && $data['clash'] > 0) {
+      $checkClash = false;
+      // 撞单客户强制公开
+      $data['share'] = 1;
     }
 
     if (empty($data['settle_date'])) {
@@ -429,10 +434,20 @@ class Customer extends Base
           "title" => '修改客户信息',
           "summary" => $summary
         ]);
+
+        // 发送撞单通知
+        if (isset($data['clash']) && $data['clash'] > 0 && !$oldData->parallel) {
+          $company = Company::get($data['company_id']);
+          if ($company) {
+            $admin_id = $company->user_id;
+            $message = $user->title . '登记的客户“' . $data['customer_name'] . '”发生转单，已申请并行或强行转交，请及时处理。';
+            $url = 'http://' . config('app_host') . '/app/customer/view/'. $id;
+            User::pushMessage($admin_id, $message, $url);
+          }
+        }
       }
+
       return $id;
-    } else if (!self::allow($user, null, 'new')) {
-      self::exception('您没有权限添加客户。');
     } else {
       $data['city'] = self::$city;
       $data['user_id'] = $user_id;
@@ -470,6 +485,17 @@ class Customer extends Base
           $linkman['type'] = 'customer';
           $linkman['owner_id'] = $newData->id;
           Linkman::addUp($user, 0, $linkman);
+        }
+
+        // 发送撞单通知
+        if (isset($data['clash']) && $data['clash'] > 0) {
+          $company = Company::get($data['company_id']);
+          if ($company) {
+            $admin_id = $company->user_id;
+            $message = $user->title . '登记的客户“' . $data['customer_name'] . '”发生转单，已申请并行或强行转交，请及时处理。';
+            $url = 'http://' . config('app_host') . '/app/customer/view/'. $newData->id;
+            User::pushMessage($admin_id, $message, $url);
+          }
         }
 
         return $newData->id;
@@ -561,6 +587,8 @@ class Customer extends Base
 
     $result = false;
     $clashCustomer = self::get($customer->clash);
+    $message = '';
+    $url = '';
 
     if ($clashCustomer == null) {
       self::exception('被撞单客户不存在。');
@@ -570,25 +598,30 @@ class Customer extends Base
       if ($result) {
         self::remove($user, $id);
       }
+      $message = '您登记的撞单客户已由管理员转交给您，请及时跟进。';
+      $url = 'http://' . config('app_host') . '/app/customer/view/' . $clashCustomer->id;
     } else if ($operate == 1) {   // 并行处理
       $summary = '撞单客户并行处理';
       $customer->parallel = $clashCustomer->id;
       $customer->clash = 0;
       $result = $customer->save();
+      $message = '您登记的撞单客户已由管理员并行处理，请及时跟进。';
+      $url = 'http://' . config('app_host') . '/app/customer/view/' . $customer->id;
     } else if ($operate == 2) {   // 驳回
       $summary = '撞单客户驳回';
       $result = self::remove($user, $id);
+      $message = '您登记的撞单客户已被管理员驳回，由其他客户经理在跟进中。';
     }
 
     if ($result) {
-      // TODO: 发送通知
-
       Log::add($user, [
         "table" => 'customer',
         "owner_id" => $customer->id,
         "title" => '转交客户',
         "summary" => $summary
       ]);
+
+      User::pushMessage($customer->user_id, $message, $url);
     }
 
     return $result;

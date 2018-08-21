@@ -525,6 +525,13 @@ class Company extends Base
         "summary" => $company->title
       ];
       Log::add($user, $log);
+
+      if ($status == 0) {
+        $message = $user->title . '申请加入“' . $company->title . '”，请及时审核。';
+        $url = 'http://' . config('app_host') . '/app/company/view/' . $company->id;
+        User::pushMessage($company->user_id, $message, $url);
+      }
+
       return $status;
     } else {
       return false;
@@ -625,6 +632,10 @@ class Company extends Base
         "summary" => $user->title . ' ' . $user->mobile
       ];
       Log::add($manager, $log);
+
+      $message = '管理员已批准您加入“' . $company->title . '”。';
+      $url = 'http://' . config('app_host') . '/app/company/view/' . $company->id;
+      User::pushMessage($user_id, $message, $url);
     }
     return $result;
   }
