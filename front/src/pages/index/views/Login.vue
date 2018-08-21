@@ -145,7 +145,17 @@ export default {
       }
       this.message = ''
       this.$vux.loading.show()
-      this.$login(this.mobile.replace(/\s+/g, ''), this.password, this.vcode, this.verifyCode, (res) => {
+      let mobile = this.mobile.replace(/\s+/g, '')
+      let pwd = ''
+      let vcode = ''
+      let verifyCode = ''
+      if (this.loginModel === 'verifyCode') {
+        verifyCode = this.verifyCode
+      } else {
+        pwd = this.password
+        vcode = this.vcode
+      }
+      this.$login(mobile, pwd, vcode, verifyCode, (res) => {
         this.$vux.loading.hide()
         if (res.success) {
           this.error = false

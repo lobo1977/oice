@@ -45,12 +45,10 @@ class Index extends Base
 
       $user = null;
 
-      if ($password) {
-        $user = User::loginByPassword($mobile, $password, $vcode);
-      } else if ($verify_code) {
+      if ($verify_code) {
         $user = User::loginByVerifyCode($mobile, $verify_code);
       } else {
-        return;
+        $user = User::loginByPassword($mobile, $password, $vcode);
       }
 
       if ($user) {
