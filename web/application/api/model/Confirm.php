@@ -22,9 +22,13 @@ class Confirm extends Base
     if ($user == null) {
       return false;
     }
+
+    $superior_id = Company::getSuperior($confirm->company_id, $confirm->user_id);
+
     if ($operate == 'view') {
       return $confirm->user_id == $user->id ||
-        $confirm->building_company_id == $user->company_id;
+        $confirm->building_company_id == $user->company_id ||
+        ($confirm->company_id == $user->company_id && $user->id == $superior_id);
     } else if ($operate == 'edit' || $operate = 'delete') {
       return $confirm->user_id == $user->id &&
         $confirm->company_id == $user->company_id;
@@ -46,11 +50,14 @@ class Confirm extends Base
 
     $list = self::alias('a')
       ->join('customer c', 'a.customer_id = c.id')
-      ->join('building b', 'a.building_id = b.id');
+      ->join('building b', 'a.building_id = b.id')
+      ->leftJoin('user_company d', 'a.user_id = d.user_id and a.company_id = d.company_id and d.status = 1');
 
     if ($customer_id) {
       $list->where('a.customer_id', $customer_id)
-        ->where('a.user_id', $user_id);
+      ->where('a.user_id = ' . $user_id .
+        ' OR (a.company_id > 0 AND a.company_id = ' . $company_id .
+        ' AND d.superior_id = ' . $user_id . ')');
     } else if ($building_id) {
       $list->where('a.building_id', $building_id)
         ->where('(b.user_id = ' . $user_id . ' OR b.company_id = ' . $company_id . ')');
