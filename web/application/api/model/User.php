@@ -200,7 +200,8 @@ class User extends Base
    * 更新用户信息
    */
   public static function updateInfo($user, $data, $avatar) {
-    if ($user == null) {
+    $oldData = self::get($user->id);
+    if ($oldData == null) {
       self::exception('用户不存在。');
     } else {
       $summary = '';
@@ -209,43 +210,45 @@ class User extends Base
         $path = self::uploadAvatar($avatar);
         if ($path) {
           $data['avatar'] = $path;
-          $summary = $summary . '头像：' . $user->avatar . ' -> ' . $data['avatar'] . '\n';
+          $summary = $summary . '头像：' . $oldData->avatar . ' -> ' . $data['avatar'] . '\n';
         }
+      } else if (isset($data['avatar'])) {
+        unset($data['avatar']);
       }
 
-      if ($data['title'] != $user->title) {
-        if ($user->title) {
-          $summary = '姓名：' . $user->title . ' -> ' . $data['title'] . '\n';
+      if ($data['title'] != $oldData->title) {
+        if ($oldData->title) {
+          $summary = '姓名：' . $oldData->title . ' -> ' . $data['title'] . '\n';
         } else {
           $summary = '姓名：' . $data['title'] . '\n';
         }
       }
 
-      if ($data['email'] != $user->email) {
-        if ($user->email) {
-          $summary = '电子邮箱：' . $user->email . ' -> ' . $data['email'] . '\n';
+      if ($data['email'] != $oldData->email) {
+        if ($oldData->email) {
+          $summary = '电子邮箱：' . $oldData->email . ' -> ' . $data['email'] . '\n';
         } else {
           $summary = '电子邮箱：' . $data['email'] . '\n';
         }
       }
 
-      if ($data['weixin'] != $user->weixin) {
-        if ($user->weixin) {
-          $summary = '微信：' . $user->weixin . ' -> ' . $data['weixin'] . '\n';
+      if ($data['weixin'] != $oldData->weixin) {
+        if ($oldData->weixin) {
+          $summary = '微信：' . $oldData->weixin . ' -> ' . $data['weixin'] . '\n';
         } else {
           $summary = '微信：' . $data['weixin'] . '\n';
         }
       }
 
-      if ($data['qq'] != $user->qq) {
-        if ($user->qq) {
-          $summary = 'QQ：' . $user->qq . ' -> ' . $data['qq'] . '\n';
+      if ($data['qq'] != $oldData->qq) {
+        if ($oldData->qq) {
+          $summary = 'QQ：' . $oldData->qq . ' -> ' . $data['qq'] . '\n';
         } else {
           $summary = 'QQ：' . $data['qq'] . '\n';
         }
       }
 
-      $result = $user->save($data);
+      $result = $oldData->save($data);
       if ($result) {
         Log::add($user, [
           "table" => "user",
@@ -262,12 +265,13 @@ class User extends Base
    * 修改密码
    */
   public static function changePassword($user, $password) {
-    if ($user == null) {
+    $oldData = self::get($user->id);
+    if ($oldData == null) {
       self::exception('用户不存在。');
     } else {
-      $user->salt = substr(md5(strval(time())), 0, 5);
-      $user->password = self::genPassword($password, $user->salt);
-      $result = $user->save();
+      $oldData->salt = substr(md5(strval(time())), 0, 5);
+      $oldData->password = self::genPassword($password, $oldData->salt);
+      $result = $oldData->save();
       if ($result) {
         Log::add($user, [
           "table" => "user",
@@ -288,7 +292,8 @@ class User extends Base
       self::exception('验证码错误。');
     }
 
-    if ($user == null) {
+    $oldData = self::get($user->id);
+    if ($oldData == null) {
       self::exception('用户不存在。');
     }
 
@@ -297,8 +302,8 @@ class User extends Base
       self::exception('该手机号已被占用。');
     }
 
-    $user->mobile = $mobile;
-    $result = $user->save();
+    $oldData->mobile = $mobile;
+    $result = $oldData->save();
     if ($result) {
       Log::add($user, [
         "table" => "user",

@@ -274,6 +274,8 @@ class Company extends Base
           $data['logo'] = $logoPath;
           $summary = $summary . 'Logo：' . $oldData->logo . ' -> ' . $data['logo'] . '\n';
         }
+      } else if (isset($data['logo'])) {
+        unset($data['logo']);
       }
 
       if ($stamp) {
@@ -282,6 +284,8 @@ class Company extends Base
           $data['stamp'] = $stampPath;
           $summary = $summary . '公章：' . $oldData->stamp . ' -> ' . $data['stamp'] . '\n';
         }
+      } else if (isset($data['stamp'])) {
+        unset($data['stamp']);
       }
 
       $result =  $oldData->save($data);
@@ -306,6 +310,8 @@ class Company extends Base
         if ($logoPath) {
           $data['logo'] = $logoPath;
         }
+      } else if (isset($data['logo'])) {
+        unset($data['logo']);
       }
 
       if ($stamp) {
@@ -313,6 +319,8 @@ class Company extends Base
         if ($stampPath) {
           $data['stamp'] = $stampPath;
         }
+      } else if (isset($data['stamp'])) {
+        unset($data['stamp']);
       }
 
       $newData = new Company($data);
