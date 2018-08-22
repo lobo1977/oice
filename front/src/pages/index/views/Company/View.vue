@@ -224,7 +224,8 @@ export default {
     },
     itemClick (item) {
       if (item.disabled || this.mouseMove) {
-
+      } else {
+        this.$router.push({name: 'UserView', params: {id: item.id}})
       }
     },
     audit (userId, flag) {

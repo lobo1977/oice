@@ -19,7 +19,7 @@
         :value="user.superior">
         <x-icon slot="icon" type="android-contact" class="cell-icon"></x-icon>
       </cell>
-      <cell title="切换企业" :link="{name:'Company'}" :value="user.company">
+      <cell title="我的企业" :link="{name:'Company'}" :value="user.company">
         <x-icon slot="icon" type="android-people" class="cell-icon"></x-icon>
       </cell>
       <cell title="修改密码" :link="{name:'Password'}">

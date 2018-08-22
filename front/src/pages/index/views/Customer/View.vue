@@ -256,7 +256,7 @@ export default {
         clash: 0,             // 撞单
         user_id: 0,
         manager: '',          // 客户经理
-        avatar: '/static/img/avatar.png',
+        avatar: '',
         mobile: '',
         company: '',          // 所属企业
         allowEdit: false,
