@@ -12,17 +12,24 @@ export default new Router({
       path: '/',
       name: 'Home',
       redirect: '/math'
+    },
+    {
+      path: '/.html',
+      redirect: '/math'
     }, {
       path: '/math',
       name: 'Math',
       meta: {
         title: '数学作业',
-        hideBar: true
+        hideBar: true,
+        showMenu: true,
+        showPrint: true
       },
       component: Math
     }, {
       path: '*',
       meta: {
+        title: '出错了',
         hideBar: true
       },
       component: function (resolve) {

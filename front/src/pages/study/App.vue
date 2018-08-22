@@ -6,22 +6,22 @@
       :right-options="rightOptions"
       :title="title"
       :transition="headerTransition" @on-click-back="goBack">
-      <span slot="right" v-if="$route.meta.showPlus" @click="showMenu = true">
-        <x-icon type="plus" size="24" class="header-icon"></x-icon>
-      </span>
-      <span slot="right" v-if="$route.meta.showEdit" @click="goEdit">
+      <span slot="right" v-show="$route.meta.showEdit" @click="goEdit">
         <x-icon type="compose" size="24" class="header-icon"></x-icon>
+      </span>
+      <span slot="right" v-show="$route.meta.showPrint" @click="goPrint">
+        <x-icon type="ios-printer" size="24" class="header-icon"></x-icon>
+      </span>
+      <span slot="right" v-show="$route.meta.showMenu" @click="showMenu">
+        <x-icon type="ios-more" size="24" class="header-icon"></x-icon>
       </span>
     </x-header>
 
-    <actionsheet v-model="showMenu" :menus="menus" @on-click-menu="menuClick">
-    </actionsheet>
-
     <keep-alive>
-      <router-view v-if="$route.meta.keepAlive" @on-component-mounted="componentMounted" 
+      <router-view ref="page" v-if="$route.meta.keepAlive" @on-component-mounted="componentMounted" 
         @on-view-loaded="changeTitle"></router-view>
     </keep-alive>
-    <router-view v-if="!$route.meta.keepAlive" @on-component-mounted="componentMounted" 
+    <router-view ref="page" v-if="!$route.meta.keepAlive" @on-component-mounted="componentMounted" 
         @on-view-loaded="changeTitle"></router-view>
 
     <tabbar style="position:fixed;" icon-class="vux-center" v-if="!this.$route.meta.hideBar" slot="bottom">
@@ -44,10 +44,7 @@ export default {
   },
   data () {
     return {
-      title: document.title,
-      menus: {
-      },
-      showMenu: false
+      title: document.title
     }
   },
   methods: {
@@ -62,10 +59,20 @@ export default {
         this.$router.back()
       }
     },
-    menuClick (menuKey, menuItem) {
-      this.$router.push({name: menuKey, params: {id: 0}})
+    showMenu () {
+      if (this.$refs.page && this.$refs.page.propMenu) {
+        this.$refs.page.propMenu()
+      }
     },
     goEdit () {
+      if (this.$refs.page && this.$refs.page.edit) {
+        this.$refs.page.edit()
+      }
+    },
+    goPrint () {
+      if (this.$refs.page && this.$refs.page.print) {
+        this.$refs.page.print()
+      }
     },
     changeTitle (title) {
       if (title) {
@@ -99,7 +106,7 @@ export default {
       return '46px'
     },
     paddingBottom () {
-      return '55px'
+      return '0'
     }
   },
   created () {
@@ -172,9 +179,11 @@ html, body {
 
 .vux-header {
   .header-icon {
+    margin-left:10px;
     fill:#fff;
     position:relative;
     top:-3px;
+    cursor:pointer;
   }
 }
 
