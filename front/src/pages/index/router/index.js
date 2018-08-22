@@ -318,7 +318,7 @@ export default new Router({
       path: '/my/customer',
       name: 'MyCustomer',
       meta: {
-        title: '我的客户',
+        title: '跟进客户',
         showBack: true,
         hideBar: true,
         requiresAuth: true
