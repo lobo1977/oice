@@ -194,8 +194,8 @@ class Linkman extends Base
         Log::add($user, $log);
       }
       return $id;
-    } else if (!self::allow($user, $data['type'], $data['owner_id'], 'edit')) {
-        self::exception('您没有权限修改此联系人。');
+    } else if (!self::allow($user, $data['type'], $data['owner_id'], 'new')) {
+        self::exception('您没有权限添加联系人。');
     } else {
       $data['user_id'] = $user_id;
 

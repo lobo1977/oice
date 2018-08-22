@@ -31,7 +31,9 @@ class Customer extends Base
       return false;
     }
 
-    $superior_id = Company::getSuperior($customer->company_id, $customer->user_id);
+    if ($customer != null) {
+      $superior_id = Company::getSuperior($customer->company_id, $customer->user_id);
+    }
 
     if ($operate == 'view') {
       return $customer->user_id == $user->id || 
@@ -42,15 +44,15 @@ class Customer extends Base
     } else if ($operate == 'edit') {
       return $customer->user_id == $user->id &&
         $customer->company_id == $user->company_id && 
-        (!$customer->clash || $oldData->parallel);
+        (!$customer->clash || $customer->parallel);
     } else if ($operate == 'follow') {    // 跟进
       return $customer->user_id == $user->id &&
         $customer->company_id == $user->company_id && 
-        (!$customer->clash || $oldData->parallel);
+        (!$customer->clash || $customer->parallel);
     } else if ($operate == 'confirm') {   // 确认
       return $customer->user_id == $user->id &&
         $customer->company_id == $user->company_id && 
-        (!$customer->clash || $oldData->parallel);
+        (!$customer->clash || $customer->parallel);
     } else if ($operate == 'clash') {     // 撞单处理
       return $user->isAdmin && $customer->clash &&
         $customer->company_id == $user->company_id;
@@ -128,7 +130,7 @@ class Customer extends Base
       ->where('a.id', $id)
       ->field('a.id,a.customer_name,a.area,a.address,a.demand,a.lease_buy,' .
         'a.district,a.min_acreage,a.max_acreage,a.budget,a.settle_date,a.current_area,' .
-        'a.end_date,a.rem,a.status,a.clash,a.share,a.user_id,a.company_id,' .
+        'a.end_date,a.rem,a.status,a.clash,a.parallel,a.share,a.user_id,a.company_id,' .
         'b.title as manager,b.avatar,b.mobile,c.title as company')
       ->find();
 
@@ -219,11 +221,14 @@ class Customer extends Base
       } else if (!self::allow($user, $oldData, 'edit')) {
         self::exception('您没有权限修改此客户。');
       }
-      if ($oldData->clash || $oldData->parallel) {
+      if ((isset($data['clash']) && $data['clash'] > 0) || 
+        $oldData->clash || $oldData->parallel) {
         $checkClash = false;
       }
     } else if (!self::allow($user, null, 'new')) {
       self::exception('您没有权限添加客户。');
+    } else if (isset($data['clash']) && $data['clash'] > 0) {
+      $checkClash = false;
     }
 
     $mobile = isset($data['mobile']) ? $data['mobile'] : '';
@@ -252,11 +257,11 @@ class Customer extends Base
 
           if ($clash->status == 5) {
             self::transfer($user, $clash->id, $user_id, $data);
-            $message = '客户资料和<strong>' . $clash->user . '</strong>的' . self::$status[$clash->status] . '客户：<strong>' .
+            $message = '客户资料和 <strong>' . $clash->user . '</strong> 的' . self::$status[$clash->status] . '客户：<strong style="color:red;">' .
               $clash->customer_name . '</strong> 发生撞单，旧客户已自动转交给您并转为' . 
                 self::$status[$data['status']] . '客户，请及时跟进。';
           } else {
-            $message = '客户资料和<strong>' . $clash->user . '</strong>的' . self::$status[$clash->status] . '客户：<strong>' .
+            $message = '客户资料和 <strong>' . $clash->user . '</strong> 的' . self::$status[$clash->status] . '客户：<strong style="color:red;">' .
               $clash->customer_name . '</strong> 发生撞单，您可以选择<strong>放弃登记</strong>或<strong>申请转交或并行</strong>，' .
               '由管理员按照<strong>核查撞单及覆盖原则</strong>处理。点击<strong>确定</strong>申请转交或并行。';
             $resultData['confirm'] = true;
@@ -440,7 +445,7 @@ class Customer extends Base
           $company = Company::get($data['company_id']);
           if ($company) {
             $admin_id = $company->user_id;
-            $message = $user->title . '登记的客户“' . $data['customer_name'] . '”发生转单，已申请并行或强行转交，请及时处理。';
+            $message = $user->title . '登记的客户“' . $data['customer_name'] . '”发生撞单，已申请并行或强行转交，请及时处理。';
             $url = 'http://' . config('app_host') . '/app/customer/view/'. $id;
             User::pushMessage($admin_id, $message, $url);
           }
@@ -492,7 +497,7 @@ class Customer extends Base
           $company = Company::get($data['company_id']);
           if ($company) {
             $admin_id = $company->user_id;
-            $message = $user->title . '登记的客户“' . $data['customer_name'] . '”发生转单，已申请并行或强行转交，请及时处理。';
+            $message = $user->title . '登记的客户“' . $data['customer_name'] . '”发生撞单，已申请并行或强行转交，请及时处理。';
             $url = 'http://' . config('app_host') . '/app/customer/view/'. $newData->id;
             User::pushMessage($admin_id, $message, $url);
           }
