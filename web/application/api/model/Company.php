@@ -174,7 +174,7 @@ class Company extends Base
     if ($operate == 'view') {
       $data->allowEdit = self::allow($user, $data, 'edit');
       $data->allowInvite = self::allow($user, $data, 'invite');
-      $data->allowPass = self::allow($user, $data, 'passs');
+      $data->allowPass = self::allow($user, $data, 'pass');
       $data->allowDelete = self::allow($user, $data, 'delete');
       $data->isAddin = false;
       $data->isInvtie = false;
