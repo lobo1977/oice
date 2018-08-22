@@ -3,7 +3,7 @@
     <group>
       <cell :title="info.title" :inline-desc="info.company">
         <img slot="icon" :src="info.avatar" class="cell-image" 
-          style="width:4em;margin-right:1em"
+          style="width:4em;margin-right:1em;max-height:4em;"
           @click.stop="previewAvatar">
       </cell>
     </group>

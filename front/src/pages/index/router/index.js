@@ -221,7 +221,7 @@ export default new Router({
       path: '/my/mobile',
       name: 'ChangeMobile',
       meta: {
-        title: '更换手机号码',
+        title: '绑定手机',
         showBack: true,
         hideBar: true,
         requiresAuth: true
