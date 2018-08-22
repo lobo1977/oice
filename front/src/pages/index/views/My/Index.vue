@@ -28,6 +28,9 @@
         :value="user.superior">
         <x-icon slot="icon" type="android-contact" class="cell-icon"></x-icon>
       </cell>
+      <cell v-if="user.company_id > 0" title="企业成员" :link="{name: 'CompanyMember', params: {id: user.company_id}}">
+        <x-icon slot="icon" type="android-people" class="cell-icon"></x-icon>
+      </cell>
       <cell title="修改密码" :link="{name:'Password'}">
         <x-icon slot="icon" type="android-lock" class="cell-icon"></x-icon>
       </cell>
@@ -55,7 +58,7 @@ export default {
         // type: 0,
         title: '',
         avatar: '',
-        // company_id: 0,
+        company_id: 0,
         company: '',
         // logo: '',
         mobile: '',

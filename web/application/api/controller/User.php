@@ -26,20 +26,21 @@ class User extends Base
    */
   public function detail($id = 0) {
     if ($id) {
-      $inSameCompany = false;
       $data = modelUser::getById($id);
-      $companyList = Company::my($data);
-
-      if ($companyList != null) {
-        foreach($companyList as $company) {
-          if ($company->id == $this->user->company_id) {
-            $inSameCompany = true;
-            break;
+      
+      if ($this->user != null && $this->user->id != $id) {
+        $companyList = Company::my($data);
+        $inSameCompany = false;
+        
+        if ($companyList != null) {
+          foreach($companyList as $company) {
+            if ($company->id == $this->user->company_id) {
+              $inSameCompany = true;
+              break;
+            }
           }
         }
-      }
 
-      if ($this->user != null) {
         if ($this->user->superior_id == $id) {
           $data->isSuperior = true;
         } else if ($inSameCompany) {
