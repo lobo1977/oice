@@ -22,7 +22,23 @@ class My extends Base
   }
 
   /**
-   * 我的客户
+   * 我的项目
+   */
+  public function building($page = 1) {
+    $list = Building::my($this->user, $page);
+    return $this->succeed($list);
+  }
+
+  /**
+   * 我的跟进客户
+   */
+  public function task($page = 1) {
+    $list = Customer::search($this->user, ['status' => '1,2,3']);
+    return $this->succeed($list);
+  }
+
+  /**
+   * 我的可跟进客户
    */
   public function customer() {
     $list = Customer::search($this->user, ['status' => '0,1,2', 'clash' => false]);

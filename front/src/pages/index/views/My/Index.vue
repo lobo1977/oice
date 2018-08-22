@@ -1,26 +1,32 @@
 <template>
   <div>
-    <masker color="255,255,255" :opacity="1" style="margin:10px;height:140px;border-radius:2px;">
-      <div slot="content" class="user-info" @click="eidt">
-        <div style="height:60px;">
-          <h4 @click.stop="goCompany">{{user.company}}</h4>
-        </div>
-        <img v-if="user.avatar && user.avatar.length > 0" :src="user.avatar" />
-        <h2>{{user.title}}</h2>
-        <p>{{user.mobile}}</p>
-      </div>
-    </masker>
     <group gutter="0">
-      <cell title="我的收藏" :link="{name:'Favorite'}">
-        <x-icon slot="icon" type="android-star" class="cell-icon"></x-icon>
+      <cell :title="user.title" :inline-desc="user.mobile"
+        :link="{name: 'Info'}">
+        <img slot="icon" :src="user.avatar" class="cell-image">
+      </cell>
+    </group>
+
+    <grid :show-lr-borders="false" :show-vertical-dividers="false">
+      <grid-item :link="{name:'Favorite'}" label="收藏">
+        <x-icon slot="icon" size="30" type="android-star" style="fill:rgb(4, 190, 2);"></x-icon>
+      </grid-item>
+      <grid-item :link="{name:'MyBuilding'}" label="项目">
+        <x-icon slot="icon" size="30" type="home" style="fill:rgb(253, 237, 16);"></x-icon>
+      </grid-item>
+      <grid-item :link="{name:'MyCustomer'}" label="跟进客户">
+        <x-icon slot="icon" size="30" type="android-contacts" style="fill:rgb(245, 78, 1);"></x-icon>
+      </grid-item>
+    </grid>
+
+    <group gutter="0.5em">
+      <cell title="我的企业" :link="{name:'Company'}" :value="user.company">
+        <x-icon slot="icon" type="android-people" class="cell-icon"></x-icon>
       </cell>
       <cell v-if="user.superior_id > 0" title="我的上级" 
         :link="{name:'UserView', params: {id: user.superior_id}}"
         :value="user.superior">
         <x-icon slot="icon" type="android-contact" class="cell-icon"></x-icon>
-      </cell>
-      <cell title="我的企业" :link="{name:'Company'}" :value="user.company">
-        <x-icon slot="icon" type="android-people" class="cell-icon"></x-icon>
       </cell>
       <cell title="修改密码" :link="{name:'Password'}">
         <x-icon slot="icon" type="android-lock" class="cell-icon"></x-icon>
@@ -33,26 +39,27 @@
 </template>
 
 <script>
-import { Masker, Group, Cell } from 'vux'
+import { Group, Cell, Grid, GridItem } from 'vux'
 
 export default {
   components: {
-    Masker,
     Group,
-    Cell
+    Cell,
+    Grid,
+    GridItem
   },
   data () {
     return {
       user: {
-        id: 0,
-        type: 0,
+        // id: 0,
+        // type: 0,
         title: '',
         avatar: '',
-        company_id: 0,
+        // company_id: 0,
         company: '',
-        logo: '',
+        // logo: '',
         mobile: '',
-        email: '',
+        // email: '',
         superior_id: 0,
         superior: ''
       }
@@ -64,42 +71,16 @@ export default {
     })
   },
   methods: {
-    goCompany () {
-      this.$router.push({name: 'CompanyView', params: {id: this.user.company_id}})
-    },
-    eidt () {
-      this.$router.push({name: 'Info'})
-    }
   }
 }
 </script>
 
 <style lang="less">
-  .user-info {
-    padding:10px;
-    h4 {
-      width:70%;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      color:#999;
-    }
-    h2 {
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      color:#999;
-    }
-    img {
-      position: absolute;
-      top:10px;
-      right:10px;
-      width:60px;
-      height:60px;
-      border-radius: 5px;
-    }
-    p {
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      color:#666;
+  .weui-grids {
+    margin-top:0.5em;
+    background-color: #fff;
+    .weui-grid {
+      padding:15px 10px;
     }
   }
 </style>

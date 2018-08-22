@@ -25,30 +25,6 @@ class Customer extends Base
 
     if ($params) {
       $list = modelCustomer::search($this->user, $params);
-
-      foreach($list as $key=>$customer) {
-        $customer->title = '【' . modelCustomer::$status[$customer->status] . '】' . $customer->customer_name;
-        if ($customer->clash) {
-          $customer->title = $customer->title . '<span style="color:red">（撞单）</span>';
-        }
-        $customer->desc = (empty($customer->lease_buy) ? '' : $customer->lease_buy) . 
-          (empty($customer->demand) ? '' : $customer->demand . ' ');
-
-        if ($customer->min_acreage && $customer->max_acreage) {
-            $customer->desc = $customer->desc . ' ' . $customer->min_acreage . ' 至 ' . $customer->max_acreage . ' 平米';
-        } else if ($customer->min_acreage) {
-            $customer->desc = $customer->desc . ' ' . $customer->min_acreage . ' 平米以上';
-        } else if ($customer->max_acreage) {
-            $customer->desc = $customer->desc . ' ' . $customer->max_acreage . ' 平米以内';
-        }
-
-        if ($customer->budget) {
-          $customer->desc = $customer->desc . ' ' . $customer->budget;
-        }
-
-        $customer->url = '/customer/view/' . $customer->id;
-      }
-
       return $this->succeed($list);
     } else {
       return;

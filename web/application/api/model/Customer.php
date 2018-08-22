@@ -22,6 +22,34 @@ class Customer extends Base
   private static $IGNORE_WORDS = '/北京|上海|深圳|广州|中国|美国|日本|德国|英国|法国|（|）|\(|\)/';
   
   /**
+   * 格式化列表数据
+   */
+  protected static function formatList($list) {
+    foreach($list as $key=>$customer) {
+      $customer->title = '【' . modelCustomer::$status[$customer->status] . '】' . $customer->customer_name;
+      if ($customer->clash) {
+        $customer->title = $customer->title . '<span style="color:red">（撞单）</span>';
+      }
+      $customer->desc = (empty($customer->lease_buy) ? '' : $customer->lease_buy) . 
+        (empty($customer->demand) ? '' : $customer->demand . ' ');
+
+      if ($customer->min_acreage && $customer->max_acreage) {
+          $customer->desc = $customer->desc . ' ' . $customer->min_acreage . ' 至 ' . $customer->max_acreage . ' 平米';
+      } else if ($customer->min_acreage) {
+          $customer->desc = $customer->desc . ' ' . $customer->min_acreage . ' 平米以上';
+      } else if ($customer->max_acreage) {
+          $customer->desc = $customer->desc . ' ' . $customer->max_acreage . ' 平米以内';
+      }
+
+      if ($customer->budget) {
+        $customer->desc = $customer->desc . ' ' . $customer->budget;
+      }
+
+      $customer->url = '/customer/view/' . $customer->id;
+    }
+  }
+  
+  /**
    * 权限检查
    */
   public static function allow($user, $customer, $operate) {
@@ -65,7 +93,7 @@ class Customer extends Base
       return false;
     }
   }
-
+  
   /**
    * 检索客户信息
    */
@@ -88,7 +116,6 @@ class Customer extends Base
     
     $list = self::alias('a')
       ->leftJoin('user_company b', 'a.user_id = b.user_id and a.company_id = b.company_id and b.status = 1')
-      ->where('a.city', self::$city)
       ->where('a.user_id = ' . $user_id .
         ' OR (a.share = 1 AND a.company_id > 0 AND a.company_id = ' . $company_id . ')' .
         ' OR (a.company_id > 0 AND a.company_id = ' . $company_id . ' AND b.superior_id = ' . $user_id . ')');
@@ -117,7 +144,7 @@ class Customer extends Base
       ->order('a.id', 'desc')
       ->select();
 
-    return $result;
+    return self::formatList($result);
   }
 
   /**

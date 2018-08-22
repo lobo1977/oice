@@ -303,6 +303,30 @@ export default new Router({
         require(['../views/My/favorite.vue'], resolve)
       }
     }, {
+      path: '/my/building',
+      name: 'MyBuilding',
+      meta: {
+        title: '我的项目',
+        showBack: true,
+        hideBar: true,
+        requiresAuth: true
+      },
+      component: function (resolve) {
+        require(['../views/My/building.vue'], resolve)
+      }
+    }, {
+      path: '/my/customer',
+      name: 'MyCustomer',
+      meta: {
+        title: '我的客户',
+        showBack: true,
+        hideBar: true,
+        requiresAuth: true
+      },
+      component: function (resolve) {
+        require(['../views/My/customer.vue'], resolve)
+      }
+    }, {
       path: '/my/password',
       name: 'Password',
       meta: {
