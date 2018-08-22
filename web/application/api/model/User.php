@@ -11,14 +11,9 @@ use app\api\model\Oauth;
 class User extends Base
 {
   use SoftDelete;
-  protected $wechat;
   protected $pk = 'id';
   protected $deleteTime = 'delete_time';
   public static $status = ['正常','冻结'];
-
-  protected function initialize() {
-    $this->wechat = new Wechat();
-  }
 
   /**
    * 格式化用户信息
@@ -355,7 +350,8 @@ class User extends Base
   /**
    * 向用户发送消息
    */
-	public function pushMessage($user_id, $message, $url) {
+	public static function pushMessage($user_id, $message, $url) {
+    $wechat = new Wechat();
     $user = self::get($user_id);
 
     if ($user == null) {
@@ -373,12 +369,12 @@ class User extends Base
 		
 		if ($url) {
 			if (!strpos($url, "w.url.cn")) {
-				$url = $this->weixin->getShortUrl($url);
+				$url = $wechat->getShortUrl($url);
 			}
 			$weixinMsg = $weixinMsg . $url;
 		}
 
-    return $this->weixin->sendTextMsg($openId, $weixinMsg);
+    return $wechat->sendTextMsg($openid, $weixinMsg);
 	}
 
   /**
