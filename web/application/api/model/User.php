@@ -7,6 +7,7 @@ use app\api\model\Base;
 use app\api\model\Log;
 use app\api\model\Verify;
 use app\api\model\Oauth;
+use app\api\model\Company;
 
 class User extends Base
 {
@@ -39,6 +40,11 @@ class User extends Base
    * 获取企业成员
    */
   public static function companyMember($user, $id, $status = 0, $page = 0) {
+    $company = Company::get($id);
+    if ($company == null) {
+      self::exception('企业不存在。');
+    }
+
     $list = self::alias('a')
       ->join('user_company b', 'a.id = b.user_id and b.status = ' . $status)
       ->where('b.company_id', $id)
@@ -52,6 +58,9 @@ class User extends Base
     $list = $list->select();
 
     foreach($list as $member) {
+      if ($company->user_id == $member->id) {
+        $member->isAdmin = true;
+      }
       self::formatData($member);
     }
     return $list;

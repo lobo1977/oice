@@ -1,10 +1,13 @@
 <template>
   <div>
     <group :gutter="0">
-      <cell v-for="(item, index) in list" :key="index" 
-        :title="item.title" :inline-desc="item.mobile"
+      <cell v-for="(item, index) in list" :key="index" :title="item.title"
         :link="{name: 'UserView', params: {id: item.id}}">
         <img slot="icon" :src="item.avatar" class="cell-image" />
+        <div slot="inline-desc">
+          <span>{{item.mobile}}</span>
+          <x-icon type="person" v-if="item.isAdmin" size="18" class="cell-desc-icon"></x-icon>
+        </div>
       </cell>
     </group>
 
@@ -95,4 +98,7 @@ export default {
 </script>
 
 <style lang="less">
+  .cell-desc-icon {
+    fill: rgb(4, 190, 2);
+  }
 </style>
