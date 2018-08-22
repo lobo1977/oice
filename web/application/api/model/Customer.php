@@ -26,7 +26,7 @@ class Customer extends Base
    */
   protected static function formatList($list) {
     foreach($list as $key=>$customer) {
-      $customer->title = '【' . modelCustomer::$status[$customer->status] . '】' . $customer->customer_name;
+      $customer->title = '【' . self::$status[$customer->status] . '】' . $customer->customer_name;
       if ($customer->clash) {
         $customer->title = $customer->title . '<span style="color:red">（撞单）</span>';
       }
@@ -47,6 +47,7 @@ class Customer extends Base
 
       $customer->url = '/customer/view/' . $customer->id;
     }
+    return $list;
   }
   
   /**
