@@ -175,9 +175,7 @@ class Wechat {
 		);
 		$jsondata = json_encode($arr);
 		$res = $this->https_request($url, $jsondata);
-		$res = json_decode(htmlspecialchars_decode($res), true);
-		$this->errcode = $res['errcode'];
-		if ($this->errcode == 0) {
+		if (isset($res['short_url'])) {
 			return $res['short_url'];
 		} else {
 			$this->parseError($res, 'getShortUrl');
@@ -211,8 +209,7 @@ class Wechat {
 		$url = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=" . $access_token;
 		$jsondata = urldecode(json_encode($msg));
 		$res = $this->https_request($url, $jsondata);
-		$res = json_decode(htmlspecialchars_decode($res), true);
-		if ($this->errcode == 0) {
+		if (isset($res['errcode']) && $res['errcode'] == 0) {
 			return true;
 		} else {
 			$this->parseError($res, 'sendMsg');
