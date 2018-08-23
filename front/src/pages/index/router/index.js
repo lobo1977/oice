@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Building from '../views/Building/Index'
 import Customer from '../views/Customer/Index'
+import CustomerList from '../views/Customer/List'
 import My from '../views/My/Index'
 import Login from '../views/Login'
 import Mobile from '../views/Mobile'
@@ -82,11 +83,39 @@ export default new Router({
     }, {
       path: '/customer',
       name: 'Customer',
-      meta: {
-        title: '客户',
-        showPlus: true,
-        keepAlive: true
-      },
+      children: [
+        {
+          path: 'follow',
+          name: 'Follow',
+          component: CustomerList,
+          meta: {
+            title: '客户',
+            showPlus: true
+          }
+        },
+        {
+          path: 'potential',
+          name: 'Potential',
+          component: CustomerList,
+          meta: {
+            title: '客户',
+            showPlus: true
+          }
+        },
+        {
+          path: 'history',
+          name: 'History',
+          component: CustomerList,
+          meta: {
+            title: '客户',
+            showPlus: true
+          }
+        },
+        {
+          path: '',
+          redirect: 'follow'
+        }
+      ],
       component: Customer
     }, {
       path: '/customer/view/:id',

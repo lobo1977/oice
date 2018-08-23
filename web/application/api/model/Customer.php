@@ -123,10 +123,16 @@ class Customer extends Base
 
     if (isset($filter['keyword']) && $filter['keyword'] != '') {
       $list->where('a.customer_name', 'like', '%' . $filter['keyword'] . '%');
-    }
-
-    if (isset($filter['status']) && $filter['status'] != '') {
+    } else if (isset($filter['status']) && $filter['status'] != '') {
       $list->where('a.status', 'in', $filter['status']);
+    } else if (isset($filter['type'])) {
+      if ($filter['type'] == 'potential') {
+        $list->where('a.status', '0');
+      } else if ($filter['type'] == 'history') {
+        $list->where('a.status', 'in', '4,5');
+      } else {
+        $list->where('a.status', 'in', '1,2,3');
+      }
     }
 
     if (isset($filter['clash'])) {
