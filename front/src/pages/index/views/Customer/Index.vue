@@ -11,38 +11,42 @@
       ref="search"></search>
 
     <div v-show="!isSearching">
-      <panel :list="list" :type="listType" @on-img-error="onImgError"></panel>
-
-      <div style="height:50px;">
-        <load-more :show-loading="isLoading" v-show="isLoading || isEnd" :tip="loadingTip"></load-more>
-      </div>
+      <tab>
+        <tab-item :selected="type == 'follow'" @on-item-click="getList('follow')">跟进客户</tab-item>
+        <tab-item :selected="type == 'potential'" @on-item-click="getList('potential')">潜在客户</tab-item>
+        <tab-item :selected="type == 'history'" @on-item-click="getList('history')">历史客户</tab-item>
+      </tab>
+      <router-view></router-view>
     </div>
   </div>
 </template>
 
 <script>
-import { Search, Panel, LoadMore } from 'vux'
-import { mapState } from 'vuex'
+import { Search, Tab, TabItem } from 'vux'
 
 export default {
   components: {
     Search,
-    Panel,
-    LoadMore
+    Tab,
+    TabItem
   },
   data () {
     return {
-      isLoading: false,
+      type: 'follow',
       isSearching: false,
-      listType: '2',
-      page: 0,
-      isEnd: false,
-      list: [],
       results: []
     }
   },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      vm.type = to.name.toLowerCase()
+    })
+  },
+  beforeRouteUpdate (to, from, next) {
+    this.type = to.name.toLowerCase()
+    next()
+  },
   methods: {
-    // Searcher
     resultClick (item) {
       this.$router.push({name: 'CustomerView', params: {id: item.id}})
       this.$refs.search.setBlur()
@@ -73,65 +77,9 @@ export default {
     onCancel () {
       this.isSearching = false
     },
-
-    // list
-    onImgError (item, $event) {
-    },
-    loadListData (empty) {
-      if (empty) {
-        this.isEnd = false
-        this.page = 1
-        this.list = []
-      }
-
-      this.isLoading = true
-      this.$post('/api/customer/index', {
-        page: this.page
-      }, (res) => {
-        this.isLoading = false
-
-        if (res.success) {
-          let newData = res.data
-
-          if (!newData || newData.length < 10) {
-            this.isEnd = true
-          }
-          for (let item in newData) {
-            this.list.push(newData[item])
-          }
-        }
-      })
-    }
-  },
-  mounted: function () {
-    this.loadListData(true)
-  },
-  watch: {
-    user () {
-      this.loadListData(true)
-    },
-    scrollBottom (isBottom) {
-      if (isBottom && this.$route.name === 'Customer' &&
-        !this.isLoading && !this.isEnd) {
-        this.page++
-        this.loadListData()
-      }
-    }
-  },
-  computed: {
-    ...mapState({
-      user: state => state.oice.user,
-      scroolTop: state => state.scroolTop,
-      scrollBottom: state => state.oice.scrollBottom
-    }),
-    loadingTip () {
-      if (this.isLoading) {
-        return '正在加载'
-      } else if (this.isEnd) {
-        return this.list.length ? '没有更多了' : '暂无数据'
-      } else {
-        return ''
-      }
+    getList (path) {
+      this.type = path
+      this.$router.push('/customer/' + path)
     }
   }
 }

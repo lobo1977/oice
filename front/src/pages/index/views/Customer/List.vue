@@ -1,12 +1,6 @@
 <template>
   <div>
-    <group :gutter="0">
-      <cell v-for="(item, index) in list" :key="index" :title="item.title"
-        :link="{name: 'CustomerView', params: {id: item.id}}">
-        <p slot="inline-desc" class="cell-desc">{{item.desc}}</p>
-      </cell>
-    </group>
-
+    <panel :list="list" :type="listType" @on-img-error="onImgError"></panel>
     <div style="height:50px;">
       <load-more :show-loading="isLoading" v-show="isLoading || isEnd" :tip="loadingTip"></load-more>
     </div>
@@ -14,28 +8,27 @@
 </template>
 
 <script>
-import { Group, Cell, LoadMore } from 'vux'
+import { Panel, LoadMore } from 'vux'
 import { mapState } from 'vuex'
 
 export default {
   components: {
-    Group,
-    Cell,
+    Panel,
     LoadMore
   },
   data () {
     return {
-      page: 0,
+      type: 'follow',
       isLoading: false,
+      listType: '2',
+      page: 1,
       isEnd: false,
       list: []
     }
   },
-  beforeRouteEnter (to, from, next) {
-    next(vm => {
-    })
-  },
   methods: {
+    onImgError (item, $event) {
+    },
     loadListData (empty) {
       if (empty) {
         this.isEnd = false
@@ -43,7 +36,10 @@ export default {
         this.list = []
       }
       this.isLoading = true
-      this.$get('/api/my/task?page=' + this.page, (res) => {
+      this.$post('/api/customer/index', {
+        page: this.page,
+        type: this.type
+      }, (res) => {
         this.isLoading = false
         if (res.success) {
           let newData = res.data
@@ -58,12 +54,18 @@ export default {
       })
     }
   },
-  mounted: function () {
-    this.loadListData(true)
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      vm.type = to.name.toLowerCase()
+      vm.loadListData(true)
+    })
   },
   watch: {
     scrollBottom (isBottom) {
-      if (isBottom && this.$route.name === 'MyCustomer' &&
+      if (isBottom &&
+        (this.$route.name === 'Potential' ||
+        this.$route.name === 'Follow' ||
+        this.$route.name === 'History') &&
         !this.isLoading && !this.isEnd) {
         this.page++
         this.loadListData()
@@ -87,3 +89,6 @@ export default {
   }
 }
 </script>
+
+<style lang="less">
+</style>

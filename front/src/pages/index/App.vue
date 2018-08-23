@@ -25,15 +25,15 @@
         @on-view-loaded="changeTitle"></router-view>
 
     <tabbar style="position:fixed;" icon-class="vux-center" v-if="!this.$route.meta.hideBar" slot="bottom">
-      <tabbar-item :selected="$route.name === 'Building'" link="/building">
+      <tabbar-item :selected="$route.path.indexOf('/building') === 0" link="/building">
         <x-icon slot="icon" type="home" size="30"></x-icon>
         <span slot="label">房源</span>
       </tabbar-item>
-      <tabbar-item :selected="$route.name === 'Customer'" link="/customer">
+      <tabbar-item :selected="$route.path.indexOf('/customer') === 0" link="/customer">
         <x-icon slot="icon" type="android-contacts" size="30"></x-icon>
         <span slot="label">客户</span>
       </tabbar-item>
-      <tabbar-item :selected="$route.name === 'My'" link="/my">
+      <tabbar-item :selected="$route.path.indexOf('/my') === 0" link="/my">
         <x-icon slot="icon" type="person" size="30"></x-icon>
         <span slot="label">我的</span>
       </tabbar-item>

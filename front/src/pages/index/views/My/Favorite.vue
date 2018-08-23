@@ -222,7 +222,7 @@ export default {
   },
   computed: {
     ...mapState({
-      scroolTop: state => state.scroolTop,
+      scroolTop: state => state.oice.scroolTop,
       scrollBottom: state => state.oice.scrollBottom
     }),
     loadingTip () {
