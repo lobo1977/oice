@@ -39,6 +39,11 @@
           <span slot="right">平方米</span>
         </x-input>
         <datetime title="到期日" v-model="info.end_date" value-text-align="left"></datetime>
+        <cell title="到期提醒" value-align="left">
+            <div style="float:left;display:inline-block;line-height:28px;">到期前</div>
+            <inline-x-number style="float:left;margin:0 5px;" width="50px" :min="0" :max="10" v-model="info.remind"></inline-x-number>
+            <div style="float:left;display:inline-block;line-height:28px;">个月提醒</div>
+        </cell>
       </group>
 
       <group gutter="10px">
@@ -85,7 +90,7 @@
 
 <script>
 import { Tab, TabItem, Group, Cell, Actionsheet, Popup, PopupHeader, Checker, CheckerItem,
-  PopupPicker, Datetime, XInput, XNumber, XSwitch, XTextarea, XButton, dateFormat } from 'vux'
+  PopupPicker, Datetime, XInput, InlineXNumber, XSwitch, XTextarea, XButton, dateFormat } from 'vux'
 import typeData from '../../data/building_type.json'
 import districtData from '../../data/beijing_area.json'
 import leaseBuyData from '../../data/lease_buy.json'
@@ -105,7 +110,7 @@ export default {
     PopupPicker,
     Datetime,
     XInput,
-    XNumber,
+    InlineXNumber,
     XSwitch,
     XTextarea,
     XButton
@@ -128,7 +133,8 @@ export default {
         budget: '',           // 预算
         settle_date: null,    // 入驻日期
         current_area: null,   // 在驻面积
-        end_date: null,       // 到日期
+        end_date: null,       // 到期日
+        remind: 8,            // 到期提醒（提前月份数）
         rem: '',              // 项目说明
         status: 0,            // 状态
         company_id: 0,        // 所属企业

@@ -164,7 +164,7 @@ class Customer extends Base
       ->where('a.id', $id)
       ->field('a.id,a.customer_name,a.area,a.address,a.demand,a.lease_buy,' .
         'a.district,a.min_acreage,a.max_acreage,a.budget,a.settle_date,a.current_area,' .
-        'a.end_date,a.rem,a.status,a.clash,a.parallel,a.share,a.user_id,a.company_id,' .
+        'a.end_date,a.remind,a.rem,a.status,a.clash,a.parallel,a.share,a.user_id,a.company_id,' .
         'b.title as manager,b.avatar,b.mobile,c.title as company')
       ->find();
 
