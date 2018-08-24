@@ -30,10 +30,10 @@ class My extends Base
   }
 
   /**
-   * 我的跟进客户
+   * 到期客户
    */
   public function task($page = 1) {
-    $list = Customer::search($this->user, ['status' => '1,2,3']);
+    $list = Customer::search($this->user, ['status' => '0,4,5', 'endDate' => true]);
     return $this->succeed($list);
   }
 
@@ -41,7 +41,7 @@ class My extends Base
    * 我的可跟进客户
    */
   public function customer() {
-    $list = Customer::search($this->user, ['status' => '0,1,2', 'clash' => false]);
+    $list = Customer::search($this->user, ['status' => '0,1,2,3', 'clash' => false]);
     return $this->succeed($list);
   }
 

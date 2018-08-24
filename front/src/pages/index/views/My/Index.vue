@@ -14,8 +14,8 @@
       <grid-item :link="{name:'MyBuilding'}" label="项目">
         <x-icon slot="icon" size="30" type="home" style="fill:rgb(253, 237, 16);"></x-icon>
       </grid-item>
-      <grid-item :link="{name:'MyCustomer'}" label="跟进客户">
-        <x-icon slot="icon" size="30" type="android-contacts" style="fill:rgb(245, 78, 1);"></x-icon>
+      <grid-item :link="{name:'MyCustomer'}" label="到期客户">
+        <x-icon slot="icon" size="30" type="android-calendar" style="fill:rgb(245, 78, 1);"></x-icon>
       </grid-item>
     </grid>
 

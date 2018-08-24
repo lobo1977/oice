@@ -143,6 +143,12 @@ class Customer extends Base
       }
     }
 
+    if (isset($filter['endDate'])) {
+      $list->where('a.end_date', 'not null')
+        ->where('a.remind', '>', 0)
+        ->where('date_sub(a.end_date, interval a.remind month) < now()');
+    }
+
     $result = $list->field('a.id,a.customer_name,a.area,a.address,a.demand,' .
       'a.lease_buy,a.min_acreage,a.max_acreage,a.budget,a.status,a.clash')
       ->page($filter['page'], $filter['page_size'])
