@@ -14,7 +14,7 @@
       <tab>
         <tab-item :selected="type == 'follow'" @on-item-click="getList('follow')">跟进客户</tab-item>
         <tab-item :selected="type == 'potential'" @on-item-click="getList('potential')">潜在客户</tab-item>
-        <tab-item :selected="type == 'history'" @on-item-click="getList('history')">历史客户</tab-item>
+        <tab-item :selected="type == 'history'" @on-item-click="getList('history')">客户池</tab-item>
       </tab>
       <router-view></router-view>
     </div>

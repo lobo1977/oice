@@ -40,8 +40,8 @@
         </x-input>
         <datetime title="到期日" v-model="info.end_date" value-text-align="left"></datetime>
         <cell title="到期提醒" value-align="left">
-            <div style="float:left;display:inline-block;line-height:28px;">到期前</div>
-            <inline-x-number style="float:left;margin:0 5px;" width="50px" :min="0" :max="10" v-model="info.remind"></inline-x-number>
+            <div style="float:left;display:inline-block;line-height:28px;">提前</div>
+            <inline-x-number style="float:left;margin:0 5px;" width="40px" :min="0" :max="10" v-model="info.remind"></inline-x-number>
             <div style="float:left;display:inline-block;line-height:28px;">个月提醒</div>
         </cell>
       </group>
@@ -89,8 +89,8 @@
 </template>
 
 <script>
-import { Tab, TabItem, Group, Cell, Actionsheet, Popup, PopupHeader, Checker, CheckerItem,
-  PopupPicker, Datetime, XInput, InlineXNumber, XSwitch, XTextarea, XButton, dateFormat } from 'vux'
+import { Tab, TabItem, Group, Cell, Actionsheet, Popup, PopupHeader, Checker, CheckerItem, Datetime,
+  PopupPicker, XInput, InlineXNumber, XSwitch, XTextarea, XButton, dateFormat } from 'vux'
 import typeData from '../../data/building_type.json'
 import districtData from '../../data/beijing_area.json'
 import leaseBuyData from '../../data/lease_buy.json'
@@ -107,8 +107,8 @@ export default {
     PopupHeader,
     Checker,
     CheckerItem,
-    PopupPicker,
     Datetime,
+    PopupPicker,
     XInput,
     InlineXNumber,
     XSwitch,

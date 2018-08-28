@@ -6,7 +6,7 @@ import Authenticate from '@/plugins/auth'
 import Wechat from '@/plugins/wechat'
 import App from './App'
 import router from './router/index'
-import { LoadingPlugin, ToastPlugin, AlertPlugin, ConfirmPlugin } from 'vux'
+import { LoadingPlugin, ToastPlugin, AlertPlugin, ConfirmPlugin, DatetimePlugin } from 'vux'
 
 Vue.config.productionTip = false
 
@@ -15,6 +15,7 @@ Vue.use(LoadingPlugin)
 Vue.use(ToastPlugin, {type: 'text', position: 'middle'})
 Vue.use(AlertPlugin)
 Vue.use(ConfirmPlugin)
+Vue.use(DatetimePlugin)
 Vue.use(HttpRequest)
 Vue.use(Authenticate)
 Vue.use(Wechat)
