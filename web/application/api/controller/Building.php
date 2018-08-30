@@ -36,7 +36,7 @@ class Building extends Base
     if ($id) {
       $data = modelBuilding::detail($this->user, $id);
       if ($data != null && $this->user) {
-        $data->customer = Customer::search($this->user, ['status' => '0,1,2', 'clash' => false]);
+        $data->customer = Customer::search($this->user, ['status' => '0,1,2,3', 'clash' => false]);
       }
       return $this->succeed($data);
     } else {
