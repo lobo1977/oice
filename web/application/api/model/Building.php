@@ -45,14 +45,10 @@ class Building extends Base
     if ($operate == 'share') {
       return true;
     } else if ($operate == 'view') {
-      if ($user == null) {
-        return false;
-      } else {
-        return $building->share ||
-          $building->user_id == 0 ||
-          $building->user_id == $user->id ||
-          $building->company_id == $user->company_id;
-      }
+      return $building->share ||
+        $building->user_id == 0 ||
+        ($user != null && $building->user_id == $user->id) ||
+        ($user != null && $building->company_id == $user->company_id);
     } else if ($operate == 'new') {
       return $user != null;
     } else if ($operate == 'edit') {
