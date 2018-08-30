@@ -39,22 +39,8 @@
 </template>
 
 <script>
-import {
-  Group,
-  Cell,
-  XButton,
-  dateFormat,
-  Flexbox,
-  FlexboxItem
-} from 'vux'
-
 export default {
   components: {
-    Group,
-    Cell,
-    XButton,
-    Flexbox,
-    FlexboxItem
   },
   data () {
     return {
@@ -124,16 +110,6 @@ export default {
           })
         }
       })
-    }
-  },
-  computed: {},
-  filters: {
-    formatDate (value) {
-      if (value) {
-        return dateFormat(new Date(Date.parse(value.replace(/-/g, '/'))), 'YYYY年M月D日')
-      } else {
-        return ''
-      }
     }
   }
 }

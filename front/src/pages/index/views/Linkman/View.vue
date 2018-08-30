@@ -35,15 +35,8 @@
 </template>
 
 <script>
-import { Group, Cell, Flexbox, FlexboxItem, XButton } from 'vux'
-
 export default {
   components: {
-    Group,
-    Cell,
-    Flexbox,
-    FlexboxItem,
-    XButton
   },
   data () {
     return {

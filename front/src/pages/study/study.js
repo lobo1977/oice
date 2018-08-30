@@ -6,9 +6,12 @@ import Authenticate from '@/plugins/auth'
 import Wechat from '@/plugins/wechat'
 import App from './App'
 import router from './router/index'
-import { LoadingPlugin, ToastPlugin, AlertPlugin, ConfirmPlugin, DatetimePlugin } from 'vux'
+import { dateFormat, LoadingPlugin, ToastPlugin, AlertPlugin, ConfirmPlugin, DatetimePlugin,
+  Group, Cell, Flexbox, FlexboxItem, Actionsheet, Popup, XButton, XInput } from 'vux'
 
 Vue.config.productionTip = false
+
+Vue.prototype.$dateFormat = dateFormat
 
 Vue.use(Vuex)
 Vue.use(LoadingPlugin)
@@ -19,6 +22,15 @@ Vue.use(DatetimePlugin)
 Vue.use(HttpRequest)
 Vue.use(Authenticate)
 Vue.use(Wechat)
+
+Vue.component('group', Group)
+Vue.component('cell', Cell)
+Vue.component('flexbox', Flexbox)
+Vue.component('flexbox-item', FlexboxItem)
+Vue.component('actionsheet', Actionsheet)
+Vue.component('popup', Popup)
+Vue.component('x-button', XButton)
+Vue.component('x-input', XInput)
 
 FastClick.attach(document.body)
 

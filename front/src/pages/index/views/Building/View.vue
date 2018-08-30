@@ -174,9 +174,7 @@
 </template>
 
 <script>
-import { Swiper, SwiperItem, Previewer, TransferDom, Sticky, Tab, TabItem,
-  Group, GroupTitle, Cell, Divider, Checker, CheckerItem, Actionsheet,
-  Flexbox, FlexboxItem, XButton, PopupPicker, Popup, dateFormat } from 'vux'
+import { Swiper, SwiperItem, Previewer, TransferDom, Divider, Checker, CheckerItem } from 'vux'
 import Topalert from '@/components/Topalert.vue'
 import Baidumap from '@/components/BaiduMap.vue'
 
@@ -188,21 +186,9 @@ export default {
     Swiper,
     SwiperItem,
     Previewer,
-    Sticky,
-    Tab,
-    TabItem,
-    Group,
-    GroupTitle,
-    Cell,
     Divider,
     Checker,
     CheckerItem,
-    Actionsheet,
-    Flexbox,
-    FlexboxItem,
-    XButton,
-    PopupPicker,
-    Popup,
     Topalert,
     Baidumap
   },
@@ -708,13 +694,6 @@ export default {
     }
   },
   filters: {
-    formatDate (date) {
-      if (date) {
-        return dateFormat(new Date(Date.parse(date.replace(/-/g, '/'))), 'YYYY年M月D日')
-      } else {
-        return ''
-      }
-    },
     formatFloor (floor) {
       if (floor > 0) {
         return floor + '层'

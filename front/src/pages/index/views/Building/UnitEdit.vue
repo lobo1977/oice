@@ -46,7 +46,7 @@
         </x-input>
         <cell title="装修状况" @click.native="showDecorationSelect = true" is-link :value="info.decoration" value-align="left"></cell>
         <cell title="状态" @click.native="showStatusPicker = true" :is-link="true" :value="statusText" value-align="left"></cell>
-        <datetime title="到期日" v-model="info.end_date" value-text-align="left"></datetime>
+        <cell title="到期日" :value="info.end_date" value-align="left" :is-link="true" @click.native="selectEndDate"></cell>
       </group>
 
       <group gutter="10px">
@@ -111,8 +111,7 @@
 </template>
 
 <script>
-import { Tab, TabItem, Previewer, TransferDom, Group, Cell, Actionsheet, Popup, PopupHeader, Checker, CheckerItem,
-  PopupPicker, Datetime, XInput, XNumber, XSwitch, XTextarea, XButton, dateFormat, Flexbox, FlexboxItem } from 'vux'
+import { Previewer, TransferDom, PopupHeader, Checker, CheckerItem } from 'vux'
 import faceData from '../../data/face.json'
 import rentSellData from '../../data/rent_sell.json'
 import decorationData from '../../data/decoration.json'
@@ -123,25 +122,10 @@ export default {
     TransferDom
   },
   components: {
-    Tab,
-    TabItem,
     Previewer,
-    Group,
-    Cell,
-    Actionsheet,
-    Popup,
     PopupHeader,
     Checker,
-    CheckerItem,
-    PopupPicker,
-    Datetime,
-    XInput,
-    XNumber,
-    XSwitch,
-    XTextarea,
-    XButton,
-    Flexbox,
-    FlexboxItem
+    CheckerItem
   },
   data () {
     return {
@@ -164,7 +148,7 @@ export default {
         sell_price: null,     // 出售价格
         decoration: '',       // 装修状况
         status: 0,            // 状态
-        end_date: null,       // 到日期
+        end_date: '',       // 到日期
         rem: '',              // 备注
         user_id: 0,
         company_id: 0,        // 所属企业
@@ -257,7 +241,7 @@ export default {
               vm.selectedDecoration = vm.info.decoration.split(',')
             }
             if (vm.info.end_date) {
-              vm.info.end_date = dateFormat(new Date(Date.parse(vm.info.end_date.replace(/-/g, '/'))), 'YYYY-MM-DD')
+              vm.info.end_date = vm.$dateFormat(new Date(Date.parse(vm.info.end_date.replace(/-/g, '/'))), 'YYYY-MM-DD')
             }
             if (vm.info.floor === 0 || vm.info.floor === '0') {
               vm.info.floor = null
@@ -327,6 +311,17 @@ export default {
     statusSelect (key, item) {
       this.info.status = item.value
       this.statusText = item.label
+    },
+    selectEndDate () {
+      let vm = this
+      vm.$vux.datetime.show({
+        value: vm.info.end_date,
+        cancelText: '取消',
+        confirmText: '确定',
+        onConfirm (val) {
+          vm.info.end_date = val
+        }
+      })
     },
     companySelect (key, item) {
       this.info.company_id = item.value

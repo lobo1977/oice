@@ -42,12 +42,10 @@
 </template>
 
 <script>
-import { Group, Cell, Grid, GridItem } from 'vux'
+import { Grid, GridItem } from 'vux'
 
 export default {
   components: {
-    Group,
-    Cell,
     Grid,
     GridItem
   },

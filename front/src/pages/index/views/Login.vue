@@ -46,14 +46,11 @@
 </template>
 
 <script>
-import { Group, XInput, XButton, Countdown } from 'vux'
+import { Countdown } from 'vux'
 import { mapState, mapActions } from 'vuex'
 
 export default {
   components: {
-    Group,
-    XInput,
-    XButton,
     Countdown
   },
   data () {

@@ -6,7 +6,10 @@ import Authenticate from '@/plugins/auth'
 import Wechat from '@/plugins/wechat'
 import App from './App'
 import router from './router/index'
-import { LoadingPlugin, ToastPlugin, AlertPlugin, ConfirmPlugin, DatetimePlugin } from 'vux'
+import { dateFormat, LoadingPlugin, ToastPlugin, AlertPlugin, ConfirmPlugin, DatetimePlugin,
+  Panel, Sticky, Tab, TabItem, Group, Cell, LoadMore, Flexbox, FlexboxItem,
+  Actionsheet, Popup, PopupPicker,
+  XButton, XInput, XSwitch, InlineXNumber, XTextarea } from 'vux'
 
 Vue.config.productionTip = false
 
@@ -19,6 +22,34 @@ Vue.use(DatetimePlugin)
 Vue.use(HttpRequest)
 Vue.use(Authenticate)
 Vue.use(Wechat)
+
+Vue.component('panel', Panel)
+Vue.component('sticky', Sticky)
+Vue.component('tab', Tab)
+Vue.component('tab-item', TabItem)
+Vue.component('group', Group)
+Vue.component('cell', Cell)
+Vue.component('load-more', LoadMore)
+Vue.component('flexbox', Flexbox)
+Vue.component('flexbox-item', FlexboxItem)
+Vue.component('actionsheet', Actionsheet)
+Vue.component('popup', Popup)
+Vue.component('popup-picker', PopupPicker)
+Vue.component('x-button', XButton)
+Vue.component('x-input', XInput)
+Vue.component('inline-x-number', InlineXNumber)
+Vue.component('x-textarea', XTextarea)
+Vue.component('x-switch', XSwitch)
+
+Vue.prototype.$dateFormat = dateFormat
+
+Vue.filter('formatDate', function (value) {
+  if (value) {
+    return dateFormat(new Date(Date.parse(value.replace(/-/g, '/'))), 'YYYY年M月D日')
+  } else {
+    return value
+  }
+})
 
 FastClick.attach(document.body)
 

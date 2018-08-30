@@ -22,13 +22,11 @@
 </template>
 
 <script>
-import { Search, Tab, TabItem } from 'vux'
+import { Search } from 'vux'
 
 export default {
   components: {
-    Search,
-    Tab,
-    TabItem
+    Search
   },
   data () {
     return {

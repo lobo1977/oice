@@ -29,15 +29,8 @@
 </template>
 
 <script>
-import { Group, XInput, XTextarea, XSwitch, XButton } from 'vux'
-
 export default {
   components: {
-    Group,
-    XInput,
-    XTextarea,
-    XSwitch,
-    XButton
   },
   data () {
     return {

@@ -56,15 +56,13 @@
 </template>
 
 <script>
-import { TransferDom, Flexbox, FlexboxItem, Group, Cell, XInput, XButton,
-  Actionsheet, Popup, dateFormat } from 'vux'
+import { TransferDom } from 'vux'
 
 export default {
   directives: {
     TransferDom
   },
   components: {
-    Flexbox, FlexboxItem, Group, Cell, XInput, XButton, Actionsheet, Popup, dateFormat
   },
   data () {
     return {
@@ -112,9 +110,9 @@ export default {
     },
     formatDate (date) {
       if (date) {
-        return dateFormat(date, 'YYYY年M月D日')
+        return this.$dateFormat(date, 'YYYY年M月D日')
       } else {
-        return dateFormat(new Date(), 'YYYY年M月D日')
+        return this.$dateFormat(new Date(), 'YYYY年M月D日')
       }
     },
     newQuestions () {

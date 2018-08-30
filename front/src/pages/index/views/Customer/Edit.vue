@@ -33,12 +33,12 @@
         </x-input>
 
         <x-input title="预算" v-model="info.budget" :max="30"></x-input>
-        <datetime title="入驻日期" v-model="info.settle_date" value-text-align="left"></datetime>
+        <cell title="入驻日期" :value="info.settle_date" value-align="left" :is-link="true" @click.native="selectSettleDate"></cell>
 
         <x-input title="在驻面积" type="number" v-model="info.current_area" :max="10" :show-clear="false">
           <span slot="right">平方米</span>
         </x-input>
-        <datetime title="到期日" v-model="info.end_date" value-text-align="left"></datetime>
+        <cell title="到期日" :value="info.end_date" value-align="left" :is-link="true" @click.native="selectEndDate"></cell>
         <cell title="到期提醒" value-align="left">
             <div style="float:left;display:inline-block;line-height:28px;">提前</div>
             <inline-x-number style="float:left;margin:0 5px;" width="40px" :min="0" :max="10" v-model="info.remind"></inline-x-number>
@@ -89,8 +89,7 @@
 </template>
 
 <script>
-import { Tab, TabItem, Group, Cell, Actionsheet, Popup, PopupHeader, Checker, CheckerItem, Datetime,
-  PopupPicker, XInput, InlineXNumber, XSwitch, XTextarea, XButton, dateFormat } from 'vux'
+import { PopupHeader, Checker, CheckerItem } from 'vux'
 import typeData from '../../data/building_type.json'
 import districtData from '../../data/beijing_area.json'
 import leaseBuyData from '../../data/lease_buy.json'
@@ -98,22 +97,9 @@ import statusData from '../../data/customer_status.json'
 
 export default {
   components: {
-    Tab,
-    TabItem,
-    Group,
-    Cell,
-    Actionsheet,
-    Popup,
     PopupHeader,
     Checker,
-    CheckerItem,
-    Datetime,
-    PopupPicker,
-    XInput,
-    InlineXNumber,
-    XSwitch,
-    XTextarea,
-    XButton
+    CheckerItem
   },
   data () {
     return {
@@ -131,9 +117,9 @@ export default {
         min_acreage: null,    // 最小面积(平方米)
         max_acreage: null,    // 最大面积(平方米)
         budget: '',           // 预算
-        settle_date: null,    // 入驻日期
+        settle_date: '',    // 入驻日期
         current_area: null,   // 在驻面积
-        end_date: null,       // 到期日
+        end_date: '',       // 到期日
         remind: 8,            // 到期提醒（提前月份数）
         rem: '',              // 项目说明
         status: 0,            // 状态
@@ -238,10 +224,10 @@ export default {
               vm.selectedDistrict = vm.info.district.split(',')
             }
             if (vm.info.settle_date) {
-              vm.info.settle_date = dateFormat(new Date(Date.parse(vm.info.settle_date.replace(/-/g, '/'))), 'YYYY-MM-DD')
+              vm.info.settle_date = vm.$dateFormat(new Date(Date.parse(vm.info.settle_date.replace(/-/g, '/'))), 'YYYY-MM-DD')
             }
             if (vm.info.end_date) {
-              vm.info.end_date = dateFormat(new Date(Date.parse(vm.info.end_date.replace(/-/g, '/'))), 'YYYY-MM-DD')
+              vm.info.end_date = vm.$dateFormat(new Date(Date.parse(vm.info.end_date.replace(/-/g, '/'))), 'YYYY-MM-DD')
             }
             if (!vm.info.min_acreage || vm.info.min_acreage === '0') {
               vm.info.min_acreage = null
@@ -313,6 +299,28 @@ export default {
     statusSelect (key, item) {
       this.info.status = item.value
       this.statusText = item.label
+    },
+    selectSettleDate () {
+      let vm = this
+      vm.$vux.datetime.show({
+        value: vm.info.settle_date,
+        cancelText: '取消',
+        confirmText: '确定',
+        onConfirm (val) {
+          vm.info.settle_date = val
+        }
+      })
+    },
+    selectEndDate () {
+      let vm = this
+      vm.$vux.datetime.show({
+        value: vm.info.end_date,
+        cancelText: '取消',
+        confirmText: '确定',
+        onConfirm (val) {
+          vm.info.end_date = val
+        }
+      })
     },
     companySelect (key, item) {
       this.info.company_id = item.value

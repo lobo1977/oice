@@ -8,13 +8,10 @@
 </template>
 
 <script>
-import { Panel, LoadMore } from 'vux'
 import { mapState } from 'vuex'
 
 export default {
   components: {
-    Panel,
-    LoadMore
   },
   data () {
     return {

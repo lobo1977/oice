@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import { Search, Sticky, Flexbox, FlexboxItem, XButton, PopupPicker, Panel, LoadMore } from 'vux'
+import { Search } from 'vux'
 import { mapState } from 'vuex'
 import typeData from '../../data/building_type.json'
 import districtData from '../../data/beijing_area.json'
@@ -77,14 +77,7 @@ import acreageData from '../../data/acreage.json'
 
 export default {
   components: {
-    Search,
-    Sticky,
-    Flexbox,
-    FlexboxItem,
-    XButton,
-    PopupPicker,
-    Panel,
-    LoadMore
+    Search
   },
   data () {
     return {

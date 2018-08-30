@@ -33,7 +33,7 @@
             <x-icon type="location" size="24" class="input_icon"></x-icon>
           </span>
         </x-input>
-        <datetime title="竣工日期" v-model="info.completion_date" value-text-align="left"></datetime>
+        <cell title="竣工日期" :value="info.completion_date" value-align="left" :is-link="true" @click.native="selectCompletionDate"></cell>
         <cell title="租售" @click.native="showRentSellPicker = true" :is-link="true" :value="info.rent_sell" value-align="left"></cell>
         <x-input title="价格" v-model="info.price" :max="30"></x-input>
         
@@ -44,8 +44,10 @@
         <x-input title="层面积" type="number" v-model="info.floor_area" :max="10" :show-clear="false">
           <span slot="right">平方米</span>
         </x-input>
-        <x-number title="层高(米)" v-model="info.floor_height" width="80px" 
-          :min="2" :max="8" :step="0.1" align="left"></x-number>
+        <cell title="层高" value-align="left">
+          <inline-x-number style="float:left;margin:0 5px 0 0;" width="80px" :min="2" :max="8" :step="0.1" v-model="info.floor_height"></inline-x-number>
+          <div style="float:left;display:inline-block;line-height:28px;">米</div>
+        </cell>
         <x-input title="楼板承重" type="number" v-model="info.bearing" :max="10" :show-clear="false">
           <span slot="right">千克/平方米</span>
         </x-input>
@@ -174,9 +176,7 @@
 </template>
 
 <script>
-import { Tab, TabItem, Group, Cell, Actionsheet, PopupPicker, Popup,
-  Datetime, XInput, XNumber, XSwitch, XTextarea, XButton, dateFormat,
-  Flexbox, FlexboxItem, Previewer, TransferDom } from 'vux'
+import { Previewer, TransferDom } from 'vux'
 import Baidumap from '@/components/BaiduMap.vue'
 import typeData from '../../data/building_type.json'
 import districtData from '../../data/beijing_area.json'
@@ -188,22 +188,7 @@ export default {
     TransferDom
   },
   components: {
-    Tab,
-    TabItem,
-    Group,
-    Cell,
-    Actionsheet,
-    PopupPicker,
-    Datetime,
-    XInput,
-    XNumber,
-    XSwitch,
-    XTextarea,
-    XButton,
-    Flexbox,
-    FlexboxItem,
     Previewer,
-    Popup,
     Baidumap
   },
   data () {
@@ -225,7 +210,7 @@ export default {
         address: '',          // 地址
         longitude: 0,          // 经度
         latitude: 0,           // 纬度
-        completion_date: null, // 竣工日期
+        completion_date: '', // 竣工日期
         rent_sell: '',        // 租售
         price: '',            // 价格
         acreage: null,        // 建筑面积
@@ -333,7 +318,7 @@ export default {
               vm.districtValue = [vm.info.area, vm.info.district]
             }
             if (vm.info.completion_date) {
-              vm.info.completion_date = dateFormat(new Date(Date.parse(vm.info.completion_date.replace(/-/g, '/'))), 'YYYY-MM-DD')
+              vm.info.completion_date = vm.$dateFormat(new Date(Date.parse(vm.info.completion_date.replace(/-/g, '/'))), 'YYYY-MM-DD')
             }
             if (!vm.info.acreage || vm.info.acreage === '0') {
               vm.info.acreage = null
@@ -405,6 +390,17 @@ export default {
     },
     rentSellSelect (key, item) {
       this.info.rent_sell = item.value
+    },
+    selectCompletionDate () {
+      let vm = this
+      vm.$vux.datetime.show({
+        value: vm.info.completion_date,
+        cancelText: '取消',
+        confirmText: '确定',
+        onConfirm (val) {
+          vm.info.completion_date = val
+        }
+      })
     },
     companySelect (key, item) {
       this.info.company_id = item.value

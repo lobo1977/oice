@@ -70,22 +70,17 @@
 </template>
 
 <script>
-import { Search, Group, Swipeout, SwipeoutItem, SwipeoutButton, Radio, Cell, Badge, Flexbox, FlexboxItem, XButton } from 'vux'
+import { Search, Swipeout, SwipeoutItem, SwipeoutButton, Radio, Badge } from 'vux'
 import { mapState, mapActions } from 'vuex'
 
 export default {
   components: {
     Search,
-    Group,
     Swipeout,
     SwipeoutItem,
     SwipeoutButton,
     Radio,
-    Cell,
-    Badge,
-    Flexbox,
-    FlexboxItem,
-    XButton
+    Badge
   },
   data () {
     return {

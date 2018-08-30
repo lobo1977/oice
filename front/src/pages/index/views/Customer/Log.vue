@@ -1,8 +1,9 @@
 <template>
   <div>
     <group gutter="0" label-width="4em" label-margin-right="1em" label-align="left">
-      <datetime class="datetime-picker" title="时间" v-model="info.create_time" format="YYYY-MM-DD HH:mm" :required="true"
-        :min-hour=8 :max-hour=22 :minute-list="['00', '10', '15', '20', '30', '40', '45', '50']"></datetime>
+      <cell title="时间" :value="info.create_time" value-align="left" :is-link="true" @click.native="selectTime">
+        <span slot="title" :class="{warn: !isTimeValid}">确认日期</span>
+      </cell>
       <x-input ref="input_title" title="摘要" v-model="info.title" :required="true" :max="10"
         @on-click-error-icon="titleError" :should-toast-error="false" @on-change="validateForm"></x-input>
       <x-textarea placeholder="详情" :rows="3" v-model="info.summary" :max="500"></x-textarea>
@@ -17,19 +18,12 @@
 </template>
 
 <script>
-import { Group, Datetime, dateFormat, XInput, XTextarea, XButton } from 'vux'
-
 export default {
   components: {
-    Group,
-    Datetime,
-    dateFormat,
-    XInput,
-    XTextarea,
-    XButton
   },
   data () {
     return {
+      isTimeValid: true,
       formValidate: false,
       id: 0,
       info: {
@@ -37,7 +31,7 @@ export default {
         owner_id: 0,
         title: '',        // 摘要
         summary: '',      // 详情
-        create_time: dateFormat(new Date(), 'YYYY-MM-DD HH:mm') // 时间
+        create_time: this.$dateFormat(new Date(), 'YYYY-MM-DD HH:mm') // 时间
       }
     }
   },
@@ -80,15 +74,37 @@ export default {
     })
   },
   methods: {
+    selectTime () {
+      let vm = this
+      vm.$vux.datetime.show({
+        value: vm.info.create_time,
+        cancelText: '取消',
+        confirmText: '确定',
+        format: 'YYYY-MM-DD HH:mm',
+        minHour: 8,
+        maxHour: 22,
+        minuteList: ['00', '10', '15', '20', '30', '40', '45', '50'],
+        onHide () {
+          vm.isTimeValid = vm.info.create_time.length > 0
+          vm.validateForm()
+        },
+        onConfirm (val) {
+          vm.info.create_time = val
+          vm.isTimeValid = vm.info.create_time.length > 0
+          vm.validateForm()
+        }
+      })
+    },
     titleError () {
       this.$vux.toast.show({
         text: '请输入摘要'
       })
     },
     validateForm () {
-      this.formValidate = this.$refs.input_title.valid
+      this.formValidate = this.isTimeValid && this.$refs.input_title.valid
     },
     save () {
+      this.isTimeValid = this.info.create_time.length > 0
       this.validateForm()
       if (!this.formValidate) {
         return
@@ -117,7 +133,7 @@ export default {
 </script>
 
 <style lang="less">
-.datetime-picker .weui-cell__ft {
-  text-align:left;
+.warn {
+  color: red;
 }
 </style>

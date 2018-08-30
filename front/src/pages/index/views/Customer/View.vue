@@ -205,31 +205,22 @@
 </template>
 
 <script>
-import { Tab, TabItem, Flow, FlowState, FlowLine, Group, GroupTitle, Cell, Panel,
-  Swipeout, SwipeoutItem, SwipeoutButton, CheckIcon, Actionsheet,
-  Flexbox, FlexboxItem, XButton, dateFormat, Timeline, TimelineItem } from 'vux'
+import { Flow, FlowState, FlowLine, GroupTitle,
+  Swipeout, SwipeoutItem, SwipeoutButton, CheckIcon,
+  Timeline, TimelineItem } from 'vux'
 import Topalert from '@/components/Topalert.vue'
 import printModeData from '../../data/print_mode.json'
 
 export default {
   components: {
-    Tab,
-    TabItem,
     Flow,
     FlowState,
     FlowLine,
-    Group,
     GroupTitle,
-    Cell,
-    Panel,
     Swipeout,
     SwipeoutItem,
     SwipeoutButton,
     CheckIcon,
-    Actionsheet,
-    Flexbox,
-    FlexboxItem,
-    XButton,
     Timeline,
     TimelineItem,
     Topalert
@@ -636,13 +627,6 @@ export default {
     }
   },
   filters: {
-    formatDate (value) {
-      if (value) {
-        return dateFormat(new Date(Date.parse(value.replace(/-/g, '/'))), 'YYYY年M月D日')
-      } else {
-        return ''
-      }
-    },
     printModeLabel (type) {
       if (!printModeData) {
         return ''

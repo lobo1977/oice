@@ -36,19 +36,12 @@
 </template>
 
 <script>
-import { Group, Cell, CheckIcon, LoadMore, PopupPicker, Flexbox, FlexboxItem, XButton } from 'vux'
+import { CheckIcon } from 'vux'
 import { mapState } from 'vuex'
 
 export default {
   components: {
-    Group,
-    Cell,
-    CheckIcon,
-    LoadMore,
-    PopupPicker,
-    Flexbox,
-    FlexboxItem,
-    XButton
+    CheckIcon
   },
   data () {
     return {

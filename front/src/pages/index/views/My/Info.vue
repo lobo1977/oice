@@ -29,15 +29,10 @@
 </template>
 
 <script>
-import { Group, Cell, XInput, XButton } from 'vux'
 import { mapState, mapActions } from 'vuex'
 
 export default {
   components: {
-    Group,
-    Cell,
-    XInput,
-    XButton
   },
   data () {
     return {

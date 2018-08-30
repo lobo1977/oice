@@ -42,14 +42,12 @@
 </template>
 
 <script>
-import { TransferDom, Actionsheet, XHeader, Tabbar, TabbarItem } from 'vux'
+import { XHeader, Tabbar, TabbarItem } from 'vux'
 import { mapState, mapActions } from 'vuex'
 
 export default {
   name: 'app',
   components: {
-    TransferDom,
-    Actionsheet,
     XHeader,
     Tabbar,
     TabbarItem

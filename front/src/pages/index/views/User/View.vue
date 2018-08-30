@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { Group, Cell, Flexbox, FlexboxItem, XButton, TransferDom, XDialog } from 'vux'
+import { TransferDom, XDialog } from 'vux'
 import { mapActions } from 'vuex'
 
 export default {
@@ -45,11 +45,6 @@ export default {
     TransferDom
   },
   components: {
-    Group,
-    Cell,
-    Flexbox,
-    FlexboxItem,
-    XButton,
     XDialog
   },
   data () {

@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import { Previewer, TransferDom, LoadMore, Group, Cell, CellBox, XTable, Popup, dateFormat } from 'vux'
+import { Previewer, TransferDom, XTable } from 'vux'
 import Baidumap from '@/components/BaiduMap.vue'
 
 export default {
@@ -111,12 +111,7 @@ export default {
   },
   components: {
     Previewer,
-    LoadMore,
-    Group,
-    Cell,
-    CellBox,
     XTable,
-    Popup,
     Baidumap
   },
   data () {
@@ -169,15 +164,6 @@ export default {
     },
     closeMap () {
       this.showMap = false
-    }
-  },
-  filters: {
-    formatDate (value) {
-      if (value) {
-        return dateFormat(new Date(Date.parse(value.replace(/-/g, '/'))), 'YYYY年M月D日')
-      } else {
-        return ''
-      }
     }
   },
   beforeRouteEnter (to, from, next) {

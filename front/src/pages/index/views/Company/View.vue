@@ -99,8 +99,7 @@
 </template>
 
 <script>
-import { Masker, Group, TransferDom, XDialog,
-  Swipeout, SwipeoutItem, SwipeoutButton, Cell, Flexbox, FlexboxItem, XButton } from 'vux'
+import { Masker, TransferDom, XDialog, Swipeout, SwipeoutItem, SwipeoutButton } from 'vux'
 import { mapActions } from 'vuex'
 
 export default {
@@ -109,15 +108,10 @@ export default {
   },
   components: {
     Masker,
-    Group,
     XDialog,
     Swipeout,
     SwipeoutItem,
-    SwipeoutButton,
-    Cell,
-    Flexbox,
-    FlexboxItem,
-    XButton
+    SwipeoutButton
   },
   data () {
     return {

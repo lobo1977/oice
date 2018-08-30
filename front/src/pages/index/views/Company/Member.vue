@@ -18,14 +18,10 @@
 </template>
 
 <script>
-import { Group, Cell, LoadMore } from 'vux'
 import { mapState } from 'vuex'
 
 export default {
   components: {
-    Group,
-    Cell,
-    LoadMore
   },
   data () {
     return {

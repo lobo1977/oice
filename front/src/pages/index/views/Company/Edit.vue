@@ -53,21 +53,12 @@
 </template>
 
 <script>
-import { Group, Cell, PopupPicker, Actionsheet, XInput, XSwitch, XTextarea, XButton } from 'vux'
 import { mapActions } from 'vuex'
 import districtData from '../../data/beijing_area.json'
 import joinWayData from '../../data/join_way.json'
 
 export default {
   components: {
-    Group,
-    Cell,
-    PopupPicker,
-    Actionsheet,
-    XInput,
-    XSwitch,
-    XTextarea,
-    XButton
   },
   data () {
     return {

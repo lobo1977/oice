@@ -69,8 +69,7 @@
 </template>
 
 <script>
-import { Swiper, SwiperItem, Previewer, TransferDom, PopupPicker, Actionsheet,
-  Group, GroupTitle, Cell, Flexbox, FlexboxItem, XButton, dateFormat } from 'vux'
+import { Swiper, SwiperItem, Previewer, TransferDom, GroupTitle } from 'vux'
 
 export default {
   directives: {
@@ -80,15 +79,7 @@ export default {
     Swiper,
     SwiperItem,
     Previewer,
-    PopupPicker,
-    Actionsheet,
-    Group,
-    GroupTitle,
-    Cell,
-    Flexbox,
-    FlexboxItem,
-    XButton,
-    dateFormat
+    GroupTitle
   },
   data () {
     return {
@@ -332,15 +323,6 @@ export default {
           })
         }
       })
-    }
-  },
-  filters: {
-    formatDate (value) {
-      if (value) {
-        return dateFormat(new Date(Date.parse(value.replace(/-/g, '/'))), 'YYYY年M月D日')
-      } else {
-        return ''
-      }
     }
   },
   computed: {
