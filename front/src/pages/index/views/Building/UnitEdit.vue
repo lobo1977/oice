@@ -98,7 +98,7 @@
         </flexbox-item>
       </flexbox>
       <div class="bottom-bar">
-        <form id="frmUploadUnitImage">
+        <form ref="frmUploadUnitImage">
           <x-button type="warn" class="bottom-btn">上传</x-button>
           <input type="hidden" name="id" :value="id">
           <input type="file" class="upload" name="images[]" multiple="multiple"
@@ -368,8 +368,9 @@ export default {
       this.$refs.previewer.show(index)
     },
     upload () {
+      let form = this.$refs.frmUploadUnitImage
       this.$vux.loading.show()
-      this.$postFile('/api/building/uploadUnitImage', '#frmUploadUnitImage', (res) => {
+      this.$postFile('/api/building/uploadUnitImage', form, (res) => {
         this.$vux.loading.hide()
         if (res.success) {
           this.images = res.data

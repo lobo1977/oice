@@ -151,7 +151,7 @@
         </flexbox-item>
       </flexbox>
       <div class="bottom-bar">
-        <form id="frmUploadImage">
+        <form ref="frmUploadImage">
           <x-button type="warn" class="bottom-btn">上传</x-button>
           <input type="hidden" name="id" :value="id">
           <input type="file" class="upload" name="images[]" multiple="multiple"
@@ -354,7 +354,7 @@ export default {
             vm.$emit('on-view-loaded', vm.info.building_name)
           } else {
             vm.info.__token__ = res.data.__token__
-            vm.$emit('on-view-loaded', '添加房源')
+            vm.$emit('on-view-loaded', '添加项目')
           }
         } else {
           vm.$vux.toast.show({
@@ -485,8 +485,9 @@ export default {
       this.$refs.previewer.show(index)
     },
     upload () {
+      let form = this.$refs.frmUploadImage
       this.$vux.loading.show()
-      this.$postFile('/api/building/uploadImage', '#frmUploadImage', (res) => {
+      this.$postFile('/api/building/uploadImage', form, (res) => {
         this.$vux.loading.hide()
         if (res.success) {
           this.images = res.data

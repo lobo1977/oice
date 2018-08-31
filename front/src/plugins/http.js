@@ -104,14 +104,11 @@ export default {
 
     Vue.postFile = (url, form, cb) => {
       const maxBytes = 6291456
-      let formObj = document.querySelector(form)
-
-      if (formObj == null) return
-
-      for (let i in formObj.elements) {
-        if (formObj.elements[i].type === 'file') {
-          for (let f in formObj.elements[i].files) {
-            if (formObj.elements[i].files[f].size > maxBytes) {
+      if (!form) return
+      for (let i in form.elements) {
+        if (form.elements[i].type === 'file') {
+          for (let f in form.elements[i].files) {
+            if (form.elements[i].files[f].size > maxBytes) {
               if (cb) {
                 cb.call(this, {
                   success: false,
@@ -125,7 +122,7 @@ export default {
         }
       }
 
-      let data = new FormData(formObj)
+      let data = new FormData(form)
       ajax(url, 'post', data, 'multipart/form-data', cb)
     }
 

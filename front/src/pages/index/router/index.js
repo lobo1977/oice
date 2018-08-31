@@ -25,7 +25,7 @@ export default new Router({
       path: '/building',
       name: 'Building',
       meta: {
-        title: '房源',
+        title: '项目',
         showPlus: true,
         keepAlive: true,
         canShare: true

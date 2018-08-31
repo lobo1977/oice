@@ -1,6 +1,6 @@
 <template>
   <div>
-    <form id="frmMy">
+    <form ref="frmMy">
       <input type="hidden" name="__token__" v-model="info.__token__">
       <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
         <cell title="头像">
@@ -103,8 +103,9 @@ export default {
       if (!this.formValidate) {
         return
       }
+      let form = this.$refs.frmMy
       this.$vux.loading.show()
-      this.$postFile('/api/my/edit', '#frmMy', (res) => {
+      this.$postFile('/api/my/edit', form, (res) => {
         this.$vux.loading.hide()
         if (res.success) {
           if (res.data) {

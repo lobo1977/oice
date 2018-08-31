@@ -6,28 +6,22 @@
       :right-options="rightOptions"
       :title="title"
       :transition="headerTransition" @on-click-back="goBack">
-      <span slot="right" v-if="$route.meta.showPlus" @click="showMenu = true">
+      <span slot="right" v-if="$route.meta.showPlus" @click="callNew">
         <x-icon type="plus" size="24" class="header-icon"></x-icon>
-      </span>
-      <span slot="right" v-if="$route.meta.showEdit" @click="goEdit">
-        <x-icon type="compose" size="24" class="header-icon"></x-icon>
       </span>
     </x-header>
 
-    <actionsheet v-model="showMenu" :menus="menus" @on-click-menu="menuClick">
-    </actionsheet>
-
     <keep-alive>
-      <router-view v-if="$route.meta.keepAlive && !$route.query.reload" @on-component-mounted="componentMounted" 
+      <router-view ref="page" v-if="$route.meta.keepAlive && !$route.query.reload" @on-component-mounted="componentMounted" 
         @on-view-loaded="changeTitle"></router-view>
     </keep-alive>
-    <router-view v-if="!$route.meta.keepAlive || $route.query.reload" @on-component-mounted="componentMounted" 
+    <router-view ref="page" v-if="!$route.meta.keepAlive || $route.query.reload" @on-component-mounted="componentMounted" 
         @on-view-loaded="changeTitle"></router-view>
 
     <tabbar style="position:fixed;" icon-class="vux-center" v-if="!this.$route.meta.hideBar" slot="bottom">
       <tabbar-item :selected="$route.path.indexOf('/building') === 0" link="/building">
         <x-icon slot="icon" type="home" size="30"></x-icon>
-        <span slot="label">房源</span>
+        <span slot="label">项目</span>
       </tabbar-item>
       <tabbar-item :selected="$route.path.indexOf('/customer') === 0" link="/customer">
         <x-icon slot="icon" type="android-contacts" size="30"></x-icon>
@@ -54,12 +48,7 @@ export default {
   },
   data () {
     return {
-      title: document.title,
-      menus: {
-        BuildingEdit: '添加房源',
-        CustomerEdit: '添加客户'
-      },
-      showMenu: false
+      title: document.title
     }
   },
   methods: {
@@ -74,14 +63,9 @@ export default {
         this.$router.back()
       }
     },
-    menuClick (menuKey, menuItem) {
-      this.$router.push({name: menuKey, params: {id: 0}})
-    },
-    goEdit () {
-      if (this.$route.name === 'BuildingView') {
-        this.$router.push({name: 'BuildingEdit', params: {id: this.$route.params.id}})
-      } else if (this.$route.name === 'CustomerView') {
-        this.$router.push({name: 'CustomerEdit', params: {id: this.$route.params.id}})
+    callNew () {
+      if (this.$refs.page && this.$refs.page.new) {
+        this.$refs.page.new()
       }
     },
     changeTitle (title) {

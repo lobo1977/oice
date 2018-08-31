@@ -1,6 +1,6 @@
 <template>
   <div>
-    <form id="frmCompany">
+    <form ref="frmCompany">
       <input type="hidden" name="__token__" :value="info.__token__">
       <input type="hidden" name="area" :value="info.area">
       <input type="hidden" name="status" :value="info.status ? 1 : 0">
@@ -180,10 +180,11 @@ export default {
       if (!this.formValidate) {
         return
       }
+      let form = this.$refs.frmCompany
       this.$vux.loading.show()
       this.info.status = (this.info.status ? 1 : 0)
       this.info.enable_stamp = (this.info.enable_stamp ? 1 : 0)
-      this.$postFile('/api/company/edit?id=' + this.id, '#frmCompany', (res) => {
+      this.$postFile('/api/company/edit?id=' + this.id, form, (res) => {
         if (res.success) {
           this.$updateUser((res2) => {
             this.getUser()
