@@ -103,26 +103,27 @@ export default {
     }
 
     Vue.postFile = (url, form, cb) => {
-      const maxBytes = 6291456
-      if (!form) return
-      for (let i in form.elements) {
-        if (form.elements[i].type === 'file') {
-          for (let f in form.elements[i].files) {
-            if (form.elements[i].files[f].size > maxBytes) {
-              if (cb) {
-                cb.call(this, {
-                  success: false,
-                  message: '上传文件不能超过6兆字节。',
-                  code: 0
-                })
+      let data = null
+      if (form) {
+        const maxBytes = 6291456
+        for (let i in form.elements) {
+          if (form.elements[i].type === 'file') {
+            for (let f in form.elements[i].files) {
+              if (form.elements[i].files[f].size > maxBytes) {
+                if (cb) {
+                  cb.call(this, {
+                    success: false,
+                    message: '上传文件不能超过6兆字节。',
+                    code: 0
+                  })
+                }
+                return
               }
-              return
             }
           }
         }
+        data = new FormData(form)
       }
-
-      let data = new FormData(form)
       ajax(url, 'post', data, 'multipart/form-data', cb)
     }
 
