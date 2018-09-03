@@ -70,7 +70,7 @@ export default {
       if (key === 'new') {
         this.$router.push({name: 'CustomerEdit', params: {id: 0}})
       } else if (key === 'template') {
-        document.location.href = '/static/template/customer.xlsx'
+        document.location.href = '/static/template/customer.xls'
       } else if (key === 'import') {
         if (!this.user || this.user.id === 0) {
           this.$router.push({
