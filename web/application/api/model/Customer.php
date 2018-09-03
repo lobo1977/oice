@@ -1,6 +1,8 @@
 <?php
 namespace app\api\model;
 
+use PHPExcel_IOFactory;
+use PHPExcel;
 use think\model\concern\SoftDelete;
 use app\api\model\Base;
 use app\api\model\Log;
@@ -17,7 +19,7 @@ class Customer extends Base
   protected $pk = 'id';
   protected $deleteTime = 'delete_time';
 
-  public static $status = ['潜在','跟进','看房','确认','成交','失败'];
+  public static $status = ['潜在','跟进','看房','确认','成交','失败','名录'];
   public static $share = ['私有','共享'];
   private static $IGNORE_WORDS = '/北京|上海|深圳|广州|中国|美国|日本|德国|英国|法国|（|）|\(|\)/';
   
@@ -128,8 +130,8 @@ class Customer extends Base
     } else if (isset($filter['type'])) {
       if ($filter['type'] == 'potential') {
         $list->where('a.status', '0');
-      } else if ($filter['type'] == 'history') {
-        $list->where('a.status', 'in', '4,5');
+      } else if ($filter['type'] == 'pool') {
+        $list->where('a.status', 'in', '4,5,6');
       } else {
         $list->where('a.status', 'in', '1,2,3');
       }
@@ -272,6 +274,10 @@ class Customer extends Base
     }
 
     $mobile = isset($data['mobile']) ? $data['mobile'] : '';
+
+    if ((!isset($data['company_id']) || !$data['company_id']) && $company_id) {
+      $data['company_id'] = $company_id;
+    }
 
     // 撞单检查
     if ($checkClash && isset($data['company_id']) && $data['company_id'] > 0) {
@@ -496,9 +502,6 @@ class Customer extends Base
     } else {
       $data['city'] = self::$city;
       $data['user_id'] = $user_id;
-      if ((!isset($data['company_id']) || !$data['company_id']) && $company_id) {
-        $data['company_id'] = $company_id;
-      }
 
       $linkman = null;
       if (isset($data['linkman'])) {
@@ -693,5 +696,135 @@ class Customer extends Base
       Log::add($user, $log);
     }
     return $result;
+  }
+
+  /**
+   * 批量导入客户
+   */
+  public static function import($user, $data) {
+    if (!self::allow($user, null, 'new')) {
+      self::exception('您没有权限添加客户。');
+    }
+
+    if (!$data) {
+      self::exception('缺少数据文件。');
+    }
+
+    try {
+      $fileName = $data->getInfo('tmp_name');
+      $fileType = PHPExcel_IOFactory::identify($fileName);
+      $objReader = PHPExcel_IOFactory::createReader($fileType);
+      $objPHPExcel = $objReader->load($fileName);
+    } catch(Exception $e) {
+      self::exception($e->getMessage());
+    }
+
+    $sheet = $objPHPExcel->getSheet(0);
+    $highestRow = $sheet->getHighestRow();
+    $highestColumn = $sheet->getHighestColumn();
+
+    if ($highestRow < 2) {
+      self::exception('导入数据为空。');
+    }
+
+    $user_id = 0;
+    $company_id = 0;
+
+    if ($user) {
+      $user_id = $user->id;
+      $company_id = $user->company_id;
+    }
+
+    $succCount = 0;
+    $clashCount = 0;
+    $failCount = 0;
+
+    for ($row = 2; $row <= $highestRow; $row++) {
+      $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
+      if (count($rowData) < 1 || count($rowData[0]) < 14) {
+        self::exception('导入数据不完整，请使用导入模板。');
+      }
+      $customer = [
+        'customer_name' => $rowData[0][0],
+        'linkman' => $rowData[0][1],
+        'mobile' => $rowData[0][2],
+        'area' => $rowData[0][3],
+        'address' => $rowData[0][4],
+        'demand' => $rowData[0][5],
+        'lease_buy' => $rowData[0][6],
+        'min_acreage' => $rowData[0][7],
+        'max_acreage' => $rowData[0][8],
+        'budget' => $rowData[0][9],
+        'settle_date' => $rowData[0][10],
+        'current_area' => $rowData[0][11],
+        'end_date' => $rowData[0][12],
+        'rem' => $rowData[0][13]
+      ];
+
+      if ($customer['customer_name'] && 
+        $customer['linkman'] && $customer['mobile']) {
+        foreach($customer as $k=>$v) {
+          if ($v == '' || $v == null || $v == 'null' || $v == 'NULL') {
+            unset($customer[$k]);
+          }
+        }
+
+        if ($company_id) {
+          $clash = self::clashCheck(0, $customer['customer_name'], $customer['mobile'], $company_id);
+          if ($clash) {
+            $clashCount++;
+            continue;
+          }
+        }
+
+        $customer['city'] = self::$city;
+        $customer['remind'] = 8;
+        $customer['user_id'] = $user_id;
+        $customer['company_id'] = $company_id;
+        $customer['status'] = 6;
+        $customer['share'] = 0;
+
+        if (isset($customer['settle_date'])) {
+          $n = intval(($customer['settle_date'] - 25569) * 3600 * 24);
+          $customer['settle_date'] = gmdate('Y-m-d', $n);
+        }
+
+        if (isset($customer['end_date'])) {
+          $n = intval(($customer['end_date'] - 25569) * 3600 * 24);
+          $customer['end_date'] = gmdate('Y-m-d', $n);
+        }
+
+        $linkman['type'] = 'customer';
+        $linkman['title'] = $customer['linkman'];
+        $linkman['mobile'] = $customer['mobile'];
+        unset($customer['linkman']);
+        unset($customer['mobile']);
+
+        $newData = new Customer($customer);
+        $result = $newData->save();
+
+        if ($result) {
+          Log::add($user, [
+            "table" => "customer",
+            "owner_id" => $newData->id,
+            "title" => '导入客户',
+            "summary" => $newData->customer_name
+          ]);
+          $linkman['owner_id'] = $newData->id;
+          Linkman::addUp($user, 0, $linkman);
+          $succCount++;
+        } else {
+          $failCount++;
+        }
+      } else {
+        $failCount++;
+      }
+    }
+
+    return [
+      'success' => $succCount,
+      'clash' => $clashCount,
+      'fail' => $failCount
+    ];
   }
 }

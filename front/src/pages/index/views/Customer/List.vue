@@ -26,7 +26,7 @@ export default {
   methods: {
     onImgError (item, $event) {
     },
-    loadListData (empty) {
+    loadData (empty) {
       if (empty) {
         this.isEnd = false
         this.page = 1
@@ -49,12 +49,15 @@ export default {
           }
         }
       })
+    },
+    export () {
+      // TODO:导出数据
     }
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
       vm.type = to.name.toLowerCase()
-      vm.loadListData(true)
+      vm.loadData(true)
     })
   },
   watch: {
@@ -65,7 +68,7 @@ export default {
         this.$route.name === 'History') &&
         !this.isLoading && !this.isEnd) {
         this.page++
-        this.loadListData()
+        this.loadData()
       }
     }
   },

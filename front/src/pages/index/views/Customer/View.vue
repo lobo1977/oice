@@ -1,7 +1,7 @@
 <template>
   <div>
     <topalert v-if="info.id > 0 && info.clash > 0" message="该客户已撞单，暂时不能跟进，请等候管理员处理。"></topalert>
-    
+
     <tab>
       <tab-item @on-item-click="goTab(0)" :selected="tab === 0">基本信息</tab-item>
       <tab-item @on-item-click="goTab(1)" :selected="tab === 1">跟进纪要</tab-item>
@@ -10,7 +10,7 @@
     </tab>
 
     <div v-show="tab === 0">
-      <flow>
+      <flow v-if="info.id > 0 && info.status < 6">
         <flow-state title="潜在" is-done></flow-state>
         <flow-line :is-done="info.status > 0" :tip="flowOneText"></flow-line>
         <flow-state title="跟进" :is-done="info.status > 0"></flow-state>
@@ -319,6 +319,9 @@ export default {
     next()
   },
   methods: {
+    new () {
+      this.$router.push({name: 'CustomerEdit', params: {id: 0}})
+    },
     goTab (tab) {
       this.$router.replace({name: 'CustomerView', params: {id: this.info.id}, query: {tab: tab}})
     },

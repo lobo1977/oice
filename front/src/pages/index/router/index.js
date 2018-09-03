@@ -103,8 +103,8 @@ export default new Router({
           }
         },
         {
-          path: 'history',
-          name: 'History',
+          path: 'pool',
+          name: 'Pool',
           component: CustomerList,
           meta: {
             title: '客户',

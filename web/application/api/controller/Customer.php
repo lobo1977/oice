@@ -129,6 +129,19 @@ class Customer extends Base
   }
 
   /**
+   * 批量导入客户
+   */
+  public function import() {
+    $data = request()->file('data');
+    $result = modelCustomer::import($this->user, $data);
+    if ($result) {
+      return $this->succeed($result);
+    } else {
+      return $this->fail();
+    }
+  }
+
+  /**
    * 撞单处理
    */
   public function clashPass($id, $operate) {
