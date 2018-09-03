@@ -323,6 +323,9 @@ export default {
     })
   },
   methods: {
+    new () {
+      this.$router.push({name: 'BuildingEdit', params: {id: 0}})
+    },
     goTab (tab) {
       this.$router.replace({name: 'BuildingView', id: this.info.id, query: {tab: tab}})
       this.tab = tab

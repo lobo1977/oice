@@ -117,9 +117,9 @@ export default {
         min_acreage: null,    // 最小面积(平方米)
         max_acreage: null,    // 最大面积(平方米)
         budget: '',           // 预算
-        settle_date: '',    // 入驻日期
+        settle_date: '',      // 入驻日期
         current_area: null,   // 在驻面积
-        end_date: '',       // 到期日
+        end_date: '',         // 到期日
         remind: 8,            // 到期提醒（提前月份数）
         rem: '',              // 项目说明
         status: 0,            // 状态

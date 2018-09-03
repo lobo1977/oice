@@ -10,6 +10,8 @@
       @on-cancel="onCancel"
       @on-submit="onSubmit"
       ref="search"></search>
+    
+    <actionsheet v-model="showNewMenu" :menus="newMenus" theme="android" @on-click-menu="newMenuClick"></actionsheet>
 
     <div v-show="!isSearching">
       <sticky :offset="46">
@@ -81,6 +83,13 @@ export default {
   },
   data () {
     return {
+      showNewMenu: false,
+      newMenus: {
+        new: '添加项目',
+        template: '下载批量导入模板',
+        import: '批量导入项目',
+        export: '导出'
+      },
       isLoading: false,
       isSearching: false,
       typeText: '类别',
@@ -151,7 +160,15 @@ export default {
     onCancel () {
       this.isSearching = false
     },
-
+    new () {
+      // this.showNewMenu = true
+      this.$router.push({name: 'BuildingEdit', params: {id: 0}})
+    },
+    newMenuClick (key, item) {
+      if (key === 'new') {
+        this.$router.push({name: 'BuildingEdit', params: {id: 0}})
+      }
+    },
     // Picker
     typeChange (val) {
       this.typeText = this.$refs.typePicker.getNameValues()
