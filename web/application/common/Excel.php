@@ -11,7 +11,7 @@ class Excel {
   /**
    * 构造函数
    */
-  function __construct($gatway = '') {
+  function __construct() {
     $this->error = "";
   }
 
@@ -19,6 +19,9 @@ class Excel {
     return $this->error;
   }
 
+  /**
+   * 从EXCEL获取数据行
+   */
   public function getData($file) {
     if (!$file) {
       $this->error = '缺少数据文件。';
@@ -47,7 +50,10 @@ class Excel {
     return $sheet->rangeToArray('A2:' . $highestColumn . $highestRow, NULL, TRUE, FALSE);
   }
 
-  public function export($title, $headers, $list, $pk = '') {
+  /**
+   * 生成EXCEL
+   */
+  public function export($title, $headers, $data, $pk = '') {
     $objExcel = new \PHPExcel();
     $c = '';
     $asc = 65;
@@ -82,7 +88,7 @@ class Excel {
     // 填充数据
     $row = 2;
     $pkv = '';
-    foreach ($list as $r => $d) {
+    foreach ($data as $r => $d) {
       if ($pk == '' || $d[$pk] != $pkv) {
         if (isset($d[$pk])) {
           $pkv = $d[$pk];
