@@ -83,9 +83,12 @@ function ajax (url, method, data, contentType, cb) {
               err.message = error.response.status
           }
         }
+      } else if (error.message) {
+        err.message = error.message
       }
       if (cb) cb(err)
-    })
+    }
+  )
 }
 
 export default {

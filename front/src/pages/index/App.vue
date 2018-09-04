@@ -6,6 +6,9 @@
       :right-options="rightOptions"
       :title="title"
       :transition="headerTransition" @on-click-back="goBack">
+      <span slot="right" v-show="$route.meta.showOutput" @click="callExport" style="margin-right:10px;">
+        <x-icon type="android-download" size="24" class="header-icon"></x-icon>
+      </span>
       <span slot="right" v-if="$route.meta.showPlus" @click="callNew">
         <x-icon type="plus" size="24" class="header-icon"></x-icon>
       </span>
@@ -61,6 +64,11 @@ export default {
         this.$router.push({name: 'Home'})
       } else {
         this.$router.back()
+      }
+    },
+    callExport () {
+      if (this.$refs.page && this.$refs.page.export) {
+        this.$refs.page.export()
       }
     },
     callNew () {

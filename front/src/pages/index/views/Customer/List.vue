@@ -51,7 +51,10 @@ export default {
       })
     },
     export () {
-      // TODO:导出数据
+      if (this.$store.state.oice.user) {
+        let token = this.$store.state.oice.user.token
+        window.location.href = '/api/customer/export?user-token=' + token + '&type=' + this.type
+      }
     }
   },
   beforeRouteEnter (to, from, next) {

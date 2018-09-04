@@ -44,8 +44,7 @@ export default {
       newMenus: {
         new: '添加客户',
         template: '下载批量导入模板',
-        import: '批量导入客户',
-        export: '导出'
+        import: '批量导入客户'
       },
       type: 'follow',
       isSearching: false,
@@ -70,7 +69,7 @@ export default {
       if (key === 'new') {
         this.$router.push({name: 'CustomerEdit', params: {id: 0}})
       } else if (key === 'template') {
-        document.location.href = '/static/template/customer.xls'
+        window.location.href = '/static/template/customer.xls'
       } else if (key === 'import') {
         if (!this.user || this.user.id === 0) {
           this.$router.push({
@@ -79,15 +78,6 @@ export default {
           })
         } else {
           this.$refs.inpFile.click()
-        }
-      } else if (key === 'export') {
-        if (!this.user || this.user.id === 0) {
-          this.$router.push({
-            name: 'Login',
-            query: { redirect: this.$route.fullPath }
-          })
-        } else {
-          this.$refs.list.export()
         }
       }
     },
@@ -139,6 +129,16 @@ export default {
             })
           }
         })
+      }
+    },
+    export () {
+      if (!this.user || this.user.id === 0) {
+        this.$router.push({
+          name: 'Login',
+          query: { redirect: this.$route.fullPath }
+        })
+      } else {
+        this.$refs.list.export()
       }
     },
     resultClick (item) {

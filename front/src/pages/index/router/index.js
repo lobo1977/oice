@@ -90,6 +90,7 @@ export default new Router({
           component: CustomerList,
           meta: {
             title: '客户',
+            showOutput: true,
             showPlus: true
           }
         },
@@ -99,6 +100,7 @@ export default new Router({
           component: CustomerList,
           meta: {
             title: '客户',
+            showOutput: true,
             showPlus: true
           }
         },
@@ -108,6 +110,7 @@ export default new Router({
           component: CustomerList,
           meta: {
             title: '客户',
+            showOutput: true,
             showPlus: true
           }
         },

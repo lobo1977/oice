@@ -142,6 +142,13 @@ class Customer extends Base
   }
 
   /**
+   * 导出客户
+   */
+  public function export($type) {
+    modelCustomer::export($this->user, $type);
+  }
+
+  /**
    * 撞单处理
    */
   public function clashPass($id, $operate) {

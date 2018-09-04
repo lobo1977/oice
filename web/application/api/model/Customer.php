@@ -1,9 +1,8 @@
 <?php
 namespace app\api\model;
 
-use PHPExcel_IOFactory;
-use PHPExcel;
 use think\model\concern\SoftDelete;
+use app\common\Excel;
 use app\api\model\Base;
 use app\api\model\Log;
 use app\api\model\Linkman;
@@ -706,25 +705,15 @@ class Customer extends Base
       self::exception('您没有权限添加客户。');
     }
 
-    if (!$data) {
-      self::exception('缺少数据文件。');
+    $excel = new Excel();
+    $rowData = $excel->getData($data);
+
+    if (!$rowData) {
+      self::exception($excel->getError());
     }
 
-    try {
-      $fileName = $data->getInfo('tmp_name');
-      $fileType = PHPExcel_IOFactory::identify($fileName);
-      $objReader = PHPExcel_IOFactory::createReader($fileType);
-      $objPHPExcel = $objReader->load($fileName);
-    } catch(Exception $e) {
-      self::exception($e->getMessage());
-    }
-
-    $sheet = $objPHPExcel->getSheet(0);
-    $highestRow = $sheet->getHighestRow();
-    $highestColumn = $sheet->getHighestColumn();
-
-    if ($highestRow < 2) {
-      self::exception('导入数据为空。');
+    if (count($rowData) < 1 || count($rowData[0]) < 14) {
+      self::exception('导入数据不完整，请使用导入模板。');
     }
 
     $user_id = 0;
@@ -739,26 +728,22 @@ class Customer extends Base
     $clashCount = 0;
     $failCount = 0;
 
-    for ($row = 2; $row <= $highestRow; $row++) {
-      $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
-      if (count($rowData) < 1 || count($rowData[0]) < 14) {
-        self::exception('导入数据不完整，请使用导入模板。');
-      }
+    foreach ($rowData as $row) {
       $customer = [
-        'customer_name' => $rowData[0][0],
-        'linkman' => $rowData[0][1],
-        'mobile' => $rowData[0][2],
-        'area' => $rowData[0][3],
-        'address' => $rowData[0][4],
-        'demand' => $rowData[0][5],
-        'lease_buy' => $rowData[0][6],
-        'min_acreage' => $rowData[0][7],
-        'max_acreage' => $rowData[0][8],
-        'budget' => $rowData[0][9],
-        'settle_date' => $rowData[0][10],
-        'current_area' => $rowData[0][11],
-        'end_date' => $rowData[0][12],
-        'rem' => $rowData[0][13]
+        'customer_name' => $row[0],
+        'linkman' => $row[1],
+        'mobile' => $row[2],
+        'area' => $row[3],
+        'address' => $row[4],
+        'demand' => $row[5],
+        'lease_buy' => $row[6],
+        'min_acreage' => $row[7],
+        'max_acreage' => $row[8],
+        'budget' => $row[9],
+        'settle_date' => $row[10],
+        'current_area' => $row[11],
+        'end_date' => $row[12],
+        'rem' => $row[13]
       ];
 
       if ($customer['customer_name'] && 
@@ -826,5 +811,61 @@ class Customer extends Base
       'clash' => $clashCount,
       'fail' => $failCount
     ];
+  }
+
+  /**
+   * 导出客户
+   */
+  public static function export($user, $type) {
+    $user_id = 0;
+    $company_id = 0;
+
+    if ($user) {
+      $user_id = $user->id;
+      $company_id = $user->company_id;
+    }
+
+    $title = '客户';
+
+    $list = db('customer')->alias('a')
+      ->leftJoin('user_company b', 'a.user_id = b.user_id and a.company_id = b.company_id and b.status = 1')
+      ->leftJoin('linkman c', 'c.type = "customer" AND c.owner_id = a.id')
+      ->where('a.user_id = ' . $user_id .
+        ' OR (a.share = 1 AND a.company_id > 0 AND a.company_id = ' . $company_id . ')' .
+        ' OR (a.company_id > 0 AND a.company_id = ' . $company_id . ' AND b.superior_id = ' . $user_id . ')');
+
+    if ($type == 'potential') {
+      $title = '潜在客户';
+      $list->where('a.status', '0');
+    } else if ($type == 'pool') {
+      $title = '客户池';
+      $list->where('a.status', 'in', '4,5,6');
+    } else if ($type == 'follow') {
+      $title = '跟进客户';
+      $list->where('a.status', 'in', '1,2,3');
+    }
+
+    $result = $list->field('a.id,a.customer_name,c.title as linkman,c.mobile,a.area,a.address,a.demand,' .
+      'a.lease_buy,a.min_acreage,a.max_acreage,a.budget,a.settle_date,a.current_area,a.end_date,a.rem')
+      ->order('a.id', 'asc')
+      ->select();
+
+    $excel = new Excel();
+    $excel->export($title, [
+      '客户名称',
+      '联系人',
+      '联系电话',
+      '城区',
+      '地址',
+      '需求项目',
+      '租购',
+      '最小面积(平方米)',
+      '最大面积(平方米)',
+      '预算',
+      '入驻日期',
+      '在驻面积(平方米)',
+      '到期日',
+      '备注'
+    ], $result, 'id');
   }
 }

@@ -87,8 +87,7 @@ export default {
       newMenus: {
         new: '添加项目',
         template: '下载批量导入模板',
-        import: '批量导入项目',
-        export: '导出'
+        import: '批量导入项目'
       },
       isLoading: false,
       isSearching: false,

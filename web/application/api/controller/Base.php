@@ -13,7 +13,11 @@ class Base extends Controller
 
   protected function getUser($update = false) {
     if ($this->user == null || $update) {
-      $token = request()->header('User-Token');
+      if (input('?user-token')) {
+        $token = input('user-token');
+      } else {
+        $token = request()->header('User-Token');
+      }
       if ($token) {
         $result = User::getUserByToken($token);
         if ($result) {
