@@ -223,33 +223,33 @@ class User extends Base
 
       if ($data['title'] != $oldData->title) {
         if ($oldData->title) {
-          $summary = '姓名：' . $oldData->title . ' -> ' . $data['title'] . '\n';
+          $summary = $summary . '姓名：' . $oldData->title . ' -> ' . $data['title'] . '\n';
         } else {
-          $summary = '姓名：' . $data['title'] . '\n';
+          $summary = $summary . '姓名：' . $data['title'] . '\n';
         }
       }
 
       if ($data['email'] != $oldData->email) {
         if ($oldData->email) {
-          $summary = '电子邮箱：' . $oldData->email . ' -> ' . $data['email'] . '\n';
+          $summary = $summary . '电子邮箱：' . $oldData->email . ' -> ' . $data['email'] . '\n';
         } else {
-          $summary = '电子邮箱：' . $data['email'] . '\n';
+          $summary = $summary . '电子邮箱：' . $data['email'] . '\n';
         }
       }
 
       if ($data['weixin'] != $oldData->weixin) {
         if ($oldData->weixin) {
-          $summary = '微信：' . $oldData->weixin . ' -> ' . $data['weixin'] . '\n';
+          $summary = $summary . '微信：' . $oldData->weixin . ' -> ' . $data['weixin'] . '\n';
         } else {
-          $summary = '微信：' . $data['weixin'] . '\n';
+          $summary = $summary . '微信：' . $data['weixin'] . '\n';
         }
       }
 
       if ($data['qq'] != $oldData->qq) {
         if ($oldData->qq) {
-          $summary = 'QQ：' . $oldData->qq . ' -> ' . $data['qq'] . '\n';
+          $summary = $summary . 'QQ：' . $oldData->qq . ' -> ' . $data['qq'] . '\n';
         } else {
-          $summary = 'QQ：' . $data['qq'] . '\n';
+          $summary = $summary . 'QQ：' . $data['qq'] . '\n';
         }
       }
 
@@ -259,7 +259,7 @@ class User extends Base
           "table" => "user",
           "owner_id" => $user->id,
           "title" => '修改账号信息',
-          "summay" => $summary
+          "summary" => $summary
         ]);
       }
       return true;
