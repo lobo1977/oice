@@ -41,7 +41,7 @@ class Sms {
    */
   public function sendInvite($mobile, $username, $company) {
     $company = $company . ' ' . config('app_name');
-    $url = 'http://' . config('app_host') . '/#/login';
+    $url = 'http://' . config('app_host') . '/app/login';
     if ($this->gatway == 'TX') {
       return $this->sendSMSTX($mobile, 'sms.tmpInviteId', [$username, $company, $url]);
     } else {

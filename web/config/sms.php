@@ -24,6 +24,6 @@ return [
   'pwd' => 'Tch123456',
   'url' => 'http://222.73.117.158/msg/HttpBatchSendSM',
   'query_url' => 'http://222.73.117.158/msg/QueryBalance',
-  'tmp_code' => '您的验证码是：%s，请于 %s 分钟内填写，如非本人操作，请忽略本短信。',
-  'tmp_invite' => '您的同事%s邀请您加入%s，详情请点击：%s'
+  'tmp_code' => '【商办云】您的验证码是：%s，请于 %s 分钟内填写，如非本人操作，请忽略本短信。',
+  'tmp_invite' => '【商办云】您的同事%s邀请您加入%s，详情请点击：%s'
 ];
