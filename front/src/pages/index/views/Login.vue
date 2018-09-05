@@ -11,11 +11,11 @@
          is-type="china-mobile" @on-click-error-icon="mobileError" :should-toast-error="false" @on-enter="login" @on-change="validatedForm">
         <x-icon slot="label" type="iphone" size="28" style="fill:#333;position:relative;left:-6px;top:3px;"></x-icon>
       </x-input>
-      <x-input ref="input_password" v-if="loginModel === 'password'" type="password" placeholder="输入登录密码" v-model="password" :max="16" :required="true"
+      <x-input ref="input_password" v-if="loginModel !== 'verifyCode'" type="password" placeholder="输入登录密码" v-model="password" :max="16" :required="true"
         :should-toast-error="false" @on-click-error-icon="passwordError" @on-enter="login" @on-change="validatedForm">
         <x-icon slot="label" type="locked" size="20" style="fill:#333;position:relative;left:-2px;top:1px;margin-right:9px;"></x-icon>
       </x-input>
-      <x-input ref="input_vcode" v-if="loginModel === 'password' && error" placeholder="输入验证码" v-model="vcode" :max="5" :required="true"
+      <x-input ref="input_vcode" v-if="loginModel !== 'verifyCode' && error" placeholder="输入验证码" v-model="vcode" :max="5" :required="true"
          :should-toast-error="false" @on-click-error-icon="vcodeError" @on-enter="login" @on-change="validatedForm">
         <img slot="right" id="imgVCode" class="weui-vcode-img" src="/api/verify" alt="captcha" @click="reloadVCodeImg">
       </x-input>
@@ -34,7 +34,7 @@
       <p style="padding-top:10px;margin-bottom:30px;color:#0a95dc;">
         <a @click.prevent="changeLoginModel">
             <span v-show="loginModel === 'verifyCode'">使用账号密码登录</span>
-            <span v-show="loginModel === 'password'">使用验证码登录</span>
+            <span v-show="loginModel !== 'verifyCode'">使用验证码登录</span>
         </a>
       </p>
 
@@ -82,7 +82,7 @@ export default {
     validatedForm () {
       this.isMobileValidated = this.$refs.input_mobile.valid
       this.formValidated = this.isMobileValidated &&
-        ((this.loginModel === 'password' &&
+        ((this.loginModel !== 'verifyCode' &&
         this.password.length &&
         (this.vcode.length || this.error === false)) ||
         (this.loginModel === 'verifyCode' &&
