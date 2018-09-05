@@ -492,12 +492,13 @@ class Company extends Base
     $status = 1;
     $invite = db('invite')->where('company_id', $id)
       ->where('mobile', $user->mobile)
+      ->where('status', 0)
       ->find();
     
     if ($company->user_id != $user_id) {
       if ($company->join_way > 1 && $invite == null) {
         self::exception('该企业需要通过邀请加入。');
-      } else if ($company->join_way == 1) {
+      } else if ($company->join_way == 1 && $invite == null) {
         $status = 0;
       }
     }
@@ -641,7 +642,7 @@ class Company extends Base
       ];
       Log::add($manager, $log);
 
-      $message = '管理员已批准您加入“' . $company->title . '”。';
+      $message = '管理员已批准您加入企业“' . $company->title . '”。';
       $url = 'http://' . config('app_host') . '/app/company/view/' . $company->id;
       User::pushMessage($user_id, $message, $url);
     }
@@ -670,8 +671,10 @@ class Company extends Base
     }
 
     $operate = '驳回加入企业';
+    $message = '管理员已拒绝您加入企业“' . $company->title . '”的申请。';
     if ($joinStatus['status'] == 1) {
       $operate = '移除企业成员';
+      $message = '管理员已将您从企业“' . $company->title . '”中移除。';
     }
 
     $result = db('user_company')
@@ -686,6 +689,8 @@ class Company extends Base
         "summary" => $user->title
       ];
       Log::add($manager, $log);
+
+      User::pushMessage($user_id, $message);
     }
     return $result;
   }
