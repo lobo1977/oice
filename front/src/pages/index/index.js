@@ -130,7 +130,7 @@ router.beforeEach(function (to, from, next) {
   if (to.name === 'Logout') {
     Vue.logout(() => {
       store.commit('setUser', {user: null})
-      next({name: 'Login', replace: true})
+      next({name: 'Home', replace: true})
     })
   } else if (to.name === 'WechatLogin') {
     let query = to.query
