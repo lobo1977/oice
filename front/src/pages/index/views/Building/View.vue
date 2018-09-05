@@ -334,11 +334,8 @@ export default {
       this.$refs.previewer.show(index)
     },
     favorite () {
-      if (!this.user || this.user.id === 0) {
-        this.$router.push({
-          name: 'Login',
-          query: { redirect: this.$route.fullPath }
-        })
+      if (!this.$checkAuth()) {
+        return
       }
       this.$vux.loading.show()
       if (this.info.isFavorite) {
@@ -387,11 +384,8 @@ export default {
     selectUnit () {
     },
     toCustomer (flag) {
-      if (!this.user || this.user.id === 0) {
-        this.$router.push({
-          name: 'Login',
-          query: { redirect: this.$route.fullPath }
-        })
+      if (!this.$checkAuth()) {
+        return
       }
       this.customerFlag = flag
       if (this.customerFlag === 1 && this.tab === 2 && this.selectedUnit.length > 1) {
@@ -477,34 +471,30 @@ export default {
       this.$router.push({name: 'ConfirmEdit', params: {id: 0, bid: bid, cid: cid}})
     },
     batchFavorite () {
-      if (this.user && this.user.id > 0) {
-        if (this.selectedUnit.length <= 0) {
-          return
-        }
-        this.$vux.loading.show()
-        this.$post('/api/building/batchFavorite', {
-          ids: this.selectedUnit
-        }, (res) => {
-          this.$vux.loading.hide()
-          if (res.success) {
-            this.$vux.toast.show({
-              type: 'success',
-              text: '已添加到收藏夹。',
-              width: '13em'
-            })
-          } else {
-            this.$vux.toast.show({
-              text: res.message,
-              width: '15em'
-            })
-          }
-        })
-      } else {
-        this.$router.push({
-          name: 'Login',
-          query: { redirect: this.$route.fullPath }
-        })
+      if (this.selectedUnit.length <= 0) {
+        return
       }
+      if (!this.$checkAuth()) {
+        return
+      }
+      this.$vux.loading.show()
+      this.$post('/api/building/batchFavorite', {
+        ids: this.selectedUnit
+      }, (res) => {
+        this.$vux.loading.hide()
+        if (res.success) {
+          this.$vux.toast.show({
+            type: 'success',
+            text: '已添加到收藏夹。',
+            width: '13em'
+          })
+        } else {
+          this.$vux.toast.show({
+            text: res.message,
+            width: '15em'
+          })
+        }
+      })
     },
     buildingMenuClick (key, item) {
       let vm = this

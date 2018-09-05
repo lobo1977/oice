@@ -51,6 +51,23 @@ Vue.filter('formatDate', function (value) {
   }
 })
 
+Vue.prototype.$download = (url) => {
+  Vue.$vux.loading.show()
+  let iframe = document.createElement('iframe')
+  iframe.style.display = 'none'
+  iframe.src = url
+  document.body.appendChild(iframe)
+  let timer = setInterval(() => {
+    let iframeDoc = iframe.contentDocument || iframe.contentWindow.document
+    if (iframeDoc && (iframeDoc.readyState === 'complete' ||
+      iframeDoc.readyState === 'interactive')) {
+      document.body.removeChild(iframe)
+      Vue.$vux.loading.hide()
+      clearInterval(timer)
+    }
+  }, 500)
+}
+
 FastClick.attach(document.body)
 
 let store = new Vuex.Store({})
@@ -92,6 +109,22 @@ store.registerModule('oice', {
   }
 })
 
+Vue.prototype.$checkAuth = () => {
+  if (store.state.oice.user == null) {
+    let path = router.currentRoute.fullPath
+    if (Vue.isWechat()) {
+      window.location.href = '/api/wechat/login?redirect=' + encodeURI(path)
+    } else {
+      router.push({
+        name: 'Login',
+        query: { redirect: path }
+      })
+    }
+    return false
+  }
+  return true
+}
+
 router.beforeEach(function (to, from, next) {
   store.commit('updateLoadingStatus', {isLoading: true})
   if (to.name === 'Logout') {
@@ -131,7 +164,7 @@ router.beforeEach(function (to, from, next) {
   } else if (to.matched.some(record => record.meta.requiresAuth) &&
     store.state.oice.user == null) {
     if (Vue.isWechat()) {
-      document.location.href = '/api/wechat/login?redirect=' + encodeURI(to.fullPath)
+      window.location.href = '/api/wechat/login?redirect=' + encodeURI(to.fullPath)
       next(false)
     } else {
       next({

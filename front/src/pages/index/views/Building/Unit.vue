@@ -83,9 +83,6 @@ export default {
   },
   data () {
     return {
-      user: {
-        id: 0
-      },
       info: {
         id: 0,
         title: '',
@@ -122,7 +119,6 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      vm.user = vm.$store.state.oice.user || vm.user
       let id = parseInt(to.params.id)
       if (!isNaN(id)) {
         vm.$get('/api/unit/detail?id=' + id, (res) => {
@@ -186,11 +182,8 @@ export default {
       this.$refs.previewer.show(index)
     },
     favorite () {
-      if (!this.user || this.user.id === 0) {
-        this.$router.push({
-          name: 'Login',
-          query: { redirect: this.$route.fullPath }
-        })
+      if (!this.$checkAuth()) {
+        return
       }
       this.$vux.loading.show()
       if (this.info.isFavorite) {
@@ -234,11 +227,8 @@ export default {
       }
     },
     toCustomer (flag) {
-      if (!this.user || this.user.id === 0) {
-        this.$router.push({
-          name: 'Login',
-          query: { redirect: this.$route.fullPath }
-        })
+      if (!this.$checkAuth()) {
+        return
       }
       this.customerFlag = flag
       if (this.myCustomer.length) {

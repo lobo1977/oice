@@ -82,7 +82,6 @@ export default new Router({
       }
     }, {
       path: '/customer',
-      name: 'Customer',
       children: [
         {
           path: 'follow',
@@ -116,6 +115,7 @@ export default new Router({
         },
         {
           path: '',
+          name: 'Customer',
           redirect: 'follow'
         }
       ],

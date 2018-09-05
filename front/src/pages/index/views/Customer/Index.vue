@@ -37,9 +37,6 @@ export default {
   },
   data () {
     return {
-      user: {
-        id: 0
-      },
       showNewMenu: false,
       newMenus: {
         new: '添加客户',
@@ -53,7 +50,6 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      vm.user = vm.$store.state.oice.user || vm.user
       vm.type = to.name.toLowerCase()
     })
   },
@@ -71,12 +67,7 @@ export default {
       } else if (key === 'template') {
         window.location.href = '/static/template/customer.xls'
       } else if (key === 'import') {
-        if (!this.user || this.user.id === 0) {
-          this.$router.push({
-            name: 'Login',
-            query: { redirect: this.$route.fullPath }
-          })
-        } else {
+        if (this.$checkAuth()) {
           this.$refs.inpFile.click()
         }
       }
@@ -132,12 +123,7 @@ export default {
       }
     },
     export () {
-      if (!this.user || this.user.id === 0) {
-        this.$router.push({
-          name: 'Login',
-          query: { redirect: this.$route.fullPath }
-        })
-      } else {
+      if (this.$checkAuth()) {
         this.$refs.list.export()
       }
     },
