@@ -1,9 +1,12 @@
 <template>
   <div>
     <group gutter="0">
-      <cell :title="user.title" :inline-desc="user.mobile"
+      <cell v-if="user.id" :title="user.title" :inline-desc="user.company"
         :link="{name: 'Info'}">
         <img slot="icon" :src="user.avatar" class="cell-image">
+      </cell>
+      <cell v-if="!user.id" title="登录" :is-link="true" @click.native="login">
+        <img slot="icon" src="/static/img/avatar.png" class="cell-image">
       </cell>
     </group>
 
@@ -31,10 +34,10 @@
       <cell v-if="user.company_id > 0" title="企业成员" :link="{name: 'CompanyMember', params: {id: user.company_id}}">
         <x-icon slot="icon" type="android-people" class="cell-icon"></x-icon>
       </cell>
-      <cell title="修改密码" :link="{name:'Password'}">
+      <cell v-if="user.id" title="修改密码" :link="{name:'Password'}">
         <x-icon slot="icon" type="android-lock" class="cell-icon"></x-icon>
       </cell>
-      <cell title="退出登录" :link="{name:'Logout'}">
+      <cell v-if="user.id" title="退出登录" :link="{name:'Logout'}">
         <x-icon slot="icon" type="android-exit" class="cell-icon"></x-icon>
       </cell>
     </group>
@@ -72,6 +75,9 @@ export default {
     })
   },
   methods: {
+    login () {
+      this.$checkAuth()
+    }
   }
 }
 </script>

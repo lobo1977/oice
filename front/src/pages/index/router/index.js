@@ -232,9 +232,7 @@ export default new Router({
       path: '/my',
       name: 'My',
       meta: {
-        title: '我的',
-        requiresAuth: true,
-        keepAlive: true
+        title: '我的'
       },
       component: My
     }, {
