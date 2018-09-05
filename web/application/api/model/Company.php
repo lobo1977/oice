@@ -288,7 +288,7 @@ class Company extends Base
         unset($data['stamp']);
       }
 
-      $result =  $oldData->save($data);
+      $result = $oldData->save($data);
 
       if ($result && $summary) {
         Log::add($user, [
@@ -345,33 +345,73 @@ class Company extends Base
   }
 
   /**
+   * 更换企业管理员
+   */
+  public static function turn($manager, $id, $user_id) {
+    $company = self::get($id);
+    if ($company == null) {
+      self::exception('企业不存在。');
+    }
+    if (!self::allow($manager, $company, 'edit')) {
+      self::exception('您没有权限。');
+    }
+
+    $user = User::get($user_id);
+    if ($user == null) {
+      self::exception('用户不存在。');
+    }
+
+    $joinStatus = self::getJoinStatus($user, $id);
+    if ($joinStatus == null || $joinStatus['status'] == 0) {
+      self::exception('该用户没有加入企业。');
+    }
+
+    $result = $company->save(['user_id' => $user_id]);
+
+    if ($result) {
+      Log::add($manager, [
+        "table" => "company",
+        "owner_id" => $company->id,
+        "title" => '更换管理员',
+        "summary" => $user->title
+      ]);
+
+      $message = $manager->title . '已将企业“' . $company->title . '”管理员权限转交给你。';
+      $url = 'http://' . config('app_host') . '/app/company/view/' . $company->id;
+      User::pushMessage($user->id, $message, $url);
+    }
+
+    return $result;
+  }
+
+  /**
    * 删除企业
    */
   public static function remove($user, $id) {
     $company = self::get($id);
-    if ($company != null) {
-      if (self::allow($user, $company, 'delete')) {
-        self::exception('您没有权限删除此企业。');
-      }
-      
-      $joinStatus = self::getJoinStatus($user, $id);
-      
-      if ($joinStatus) {
-        self::exception('已加入的企业不能删除。');
-      }
-      $log = [
-        "table" => 'company',
-        "owner_id" => $company->id,
-        "title" => '删除企业',
-        "summary" => $company->title
-      ];
-      $result = $company->delete();
-      if ($result) {
-        Log::add($user, $log);
-      }
-      return $result;
+    if ($company == null) {
+      self::exception('企业不存在。');
     }
-    return false;
+    if (!self::allow($user, $company, 'delete')) {
+      self::exception('您没有权限删除此企业。');
+    }
+    
+    $joinStatus = self::getJoinStatus($user, $id);
+    
+    if ($joinStatus) {
+      self::exception('已加入的企业不能删除。');
+    }
+    $log = [
+      "table" => 'company',
+      "owner_id" => $company->id,
+      "title" => '删除企业',
+      "summary" => $company->title
+    ];
+    $result = $company->delete();
+    if ($result) {
+      Log::add($user, $log);
+    }
+    return $result;
   }
 
   /**
@@ -557,7 +597,7 @@ class Company extends Base
     } else if ($user == null) {
       self::exception('用户无效。');
     } else if ($company->user_id == $user->id) {
-      self::exception('不能退出由您创建的企业。');
+      self::exception('管理员不能退出企业。');
     }
 
     $user_id = $user->id;

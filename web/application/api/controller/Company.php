@@ -96,6 +96,18 @@ class Company extends Base
   }
 
   /**
+   * 更换企业管理员
+   */
+  public function turn($id, $user_id) {
+    $result = modelCompany::turn($this->user, $id, $user_id);
+    if ($result) {
+      return $this->succeed($this->getUser(true));
+    } else {
+      return $this->fail();
+    }
+  }
+
+  /**
    * 删除企业
    */
   public function remove($id) {
