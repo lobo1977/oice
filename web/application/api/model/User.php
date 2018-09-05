@@ -157,6 +157,7 @@ class User extends Base
       } else {
         $user = new User();
         $user->mobile = $mobile;
+        $user->title = preg_replace('/(\d{3})\d{4}(\d{4})/', '$1****$2', $mobile);
         $user->salt = substr(md5(strval(time())), 0, 5);
         if ($oauth) {
           if ($oauth->nickname) {
@@ -307,6 +308,9 @@ class User extends Base
     }
 
     $oldData->mobile = $mobile;
+    if (!$oldData->title) {
+      $oldData->title = preg_replace('/(\d{3})\d{4}(\d{4})/', '$1****$2', $mobile);
+    }
     $result = $oldData->save();
     if ($result) {
       Log::add($user, [
@@ -333,7 +337,6 @@ class User extends Base
         ]);
       }
     }
-
     return true;
   }
 
