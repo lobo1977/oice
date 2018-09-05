@@ -41,7 +41,7 @@ class Sms {
    * 发送邀请
    */
   public function sendInvite($mobile, $username, $company) {
-    $company = $company . ' ' . config('app_name');
+    $company = $company . config('app_name');
     $wechat = new Wechat();
     $url = 'http://' . config('app_host') . '/app/login';
     $url = $wechat->getShortUrl($url);
