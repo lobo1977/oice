@@ -455,8 +455,8 @@ class Company extends Base
       $log = [
         "table" => 'company',
         "owner_id" => $id,
-        "title" => '邀请用户加入企业',
-        "summary" => $company->title . ' 用户：' . $mobile
+        "title" => '邀请用户加入',
+        "summary" => $mobile
       ];
       Log::add($user, $log);
 
