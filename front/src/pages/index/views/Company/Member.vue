@@ -1,14 +1,24 @@
 <template>
   <div>
     <group :gutter="0">
-      <cell v-for="(item, index) in list" :key="index" :title="item.title"
-        :link="{name: 'UserView', params: {id: item.id}}">
-        <img slot="icon" :src="item.avatar" class="cell-image" />
-        <div slot="inline-desc">
-          <span>{{item.mobile}}</span>
-          <x-icon type="person" v-if="item.isAdmin" size="18" class="cell-desc-icon"></x-icon>
-        </div>
-      </cell>
+      <swipeout>
+        <swipeout-item v-for="(item, index) in list" :key="index" transition-mode="follow"
+          @on-open="swipeoutOpen(item)" @on-close="swipeoutClose(item)"
+          @mousedown.native="itemMouseDown" @mouseup.native="itemMouseUp" 
+          @touchstart.native="itemMouseDown" @touchend.native="itemMouseUp"
+          @click.native="itemClick(item)">
+          <div slot="right-menu">
+            <swipeout-button v-if="user.isAdmin && !item.isAdmin" @click.native.stop="remove(item)" type="warn">移除</swipeout-button>
+          </div>
+          <cell slot="content" :title="item.title" :inline-desc="item.mobile">
+            <img slot="icon" :src="item.avatar" class="cell-image">
+            <div slot="inline-desc">
+              <span>{{item.mobile}}</span>
+              <x-icon type="person" v-if="item.isAdmin" size="18" class="cell-desc-icon"></x-icon>
+            </div>
+          </cell>
+        </swipeout-item>
+      </swipeout>
     </group>
 
     <div style="height:50px;">
@@ -18,13 +28,20 @@
 </template>
 
 <script>
+import { Swipeout, SwipeoutItem, SwipeoutButton } from 'vux'
 import { mapState } from 'vuex'
 
 export default {
   components: {
+    Swipeout,
+    SwipeoutItem,
+    SwipeoutButton
   },
   data () {
     return {
+      user: {
+        isAdmin: false
+      },
       id: 0,
       isLoading: false,
       page: 0,
@@ -34,6 +51,7 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
+      vm.user = vm.$store.state.oice.user || vm.user
       let id = parseInt(to.params.id)
       if (!isNaN(id)) {
         vm.id = id
@@ -64,6 +82,55 @@ export default {
           }
         }
       })
+    },
+    swipeoutOpen (item) {
+      item.disabled = true
+    },
+    swipeoutClose (item) {
+      item.disabled = false
+    },
+    itemMouseDown (event) {
+      this.pageX = event.pageX
+      this.pageY = event.pageY
+    },
+    itemMouseUp (event) {
+      if (this.pageX !== event.pageX || this.pageY !== event.pageY) {
+        this.mouseMove = true
+      } else {
+        this.mouseMove = false
+      }
+    },
+    itemClick (item) {
+      if (item.disabled || this.mouseMove) {
+      } else {
+        this.$router.push({name: 'UserView', params: {id: item.id}})
+      }
+    },
+    remove (user) {
+      let vm = this
+      if (this.user && this.user.isAdmin) {
+        this.$vux.confirm.show({
+          title: '移除成员',
+          content: '确定要移除成员 <strong>' + user.title + '</strong> 吗？',
+          onConfirm () {
+            vm.$vux.loading.show()
+            vm.$post('/api/company/rejectAddin', {
+              id: vm.id,
+              user_id: user.id
+            }, (res) => {
+              vm.$vux.loading.hide()
+              if (res.success) {
+                vm.loadListData(true)
+              } else {
+                vm.$vux.toast.show({
+                  text: res.message,
+                  width: '13em'
+                })
+              }
+            })
+          }
+        })
+      }
     }
   },
   watch: {

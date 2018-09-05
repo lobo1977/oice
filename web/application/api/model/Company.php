@@ -666,7 +666,7 @@ class Company extends Base
 
     $joinStatus = self::getJoinStatus($user, $id);
     if ($joinStatus == null) {
-      self::exception('该用户没有加入申请。');
+      return true;
     }
 
     $operate = '驳回加入企业';
@@ -683,7 +683,7 @@ class Company extends Base
         "table" => 'company',
         "owner_id" => $id,
         "title" => $operate,
-        "summary" => $user->title . ' ' . $user->mobile
+        "summary" => $user->title
       ];
       Log::add($manager, $log);
     }

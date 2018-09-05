@@ -31,7 +31,7 @@
         :value="user.superior">
         <x-icon slot="icon" type="android-contact" class="cell-icon"></x-icon>
       </cell>
-      <cell v-if="user.company_id > 0" title="企业成员" :link="{name: 'CompanyMember', params: {id: user.company_id}}">
+      <cell v-if="user.company_id > 0" title="通讯录" :link="{name: 'CompanyMember', params: {id: user.company_id}}">
         <x-icon slot="icon" type="android-people" class="cell-icon"></x-icon>
       </cell>
       <cell v-if="user.id" title="修改密码" :link="{name:'Password'}">
