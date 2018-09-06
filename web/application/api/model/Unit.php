@@ -71,7 +71,7 @@ class Unit extends Base
   }
 
   /**
-   * 通过房源ID获取单元列表
+   * 通过项目ID获取单元列表
    */
   public static function getByBuildingId($user, $id) {
     $user_id = 0;

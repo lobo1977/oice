@@ -16,7 +16,7 @@ class Unit extends Base
   ];
 
   /**
-   * 获取房源单元
+   * 获取项目单元
    */
   public function buildingUnit($id) {
     if ($id) {

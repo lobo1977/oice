@@ -59,7 +59,7 @@ class Wechat extends Base
     $menu = array(
       'button' => array(
         array(
-          'name'=>urlencode("房源"),
+          'name'=>urlencode("项目"),
           'sub_button'=> array(
             array(
               'name'=> urlencode("写字楼"),
