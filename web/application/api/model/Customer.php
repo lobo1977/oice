@@ -2,6 +2,7 @@
 namespace app\api\model;
 
 use think\model\concern\SoftDelete;
+use think\facade\Validate;
 use app\common\Excel;
 use app\api\model\Base;
 use app\api\model\Log;
@@ -233,7 +234,8 @@ class Customer extends Base
       ->where(function ($query) use($keyword, $mobile) {
           $query->where('a.customer_name', 'like', '%' . $keyword . '%');
           if ($mobile) {
-            $query->whereOr('b.mobile', '=', $mobile);
+            $query->whereOr('b.mobile', '=', $mobile)
+              ->whereOr('b.tel', '=', $mobile);
           } 
       })->field('a.id,a.customer_name,a.status,a.user_id,u.title as user,b.title as linkman,b.mobile')
       ->find();
@@ -732,7 +734,7 @@ class Customer extends Base
       $customer = [
         'customer_name' => $row[0],
         'linkman' => $row[1],
-        'mobile' => $row[2],
+        'tel' => $row[2],
         'area' => $row[3],
         'address' => $row[4],
         'demand' => $row[5],
@@ -747,7 +749,7 @@ class Customer extends Base
       ];
 
       if ($customer['customer_name'] && 
-        $customer['linkman'] && $customer['mobile']) {
+        $customer['linkman'] && $customer['tel']) {
         foreach($customer as $k=>$v) {
           if ($v == '' || $v == null || $v == 'null' || $v == 'NULL') {
             unset($customer[$k]);
@@ -755,7 +757,7 @@ class Customer extends Base
         }
 
         if ($company_id) {
-          $clash = self::clashCheck(0, $customer['customer_name'], $customer['mobile'], $company_id);
+          $clash = self::clashCheck(0, $customer['customer_name'], $customer['tel'], $company_id);
           if ($clash) {
             $clashCount++;
             continue;
@@ -781,9 +783,13 @@ class Customer extends Base
 
         $linkman['type'] = 'customer';
         $linkman['title'] = $customer['linkman'];
-        $linkman['mobile'] = $customer['mobile'];
+        if (Validate::isMobile($customer['tel'])) {
+          $linkman['mobile'] = $customer['tel'];
+        } else {
+          $linkman['tel'] = $customer['tel'];
+        }
         unset($customer['linkman']);
-        unset($customer['mobile']);
+        unset($customer['tel']);
 
         $newData = new Customer($customer);
         $result = $newData->save();

@@ -14,7 +14,7 @@
 
     <form ref="frmCustomer" style="display:none">
       <input ref="inpFile" type="file" name="data" @change="upLoad"
-        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+        accept="application/vnd.ms-excel">
     </form>
 
     <div v-show="!isSearching">
@@ -95,13 +95,13 @@ export default {
               if (message) {
                 message += '，'
               }
-              message += '由于客户资料重复 ' + clash + ' 条资料导入失败'
+              message += '由于客户资料重复 ' + clash + ' 条导入失败'
             }
             if (fail > 0) {
               if (message) {
                 message += '，'
               }
-              message += '由于客户资料不完整 ' + fail + ' 条资料导入失败'
+              message += '由于客户资料不完整 ' + fail + ' 条导入失败'
             }
             message += '。'
             vm.$vux.alert.show({
