@@ -5,21 +5,13 @@
       <span slot="overwrite-left">
         <x-icon type="close" size="20" class="icon-close" @click="close"></x-icon>
       </span>
+      <span slot="right" v-if="isEdit" @click.native="confirm"
+        :class="{enable: location.longitude !== 0 || location.latitude !== 0}">
+        确定
+      </span>
     </x-header>
     
     <div id="baidumap" class="map"></div>
-
-    <flexbox v-if="isEdit" :gutter="0" class="bottom-bar">
-      <flexbox-item :span="6">
-        <x-button type="primary" class="bottom-btn" :disabled="location.longitude === 0 && location.latitude === 0"
-          @click.native="confirm"> 确定
-        </x-button>
-      </flexbox-item>
-      <flexbox-item :span="6">
-        <x-button type="default" class="bottom-btn" @click.native="close"> 取消
-        </x-button>
-      </flexbox-item>
-    </flexbox>
 
     <div v-if="!isEdit" class="fix-bottom">
       <h4 style="font-size:1em;">{{title}}</h4>
@@ -196,5 +188,9 @@ export default {
   width:100%;
   background-color:#fff;
   padding:10px 15px;
+}
+
+.enable {
+  color:#fff;
 }
 </style>
