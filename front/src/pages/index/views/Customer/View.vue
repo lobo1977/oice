@@ -81,8 +81,8 @@
           <x-button type="primary" class="bottom-btn"
             v-if="!info.clash || !info.allowClash"
             :disabled="!info.allowFollow"
-            :link="{name:'Favorite', query: { cid: info.id }}">
-            <x-icon type="search" class="btn-icon"></x-icon> 筛选项目
+            :link="{name: 'CustomerLog', params: {id:0, cid: info.id}}">
+            <x-icon type="refresh" class="btn-icon"></x-icon> 跟进
           </x-button>
           <x-button type="primary" class="bottom-btn" 
             v-if="info.clash > 0 && info.allowClash"
@@ -93,7 +93,7 @@
         <flexbox-item :span="4">
           <x-button type="warn" class="bottom-btn" :disabled="!info.allowEdit"
             :link="{name:'CustomerEdit', params: { id: info.id }}">
-            <x-icon type="compose" class="btn-icon"></x-icon> 修改
+            <x-icon type="compose" class="btn-icon"></x-icon> 修改资料
           </x-button>
         </flexbox-item>
         <flexbox-item :span="2">

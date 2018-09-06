@@ -109,9 +109,7 @@ export default {
       if (!this.formValidate) {
         return
       }
-
-      this.$vux.loading.show({text: '请稍后...'})
-
+      this.$vux.loading.show()
       this.$post('/api/customer/log?id=' + this.id, this.info, (res) => {
         this.$vux.loading.hide()
         if (res.success) {
