@@ -5,7 +5,7 @@
       <span slot="overwrite-left">
         <x-icon type="close" size="20" class="icon-close" @click="close"></x-icon>
       </span>
-      <span slot="right" v-if="isEdit" @click.native="confirm"
+      <span slot="right" v-if="isEdit" @click="confirm"
         :class="{enable: location.longitude !== 0 || location.latitude !== 0}">
         确定
       </span>
