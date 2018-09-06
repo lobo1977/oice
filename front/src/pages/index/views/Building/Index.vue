@@ -13,6 +13,11 @@
     
     <actionsheet v-model="showNewMenu" :menus="newMenus" theme="android" @on-click-menu="newMenuClick"></actionsheet>
 
+    <form ref="frmBuilding" style="display:none">
+      <input ref="inpBuildingFile" type="file" name="data" @change="upLoad"
+        accept="application/vnd.ms-excel">
+    </form>
+
     <div v-show="!isSearching">
       <sticky :offset="46">
         <flexbox :gutter="0" class="filter">
@@ -160,12 +165,67 @@ export default {
       this.isSearching = false
     },
     new () {
-      // this.showNewMenu = true
-      this.$router.push({name: 'BuildingEdit', params: {id: 0}})
+      this.showNewMenu = true
+    },
+    upLoad () {
+      let vm = this
+      let src = vm.$refs.inpBuildingFile
+      if (src.files && src.files[0]) {
+        let form = vm.$refs.frmBuilding
+        vm.$vux.loading.show()
+        vm.$postFile('/api/building/import', form, (res) => {
+          try {
+            src.value = ''
+          } catch (e) {}
+          vm.$vux.loading.hide()
+          if (res.success) {
+            let message = ''
+            let success = res.data.success
+            let clash = res.data.clash
+            let fail = res.data.fail
+            if (success > 0) {
+              message = '成功导入 ' + success + ' 条项目资料'
+            }
+            if (clash > 0) {
+              if (message) {
+                message += '，'
+              }
+              message += '由于项目资料重复 ' + clash + ' 条导入失败'
+            }
+            if (fail > 0) {
+              if (message) {
+                message += '，'
+              }
+              message += '由于项目资料不完整 ' + fail + ' 条导入失败'
+            }
+            message += '。'
+            vm.$vux.alert.show({
+              title: '操作完成',
+              content: message,
+              onHide () {
+                if (success > 0) {
+                  vm.loadListData(true)
+                }
+              }
+            })
+          } else {
+            vm.$vux.toast.show({
+              text: res.message,
+              width: '15em'
+            })
+          }
+        })
+      }
     },
     newMenuClick (key, item) {
       if (key === 'new') {
         this.$router.push({name: 'BuildingEdit', params: {id: 0}})
+      } else if (key === 'template') {
+        window.location.href = '/static/template/building.xls'
+      } else if (key === 'import') {
+        if (this.$checkAuth()) {
+          this.$refs.inpBuildingFile.click()
+        }
       }
     },
     // Picker
@@ -243,14 +303,6 @@ export default {
         this.page++
         this.loadListData()
       }
-    },
-    $route (to) {
-      // if (to.query.type) {
-      //   let i = Number(to.query.type)
-      //   this.setTypePicker(i)
-      // } else {
-      //   this.setTypePicker(1)
-      // }
     }
   },
   computed: {

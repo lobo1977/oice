@@ -2,6 +2,8 @@
 namespace app\api\model;
 
 use think\model\concern\SoftDelete;
+use think\facade\Validate;
+use app\common\Excel;
 use app\api\model\Base;
 use app\api\model\File;
 use app\api\model\Log;
@@ -50,7 +52,7 @@ class Building extends Base
         ($user != null && $building->user_id == $user->id) ||
         ($user != null && $building->company_id == $user->company_id);
     } else if ($operate == 'new') {
-      return $user != null;
+      return $user != null && $user->company_id > 0;
     } else if ($operate == 'edit') {
       if ($user == null) {
         return false;
@@ -68,7 +70,7 @@ class Building extends Base
   }
   
   /**
-   * 检索房源信息
+   * 检索项目信息
    */
   public static function search($user, $filter) {
     if (!isset($filter['page'])) {
@@ -146,7 +148,7 @@ class Building extends Base
   }
 
   /**
-   * 检索收藏的房源信息
+   * 检索收藏的项目信息
    */
   public static function myFavorite($user, $page = 1) {
     if ($user == null) {
@@ -216,7 +218,7 @@ class Building extends Base
   }
 
   /**
-   * 获取房源详细信息
+   * 获取项目详细信息
    */
   public static function detail($user, $id, $operate = 'view') {
     $data = self::where('id', $id)
@@ -226,9 +228,9 @@ class Building extends Base
         'share,user_id,company_id')->find();
 
     if ($data == null) {
-      self::exception('房源信息不存在。');
+      self::exception('项目信息不存在。');
     } else if (!self::allow($user, $data, $operate)) {
-      self::exception('您没有权限' . ($operate == 'edit' ? '编辑' : '查看') . '此房源。');
+      self::exception('您没有权限' . ($operate == 'edit' ? '编辑' : '查看') . '此项目。');
     }
 
     $data->engInfo = db('building_en')->where('id', $id)
@@ -256,7 +258,7 @@ class Building extends Base
   }
 
   /**
-   * 添加/修改房源信息
+   * 添加/修改项目信息
    */
   public static function addUp($user, $id, $data) {
     if (empty($data['completion_date'])) {
@@ -272,9 +274,9 @@ class Building extends Base
     if ($id) {
       $oldData = self::get($id);
       if ($oldData == null) {
-        self::exception('房源信息不存在。');
+        self::exception('项目信息不存在。');
       } else if (!self::allow($user, $oldData, 'edit')) {
-        self::exception('您没有权限修改此房源。');
+        self::exception('您没有权限修改此项目。');
       }
 
       $summary = '';
@@ -526,13 +528,13 @@ class Building extends Base
         Log::add($user, [
           "table" => "building",
           "owner_id" => $id,
-          "title" => '修改房源信息',
+          "title" => '修改项目信息',
           "summary" => $summary
         ]);
       }
       return $id;
     } else if (!self::allow($user, null, 'new')) {
-      self::exception('您没有权限添加房源。');
+      self::exception('您没有权限添加项目。');
     } else {
       $data['city'] = self::$city;
       $data['user_id'] = $user_id;
@@ -544,7 +546,7 @@ class Building extends Base
         Log::add($user, [
           "table" => "building",
           "owner_id" => $newData->id,
-          "title" => '登记房源',
+          "title" => '登记项目',
           "summary" => $newData->building_name
         ]);
         return $newData->id;
@@ -560,9 +562,9 @@ class Building extends Base
   public static function addUpEngInfo($user, $id, $data) {
     $building = self::get($id);
     if ($building == null) {
-      self::exception('房源信息不存在。');
+      self::exception('项目信息不存在。');
     } else if (!self::allow($user, $building, 'edit')) {
-      self::exception('您没有权限修改此房源。');
+      self::exception('您没有权限修改此项目。');
     }
 
     $oldData = db('building_en')->where('id', $id)->find();
@@ -690,7 +692,7 @@ class Building extends Base
       Log::add($user, [
         "table" => "building",
         "owner_id" => $id,
-        "title" => '修改房源英文信息',
+        "title" => '修改项目英文信息',
         "summary" => $summary
       ]);
       return $result;
@@ -736,20 +738,20 @@ class Building extends Base
   }
 
   /**
-   * 删除房源
+   * 删除项目
    */
   public static function remove($user, $id) {
     $building = self::get($id);
     if ($building == null) {
       return true;
     } else if (!self::allow($user, $building, 'delete')) {
-      self::exception('您没有权限删除此房源。');
+      self::exception('您没有权限删除此项目。');
     }
     
     $log = [
       "table" => 'building',
       "owner_id" => $building->id,
-      "title" => '删除房源',
+      "title" => '删除项目',
       "summary" => $building->building_name
     ];
     $result = $building->delete();
@@ -757,5 +759,135 @@ class Building extends Base
       Log::add($user, $log);
     }
     return $result;
+  }
+
+  /**
+   * 批量导入项目
+   */
+  public static function import($user, $data) {
+    if (!self::allow($user, null, 'new')) {
+      self::exception('您没有权限添加项目。');
+    }
+
+    $excel = new Excel();
+    $rowData = $excel->getData($data);
+
+    if (!$rowData) {
+      self::exception($excel->getError());
+    }
+
+    if (count($rowData) < 1 || count($rowData[0]) < 23) {
+      self::exception('导入数据不完整，请使用导入模板。');
+    }
+
+    $user_id = 0;
+    $company_id = 0;
+
+    if ($user) {
+      $user_id = $user->id;
+      $company_id = $user->company_id;
+    }
+
+    $succCount = 0;
+    $clashCount = 0;
+    $failCount = 0;
+
+    foreach ($rowData as $row) {
+      $building = [
+        'building_name' => $row[0],
+        'type' => $row[1],
+        'level' => $row[2],
+        'area' => $row[3],
+        'address' => $row[4],
+        'developer' => $row[5],
+        'linkman' => $row[6],
+        'tel' => $row[7],
+        'manager' => $row[8],
+        'completion_date' => $row[9],
+        'acreage' => $row[10],
+        'floor' => $row[11],
+        'floor_height' => $row[12],
+        'floor_area' => $row[13],
+        'bearing' => $row[14],
+        'fee' => $row[15],
+        'electricity_fee' => $row[16],
+        'car_seat' => $row[17],
+        'rem' => $row[18],
+        'equipment' => $row[19],
+        'traffic' => $row[20],
+        'facility' => $row[21],
+        'environment' => $row[22]
+      ];
+
+      if ($building['building_name'] || $building['type']) {
+        foreach($building as $k=>$v) {
+          if ($v == '' || $v == null || $v == 'null' || $v == 'NULL') {
+            unset($building[$k]);
+          }
+        }
+
+        if ($company_id) {
+          $clash = self::where('building_name', $building['building_name'])
+            ->where('company_id', $company_id)->find();
+          if ($clash) {
+            $clashCount++;
+            continue;
+          }
+        }
+
+        if (isset($building['completion_date'])) {
+          $n = intval(($building['completion_date'] - 25569) * 3600 * 24);
+          $building['completion_date'] = gmdate('Y-m-d', $n);
+        }
+
+        $building['city'] = self::$city;
+        $building['share'] = 0;
+        $building['user_id'] = $user_id;
+        $building['company_id'] = $company_id;
+
+        if ($building['linkman'] || $building['tel']) {
+          $linkman['type'] = 'building';
+          if (isset($building['linkman'])) {
+            $linkman['title'] = $building['linkman'];
+            unset($building['linkman']);
+          }
+          if (isset($building['tel'])) {
+            if (Validate::isMobile($building['tel'])) {
+              $linkman['mobile'] = $building['tel'];
+            } else {
+              $linkman['tel'] = $building['tel'];
+            }
+            unset($building['tel']);
+          }
+        }
+
+        $newData = new Building($building);
+        $result = $newData->save();
+
+        if ($result) {
+          Log::add($user, [
+            "table" => "building",
+            "owner_id" => $newData->id,
+            "title" => '导入项目',
+            "summary" => $newData->building_name
+          ]);
+          if ($linkman) {
+            $linkman['owner_id'] = $newData->id;
+            Linkman::addUp($user, 0, $linkman);
+          }
+          $succCount++;
+        } else {
+          $failCount++;
+        }
+      } else {
+        $failCount++;
+      }
+    }
+
+    return [
+      'success' => $succCount,
+      'clash' => $clashCount,
+      'fail' => $failCount
+    ];
   }
 }

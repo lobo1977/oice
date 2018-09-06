@@ -17,7 +17,7 @@ class Building extends Base
   ];
 
   /**
-   * 检索房源信息
+   * 检索项目信息
    */
   public function index() {
     $params = input('post.');
@@ -30,7 +30,20 @@ class Building extends Base
   }
 
   /**
-   * 查看房源信息
+   * 批量导入项目
+   */
+  public function import() {
+    $data = request()->file('data');
+    $result = modelBuilding::import($this->user, $data);
+    if ($result) {
+      return $this->succeed($result);
+    } else {
+      return $this->fail();
+    }
+  }
+
+  /**
+   * 查看项目信息
    */
   public function detail($id = 0) {
     if ($id) {
@@ -45,7 +58,7 @@ class Building extends Base
   }
 
   /**
-   * 分享房源信息
+   * 分享项目信息
    */
   public function share($id = 0) {
     if ($id) {
@@ -67,9 +80,8 @@ class Building extends Base
     return $this->succeed($images);
   }
 
-
   /**
-   * 添加/修改房源信息
+   * 添加/修改项目信息
    */
   public function edit($id) {
     if ($this->request->isGet()) {
@@ -113,7 +125,7 @@ class Building extends Base
   }
 
   /**
-   * 添加修改楼盘英文信息
+   * 添加修改项目英文信息
    */
   public function saveEngInfo($id) {
     $validate = Validate::make([
@@ -140,7 +152,7 @@ class Building extends Base
   }
 
   /**
-   * 上传房源图片
+   * 上传项目图片
    */
   public function uploadImage($id) {
     $files = request()->file('images');
