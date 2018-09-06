@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { XHeader, Flexbox, FlexboxItem, XButton } from 'vux'
+import { XHeader } from 'vux'
 import BMap from 'BMap'
 import BMAP_STATUS_SUCCESS from 'BMAP_STATUS_SUCCESS'
 
@@ -66,10 +66,7 @@ export default {
     }
   },
   components: {
-    XHeader,
-    Flexbox,
-    FlexboxItem,
-    XButton
+    XHeader
   },
   data () {
     return {
