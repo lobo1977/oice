@@ -1,11 +1,11 @@
 <template>
   <div style="margin:0 auto;max-width:600px;padding:15px;">
     <group>
-      <x-input ref="input_mobile" type="text" mask="999 9999 9999" placeholder="输入手机号码" v-model="mobile" :max="13" :required="true"
+      <x-input ref="inpBindMobile" type="text" mask="999 9999 9999" placeholder="输入手机号码" v-model="mobile" :max="13" :required="true"
          is-type="china-mobile" @on-click-error-icon="mobileError" :should-toast-error="false" @on-enter="bind" @on-change="validatedForm">
         <x-icon slot="label" type="iphone" size="28" style="fill:#333;position:relative;left:-6px;top:3px;"></x-icon>
       </x-input>
-      <x-input ref="input_verify_code" placeholder="输入验证码" v-model="verifyCode" :max="6" :required="true"
+      <x-input placeholder="输入验证码" v-model="verifyCode" :max="6" :required="true"
         :should-toast-error="false" @on-click-error-icon="verifyCodeError" @on-enter="bind" @on-change="validatedForm">
         <x-icon slot="label" type="android-apps" size="20" style="fill:#333;position:relative;left:-2px;top:1px;margin-right:9px;"></x-icon>
         <x-button slot="right" action-type="button" type="primary" mini :disabled="!isMobileValidated || timerStart" @click.native="sendVerifyCode">
@@ -48,7 +48,7 @@ export default {
       'setUser'
     ]),
     validatedForm () {
-      this.isMobileValidated = this.$refs.input_mobile.valid
+      this.isMobileValidated = this.$refs.inpBindMobile.valid
       this.formValidated = this.isMobileValidated && this.verifyCode.length
     },
     mobileError () {

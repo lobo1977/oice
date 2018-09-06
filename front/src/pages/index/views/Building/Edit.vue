@@ -7,7 +7,7 @@
     </tab>
 
     <div v-transfer-dom v-if="images.length">
-      <previewer :list="images" ref="previewer" :options="previewOptions">
+      <previewer :list="images" ref="prevBuildingEdit" :options="previewOptions">
         <template slot="button-before">
           <span class="previewer-icon" @click.prevent.stop="confirmRemoveImage" title="删除">
             <x-icon type="trash-a" size="24"></x-icon>
@@ -21,7 +21,7 @@
 
     <div v-show="tab === 0">
       <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
-        <x-input ref="input_name" title="项目名称" v-model="info.building_name" :required="true" :max="30"
+        <x-input ref="inpBuildingName" title="项目名称" v-model="info.building_name" :required="true" :max="30"
           @on-click-error-icon="nameError" :should-toast-error="false" @on-change="validateForm"></x-input>
         
         <popup-picker title="项目类型" :data="typePickerList" @on-change="typeChange" v-model="typeValue" value-text-align="left"></popup-picker>
@@ -97,7 +97,7 @@
 
     <div v-if="tab === 1">
       <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
-        <x-input ref="input_en_name" title="项目名称" v-model="engInfo.name" :required="true" :max="50"
+        <x-input ref="inpEngName" title="项目名称" v-model="engInfo.name" :required="true" :max="50"
           @on-click-error-icon="nameError" :should-toast-error="false" @on-change="validateEngForm"></x-input>
       </group>
 
@@ -151,7 +151,7 @@
         </flexbox-item>
       </flexbox>
       <div class="bottom-bar">
-        <form ref="frmUploadImage">
+        <form ref="frmUploadBuildingImage">
           <x-button type="warn" class="bottom-btn">上传</x-button>
           <input type="hidden" name="id" :value="id">
           <input type="file" class="upload" name="images[]" multiple="multiple"
@@ -372,10 +372,10 @@ export default {
       })
     },
     validateForm () {
-      this.formValidate = this.$refs.input_name.valid
+      this.formValidate = this.$refs.inpBuildingName.valid
     },
     validateEngForm () {
-      this.engFormValidate = this.$refs.input_en_name.valid
+      this.engFormValidate = this.$refs.inpEngName.valid
     },
     typeChange (val) {
       this.info.type = val[0]
@@ -482,10 +482,10 @@ export default {
       })
     },
     preview (index) {
-      this.$refs.previewer.show(index)
+      this.$refs.prevBuildingEdit.show(index)
     },
     upload () {
-      let form = this.$refs.frmUploadImage
+      let form = this.$refs.frmUploadBuildingImage
       this.$vux.loading.show()
       this.$postFile('/api/building/uploadImage', form, (res) => {
         this.$vux.loading.hide()
@@ -500,7 +500,7 @@ export default {
       })
     },
     setDefault () {
-      let index = this.$refs.previewer.getCurrentIndex()
+      let index = this.$refs.prevBuildingEdit.getCurrentIndex()
       if (index < 0) return
       this.$vux.loading.show()
       this.$post('/api/building/setDefaultImage', {

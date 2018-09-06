@@ -13,7 +13,7 @@
           <input id="inputLogo" type="file" name="logo" class="upload" @change="loadLogo"
               accept="image/*">
         </cell>
-        <x-input name="title" ref="input_name" title="企业简称" v-model="info.title" :required="true" :max="10"
+        <x-input ref="inpCompanyName" name="title" title="企业简称" v-model="info.title" :required="true" :max="10"
           @on-click-error-icon="nameError" :should-toast-error="false" @on-change="validateForm"></x-input>
         <x-input name="full_name" title="企业全称" v-model="info.full_name" :max="50"></x-input>
         <popup-picker title="所在地" :data="districtPickerList" @on-change="districtChange"
@@ -144,7 +144,7 @@ export default {
       })
     },
     validateForm () {
-      this.formValidate = this.$refs.input_name.valid
+      this.formValidate = this.$refs.inpCompanyName.valid
     },
     districtChange (val) {
       this.info.area = (val[0] === 'all') ? '' : val[0]

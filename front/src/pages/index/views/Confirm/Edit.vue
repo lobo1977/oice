@@ -18,7 +18,7 @@
           :link="{name: 'CustomerView', params: { id: info.customer_id }}">
           <span slot="title" :class="{warn: !info.customer_id}">客户</span>
         </cell>
-        <x-input ref="input_acreage" title="面积" type="number" :required="true" v-model="info.acreage" :max="10" :show-clear="false"
+        <x-input ref="inpConfirmAcreage" title="面积" type="number" :required="true" v-model="info.acreage" :max="10" :show-clear="false"
           @on-click-error-icon="acreageError" :should-toast-error="false" @on-change="validateForm">
           <span slot="right">平方米</span>
         </x-input>
@@ -191,7 +191,7 @@ export default {
         this.building.developer &&
         this.info.company_id &&
         this.info.customer_id &&
-        this.$refs.input_acreage.valid &&
+        this.$refs.inpConfirmAcreage.valid &&
         this.info.rent_sell &&
         this.vm.isConfirmDateValid
     },

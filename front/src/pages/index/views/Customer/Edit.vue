@@ -7,11 +7,11 @@
 
     <div v-if="tab === 0">
       <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
-        <x-input ref="input_name" title="客户名称" v-model="info.customer_name" :required="true" :max="30"
+        <x-input ref="inpCustomerName" title="客户名称" v-model="info.customer_name" :required="true" :max="30"
           @on-click-error-icon="nameError" :should-toast-error="false" @on-change="validateForm"></x-input>
-        <x-input v-if="id === 0" ref="input_linkman" title="联系人" v-model="info.linkman" :required="true" :max="30"
+        <x-input v-if="id === 0" ref="inpCustomerLinkman" title="联系人" v-model="info.linkman" :required="true" :max="30"
           @on-click-error-icon="linkmanError" :should-toast-error="false" @on-change="validateForm"></x-input>
-        <x-input v-if="id === 0" ref="input_mobile" title="联系电话" type="text" mask="999 9999 9999" placeholder="请输入手机号码" 
+        <x-input v-if="id === 0" ref="inpCustomerMobile" title="联系电话" type="text" mask="999 9999 9999" placeholder="请输入手机号码" 
           v-model="info.mobile" :max="13" :required="true" is-type="china-mobile"
           @on-change="validateForm" @on-click-error-icon="mobileError" :should-toast-error="false"></x-input>
         <popup-picker title="所在地" :data="districtPickerData" @on-change="districtChange"
@@ -277,10 +277,10 @@ export default {
     },
     validateForm () {
       if (this.id === 0) {
-        this.formValidate = this.$refs.input_name.valid &&
-          this.$refs.input_linkman.valid && this.$refs.input_mobile.valid
+        this.formValidate = this.$refs.inpCustomerName.valid &&
+          this.$refs.inpCustomerLinkman.valid && this.$refs.inpCustomerMobile.valid
       } else {
-        this.formValidate = this.$refs.input_name.valid
+        this.formValidate = this.$refs.inpCustomerName.valid
       }
     },
     districtChange (val) {

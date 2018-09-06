@@ -9,11 +9,11 @@
       @on-focus="onFocus"
       @on-cancel="onCancel"
       @on-submit="onSubmit"
-      ref="search"></search>
+      ref="searchBuilding"></search>
     
     <actionsheet v-model="showNewMenu" :menus="newMenus" theme="android" @on-click-menu="newMenuClick"></actionsheet>
 
-    <form ref="frmBuilding" style="display:none">
+    <form ref="frmImportBuilding" style="display:none">
       <input ref="inpBuildingFile" type="file" name="data" @change="upLoad"
         accept="application/vnd.ms-excel">
     </form>
@@ -54,16 +54,16 @@
 
       <panel :list="buildingList" :type="listType" @on-img-error="onImgError" style="margin-top:0"></panel>
 
-      <popup-picker ref="typePicker" class="popup-picker" :show.sync="showTypePicker" 
+      <popup-picker ref="pickType" class="popup-picker" :show.sync="showTypePicker" 
         :show-cell="false" :data="typePickerList"  
         @on-change="typeChange" v-model="typeValue"></popup-picker>
-      <popup-picker ref="districtPicker" class="popup-picker" :show.sync="showDistrictPicker" 
+      <popup-picker ref="pickDistrict" class="popup-picker" :show.sync="showDistrictPicker" 
         :show-cell="false" :data="districtPickerList" :columns=2 
         @on-change="districtChange" v-model="districtValue"></popup-picker>
-      <popup-picker ref="rentSellPicker" class="popup-picker" :show.sync="showRentSellPicker" 
+      <popup-picker ref="pickRentSell" class="popup-picker" :show.sync="showRentSellPicker" 
         :show-cell="false" :data="rentSellPickerList" 
         @on-change="rentSellChange" v-model="rentSellValue"></popup-picker>
-      <popup-picker ref="acreagePicker" class="popup-picker" :show.sync="showAcreagePicker" 
+      <popup-picker ref="pickAcreage" class="popup-picker" :show.sync="showAcreagePicker" 
         :show-cell="false" :data="acreagePickerList" 
         @on-change="acreageChange" v-model="acreageValue"></popup-picker>
 
@@ -136,7 +136,7 @@ export default {
     // Searcher
     resultClick (item) {
       this.$router.push({name: 'BuildingView', params: {id: item.id}})
-      this.$refs.search.setBlur()
+      this.$refs.searchBuilding.setBlur()
       this.isSearching = false
     },
     getResult (val) {
@@ -158,7 +158,7 @@ export default {
       this.isSearching = true
     },
     onSubmit () {
-      this.$refs.search.setBlur()
+      this.$refs.searchBuilding.setBlur()
       this.isSearching = false
     },
     onCancel () {
@@ -171,7 +171,7 @@ export default {
       let vm = this
       let src = vm.$refs.inpBuildingFile
       if (src.files && src.files[0]) {
-        let form = vm.$refs.frmBuilding
+        let form = vm.$refs.frmImportBuilding
         vm.$vux.loading.show()
         vm.$postFile('/api/building/import', form, (res) => {
           try {
@@ -230,19 +230,19 @@ export default {
     },
     // Picker
     typeChange (val) {
-      this.typeText = this.$refs.typePicker.getNameValues()
+      this.typeText = this.$refs.pickType.getNameValues()
       this.loadListData(true)
     },
     districtChange (val) {
-      this.districtText = this.$refs.districtPicker.getNameValues()
+      this.districtText = this.$refs.Picker.getNameValues()
       this.loadListData(true)
     },
     rentSellChange (val) {
-      this.rentSellText = this.$refs.rentSellPicker.getNameValues()
+      this.rentSellText = this.$refs.pickRentSell.getNameValues()
       this.loadListData(true)
     },
     acreageChange (val) {
-      this.acreageText = this.$refs.acreagePicker.getNameValues()
+      this.acreageText = this.$refs.Picker.getNameValues()
       this.loadListData(true)
     },
     setTypePicker (index) {

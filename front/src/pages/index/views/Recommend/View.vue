@@ -13,7 +13,7 @@
     </div>
 
     <div v-transfer-dom>
-      <previewer :list="images" ref="previewer" :options="previewOptions"></previewer>
+      <previewer ref="prevRecommend" :list="images" :options="previewOptions"></previewer>
     </div>
 
     <load-more :show-loading="false" background-color="#fbf9fe"></load-more>
@@ -147,7 +147,7 @@ export default {
       vm.images = vm.list[index].images
       if (vm.images.length) {
         setTimeout(() => {
-          vm.$refs.previewer.show(0)
+          vm.$refs.prevRecommend.show(0)
         }, 200)
       }
     },

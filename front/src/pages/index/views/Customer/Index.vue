@@ -8,12 +8,12 @@
       @on-focus="onFocus"
       @on-cancel="onCancel"
       @on-submit="onSubmit"
-      ref="search"></search>
+      ref="searchCustomer"></search>
 
     <actionsheet v-model="showNewMenu" :menus="newMenus" theme="android" @on-click-menu="newMenuClick"></actionsheet>
 
-    <form ref="frmCustomer" style="display:none">
-      <input ref="inpFile" type="file" name="data" @change="upLoad"
+    <form ref="frmImportCustomer" style="display:none">
+      <input ref="inpCustomerFile" type="file" name="data" @change="upLoad"
         accept="application/vnd.ms-excel">
     </form>
 
@@ -23,7 +23,7 @@
         <tab-item :selected="type == 'potential'" @on-item-click="getList('potential')">潜在客户</tab-item>
         <tab-item :selected="type == 'pool'" @on-item-click="getList('pool')">客户池</tab-item>
       </tab>
-      <router-view ref="list"></router-view>
+      <router-view ref="listCustomer"></router-view>
     </div>
   </div>
 </template>
@@ -68,15 +68,15 @@ export default {
         window.location.href = '/static/template/customer.xls'
       } else if (key === 'import') {
         if (this.$checkAuth()) {
-          this.$refs.inpFile.click()
+          this.$refs.inpCustomerFile.click()
         }
       }
     },
     upLoad () {
       let vm = this
-      let src = vm.$refs.inpFile
+      let src = vm.$refs.inpCustomerFile
       if (src.files && src.files[0]) {
-        let form = vm.$refs.frmCustomer
+        let form = vm.$refs.frmImportCustomer
         vm.$vux.loading.show()
         vm.$postFile('/api/customer/import', form, (res) => {
           try {
@@ -124,12 +124,12 @@ export default {
     },
     export () {
       if (this.$checkAuth()) {
-        this.$refs.list.export()
+        this.$refs.listCustomer.export()
       }
     },
     resultClick (item) {
       this.$router.push({name: 'CustomerView', params: {id: item.id}})
-      this.$refs.search.setBlur()
+      this.$refs.searchCustomer.setBlur()
       this.isSearching = false
     },
     getResult (val) {
@@ -151,7 +151,7 @@ export default {
       this.isSearching = true
     },
     onSubmit () {
-      this.$refs.search.setBlur()
+      this.$refs.searchCustomer.setBlur()
       this.isSearching = false
     },
     onCancel () {
@@ -159,7 +159,7 @@ export default {
     },
     getList (path) {
       if (this.type === path) {
-        this.$refs.list.loadData(true)
+        this.$refs.listCustomer.loadData(true)
       } else {
         this.$router.push('/customer/' + path)
       }

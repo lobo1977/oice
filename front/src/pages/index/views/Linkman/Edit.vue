@@ -1,15 +1,15 @@
 <template>
   <div>
     <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
-      <x-input ref="input_title" title="姓名" v-model="info.title" :required="true" :max="10"
+      <x-input ref="inpLinkmanTitle" title="姓名" v-model="info.title" :required="true" :max="10"
         @on-click-error-icon="titleError" :should-toast-error="false" @on-change="validateForm"></x-input>
       <x-input title="所在部门" v-model="info.department" :max="20"></x-input>
       <x-input title="职务" v-model="info.job" :max="20"></x-input>
-      <x-input ref="input_mobile" title="手机号码" type="text" mask="999 9999 9999"
+      <x-input ref="inpLinkmanMobile" title="手机号码" type="text" mask="999 9999 9999"
         v-model="info.mobile" :max="13" :required="true" is-type="china-mobile"
         @on-change="validateForm" @on-click-error-icon="mobileError" :should-toast-error="false"></x-input>
       <x-input title="办公电话" v-model="info.tel" :max="20"></x-input>
-      <x-input type="email" ref="input_email" title="电子邮箱" v-model="info.email" :max="30" is-type="email"
+      <x-input ref="inpLinkmanEmail" type="email" title="电子邮箱" v-model="info.email" :max="30" is-type="email"
         @on-change="validateForm" @on-click-error-icon="emailError" :should-toast-error="false"></x-input>
       <x-input title="微信" v-model="info.weixin" :max="30"></x-input>
       <x-input title="QQ" v-model="info.qq" :max="30"></x-input>
@@ -113,8 +113,8 @@ export default {
       })
     },
     validateForm () {
-      this.formValidate = this.$refs.input_title.valid &&
-        this.$refs.input_mobile.valid && this.$refs.input_email.valid
+      this.formValidate = this.$refs.inpLinkmanTitle.valid &&
+        this.$refs.inpLinkmanMobile.valid && this.$refs.inpLinkmanEmail.valid
     },
     save () {
       this.validateForm()

@@ -14,7 +14,7 @@
       <load-more :show-loading="isLoading" v-show="isLoading || isEnd" :tip="loadingTip"></load-more>
     </div>
 
-    <popup-picker ref="customerPicker" class="popup-picker" :show.sync="showCustomerPicker" 
+    <popup-picker class="popup-picker" :show.sync="showCustomerPicker" 
       popup-title="选择客户" :show-cell="false" :data="myCustomer" v-model="selectCustomer"
       @on-hide="addFilter"></popup-picker>
     

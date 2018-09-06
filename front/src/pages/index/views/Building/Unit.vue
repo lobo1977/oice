@@ -8,7 +8,7 @@
     </swiper>
 
     <div v-transfer-dom>
-      <previewer :list="info.images" ref="previewer" :options="previewOptions"></previewer>
+      <previewer :list="info.images" ref="prevUnit" :options="previewOptions"></previewer>
     </div>
 
     <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
@@ -59,7 +59,7 @@
       </flexbox-item>
     </flexbox>
 
-    <popup-picker ref="customerPicker" class="popup-picker" :show.sync="showCustomerPicker" 
+    <popup-picker class="popup-picker" :show.sync="showCustomerPicker" 
       popup-title="选择客户" :show-cell="false" :data="myCustomer" v-model="selectCustomer"
       @on-hide="customerSelected"></popup-picker>
 
@@ -179,7 +179,7 @@ export default {
   },
   methods: {
     preview (index) {
-      this.$refs.previewer.show(index)
+      this.$refs.prevUnit.show(index)
     },
     favorite () {
       if (!this.$checkAuth()) {

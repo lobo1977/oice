@@ -10,10 +10,10 @@
           <input id="inputAvatar" type="file" name="avatar" class="upload" @change="loadAvatar"
               accept="image/*">
         </cell>
-        <x-input name="title" ref="input_name" title="姓名" v-model="info.title" :required="true" :max="30"
+        <x-input ref="inpMyName" name="title" title="姓名" v-model="info.title" :required="true" :max="30"
           @on-click-error-icon="nameError" :should-toast-error="false" @on-change="validateForm"></x-input>
         <cell title="手机" :value="info.mobile" is-link value-align="left" :link="{name: 'ChangeMobile'}"></cell>
-        <x-input name="email" type="email" ref="input_email" title="电子邮箱" v-model="info.email" :max="30" is-type="email"
+        <x-input ref="inpMyEmail" type="email" name="email" title="电子邮箱" v-model="info.email" :max="30" is-type="email"
           @on-change="validateForm" @on-click-error-icon="emailError" :should-toast-error="false"></x-input>
         <x-input name="weixin" title="微信" v-model="info.weixin" :max="30"></x-input>
         <x-input name="qq" title="QQ" v-model="info.qq" :max="30"></x-input>
@@ -84,8 +84,8 @@ export default {
       })
     },
     validateForm () {
-      this.formValidate = this.$refs.input_name.valid &&
-          this.$refs.input_email.valid
+      this.formValidate = this.$refs.inpMyName.valid &&
+          this.$refs.inpMyEmail.valid
     },
     loadAvatar () {
       let src = document.getElementById('inputAvatar')

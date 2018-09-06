@@ -9,7 +9,7 @@
       @on-cancel="onCancel"
       @on-submit="onSubmit"
       placeholder="查找并加入企业"
-      ref="search"></search>
+      ref="searchCompany"></search>
 
     <div v-show="!isSearching">
       <group v-if="my.length > 0" title="切换企业">
@@ -107,7 +107,7 @@ export default {
     // Searcher
     resultClick (item) {
       this.$router.push({name: 'CompanyView', params: {id: item.id}})
-      this.$refs.search.setBlur()
+      this.$refs.searchCompany.setBlur()
       this.isSearching = false
     },
     getResult (val) {
@@ -129,7 +129,7 @@ export default {
       this.isSearching = true
     },
     onSubmit () {
-      this.$refs.search.setBlur()
+      this.$refs.searchCompany.setBlur()
       this.isSearching = false
     },
     onCancel () {

@@ -3,10 +3,10 @@
     style="margin:0 auto;max-width:600px;padding:15px;">
 
     <group>
-      <x-input ref="input_password" type="password" placeholder="输入密码" v-model="password" :max="16" :required="true"
+      <x-input ref="inpChangePwd" type="password" placeholder="输入密码" v-model="password" :max="16" :required="true"
         :should-toast-error="false" @on-click-error-icon="passwordError" @on-change="validateform">
       </x-input>
-      <x-input ref="repet_password" type="password" placeholder="再次输入密码" v-model="repetPassword" :max="16"
+      <x-input ref="inpRepetPwd" type="password" placeholder="再次输入密码" v-model="repetPassword" :max="16"
         :equal-with="password" :should-toast-error="false" @on-click-error-icon="repetPasswordError" @on-change="validateform">
       </x-input>
     </group>
@@ -41,8 +41,8 @@ export default {
       })
     },
     validateform () {
-      this.formValid = this.$refs.input_password.valid &&
-        this.$refs.repet_password.valid && this.password === this.repetPassword
+      this.formValid = this.$refs.inpChangePwd.valid &&
+        this.$refs.inpRepetPwd.valid && this.password === this.repetPassword
     },
     changePwd () {
       this.$vux.loading.show()

@@ -6,7 +6,7 @@
     </tab>
 
     <div v-transfer-dom>
-      <previewer :list="images" ref="previewer" :options="previewOptions">
+      <previewer :list="images" ref="prevUnitEdit" :options="previewOptions">
         <template slot="button-before">
           <span class="previewer-icon" @click.prevent.stop="confirmRemoveImage" title="删除">
             <x-icon type="trash-a" size="24"></x-icon>
@@ -25,7 +25,7 @@
           :max="10" :show-clear="false" placeholder="地下填写负数">
           <span slot="right">层</span>
         </x-input>
-        <x-input ref="input_room" title="房间号" v-model="info.room" :required="true" :max="10"
+        <x-input ref="inpRoom" title="房间号" v-model="info.room" :required="true" :max="10"
           placeholder="填写房间号或整层"
           @on-click-error-icon="roomError" :should-toast-error="false" @on-change="validateForm"></x-input>
         <cell title="朝向">
@@ -54,8 +54,8 @@
       </group>
 
       <group gutter="10px" label-width="4em" label-margin-right="1em" label-align="right">
-        <x-input v-if="id === 0" ref="input_linkman" title="联系人" v-model="info.linkman" :max="30"></x-input>
-        <x-input v-if="id === 0" ref="input_mobile" title="联系电话" type="text" mask="999 9999 9999" placeholder="请输入手机号码" 
+        <x-input v-if="id === 0" ref="inpUnitLinkman" title="联系人" v-model="info.linkman" :max="30"></x-input>
+        <x-input v-if="id === 0" ref="inpUnitMobile" title="联系电话" type="text" mask="999 9999 9999" placeholder="请输入手机号码" 
           v-model="info.mobile" :max="13" is-type="china-mobile"
           @on-change="validateForm" @on-click-error-icon="mobileError" :should-toast-error="false"></x-input>
       </group>
@@ -292,10 +292,10 @@ export default {
     },
     validateForm () {
       if (this.id === 0) {
-        this.formValidate = this.$refs.input_room.valid &&
-          this.$refs.input_linkman.valid && this.$refs.input_mobile.valid
+        this.formValidate = this.$refs.inpRoom.valid &&
+          this.$refs.inpUnitLinkman.valid && this.$refs.inpUnitMobile.valid
       } else {
-        this.formValidate = this.$refs.input_room.valid
+        this.formValidate = this.$refs.inpRoom.valid
       }
     },
     selectFace () {
@@ -365,7 +365,7 @@ export default {
       })
     },
     preview (index) {
-      this.$refs.previewer.show(index)
+      this.$refs.prevUnitEdit.show(index)
     },
     upload () {
       let form = this.$refs.frmUploadUnitImage
@@ -383,7 +383,7 @@ export default {
       })
     },
     setDefault () {
-      let index = this.$refs.previewer.getCurrentIndex()
+      let index = this.$refs.prevUnitEdit.getCurrentIndex()
       if (index < 0) return
       this.$vux.loading.show()
       this.$post('/api/building/setDefaultImage', {
@@ -411,7 +411,7 @@ export default {
       })
     },
     confirmRemoveImage () {
-      let index = this.$refs.previewer.getCurrentIndex()
+      let index = this.$refs.prevUnitEdit.getCurrentIndex()
       if (index < 0) return
       let img = this.images[index]
       if (img.default === 1) {

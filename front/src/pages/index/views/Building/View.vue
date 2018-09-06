@@ -11,7 +11,7 @@
     </swiper>
 
     <div v-transfer-dom v-if="info.images.length">
-      <previewer :list="info.images" ref="previewer" :options="previewOptions"></previewer>
+      <previewer :list="info.images" ref="prevBuilding" :options="previewOptions"></previewer>
     </div>
 
     <sticky :offset="46" v-if="user != null && user.id > 0">
@@ -155,7 +155,7 @@
         :inline-desc="item.desc"></cell>
     </div>
 
-    <popup-picker ref="customerPicker" class="popup-picker" :show.sync="showCustomerPicker" 
+    <popup-picker class="popup-picker" :show.sync="showCustomerPicker" 
       popup-title="选择客户" :show-cell="false" :data="myCustomer" v-model="selectCustomer"
       @on-hide="customerSelected"></popup-picker>
     
@@ -331,7 +331,7 @@ export default {
       this.tab = tab
     },
     preview (index) {
-      this.$refs.previewer.show(index)
+      this.$refs.prevBuilding.show(index)
     },
     favorite () {
       if (!this.$checkAuth()) {

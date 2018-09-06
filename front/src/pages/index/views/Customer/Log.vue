@@ -4,7 +4,7 @@
       <cell title="时间" :value="info.create_time" value-align="left" :is-link="true" @click.native="selectTime">
         <span slot="title" :class="{warn: !isTimeValid}">确认日期</span>
       </cell>
-      <x-input ref="input_title" title="摘要" v-model="info.title" :required="true" :max="10"
+      <x-input ref="inpLogTitle" title="摘要" v-model="info.title" :required="true" :max="10"
         @on-click-error-icon="titleError" :should-toast-error="false" @on-change="validateForm"></x-input>
       <x-textarea placeholder="详情" :rows="3" v-model="info.summary" :max="500"></x-textarea>
     </group>
@@ -101,7 +101,7 @@ export default {
       })
     },
     validateForm () {
-      this.formValidate = this.isTimeValid && this.$refs.input_title.valid
+      this.formValidate = this.isTimeValid && this.$refs.inpLogTitle.valid
     },
     save () {
       this.isTimeValid = this.info.create_time.length > 0
