@@ -1,6 +1,6 @@
 <template>
   <div>
-    <group>
+    <group :gutter="0">
       <cell v-for="(item, index) in list" :key="index" :title="item.title" :link="item.url">
         <img slot="icon" :src="item.src" class="cell-image" />
         <p slot="inline-desc" class="cell-desc">{{item.desc}}</p>

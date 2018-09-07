@@ -11,7 +11,7 @@
             <swipeout-button v-if="user.isAdmin && !item.isAdmin" @click.native.stop="turn(item)" type="primary">转交</swipeout-button>
             <swipeout-button v-if="user.isAdmin && !item.isAdmin" @click.native.stop="remove(item)" type="warn">移除</swipeout-button>
           </div>
-          <cell slot="content" :title="item.title" :inline-desc="item.mobile">
+          <cell slot="content" :title="item.title">
             <img slot="icon" :src="item.avatar" class="cell-image">
             <div slot="inline-desc">
               <span>{{item.mobile}}</span>
