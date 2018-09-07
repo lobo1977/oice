@@ -126,12 +126,11 @@
             </span>
             <span @click="removeLog(item.id)">
               <x-icon v-if="item.allowDelete" 
-                type="android-cancel" size="20"></x-icon>
+                type="close" size="18"></x-icon>
             </span>
           </h4>
           <p v-if="item.summary" v-html="item.summary"></p>
-          <p>{{item.create_time}}</p>
-          <p v-if="item.user || item.mobile">{{item.user || item.mobile}}</p>
+          <p class="foot">{{item.user}} &nbsp; {{item.create_time|formatTime}}</p>
         </timeline-item>
       </timeline>
 
@@ -736,32 +735,36 @@ export default {
 }
 
 .time-line {
-	p {
-    margin-top:0.2em;
-		color: #888;
-		font-size: 0.8rem;
-	}
-	h4 {
-		color: #666;
-    font-weight: normal;
-    .vux-x-icon {
-      position: relative;
-      top:4px;
-      margin-left:5px;
-      cursor:pointer;
-    } 
-    .vux-x-icon-compose {
-      fill:rgb(4, 190, 2);
-    }
-    .vux-x-icon-android-cancel {
-      fill:red;
-    }
-	}
-	.recent {
-		color: rgb(4, 190, 2)
+  .vux-timeline {
+    padding:0.8em;
   }
-  .vux-timeline-item-head{
-    top:8px;
+  .vux-timeline-item-content {
+    padding-bottom:0.5em;
+    h4 {
+      font-size:0.8em;
+      color: #666;
+      font-weight: bold;
+      .vux-x-icon {
+        position: relative;
+        top:4px;
+        cursor:pointer;
+      }
+      .vux-x-icon-compose {
+        margin-left:3px;
+        fill:rgb(4, 190, 2);
+      }
+      .vux-x-icon-close {
+        fill:red;
+      }
+    }
+    p {
+      margin-top:0.4em;
+      color: #888;
+      font-size: 0.8em;
+    }
+    p.foot {
+      font-size:0.6em
+    }
   }
 }
 </style>

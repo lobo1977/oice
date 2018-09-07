@@ -217,6 +217,7 @@ html, body {
   position:fixed;
   bottom:0;
   width:100%;
+  z-index:100;
   .weui-btn {
     border:0;
     border-radius:0;
