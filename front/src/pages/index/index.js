@@ -51,6 +51,37 @@ Vue.filter('formatDate', function (value) {
   }
 })
 
+Vue.filter('formatTime', function (value) {
+  if (value) {
+    let time = new Date(Date.parse(value.replace(/-/g, '/')))
+    let now = new Date()
+    let timeDiff = now - time
+
+    if (timeDiff < 0) {
+      if (now.getFullYear() !== time.getFullYear()) {
+        return dateFormat(time, 'YYYY年M月D日 HH:mm')
+      } else if (now.getDate() !== time.getDate()) {
+        return dateFormat(time, 'M月D日 HH:mm')
+      } else {
+        return dateFormat(time, 'HH:mm')
+      }
+    } else if (timeDiff < 1000 * 60 * 3) {
+      return '刚刚'
+    } else if (timeDiff < 1000 * 60 * 59) {
+      return Math.round(timeDiff / 1000 / 60) + '分钟前'
+    } else if (timeDiff < 1000 * 60 * 60 * 24) {
+      return dateFormat(time, 'HH:mm')
+    } else if (timeDiff < 1000 * 60 * 60 * 24 * 180 ||
+      now.getFullYear() === time.getFullYear()) {
+      return dateFormat(time, 'M月D日 HH:mm')
+    } else {
+      return dateFormat(time, 'YYYY年M月D日 HH:mm')
+    }
+  } else {
+    return value
+  }
+})
+
 Vue.prototype.$download = (url) => {
   Vue.$vux.loading.show()
   let iframe = document.createElement('iframe')
