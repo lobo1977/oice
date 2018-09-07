@@ -128,9 +128,10 @@ export default {
                   vm.user = res.data
                   vm.setUser(res.data)
                 }
-                vm.$vux.alert.show({
-                  title: '提示',
-                  content: '已将企业管理员权限转交给 <strong> ' + user.title + '</strong>。',
+                vm.$vux.toast.show({
+                  type: 'success',
+                  text: '转交成功。',
+                  width: '12em',
                   onHide () {
                     vm.loadListData(true)
                   }
