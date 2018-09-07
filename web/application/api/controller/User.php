@@ -22,6 +22,14 @@ class User extends Base
   }
 
   /**
+   * 检索企业成员
+   */
+  public function search($company, $keyword) {
+    $result = modelUser::companyMember($this->user, $company, 1, -1, $keyword);
+    return $this->succeed($result);
+  }
+
+  /**
    * 查看用户信息
    */
   public function detail($id = 0) {

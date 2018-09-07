@@ -39,7 +39,7 @@ class User extends Base
   /**
    * 获取企业成员
    */
-  public static function companyMember($user, $id, $status = 0, $page = 0) {
+  public static function companyMember($user, $id, $status = 0, $page = 0, $keyword = '') {
     $company = Company::get($id);
     if ($company == null) {
       self::exception('企业不存在。');
@@ -47,12 +47,17 @@ class User extends Base
 
     $list = self::alias('a')
       ->join('user_company b', 'a.id = b.user_id and b.status = ' . $status)
-      ->where('b.company_id', $id)
-      ->field('a.id,a.title,a.avatar,a.mobile')
+      ->where('b.company_id', $id);
+
+    if ($keyword != '') {
+      $list->where('a.title|a.mobile', 'like', '%' . $keyword . '%');
+    }
+
+    $list->field('a.id,a.title,a.avatar,a.mobile')
       ->order('b.create_time', 'asc');
 
     if ($page > 0) {
-      $list = $list->page($page, 10);
+      $list->page($page, 10);
     }
 
     $list = $list->select();
@@ -61,6 +66,7 @@ class User extends Base
       if ($company->user_id == $member->id) {
         $member->isAdmin = true;
       }
+      $member->checked = false;
       self::formatData($member);
     }
     return $list;
