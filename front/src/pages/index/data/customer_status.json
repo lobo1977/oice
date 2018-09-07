@@ -19,5 +19,8 @@
         "label": "失败",
         "type": "warn",
         "value": 5
+    }, {
+        "label": "名录",
+        "value": 6
     }
 ]
