@@ -9,7 +9,7 @@
       <tab-item @on-item-click="goTab(3)" :selected="tab === 3">推荐资料</tab-item>
     </tab>
 
-    <div v-show="tab === 0">
+    <div v-show="tab === 0 && !showSelectUser">
       <flow v-if="info.id > 0 && info.status < 6">
         <flow-state title="潜在" is-done></flow-state>
         <flow-line :is-done="info.status > 0" :tip="flowOneText"></flow-line>
@@ -42,7 +42,7 @@
 
       <group v-if="info.linkman.length || info.allowEdit">
         <group-title slot="title">联系人
-          <router-link style="float:right;color:#333;" v-if="info.allowEdit"
+          <router-link style="float:right;color:#333;cursor:pointer;" v-if="info.allowEdit"
             :to="{name: 'LinkmanEdit', params: {id: 0, type: 'customer', oid: info.id}}">+ 添加</router-link>
         </group-title>
         <cell v-for="(item, index) in info.linkman" :key="index"
@@ -50,7 +50,11 @@
           :inline-desc="item.desc"></cell>
       </group>
 
-      <group v-if="info.user_id" title="客户经理">
+      <group v-if="info.manager || info.allowTurn">
+        <group-title slot="title">客户经理
+          <a style="float:right;color:#333;cursor:pointer;" v-if="info.allowTurn"
+            @click="showSelectUser = true">转交</a>
+        </group-title>
         <cell :title="info.manager" :inline-desc="info.company || info.mobile"
           :link="{name: 'UserView', params: {id: info.user_id}}">
           <img slot="icon" :src="info.avatar" class="cell-image">
@@ -104,6 +108,12 @@
         </flexbox-item>
       </flexbox>
     </div>
+
+    <popup v-model="showSelectUser" position="bottom"
+      height="100%" style="overflow-y:hidden;">
+      <user-selecter :is-shown="showSelectUser" :company="info.company_id"
+        @on-close="showSelectUser = false" @on-confirm="setManager"></user-selecter>
+    </popup>
 
     <div v-show="tab === 1" class="time-line">
       <timeline>
@@ -209,6 +219,7 @@ import { Flow, FlowState, FlowLine, GroupTitle,
   Swipeout, SwipeoutItem, SwipeoutButton, CheckIcon,
   Timeline, TimelineItem } from 'vux'
 import Topalert from '@/components/Topalert.vue'
+import UserSelecter from '../User/Selecter.vue'
 import printModeData from '../../data/print_mode.json'
 
 export default {
@@ -223,7 +234,8 @@ export default {
     CheckIcon,
     Timeline,
     TimelineItem,
-    Topalert
+    Topalert,
+    UserSelecter
   },
   data () {
     return {
@@ -246,11 +258,13 @@ export default {
         status: 0,            // 状态
         clash: 0,             // 撞单
         user_id: 0,
+        company_id: 0,
         manager: '',          // 客户经理
         avatar: '',
         mobile: '',
         company: '',          // 所属企业
         allowEdit: false,
+        allowTurn: false,
         allowFollow: false,
         allowConfirm: false,
         allowClash: false,
@@ -262,6 +276,7 @@ export default {
         confirm: [],            // 确认书
         clashCustomer: null
       },
+      showSelectUser: false,
       checkCount: 0,
       showPrintPicker: false,
       printMode: printModeData,
@@ -352,6 +367,39 @@ export default {
           vm.$vux.toast.show({
             text: res.message,
             width: '15em'
+          })
+        }
+      })
+    },
+    setManager (newUser) {
+      let vm = this
+      if (!newUser) return
+      if (newUser.id === vm.info.user_id) return
+      vm.$vux.confirm.show({
+        title: '转交客户',
+        content: '确定要将客户转交给 <strong>' + newUser.title + '</strong> 吗？',
+        onConfirm () {
+          vm.$vux.loading.show()
+          vm.$post('/api/customer/turn', {
+            id: vm.info.id,
+            user_id: newUser.id
+          }, (res) => {
+            vm.$vux.loading.hide()
+            if (res.success) {
+              vm.$vux.toast.show({
+                type: 'success',
+                text: '转交成功。',
+                width: '12em',
+                onHide () {
+                  vm.$router.back()
+                }
+              })
+            } else {
+              vm.$vux.toast.show({
+                text: res.message,
+                width: '13em'
+              })
+            }
           })
         }
       })

@@ -72,6 +72,9 @@ class Customer extends Base
         ($customer->company_id == $user->company_id && $user->id == $superior_id);
     } else if ($operate == 'new') {
       return true;
+    } else if ($operate == 'turn') {
+      return $customer->company_id == $user->company_id &&
+        ($customer->user_id == $user->id || $user->isAdmin);
     } else if ($operate == 'edit') {
       return $customer->user_id == $user->id &&
         $customer->company_id == $user->company_id && 
@@ -195,6 +198,7 @@ class Customer extends Base
 
       User::formatData($data);
       $data->allowEdit = self::allow($user, $data, 'edit');
+      $data->allowTurn = self::allow($user, $data, 'turn');
       $data->allowFollow = self::allow($user, $data, 'follow');
       $data->allowConfirm = self::allow($user, $data, 'confirm');
       $data->allowClash = self::allow($user, $data, 'clash');
@@ -584,13 +588,16 @@ class Customer extends Base
   }
 
   // 转交客户
-  public static function transfer($user, $id, $to_user, $data = null) {
+  public static function transfer($user, $id, $to_user, $data = null, $checkRight = false) {
     $customer = self::alias('a')
       ->join('user u', "a.user_id = u.id")
-      ->field('a.id,a.user_id,a.status,u.title')->find();
+      ->field('a.id,a.user_id,a.company_id,a.clash,a.parallel,a.status,u.title')
+      ->find();
 
     if ($customer == null) {
       self::exception('客户不存在。');
+    } else if ($checkRight && !self::allow($user, $customer, 'turn')) {
+      self::exception('您没有权限转交这个客户。');
     } else if ($customer->user_id == $to_user) {
       return true;
     }

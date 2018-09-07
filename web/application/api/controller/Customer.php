@@ -129,6 +129,18 @@ class Customer extends Base
   }
 
   /**
+   * 转交客户
+   */
+  public function turn($id, $user_id) {
+    $result = modelCustomer::transfer($this->user, $id, $user_id, null, true);
+    if ($result) {
+      return $this->succeed();
+    } else {
+      return $this->fail();
+    }
+  }
+
+  /**
    * 批量导入客户
    */
   public function import() {
