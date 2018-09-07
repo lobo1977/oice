@@ -5,8 +5,8 @@
         @on-click-error-icon="titleError" :should-toast-error="false" @on-change="validateForm"></x-input>
       <x-input title="所在部门" v-model="info.department" :max="20"></x-input>
       <x-input title="职务" v-model="info.job" :max="20"></x-input>
-      <x-input ref="inpLinkmanMobile" title="手机号码" type="text" mask="999 9999 9999"
-        v-model="info.mobile" :max="13" :required="true" is-type="china-mobile"
+      <x-input ref="inpLinkmanMobile" title="手机号码" type="number"
+        v-model="info.mobile" :max="11" :required="true" is-type="china-mobile"
         @on-change="validateForm" @on-click-error-icon="mobileError" :should-toast-error="false"></x-input>
       <x-input title="办公电话" v-model="info.tel" :max="20"></x-input>
       <x-input ref="inpLinkmanEmail" type="email" title="电子邮箱" v-model="info.email" :max="30" is-type="email"

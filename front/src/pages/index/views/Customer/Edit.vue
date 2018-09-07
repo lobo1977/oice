@@ -11,8 +11,8 @@
           @on-click-error-icon="nameError" :should-toast-error="false" @on-change="validateForm"></x-input>
         <x-input v-if="id === 0" ref="inpCustomerLinkman" title="联系人" v-model="info.linkman" :required="true" :max="30"
           @on-click-error-icon="linkmanError" :should-toast-error="false" @on-change="validateForm"></x-input>
-        <x-input v-if="id === 0" ref="inpCustomerMobile" title="联系电话" type="text" mask="999 9999 9999" placeholder="请输入手机号码" 
-          v-model="info.mobile" :max="13" :required="true" is-type="china-mobile"
+        <x-input v-if="id === 0" ref="inpCustomerMobile" title="联系电话" type="number" placeholder="请输入手机号码" 
+          v-model="info.mobile" :max="11" :required="true" is-type="china-mobile"
           @on-change="validateForm" @on-click-error-icon="mobileError" :should-toast-error="false"></x-input>
         <popup-picker title="所在地" :data="districtPickerData" @on-change="districtChange"
           :columns="2" :fixed-columns="1"

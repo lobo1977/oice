@@ -55,8 +55,8 @@
 
       <group gutter="10px" label-width="4em" label-margin-right="1em" label-align="right">
         <x-input v-if="id === 0" ref="inpUnitLinkman" title="联系人" v-model="info.linkman" :max="30"></x-input>
-        <x-input v-if="id === 0" ref="inpUnitMobile" title="联系电话" type="text" mask="999 9999 9999" placeholder="请输入手机号码" 
-          v-model="info.mobile" :max="13" is-type="china-mobile"
+        <x-input v-if="id === 0" ref="inpUnitMobile" title="联系电话" type="number" placeholder="请输入手机号码" 
+          v-model="info.mobile" :max="11" is-type="china-mobile"
           @on-change="validateForm" @on-click-error-icon="mobileError" :should-toast-error="false"></x-input>
       </group>
 
