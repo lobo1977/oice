@@ -238,12 +238,16 @@ export default {
             if (!vm.info.current_area || vm.info.current_area === '0') {
               vm.info.current_area = null
             }
-            vm.statusText = vm.statusPickerData[vm.info.status].label
+            if (vm.info.status >= 0 && vm.info.status < vm.statusPickerData.length) {
+              vm.statusText = vm.statusPickerData[vm.info.status].label
+            }
             vm.info.share = vm.info.share === 1
             vm.$emit('on-view-loaded', vm.info.customer_name)
           } else {
             vm.info.__token__ = res.data.__token__
-            vm.statusText = vm.statusPickerData[vm.info.status].label
+            if (vm.info.status >= 0 && vm.info.status < vm.statusPickerData.length) {
+              vm.statusText = vm.statusPickerData[vm.info.status].label
+            }
             vm.$emit('on-view-loaded', '添加客户')
           }
           if (vm.info.company_id === 0 && vm.companyPickerData.length) {
