@@ -30,7 +30,7 @@
         <x-icon slot="icon" type="android-contacts" size="30"></x-icon>
         <span slot="label">客户</span>
       </tabbar-item>
-      <tabbar-item :selected="$route.path.indexOf('/my') === 0" link="/my">
+      <tabbar-item :selected="$route.path.indexOf('/my') === 0" :show-dot="user && user.invite_me" link="/my">
         <x-icon slot="icon" type="person" size="30"></x-icon>
         <span slot="label">我的</span>
       </tabbar-item>
@@ -86,6 +86,7 @@ export default {
   },
   computed: {
     ...mapState({
+      user: state => state.oice.user,
       isLoading: state => state.oice.isLoading,
       direction: state => state.oice.direction,
       scrollTop: state => state.oice.scrollTop

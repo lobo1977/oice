@@ -88,6 +88,10 @@ class User extends Base
       ->find();
     
     if ($data) {
+      $inviteMe = Company::inviteMe($data);
+      if ($inviteMe) {
+        $data->invite_me = count($inviteMe);
+      }
       return self::formatData($data);
     } else {
       return null;

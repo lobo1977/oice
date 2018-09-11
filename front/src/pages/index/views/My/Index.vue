@@ -23,8 +23,12 @@
     </grid>
 
     <group gutter="0.5em">
-      <cell title="我的企业" :link="{name:'Company'}" :value="user.company">
+      <cell title="我的企业" :link="{name:'Company'}">
         <x-icon slot="icon" type="android-people" class="cell-icon"></x-icon>
+        <div style="display:inline-block;">
+          <span style="vertical-align:middle;">{{user.company}}</span>
+          <badge v-if="user.invite_me"></badge>
+        </div>
       </cell>
       <cell v-if="user.superior_id > 0" title="我的上级" 
         :link="{name:'UserView', params: {id: user.superior_id}}"
@@ -65,7 +69,8 @@ export default {
         mobile: '',
         // email: '',
         superior_id: 0,
-        superior: ''
+        superior: '',
+        invite_me: 0
       }
     }
   },
