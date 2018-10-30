@@ -1,8 +1,8 @@
 <template>
   <div style="margin:0 auto;max-width:600px;padding:15px;">
     <group>
-      <x-input ref="inpMyMobile" type="number" placeholder="输入手机号码" v-model="mobile" :max="11" :required="true"
-         is-type="china-mobile" @on-click-error-icon="mobileError" :should-toast-error="false" @on-enter="confirm" @on-change="validatedForm">
+      <x-input ref="inpMyMobile" placeholder="输入手机号码" v-model="mobile" :max="11" :required="true"
+         type="tel" is-type="china-mobile" @on-click-error-icon="mobileError" :should-toast-error="false" @on-enter="confirm" @on-change="validatedForm">
         <x-icon slot="label" type="iphone" size="28" style="fill:#333;position:relative;left:-6px;top:3px;"></x-icon>
       </x-input>
       <x-input placeholder="输入验证码" v-model="verifyCode" :max="6" :required="true"

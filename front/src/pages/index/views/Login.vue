@@ -7,8 +7,8 @@
     </div>
 
     <group>
-      <x-input ref="inpLoginMobile" type="number" placeholder="输入手机号码" v-model="mobile" :max="11" :required="true"
-         is-type="china-mobile" @on-click-error-icon="mobileError" :should-toast-error="false" @on-enter="login" @on-change="validatedForm">
+      <x-input ref="inpLoginMobile" placeholder="输入手机号码" v-model="mobile" :max="11" :required="true"
+         type="tel" is-type="china-mobile" @on-click-error-icon="mobileError" :should-toast-error="false" @on-enter="login" @on-change="validatedForm">
         <x-icon slot="label" type="iphone" size="28" style="fill:#333;position:relative;left:-6px;top:3px;"></x-icon>
       </x-input>
       <x-input v-if="loginModel !== 'verifyCode'" type="password" placeholder="输入登录密码" v-model="password" :max="16" :required="true"

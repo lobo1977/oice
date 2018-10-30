@@ -5,8 +5,8 @@
         @on-click-error-icon="titleError" :should-toast-error="false" @on-change="validateForm"></x-input>
       <x-input title="所在部门" v-model="info.department" :max="20"></x-input>
       <x-input title="职务" v-model="info.job" :max="20"></x-input>
-      <x-input ref="inpLinkmanMobile" title="手机号码" type="number"
-        v-model="info.mobile" :max="11" :required="true" is-type="china-mobile"
+      <x-input ref="inpLinkmanMobile" title="手机号码"
+        type="tel" v-model="info.mobile" :max="11" :required="true" is-type="china-mobile"
         @on-change="validateForm" @on-click-error-icon="mobileError" :should-toast-error="false"></x-input>
       <x-input title="办公电话" v-model="info.tel" :max="20"></x-input>
       <x-input ref="inpLinkmanEmail" type="email" title="电子邮箱" v-model="info.email" :max="30" is-type="email"
@@ -81,7 +81,7 @@ export default {
                 vm.info[item] = res.data[item]
               }
             }
-            vm.info.status = vm.info.share === 0
+            vm.info.status = vm.info.status === 0
             vm.$emit('on-view-loaded', vm.info.title)
           } else {
             vm.info.__token__ = res.data.__token__
