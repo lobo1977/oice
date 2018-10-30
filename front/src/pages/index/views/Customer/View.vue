@@ -55,7 +55,7 @@
           <a style="float:right;color:#333;cursor:pointer;" v-if="info.allowTurn"
             @click="showSelectUser = true">转交</a>
         </group-title>
-        <cell :title="info.manager" :inline-desc="info.company || info.mobile"
+        <cell :title="info.manager" :inline-desc="info.company || info.manager_mobile"
           :link="{name: 'UserView', params: {id: info.user_id}}">
           <img slot="icon" :src="info.avatar" class="cell-image">
         </cell>
@@ -260,7 +260,7 @@ export default {
         company_id: 0,
         manager: '',          // 客户经理
         avatar: '',
-        mobile: '',
+        manager_mobile: '',
         company: '',          // 所属企业
         allowEdit: false,
         allowTurn: false,

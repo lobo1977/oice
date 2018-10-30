@@ -176,7 +176,7 @@ class Customer extends Base
       ->field('a.id,a.customer_name,a.area,a.address,a.demand,a.lease_buy,' .
         'a.district,a.min_acreage,a.max_acreage,a.budget,a.settle_date,a.current_area,' .
         'a.end_date,a.remind,a.rem,a.status,a.clash,a.parallel,a.share,a.user_id,a.company_id,' .
-        'b.title as manager,b.avatar,b.mobile,c.title as company')
+        'b.title as manager,b.avatar,b.mobile as manager_mobile,c.title as company')
       ->find();
 
     if ($data == null) {
@@ -243,7 +243,7 @@ class Customer extends Base
           } 
       })->field('a.id,a.customer_name,a.status,a.user_id,u.title as user,b.title as linkman,b.mobile')
       ->find();
-    
+
     return $clashData;
   }
 
