@@ -37,18 +37,18 @@
         <cell title="租售" @click.native="showRentSellPicker = true" :is-link="true" :value="info.rent_sell" value-align="left"></cell>
         <x-input title="价格" v-model="info.price" :max="30"></x-input>
         
-        <x-input v-if="false" title="建筑面积" type="number" v-model="info.acreage" :max="10" :show-clear="false">
+        <x-input v-if="false" title="建筑面积" type="tel" :max="8" v-model="info.acreage" :show-clear="false">
           <span slot="right">平方米</span>
         </x-input>
         <x-input title="楼层" v-model="info.floor" :max="10"></x-input>
-        <x-input title="层面积" type="number" v-model="info.floor_area" :max="10" :show-clear="false">
+        <x-input title="层面积" type="tel" :max="6" v-model="info.floor_area" :show-clear="false">
           <span slot="right">平方米</span>
         </x-input>
         <cell title="层高" value-align="left">
           <inline-x-number style="float:left;margin:0 5px 0 0;" width="80px" :min="2" :max="8" :step="0.1" v-model="info.floor_height"></inline-x-number>
           <div style="float:left;display:inline-block;line-height:28px;">米</div>
         </cell>
-        <x-input title="楼板承重" type="number" v-model="info.bearing" :max="10" :show-clear="false">
+        <x-input title="楼板承重" type="tel" :max="6" v-model="info.bearing" :show-clear="false">
           <span slot="right">千克/平方米</span>
         </x-input>
         <x-input title="开发商" v-model="info.developer" :max="50"></x-input>

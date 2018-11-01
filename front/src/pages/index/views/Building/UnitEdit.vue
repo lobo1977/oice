@@ -21,8 +21,8 @@
     <div v-if="tab === 0">
       <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
         <x-input title="楼栋" v-model="info.building_no" :max="10"></x-input>
-        <x-input title="楼层" type="number" v-model="info.floor" 
-          :max="10" :show-clear="false" placeholder="地下填写负数">
+        <x-input title="楼层" type="tel" :max="3" v-model="info.floor" 
+          :show-clear="false" placeholder="地下填写负数">
           <span slot="right">层</span>
         </x-input>
         <x-input ref="inpRoom" title="房间号" v-model="info.room" :required="true" :max="10"
@@ -34,14 +34,14 @@
             <checker-item v-for="i in faceSelectData" :key="i" :value="i">{{i}}</checker-item>
           </checker>
         </cell>
-        <x-input title="面积" type="number" v-model="info.acreage" :max="10" :show-clear="false">
+        <x-input title="面积" type="tel" :max="5" v-model="info.acreage" :show-clear="false">
           <span slot="right">平方米</span>
         </x-input>
         <cell title="租售" @click.native="showRentSellPicker = true" :is-link="true" :value="info.rent_sell" value-align="left"></cell>
-        <x-input title="出租价格" type="number" v-model="info.rent_price" :max="5" :show-clear="false">
+        <x-input title="出租价格" type="tel" :max="4" v-model="info.rent_price" :show-clear="false">
           <span slot="right">元/平方米/日</span>
         </x-input>
-        <x-input title="出售价格" type="number" v-model="info.sell_price" :max="5" :show-clear="false">
+        <x-input title="出售价格" type="tel" :max="8" v-model="info.sell_price" :show-clear="false">
           <span slot="right">元/平方米</span>
         </x-input>
         <cell title="装修状况" @click.native="showDecorationSelect = true" is-link :value="info.decoration" value-align="left"></cell>
@@ -55,8 +55,8 @@
 
       <group gutter="10px" label-width="4em" label-margin-right="1em" label-align="right">
         <x-input v-if="id === 0" ref="inpUnitLinkman" title="联系人" v-model="info.linkman" :max="30"></x-input>
-        <x-input v-if="id === 0" ref="inpUnitMobile" title="联系电话" type="number" placeholder="请输入手机号码" 
-          v-model="info.mobile" :max="11" is-type="china-mobile"
+        <x-input v-if="id === 0" ref="inpUnitMobile" title="联系电话" placeholder="请输入手机号码" 
+          type="tel" v-model="info.mobile" :max="11" is-type="china-mobile"
           @on-change="validateForm" @on-click-error-icon="mobileError" :should-toast-error="false"></x-input>
       </group>
 

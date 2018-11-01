@@ -11,8 +11,8 @@
           @on-click-error-icon="nameError" :should-toast-error="false" @on-change="validateForm"></x-input>
         <x-input v-if="id === 0" ref="inpCustomerLinkman" title="联系人" v-model="info.linkman" :required="true" :max="30"
           @on-click-error-icon="linkmanError" :should-toast-error="false" @on-change="validateForm"></x-input>
-        <x-input v-if="id === 0" ref="inpCustomerMobile" title="联系电话" type="number" placeholder="请输入手机号码" 
-          v-model="info.mobile" :max="11" :required="true" is-type="china-mobile"
+        <x-input v-if="id === 0" ref="inpCustomerMobile" title="联系电话" placeholder="请输入手机号码" 
+          type="tel" v-model="info.mobile" :max="11" :required="true" is-type="china-mobile"
           @on-change="validateForm" @on-click-error-icon="mobileError" :should-toast-error="false"></x-input>
         <popup-picker title="所在地" :data="districtPickerData" @on-change="districtChange"
           :columns="2" :fixed-columns="1"
@@ -25,17 +25,17 @@
         <cell title="租购" @click.native="showleaseBuyPicker = true" is-link :value="info.lease_buy" value-align="left"></cell>
         <cell title="意向区域" @click.native="showDistrictSelect = true" is-link :value="info.district" value-align="left"></cell>
 
-        <x-input title="最小面积" type="number" v-model="info.min_acreage" :max="10" :show-clear="false">
+        <x-input title="最小面积" type="tel" :max="5" v-model="info.min_acreage" :show-clear="false">
           <span slot="right">平方米</span>
         </x-input>
-        <x-input title="最大面积" type="number" v-model="info.max_acreage" :max="10" :show-clear="false">
+        <x-input title="最大面积" type="tel" :max="5" v-model="info.max_acreage" :show-clear="false">
           <span slot="right">平方米</span>
         </x-input>
 
         <x-input title="预算" v-model="info.budget" :max="30"></x-input>
         <cell title="入驻日期" :value="info.settle_date" value-align="left" :is-link="true" @click.native="selectSettleDate"></cell>
 
-        <x-input title="在驻面积" type="number" v-model="info.current_area" :max="10" :show-clear="false">
+        <x-input title="在驻面积" type="tel" :max="5" v-model="info.current_area" :show-clear="false">
           <span slot="right">平方米</span>
         </x-input>
         <cell title="到期日" :value="info.end_date" value-align="left" :is-link="true" @click.native="selectEndDate"></cell>
