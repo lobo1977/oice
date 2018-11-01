@@ -17,18 +17,17 @@ class Log extends Base
   public static function allow($user, $log, $operate, $customer = null) {
     if ($log == null || $user == null) {
       return false;
-    } else if (isset($log->system) && $log->system) {
-      return false;
-    }
-    if ($log->table == 'customer' && 
-      ($operate == 'new' || $operate == 'edit' || $operate == 'delete')) {
-      if ($customer == null) {
-        $customer = Customer::get($log->owner_id);
+    } else if ($operate == 'new') {
+      if ($log->table == 'customer') {
+        if ($customer == null) {
+          $customer = Customer::get($log->owner_id);
+        }
+        return Customer::allow($user, $customer, 'follow');
+      } else {
+        return true;
       }
-      return Customer::allow($user, $customer, 'follow') &&
-        $log->user_id == $user->id;
     } else {
-      return true;
+      return $log->getAttr('type') > 0 && $log->user_id == $user->id;
     }
   }
   
@@ -42,13 +41,13 @@ class Log extends Base
     }
 
     $log = new Log();
-    $data['system'] = 1;
+    $data['type'] = 0;
     $data['user_id'] = $user_id;
     return $log->save($data);
   }
 
   /**
-   * 编辑日志
+   * 编辑跟进纪要
    */
   public static function edit($user, $id) {
     $user_id = 0;
@@ -58,17 +57,15 @@ class Log extends Base
     
     $log = self::get($id);
     if ($log == null) {
-      self::exception('日志不存在。');
-    } else if ($log->system == 1) {
-      self::exception('系统日志不可修改。');
+      self::exception('记录不存在。');
     } else if (!self::allow($user, $log, 'edit')) {
-      self::exception('您没有权限修改此跟进纪要。');
+      self::exception('您没有权限修改此记录。');
     }
     return $log;
   }
 
   /**
-   * 添加修改日志
+   * 添加修改跟进纪要
    */
   public static function addUp($user, $id, $data) {
     $user_id = 0;
@@ -85,6 +82,7 @@ class Log extends Base
       $log->create_time = $data['create_time'];
     } else {
       $data['user_id'] = $user_id;
+      $data['type'] = 1;
       $log = new Log($data);
       if (!self::allow($user, $log, 'new')) {
         self::exception('您没有权限跟进此客户。');
@@ -101,7 +99,7 @@ class Log extends Base
       ->leftJoin('user b ','a.user_id = b.id')
       ->where('a.table', $table)
       ->where('a.owner_id', $owner_id)
-      ->field('a.id,a.title,a.summary,a.create_time,a.system,a.user_id,b.title as user,b.mobile,b.avatar')
+      ->field('a.id,a.type,a.title,a.summary,a.create_time,a.user_id,b.title as user,b.mobile,b.avatar')
       ->order('a.create_time', 'desc')->order('a.id', 'desc')
       ->select();
 
@@ -113,14 +111,14 @@ class Log extends Base
     foreach($list as $key => $log) {
       $log->summary = str_replace('\n', '<br/>', $log->summary);
       $log->allowEdit = self::allow($user, $log, 'edit', $customer);
-      $log->allowDelete = self::allow($user, $log, 'edit', $customer);
+      $log->allowDelete = self::allow($user, $log, 'delete', $customer);
     }
 
     return $list;
   }
 
   /**
-   * 删除日志
+   * 删除
    */
   public static function remove($user, $id) {
     $user_id = 0;
@@ -131,10 +129,8 @@ class Log extends Base
     $log = self::get($id);
     if ($log == null) {
       return true;
-    } else if ($log->system == 1) {
-      self::exception('系统日志不可删除。');
     } else if (!self::allow($user, $log, 'delete')) {
-      self::exception('您没有权限删除此日志。');
+      self::exception('您没有权限删除此记录。');
     } else {
       $result = $log->delete();
       return $result;
