@@ -1,7 +1,7 @@
 <?php
 namespace app\index\controller;
 
-use app\api\controller\Base;
+use think\Controller;
 use app\api\model\Recommend as modelRecommend;
 
 define ('K_PATH_IMAGES', $_SERVER['DOCUMENT_ROOT']);
@@ -31,7 +31,7 @@ class MYPDF extends \TCPDF {
 	}
 }
 
-class Recommend extends Base
+class Recommend extends Controller
 {
   /**
    * 打印版
