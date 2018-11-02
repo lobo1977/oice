@@ -185,13 +185,13 @@ class Customer extends Base
   }
 
   /**
-   * 添加/修改日志
+   * 添加/修改跟进纪要
    */
   public function log($id = 0, $cid = 0) {
     if ($this->request->isGet()) {
       $form_token = $this->formToken();
       if ($id > 0) {
-        $data = Log::edit($this->user, $id);
+        $data = Log::getById($this->user, $id, 'edit');
         $data->__token__ = $form_token;
         return $this->succeed($data);
       } else {
@@ -202,11 +202,11 @@ class Customer extends Base
 
       $validate = Validate::make([
         'title'  => 'require|token',
-        'create_time' => 'date'
+        'start_time' => 'date'
       ],[
         'title.require' => '必须填写摘要。',
         'title.token' => '无效请求，请勿重复提交。',
-        'create_time.date' => '时间无效。'
+        'start_time.date' => '时间无效。'
       ]);
 
       if (!$validate->check($data)) {

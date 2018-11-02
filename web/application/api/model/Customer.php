@@ -62,11 +62,8 @@ class Customer extends Base
       return false;
     }
 
-    if ($customer != null) {
-      $superior_id = Company::getSuperior($customer->company_id, $customer->user_id);
-    }
-
     if ($operate == 'view') {
+      $superior_id = Company::getSuperior($customer->company_id, $customer->user_id);
       return $customer->user_id == $user->id || 
         ($customer->share && $customer->company_id == $user->company_id) || 
         ($customer->company_id == $user->company_id && $user->id == $superior_id);

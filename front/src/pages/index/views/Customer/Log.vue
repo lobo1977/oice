@@ -1,14 +1,13 @@
 <template>
   <div>
     <group gutter="0" label-width="4em" label-margin-right="1em" label-align="left">
-      <cell title="时间" :value="info.create_time" value-align="left" :is-link="true" @click.native="selectTime">
-        <span slot="title" :class="{warn: !isTimeValid}">确认日期</span>
+      <cell :value="info.start_time" value-align="left" :is-link="true" @click.native="selectTime">
+        <span slot="title" :class="{warn: !isTimeValid}">时间</span>
       </cell>
       <x-input ref="inpLogTitle" title="摘要" v-model="info.title" :required="true" :max="10"
         @on-click-error-icon="titleError" :should-toast-error="false" @on-change="validateForm"></x-input>
       <x-textarea placeholder="详情" :rows="3" v-model="info.summary" :max="500"></x-textarea>
     </group>
-
     <div class="bottom-bar">
       <x-button type="primary" class="bottom-btn" @click.native="save" :disabled="!formValidate">
         <x-icon type="android-archive" class="btn-icon"></x-icon> 保存
@@ -31,7 +30,7 @@ export default {
         owner_id: 0,
         title: '',        // 摘要
         summary: '',      // 详情
-        create_time: this.$dateFormat(new Date(), 'YYYY-MM-DD HH:mm') // 时间
+        start_time: this.$dateFormat(new Date(), 'YYYY-MM-DD HH:mm') // 时间
       }
     }
   },
@@ -77,7 +76,7 @@ export default {
     selectTime () {
       let vm = this
       vm.$vux.datetime.show({
-        value: vm.info.create_time,
+        value: vm.info.start_time,
         cancelText: '取消',
         confirmText: '确定',
         format: 'YYYY-MM-DD HH:mm',
@@ -85,12 +84,12 @@ export default {
         maxHour: 22,
         minuteList: ['00', '10', '15', '20', '30', '40', '45', '50'],
         onHide () {
-          vm.isTimeValid = vm.info.create_time.length > 0
+          vm.isTimeValid = vm.info.start_time.length > 0
           vm.validateForm()
         },
         onConfirm (val) {
-          vm.info.create_time = val
-          vm.isTimeValid = vm.info.create_time.length > 0
+          vm.info.start_time = val
+          vm.isTimeValid = vm.info.start_time.length > 0
           vm.validateForm()
         }
       })
@@ -104,7 +103,7 @@ export default {
       this.formValidate = this.isTimeValid && this.$refs.inpLogTitle.valid
     },
     save () {
-      this.isTimeValid = this.info.create_time.length > 0
+      this.isTimeValid = this.info.start_time.length > 0
       this.validateForm()
       if (!this.formValidate) {
         return

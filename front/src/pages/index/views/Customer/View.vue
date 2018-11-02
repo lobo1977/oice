@@ -130,7 +130,9 @@
             </span>
           </h4>
           <p v-if="item.summary" v-html="item.summary"></p>
-          <p class="foot">{{item.user}} &nbsp; {{item.create_time|formatTime}}</p>
+          <p class="foot">
+            {{item.user}} &nbsp; {{item.start_time|formatTime}}
+          </p>
         </timeline-item>
       </timeline>
 
