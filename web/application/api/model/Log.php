@@ -60,7 +60,7 @@ class Log extends Base
     $data['type'] = 0;
     $data['user_id'] = $user_id;
     $data['company_id'] = $company_id;
-    $data['start_time'] = now();
+    $data['start_time'] = date("Y-m-d H:i:s",time());
     return $log->save($data);
   }
 
