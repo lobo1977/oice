@@ -12,6 +12,9 @@
       <span slot="right" v-if="$route.meta.showPlus" @click="callNew">
         <x-icon type="plus" size="24" class="header-icon"></x-icon>
       </span>
+      <span slot="right" v-if="$route.meta.showSearch" @click="callSearch">
+        <x-icon type="search" size="24" class="header-icon"></x-icon>
+      </span>
     </x-header>
 
     <keep-alive>
@@ -30,7 +33,11 @@
         <x-icon slot="icon" type="android-contacts" size="30"></x-icon>
         <span slot="label">客户</span>
       </tabbar-item>
-      <tabbar-item :selected="$route.path.indexOf('/my') === 0" :show-dot="user && user.invite_me" link="/my">
+      <tabbar-item :selected="$route.path.indexOf('/daily') === 0" link="/daily">
+        <x-icon slot="icon" type="android-calendar" size="30"></x-icon>
+        <span slot="label">日报</span>
+      </tabbar-item>
+      <tabbar-item :selected="$route.path.indexOf('/my') === 0" :show-dot="user && user.invite_me > 0" link="/my">
         <x-icon slot="icon" type="person" size="30"></x-icon>
         <span slot="label">我的</span>
       </tabbar-item>
@@ -74,6 +81,11 @@ export default {
     callNew () {
       if (this.$refs.page && this.$refs.page.new) {
         this.$refs.page.new()
+      }
+    },
+    callSearch () {
+      if (this.$refs.page && this.$refs.page.search) {
+        this.$refs.page.search()
       }
     },
     changeTitle (title) {

@@ -146,7 +146,7 @@ class Log extends Base
   /**
    * 查询工作日报
    */
-  public static function getDaily($user, $filter) {
+  public static function daily($user, $filter) {
     $user_id = 0;
     $company_id = 0;
 
@@ -174,18 +174,17 @@ class Log extends Base
           ->whereOr('a.table', '=', 'customer');
       });
 
-    if ($filter['user_id']) {
-      $list->where('a.user_id', $filter['user_id']);
+    if (isset($filter['id']) && $filter['id']) {
+      $list->where('a.user_id', $filter['id']);
     }
 
-    if ($filter['$date']) {
-      $list->where('a.start_time', 'between time', [$filter['$date'], strtotime($filter['$date'] + ' +1 day')]);
-    } else if ($filter['$startDate'] && $filter['$endDate']) {
-      $list->where('a.start_time', 'between time', [$filter['$startDate'], strtotime($filter['$endDate'] + ' +1 day')]);
-    } else if (!$filter['user_id']) {
-      $list->where('a.start_time', '> time', strtotime('-1 day'));
+    if (isset($filter['date']) && $filter['date']) {
+      $list->where('a.start_time', 'between time', [$filter['date'], strtotime($filter['date'] . ' +1 day')]);
+    } else if (isset($filter['startDate']) && $filter['startDate'] &&
+      isset($filter['endDate']) && $filter['endDate']) {
+      $list->where('a.start_time', 'between time', [$filter['startDate'], strtotime($filter['endDate'] . ' +1 day')]);
     } else {
-      $list->where('a.start_time', '> time', strtotime('-1 week'));
+      $list->where('a.start_time', '> time', date("Y-m-d", time()));
     }
 
     $result = $list->field('a.id,a.type,a.level,a.title,a.summary,a.start_time,a.end_time,a.company_id,a.user_id,b.title as user,b.mobile,b.avatar')
@@ -194,7 +193,7 @@ class Log extends Base
       ->select();
 
     foreach($result as $key => $log) {
-      $log->summary = str_replace('\n', '<br/>', $log->summary);
+      $log->summary = str_replace('\n', ' ', $log->summary);
       // $log->allowEdit = self::allow($user, $log, 'edit');
       // $log->allowDelete = self::allow($user, $log, 'delete');
     }

@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Building from '../views/Building/Index'
 import Customer from '../views/Customer/Index'
 import CustomerList from '../views/Customer/List'
+import Daily from '../views/Daily/Index'
 import My from '../views/My/Index'
 import Login from '../views/Login'
 import Mobile from '../views/Mobile'
@@ -227,6 +228,29 @@ export default new Router({
       },
       component: function (resolve) {
         require(['../views/Confirm/Edit.vue'], resolve)
+      }
+    }, {
+      path: '/daily',
+      name: 'Daily',
+      meta: {
+        title: '工作日报',
+        showPlus: true,
+        keepAlive: true,
+        requiresAuth: true
+      },
+      component: Daily
+    }, {
+      path: '/daily/user/:id',
+      name: 'DailyUser',
+      meta: {
+        title: '工作日报',
+        showBack: true,
+        showSearch: true,
+        hideBar: true,
+        requiresAuth: true
+      },
+      component: function (resolve) {
+        require(['../views/Daily/User.vue'], resolve)
       }
     }, {
       path: '/my',

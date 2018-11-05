@@ -16,7 +16,7 @@ class User extends Base
   /**
    * 企业成员列表
    */
-  public function companyMember($id, $page) {
+  public function companyMember($id, $page = 0) {
     $result = modelUser::companyMember($this->user, $id, 1, $page);
     return $this->succeed($result);
   }
