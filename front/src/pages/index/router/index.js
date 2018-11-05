@@ -240,11 +240,24 @@ export default new Router({
       },
       component: Daily
     }, {
+      path: '/daily/edit/:id',
+      name: 'DailyEdit',
+      meta: {
+        title: '',
+        showBack: true,
+        hideBar: true,
+        requiresAuth: true
+      },
+      component: function (resolve) {
+        require(['../views/Daily/Edit.vue'], resolve)
+      }
+    }, {
       path: '/daily/user/:id',
       name: 'DailyUser',
       meta: {
         title: '工作日报',
         showBack: true,
+        showPlus: true,
         showSearch: true,
         hideBar: true,
         requiresAuth: true

@@ -48,6 +48,9 @@ export default {
     })
   },
   methods: {
+    new () {
+      this.$router.push({name: 'DailyEdit', params: {id: 0}})
+    },
     search () {
       let vm = this
       vm.$vux.datetime.show({

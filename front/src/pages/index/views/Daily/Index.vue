@@ -40,6 +40,7 @@ export default {
   },
   methods: {
     new () {
+      this.$router.push({name: 'DailyEdit', params: {id: 0}})
     },
     loadListData (empty) {
       if (empty) {

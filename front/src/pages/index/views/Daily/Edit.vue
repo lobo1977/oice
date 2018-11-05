@@ -1,11 +1,11 @@
 <template>
   <div>
     <group gutter="0" label-width="4em" label-margin-right="1em" label-align="left">
-      <cell :value="info.start_time" value-align="left" :is-link="true" @click.native="selectTime">
-        <span slot="title" :class="{warn: !isTimeValid}">开始时间</span>
+      <cell :value="info.start_time" value-align="left" :is-link="true" @click.native="selectTime('start_time')">
+        <span slot="title" :class="{warn: !isTimeValid.start_time}">开始时间</span>
       </cell>
-      <cell :value="info.end_time" value-align="left" :is-link="true" @click.native="selectTime">
-        <span slot="title" :class="{warn: !isTimeValid}">结束时间</span>
+      <cell :value="info.end_time" value-align="left" :is-link="true" @click.native="selectTime('end_time')">
+        <span slot="title">结束时间</span>
       </cell>
       <x-input ref="inpLogTitle" title="摘要" v-model="info.title" :required="true" :max="10"
         @on-click-error-icon="titleError" :should-toast-error="false" @on-change="validateForm"></x-input>
@@ -25,7 +25,10 @@ export default {
   },
   data () {
     return {
-      isTimeValid: true,
+      isTimeValid: {
+        start_time: false,
+        end_time: false
+      },
       formValidate: false,
       id: 0,
       info: {
@@ -34,7 +37,7 @@ export default {
         title: '',        // 摘要
         summary: '',      // 详情
         start_time: this.$dateFormat(new Date(), 'YYYY-MM-DD HH:mm'), // 时间
-        end_time: this.$dateFormat(new Date(), 'YYYY-MM-DD HH:mm')    // 时间
+        end_time: ''      // 时间
       }
     }
   },
@@ -70,10 +73,10 @@ export default {
     })
   },
   methods: {
-    selectTime () {
+    selectTime (field) {
       let vm = this
       vm.$vux.datetime.show({
-        value: vm.info.start_time,
+        value: vm.info[field],
         cancelText: '取消',
         confirmText: '确定',
         format: 'YYYY-MM-DD HH:mm',
@@ -81,12 +84,12 @@ export default {
         maxHour: 22,
         minuteList: ['00', '10', '15', '20', '30', '40', '45', '50'],
         onHide () {
-          vm.isTimeValid = vm.info.start_time.length > 0
+          vm.isTimeValid[field] = vm.info[field].length > 0
           vm.validateForm()
         },
         onConfirm (val) {
-          vm.info.start_time = val
-          vm.isTimeValid = vm.info.start_time.length > 0
+          vm.info[field] = val
+          vm.isTimeValid[field] = vm.info[field].length > 0
           vm.validateForm()
         }
       })
@@ -97,10 +100,13 @@ export default {
       })
     },
     validateForm () {
-      this.formValidate = this.isTimeValid && this.$refs.inpLogTitle.valid
+      this.formValidate = this.isTimeValid.start_time &&
+        // this.isTimeValid.end_time &&
+        this.$refs.inpLogTitle.valid
     },
     save () {
-      this.isTimeValid = this.info.start_time.length > 0
+      this.isTimeValid.start_time = this.info.start_time.length > 0
+      this.isTimeValid.end_time = this.info.end_time.length > 0
       this.validateForm()
       if (!this.formValidate) {
         return
