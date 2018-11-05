@@ -51,7 +51,7 @@ export default {
       })
     },
     export () {
-      if (this.$store.state.oice.user) {
+      if (this.$store.state.oice.user && this.list.length) {
         let token = this.$store.state.oice.user.token
         let url = '/api/customer/export?user-token=' + token + '&type=' + this.type
         this.$download(url)
