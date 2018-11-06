@@ -123,7 +123,7 @@ export default {
             vm.info.canSetSuperior = false
             vm.$vux.alert.show({
               title: '提示',
-              content: '您已将 <strong> ' + vm.info.title + '</strong> 指定为上级，您的客户资料将对其可见。'
+              content: '您已将 <strong> ' + vm.info.title + '</strong> 指定为上级，您的客户资料及工作日报将对其可见。'
             })
           }
         } else {

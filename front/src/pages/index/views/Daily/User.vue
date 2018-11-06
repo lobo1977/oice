@@ -54,13 +54,16 @@ export default {
     new () {
       this.$router.push({name: 'DailyEdit', params: {id: 0}})
     },
+    updateTitle () {
+      this.$emit('on-view-loaded', this.username + ' ' + this.$dateFormat(this.date, 'M月D日'))
+    },
     getUserInfo () {
       this.$post('/api/user/detail', {
         id: this.id
       }, (res) => {
         if (res.success) {
           this.username = res.data.title
-          this.$emit('on-view-loaded', this.username + ' ' + this.$dateFormat(this.date, 'M月D日'))
+          this.updateTitle()
         }
       })
     },
@@ -73,7 +76,7 @@ export default {
         value: vm.date,
         onConfirm (val) {
           vm.date = val
-          vm.$emit('on-view-loaded', vm.username + ' ' + vm.$dateFormat(vm.date, 'M月D日'))
+          vm.updateTitle()
           vm.loadListData(true)
         }
       })
