@@ -326,11 +326,11 @@ class Customer extends Base
       $data['share'] = 1;
     }
 
-    if (empty($data['settle_date'])) {
+    if (isset($data['settle_date']) && empty($data['settle_date'])) {
       unset($data['settle_date']);
     }
 
-    if (empty($data['end_date'])) {
+    if (isset($data['end_date']) &&empty($data['end_date'])) {
       unset($data['end_date']);
     }
 

@@ -261,14 +261,14 @@ class Building extends Base
    * 添加/修改项目信息
    */
   public static function addUp($user, $id, $data) {
-    if (empty($data['completion_date'])) {
-      unset($data['completion_date']);
-    }
-
     $data['pinyin'] = \my\Pinyin::convertInitalPinyin($data['building_name']);
     $user_id = 0;
     if ($user) {
       $user_id = $user->id;
+    }
+
+    if (isset($data['completion_date']) && empty($data['completion_date'])) {
+      unset($data['completion_date']);
     }
 
     if ($id) {
