@@ -1,13 +1,14 @@
 <template>
   <div>
     <group :gutter="0">
-      <cell v-for="(item, index) in list" :key="index">
+      <cell v-for="(item, index) in list" :key="index" 
+        :link="{name: 'DailyView', params: {id: item.id}}">
         <div slot="title">
           <span>{{item.title}}</span>
         </div>
         <span style="font-size:0.8em">{{item.start_time|formatTime}}</span>
         <div slot="inline-desc">
-          <span>{{item.summary}}</span>
+          {{item.summary}}
         </div>
       </cell>
     </group>
@@ -33,6 +34,7 @@ export default {
       isLoading: false,
       page: 0,
       isEnd: false,
+      username: '',
       list: []
     }
   },
@@ -43,6 +45,7 @@ export default {
       let id = parseInt(to.params.id)
       if (!isNaN(id)) {
         vm.id = id
+        vm.getUserInfo()
         vm.loadListData(true)
       }
     })
@@ -50,6 +53,16 @@ export default {
   methods: {
     new () {
       this.$router.push({name: 'DailyEdit', params: {id: 0}})
+    },
+    getUserInfo () {
+      this.$post('/api/user/detail', {
+        id: this.id
+      }, (res) => {
+        if (res.success) {
+          this.username = res.data.title
+          this.$emit('on-view-loaded', this.username + ' ' + this.$dateFormat(this.date, 'M月D日'))
+        }
+      })
     },
     search () {
       let vm = this
@@ -60,12 +73,12 @@ export default {
         value: vm.date,
         onConfirm (val) {
           vm.date = val
+          vm.$emit('on-view-loaded', vm.username + ' ' + vm.$dateFormat(vm.date, 'M月D日'))
           vm.loadListData(true)
         }
       })
     },
     loadListData (empty) {
-      this.$emit('on-view-loaded', this.$dateFormat(this.date, 'M月D日'))
       if (empty) {
         this.isEnd = false
         this.page = 1
@@ -118,4 +131,12 @@ export default {
 </script>
 
 <style lang="less">
+.vux-cell-bd {
+  overflow: hidden;
+  .vux-label-desc > div {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow : ellipsis 
+  }
+}
 </style>

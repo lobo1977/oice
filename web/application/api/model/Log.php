@@ -68,7 +68,16 @@ class Log extends Base
    * 编辑跟进纪要
    */
   public static function getById($user, $id, $operate = 'view') {
-    $log = self::get($id);
+    if ($operate == 'view') {
+      $log = self::alias('a')
+        ->leftJoin('user b','b.id = a.user_id')
+        ->leftJoin('company c','c.id = a.company_id')
+        ->where('a.id', $id)
+        ->field('a.*,b.title as username,b.avatar,b.mobile,c.title as company')
+        ->find();
+    } else {
+      $log = self::get($id);
+    }
     if ($log == null) {
       self::exception('记录不存在。');
     } else if (!self::allow($user, $log, $operate)) {
@@ -77,6 +86,11 @@ class Log extends Base
       } else {
         self::exception('您没有权限修改此记录。');
       }
+    }
+    if ($operate == 'view') {
+      User::formatData($log);
+      $log->allowEdit = self::allow($user, $log, 'edit');
+      $log->allowDelete = self::allow($user, $log, 'delete');
     }
     return $log;
   }
@@ -87,6 +101,10 @@ class Log extends Base
   public static function addUp($user, $id, $data) {
     $log = null;
 
+    if(!isset($data['start_time']) || empty($data['start_time'])) {
+      $data['start_time'] = date("Y-m-d H:i:s",time());
+    }
+
     if ($id > 0) {
       $log = self::getById($user, $id, 'edit');
       if(isset($data['level'])) {
@@ -94,19 +112,22 @@ class Log extends Base
       }
       $log->title = $data['title'];
       $log->summary = $data['summary'];
-      if(isset($data['start_time'])) {
-        $log->start_time = $data['start_time'];
-      } else {
-        $log->start_time = now();
-      }
-      if(isset($data['end_time'])) {
+      $log->start_time = $data['start_time'];
+
+      if(isset($data['end_time']) && $data['end_time']) {
         $log->end_time = $data['end_time'];
+      } else {
+        $log->end_time = null;
       }
     } else {
       $data['type'] = 1;
       if ($user) {
         $data['user_id'] = $user->id;
         $data['company_id'] = $user->company_id;
+      }
+      
+      if(isset($data['end_time']) && empty($data['end_time'])) {
+        unset($data['end_time']);
       }
       $log = new Log($data);
 

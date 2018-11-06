@@ -9,11 +9,11 @@
       <span slot="right" v-show="$route.meta.showOutput" @click="callExport" style="margin-right:10px;">
         <x-icon type="android-download" size="24" class="header-icon"></x-icon>
       </span>
+      <span slot="right" v-if="$route.meta.showSearch" @click="callSearch" style="margin-right:10px;">
+        <x-icon type="search" size="24" class="header-icon"></x-icon>
+      </span>
       <span slot="right" v-if="$route.meta.showPlus" @click="callNew">
         <x-icon type="plus" size="24" class="header-icon"></x-icon>
-      </span>
-      <span slot="right" v-if="$route.meta.showSearch" @click="callSearch">
-        <x-icon type="search" size="24" class="header-icon"></x-icon>
       </span>
     </x-header>
 

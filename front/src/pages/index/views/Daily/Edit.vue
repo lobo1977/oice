@@ -2,7 +2,7 @@
   <div>
     <group gutter="0" label-width="4em" label-margin-right="1em" label-align="left">
       <cell :value="info.start_time" value-align="left" :is-link="true" @click.native="selectTime('start_time')">
-        <span slot="title" :class="{warn: !isTimeValid.start_time}">开始时间</span>
+        <span slot="title" :class="{warn: info.start_time.length == 0}">开始时间</span>
       </cell>
       <cell :value="info.end_time" value-align="left" :is-link="true" @click.native="selectTime('end_time')">
         <span slot="title">结束时间</span>
@@ -25,10 +25,6 @@ export default {
   },
   data () {
     return {
-      isTimeValid: {
-        start_time: false,
-        end_time: false
-      },
       formValidate: false,
       id: 0,
       info: {
@@ -84,12 +80,10 @@ export default {
         maxHour: 22,
         minuteList: ['00', '10', '15', '20', '30', '40', '45', '50'],
         onHide () {
-          vm.isTimeValid[field] = vm.info[field].length > 0
           vm.validateForm()
         },
         onConfirm (val) {
           vm.info[field] = val
-          vm.isTimeValid[field] = vm.info[field].length > 0
           vm.validateForm()
         }
       })
@@ -100,13 +94,11 @@ export default {
       })
     },
     validateForm () {
-      this.formValidate = this.isTimeValid.start_time &&
-        // this.isTimeValid.end_time &&
+      this.formValidate = this.info.start_time.length > 0 &&
+        // this.info.end_time.length &&
         this.$refs.inpLogTitle.valid
     },
     save () {
-      this.isTimeValid.start_time = this.info.start_time.length > 0
-      this.isTimeValid.end_time = this.info.end_time.length > 0
       this.validateForm()
       if (!this.formValidate) {
         return

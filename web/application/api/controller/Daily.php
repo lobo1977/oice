@@ -31,9 +31,19 @@ class Daily extends Base
   }
 
   /**
+   * 查看工作日报
+   */
+  public function detail($id = 0) {
+    if ($id) {
+      $data = Log::getById($this->user, $id, 'view');
+      return $this->succeed($data);
+    }
+  }
+
+  /**
    * 添加/修改工作日报
    */
-  public function log($id = 0) {
+  public function edit($id = 0) {
     if ($this->request->isGet()) {
       $form_token = $this->formToken();
       if ($id > 0) {
@@ -63,6 +73,18 @@ class Daily extends Base
         Log::addUp($this->user, $id, $data);
         return $this->succeed();
       }
+    }
+  }
+
+  /**
+   * 删除跟进纪要
+   */
+  public function remove($id) {
+    $result = Log::remove($this->user, $id);
+    if ($result == 1) {
+      return $this->succeed();
+    } else {
+      return $this->fail();
     }
   }
 }

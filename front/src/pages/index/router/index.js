@@ -240,18 +240,6 @@ export default new Router({
       },
       component: Daily
     }, {
-      path: '/daily/edit/:id',
-      name: 'DailyEdit',
-      meta: {
-        title: '',
-        showBack: true,
-        hideBar: true,
-        requiresAuth: true
-      },
-      component: function (resolve) {
-        require(['../views/Daily/Edit.vue'], resolve)
-      }
-    }, {
       path: '/daily/user/:id',
       name: 'DailyUser',
       meta: {
@@ -264,6 +252,30 @@ export default new Router({
       },
       component: function (resolve) {
         require(['../views/Daily/User.vue'], resolve)
+      }
+    }, {
+      path: '/daily/view/:id',
+      name: 'DailyView',
+      meta: {
+        title: '工作日报',
+        showBack: true,
+        hideBar: true,
+        requiresAuth: true
+      },
+      component: function (resolve) {
+        require(['../views/Daily/View.vue'], resolve)
+      }
+    }, {
+      path: '/daily/edit/:id',
+      name: 'DailyEdit',
+      meta: {
+        title: '',
+        showBack: true,
+        hideBar: true,
+        requiresAuth: true
+      },
+      component: function (resolve) {
+        require(['../views/Daily/Edit.vue'], resolve)
       }
     }, {
       path: '/my',
