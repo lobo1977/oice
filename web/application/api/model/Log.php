@@ -65,7 +65,7 @@ class Log extends Base
   }
 
   /**
-   * 编辑跟进纪要
+   * 获取单一记录
    */
   public static function getById($user, $id, $operate = 'view') {
     if ($operate == 'view') {
@@ -96,7 +96,7 @@ class Log extends Base
   }
 
   /**
-   * 添加修改日志
+   * 添加修改
    */
   public static function addUp($user, $id, $data) {
     $log = null;
@@ -139,7 +139,7 @@ class Log extends Base
   }
 
   /**
-   * 查询日志
+   * 日志列表
    */
   public static function getList($user, $table, $owner_id) {
     $list = self::alias('a')
@@ -165,7 +165,7 @@ class Log extends Base
   }
 
   /**
-   * 查询工作日报
+   * 工作日报列表
    */
   public static function daily($user, $filter) {
     $user_id = 0;
@@ -226,11 +226,6 @@ class Log extends Base
    * 删除
    */
   public static function remove($user, $id) {
-    $user_id = 0;
-    if ($user) {
-      $user_id = $user->id;
-    }
-    
     $log = self::get($id);
     if ($log == null) {
       return true;
