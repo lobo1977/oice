@@ -27,7 +27,7 @@ class Daily extends Base
    */
   public function user() {
     $params = input('post.');
-    $list = DailyReview::getList($this->user, $params);
+    $list = Log::daily($this->user, $params);
     return $this->succeed($list);
   }
 

@@ -16,6 +16,12 @@
     <div style="height:50px;">
       <load-more :show-loading="isLoading" v-show="isLoading || isEnd" :tip="loadingTip"></load-more>
     </div>
+
+    <div v-if="me.id > 0 && me.id == user.superior_id" class="bottom-bar">
+      <x-button type="primary" class="bottom-btn" @click.native="review" :disabled="list.length == 0">
+        <x-icon type="checkmark-round" class="btn-icon"></x-icon> 批阅
+      </x-button>
+    </div>
   </div>
 </template>
 
@@ -27,21 +33,25 @@ export default {
   },
   data () {
     return {
+      me: {
+        id: 0
+      },
       user: {
+        title: '',
+        superior_id: 0
       },
       id: 0,
       date: '',
       isLoading: false,
       page: 0,
       isEnd: false,
-      username: '',
       list: []
     }
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
+      vm.me = vm.$store.state.oice.user || vm.me
       vm.date = vm.$dateFormat(new Date(), 'YYYY-M-D')
-      vm.user = vm.$store.state.oice.user || vm.user
       let id = parseInt(to.params.id)
       if (!isNaN(id)) {
         vm.id = id
@@ -55,14 +65,14 @@ export default {
       this.$router.push({name: 'DailyEdit', params: {id: 0}})
     },
     updateTitle () {
-      this.$emit('on-view-loaded', this.username + ' ' + this.$dateFormat(this.date, 'M月D日'))
+      this.$emit('on-view-loaded', this.user.title + ' ' + this.$dateFormat(this.date, 'M月D日'))
     },
     getUserInfo () {
       this.$post('/api/user/detail', {
         id: this.id
       }, (res) => {
         if (res.success) {
-          this.username = res.data.title
+          this.user = res.data
           this.updateTitle()
         }
       })
@@ -104,6 +114,9 @@ export default {
           }
         }
       })
+    },
+    review () {
+      this.$router.push({name: 'DailyReview', params: { id: 0, user: this.id, date: this.date }})
     }
   },
   watch: {

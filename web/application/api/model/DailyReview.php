@@ -17,7 +17,7 @@ class DailyReview extends Base
    * 权限检查
    */
   public static function allow($user, $data, $operate) {
-    if ($log == null || $user == null) {
+    if ($data == null || $user == null) {
       return false;
     } else if ($operate == 'new') {
       $superior_id = Company::getSuperior($data->company_id, $data->review_user);

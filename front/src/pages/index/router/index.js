@@ -278,6 +278,18 @@ export default new Router({
         require(['../views/Daily/Edit.vue'], resolve)
       }
     }, {
+      path: '/daily/review/:id/:user/:date',
+      name: 'DailyReview',
+      meta: {
+        title: '',
+        showBack: true,
+        hideBar: true,
+        requiresAuth: true
+      },
+      component: function (resolve) {
+        require(['../views/Daily/Review.vue'], resolve)
+      }
+    }, {
       path: '/my',
       name: 'My',
       meta: {
