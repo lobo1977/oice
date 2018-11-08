@@ -1,20 +1,43 @@
 <template>
   <div>
-    <group :gutter="0">
-      <cell v-for="(item, index) in list" :key="index" 
-        :link="{name: 'DailyView', params: {id: item.id}}">
-        <div slot="title">
-          <span>{{item.title}}</span>
-        </div>
-        <span style="font-size:0.8em">{{item.start_time|formatTime}}</span>
-        <div slot="inline-desc">
-          {{item.summary}}
-        </div>
-      </cell>
-    </group>
+    <tab>
+      <tab-item :selected="tabIndex === 0" @on-item-click="tabIndex = 0">工作日报</tab-item>
+      <tab-item :selected="tabIndex === 1" @on-item-click="tabIndex = 1">批阅</tab-item>
+    </tab>
 
-    <div style="height:50px;">
-      <load-more :show-loading="isLoading" v-show="isLoading || isEnd" :tip="loadingTip"></load-more>
+    <div v-show="tabIndex === 0">
+      <group :gutter="0">
+        <cell v-for="(item, index) in list" :key="index" 
+          :link="{name: 'DailyView', params: {id: item.id}}">
+          <div slot="title">
+            <span>{{item.title}}</span>
+          </div>
+          <span style="font-size:0.8em">{{item.start_time|formatTime}}</span>
+          <div slot="inline-desc">
+            {{item.summary}}
+          </div>
+        </cell>
+      </group>
+
+      <div style="height:50px;">
+        <load-more :show-loading="isLoading" v-show="isLoading || isEnd" :tip="loadingTip"></load-more>
+      </div>
+    </div>
+
+    <div v-show="tabIndex === 1">
+      <group :gutter="0">
+        <cell v-for="(item, index) in reviewList" :key="index" :title="item.user">
+          <img slot="icon" :src="item.avatar" class="cell-image">
+          <span style="font-size:0.8em">{{item.create_time|formatTime}}</span>
+          <div slot="inline-desc">
+            <span>[{{item.levelText}}]</span>{{item.content}}
+          </div>
+        </cell>
+      </group>
+
+      <div style="height:50px;">
+        <load-more :show-loading="isReviewLoading" v-show="isReviewLoading" tip="正在加载"></load-more>
+      </div>
     </div>
 
     <div v-if="me.id > 0 && me.id == user.superior_id" class="bottom-bar">
@@ -40,12 +63,15 @@ export default {
         title: '',
         superior_id: 0
       },
+      tabIndex: 0,
       id: 0,
       date: '',
       isLoading: false,
+      isReviewLoading: false,
       page: 0,
       isEnd: false,
-      list: []
+      list: [],
+      reviewList: []
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -57,6 +83,7 @@ export default {
         vm.id = id
         vm.getUserInfo()
         vm.loadListData(true)
+        vm.loadReviewData()
       }
     })
   },
@@ -88,6 +115,7 @@ export default {
           vm.date = val
           vm.updateTitle()
           vm.loadListData(true)
+          vm.loadReviewData()
         }
       })
     },
@@ -115,6 +143,19 @@ export default {
         }
       })
     },
+    loadReviewData () {
+      this.reviewList = []
+      this.isReviewLoading = true
+      this.$post('/api/daily/review', {
+        id: this.id,
+        date: this.date
+      }, (res) => {
+        this.isReviewLoading = false
+        if (res.success) {
+          this.reviewList = res.data
+        }
+      })
+    },
     review () {
       this.$router.push({name: 'DailyReview', params: { id: 0, user: this.id, date: this.date }})
     }
@@ -122,7 +163,7 @@ export default {
   watch: {
     scrollBottom (isBottom) {
       if (isBottom && this.$route.name === 'DailyUser' &&
-        !this.isLoading && !this.isEnd) {
+        !this.isLoading && !this.isEnd && this.tabIndex === 0) {
         this.page++
         this.loadListData()
       }

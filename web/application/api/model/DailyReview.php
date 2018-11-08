@@ -4,6 +4,7 @@ namespace app\api\model;
 use think\model\concern\SoftDelete;
 use app\api\model\Base;
 use app\api\model\Company;
+use app\api\model\User;
 
 class DailyReview extends Base
 {
@@ -116,9 +117,14 @@ class DailyReview extends Base
         ') OR a.company_id = ' . $company_id)
       ->where('a.review_user', $review_user)
       ->where('a.review_date', 'between time', [$review_date, strtotime($review_date . ' +1 day')])
-      ->field('a.id,a.level,a.content,a.create_time,a.company_id,a.user_id,b.title as user,b.mobile,b.avatar')
+      ->field('a.id,a.level,a.content,a.create_time,a.company_id,a.user_id,b.title as user,b.avatar')
       ->order('a.id', 'desc')
       ->select();
+
+    foreach($list as $item) {
+      $item->levelText = self::$level[$item->level];
+      User::formatData($item);
+    }
 
     return $list;
   }

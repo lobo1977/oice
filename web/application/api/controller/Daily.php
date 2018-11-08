@@ -95,7 +95,7 @@ class Daily extends Base
    * 批阅
    */
   public function review($id = 0, $date = '') {
-    $list = Log::daily($this->user, $id, $date);
+    $list = DailyReview::getList($this->user, $id, $date);
     return $this->succeed($list);
   }
 
