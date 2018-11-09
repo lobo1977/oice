@@ -45,8 +45,8 @@ export default {
           vm.id = 0
         }
       } else if (to.params.user && to.params.date) {
-        vm.review_user = to.params.user
-        vm.review_date = to.params.date
+        vm.info.review_user = to.params.user
+        vm.info.review_date = to.params.date
       }
 
       vm.$get('/api/daily/editReview?id=' + vm.id, (res) => {

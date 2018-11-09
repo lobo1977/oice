@@ -17,8 +17,8 @@ class Daily extends Base
  /**
   * 工作日报
   */
-  public function index($page = 0) {
-    $result = User::dailyUser($this->user, $page);
+  public function index($page = 0, $date = '') {
+    $result = User::dailyUser($this->user, $page, $date);
     return $this->succeed($result);
   }
 

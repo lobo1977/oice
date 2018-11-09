@@ -8,7 +8,7 @@
     </sticky>
 
     <group v-show="false">
-      <calendar ref="calDate" title="" v-model="date" @on-change="reload"></calendar>
+      <calendar ref="calDate" title="" v-model="date" @on-change="changeDate"></calendar>
     </group>
 
     <div v-show="tabIndex === 0">
@@ -32,7 +32,8 @@
 
     <div v-show="tabIndex === 1">
       <group :gutter="0">
-        <cell v-for="(item, index) in reviewList" :key="index" :title="item.user">
+        <cell v-for="(item, index) in reviewList" :key="index" :title="item.user"
+          :link="{name: 'ReviewView', params: {id: item.id }}">
           <img slot="icon" :src="item.avatar" class="cell-image">
           <span style="font-size:0.8em">
             {{item.create_time|formatTime}}<br />
@@ -88,15 +89,30 @@ export default {
   beforeRouteEnter (to, from, next) {
     next(vm => {
       vm.me = vm.$store.state.oice.user || vm.me
-      vm.date = vm.$dateFormat(new Date(), 'YYYY-M-D')
       let id = parseInt(to.params.id)
       if (!isNaN(id)) {
+        if (to.params.date) {
+          vm.date = to.params.date
+        } else {
+          vm.date = vm.$dateFormat(new Date(), 'YYYY-M-D')
+        }
         vm.id = id
         vm.getUserInfo()
         vm.loadListData(true)
         vm.loadReviewData()
       }
     })
+  },
+  beforeRouteUpdate (to, from, next) {
+    let vm = this
+    if (to.params.date) {
+      vm.date = to.params.date
+    } else {
+      vm.date = vm.$dateFormat(new Date(), 'YYYY-M-D')
+    }
+    vm.loadListData(true)
+    vm.loadReviewData()
+    next()
   },
   methods: {
     new () {
@@ -118,10 +134,8 @@ export default {
     search () {
       this.$refs.calDate.onClick()
     },
-    reload () {
-      this.updateTitle()
-      this.loadListData(true)
-      this.loadReviewData()
+    changeDate () {
+      this.$router.push({name: 'DailyUser', params: { id: this.id, date: this.date }})
     },
     loadListData (empty) {
       if (empty) {

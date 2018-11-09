@@ -91,8 +91,7 @@ class User extends Base
     $list = self::alias('a')
       ->join('user_company b', 'a.id = b.user_id and b.status = 1 and b.company_id = ' . $company_id)
       ->leftJoin('log c', "a.id = c.user_id AND c.company_id = b.company_id AND " . 
-        " (c.type > 0 OR c.table = 'table') AND c.start_time between '" . $date . 
-        "' AND '" . date("Y-m-d", strtotime($date . ' +1 day')) . "'")
+        "c.start_time between '" . $date . "' AND '" . date("Y-m-d", strtotime($date . ' +1 day')) . "'")
       ->where('b.superior_id = ' . $user_id . ' OR a.id = ' . $user_id);
 
     $list->field('a.id,a.title,a.avatar,a.mobile,count(c.id) as daily_count')

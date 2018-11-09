@@ -71,8 +71,13 @@ class Log extends Base
     if ($operate == 'view') {
       $log = self::alias('a')
         ->leftJoin('user b','b.id = a.user_id')
+        ->leftJoin("company c", "a.table = 'company' and a.owner_id = c.id")
+        ->leftJoin("customer d", "a.table = 'customer' and a.owner_id = d.id")
+        ->leftJoin("building e", "a.table = 'building' and a.owner_id = e.id")
+        ->leftJoin("unit f", "a.table = 'unit' and a.owner_id = f.id")
         ->where('a.id', $id)
-        ->field('a.*,b.title as username,b.avatar,b.mobile')
+        ->field('a.*,b.title as username,b.avatar,b.mobile,' .
+          'c.title as company_name,d.customer_name,e.building_name,f.building_no,f.floor,f.room')
         ->find();
     } else {
       $log = self::get($id);
@@ -88,6 +93,17 @@ class Log extends Base
     }
     if ($operate == 'view') {
       User::formatData($log);
+      if ($log->building_no || $log->floor || $log->room) {
+        $log->unit_name = $log->building_no;
+        if ($log->floor > 0) {
+          $log->unit_name = $log->unit_name . $log->floor . '层';
+        } else if ($log->floor < 0) {
+          $log->unit_name = $log->unit_name . '地下' . abs($log->floor) . '层';
+        }
+        if ($log->room) {
+          $log->unit_name = $log->unit_name . $log->room;
+        }
+      }
       $log->allowEdit = self::allow($user, $log, 'edit');
       $log->allowDelete = self::allow($user, $log, 'delete');
     }
@@ -186,13 +202,12 @@ class Log extends Base
     $list = self::alias('a')
       ->leftJoin('user b ','a.user_id = b.id')
       ->leftJoin('user_company c', 'a.user_id = c.user_id and a.company_id = c.company_id and c.status = 1')
-      ->where('a.user_id = ' . $user_id .
-        ' OR (a.company_id > 0 AND a.company_id = ' . $company_id . 
-        ' AND c.superior_id = ' . $user_id . ')')
-      ->where(function ($query) {
-        $query->whereOr('a.type', '>', 0)
-          ->whereOr('a.table', '=', 'customer');
-      });
+      ->leftJoin("customer d", "a.table = 'customer' and a.owner_id = d.id")
+      ->leftJoin("building e", "a.table = 'building' and a.owner_id = e.id")
+      ->leftJoin("company g", "a.table = 'company' and a.owner_id = g.id")
+      ->where("a.user_id = " . $user_id .
+        " OR (a.company_id > 0 AND a.company_id = " . $company_id . 
+        " AND c.superior_id = " . $user_id . ")");
 
     if (isset($filter['id']) && $filter['id']) {
       $list->where('a.user_id', $filter['id']);
@@ -207,13 +222,23 @@ class Log extends Base
       $list->where('a.start_time', '> time', date("Y-m-d", time()));
     }
 
-    $result = $list->field('a.id,a.type,a.level,a.title,a.summary,a.start_time,a.end_time,a.company_id,a.user_id,b.title as user,b.mobile,b.avatar')
+    $result = $list->field('a.id,a.type,a.level,a.title,a.summary,' .
+      'a.start_time,a.end_time,a.company_id,a.user_id,b.title as user,b.mobile,b.avatar,' .
+      'd.customer_name,e.building_name,g.title as company_name')
       ->page($filter['page'], $filter['page_size'])  
       ->order('a.start_time', 'desc')->order('a.id', 'desc')
       ->select();
 
     foreach($result as $key => $log) {
-      $log->summary = str_replace('\n', ' ', $log->summary);
+      if ($log->customer_name) {
+        $log->summary = $log->customer_name;
+      } else if ($log->building_name) {
+        $log->summary = $log->building_name;
+      } else if ($log->company_name) {
+        $log->summary = $log->company_name;
+      } else {
+        $log->summary = str_replace('\n', ' ', $log->summary);
+      }
       // $log->allowEdit = self::allow($user, $log, 'edit');
       // $log->allowDelete = self::allow($user, $log, 'delete');
     }

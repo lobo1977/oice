@@ -240,7 +240,7 @@ export default new Router({
       },
       component: Daily
     }, {
-      path: '/daily/user/:id',
+      path: '/daily/user/:id/:date',
       name: 'DailyUser',
       meta: {
         title: '工作日报',

@@ -1,9 +1,17 @@
 <template>
   <div>
     <group gutter="0" label-width="4em" label-margin-right="1em" label-align="left">
-      <cell title="开始时间" :value="info.start_time" value-align="left"></cell>
-      <cell title="结束时间" :value="info.end_time" value-align="left" v-show="info.end_time.length" ></cell>
+      <cell :title="timeTitle" :value="info.start_time" value-align="left"></cell>
+      <cell title="结束时间" :value="info.end_time" value-align="left" v-show="info.end_time.length"></cell>
       <cell title="摘要" :value="info.title" value-align="left" v-show="info.title.length"></cell>
+      <cell title="企业" :value="info.company_name" value-align="left" v-show="info.owner_id > 0 && info.company_name.length"
+        :link="{name: 'CompanyView', params: {id: info.owner_id}}"></cell>
+      <cell title="客户" :value="info.customer_name" value-align="left" v-show="info.owner_id > 0 && info.customer_name.length"
+        :link="{name: 'CustomerView', params: {id: info.owner_id}}"></cell>
+      <cell title="项目" :value="info.building_name" value-align="left" v-show="info.owner_id > 0 && info.building_name.length"
+        :link="{name: 'BuildingView', params: {id: info.owner_id}}"></cell>
+      <cell title="单元" :value="info.unit_name" value-align="left" v-show="info.owner_id > 0 && info.unit_name.length"
+        :link="{name: 'Unit', params: {id: info.owner_id}}"></cell>
     </group>
     <group title="详情" v-show="info.summary.length">
       <p class="group-padding">{{info.summary}}</p>
@@ -41,6 +49,7 @@ export default {
       id: 0,
       info: {
         level: 0,
+        owner_id: 0,
         title: '',        // 摘要
         summary: '',      // 详情
         start_time: '',   // 时间
@@ -49,6 +58,10 @@ export default {
         username: '',
         mobile: '',
         avatar: '',
+        company_name: '',
+        customer_name: '',
+        building_name: '',
+        unit_name: '',
         allowEdit: false,
         allowDelete: false
       }
@@ -105,6 +118,11 @@ export default {
           })
         }
       })
+    }
+  },
+  computed: {
+    timeTitle () {
+      return (this.end_time && this.end_time.length ? '开始时间' : '时间')
     }
   }
 }

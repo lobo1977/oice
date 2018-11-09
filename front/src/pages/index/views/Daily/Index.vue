@@ -2,7 +2,7 @@
   <div>
     <group :gutter="0">
       <cell v-for="(item, index) in list" :key="index" :title="item.title" 
-        :link="{name: 'DailyUser', params: { id: item.id }}">
+        :link="{name: 'DailyUser', params: { id: item.id, date: date }}">
         <img slot="icon" :src="item.avatar" class="cell-image">
         <div slot="inline-desc">
           <span>今日 {{item.daily_count}} 项日报</span>
@@ -26,6 +26,7 @@ export default {
     return {
       user: {
       },
+      date: '',
       isLoading: false,
       page: 0,
       isEnd: false,
@@ -35,6 +36,7 @@ export default {
   beforeRouteEnter (to, from, next) {
     next(vm => {
       vm.user = vm.$store.state.oice.user || vm.user
+      vm.date = vm.$dateFormat(new Date(), 'YYYY-M-D')
       vm.loadListData(true)
     })
   },
@@ -50,7 +52,8 @@ export default {
       }
       this.isLoading = true
       this.$post('/api/daily/index', {
-        page: this.page
+        page: this.page,
+        date: this.date
       }, (res) => {
         this.isLoading = false
         if (res.success) {
