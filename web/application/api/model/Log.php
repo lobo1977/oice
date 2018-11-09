@@ -104,6 +104,7 @@ class Log extends Base
           $log->unit_name = $log->unit_name . $log->room;
         }
       }
+      $log->summary = str_replace('\n', '<br/>', $log->summary);
       $log->allowEdit = self::allow($user, $log, 'edit');
       $log->allowDelete = self::allow($user, $log, 'delete');
     }

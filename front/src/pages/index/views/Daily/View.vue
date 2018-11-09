@@ -14,7 +14,7 @@
         :link="{name: 'Unit', params: {id: info.owner_id}}"></cell>
     </group>
     <group title="详情" v-show="info.summary.length">
-      <p class="group-padding">{{info.summary}}</p>
+      <p class="group-padding" v-html="info.summary"></p>
     </group>
     <group title="提交人" v-show="info.user_id">
       <cell :title="info.username" :inline-desc="info.mobile"
