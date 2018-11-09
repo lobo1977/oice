@@ -71,9 +71,8 @@ class Log extends Base
     if ($operate == 'view') {
       $log = self::alias('a')
         ->leftJoin('user b','b.id = a.user_id')
-        ->leftJoin('company c','c.id = a.company_id')
         ->where('a.id', $id)
-        ->field('a.*,b.title as username,b.avatar,b.mobile,c.title as company')
+        ->field('a.*,b.title as username,b.avatar,b.mobile')
         ->find();
     } else {
       $log = self::get($id);

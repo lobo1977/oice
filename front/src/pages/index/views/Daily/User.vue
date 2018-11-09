@@ -1,9 +1,15 @@
 <template>
   <div>
-    <tab>
-      <tab-item :selected="tabIndex === 0" @on-item-click="tabIndex = 0">工作日报</tab-item>
-      <tab-item :selected="tabIndex === 1" @on-item-click="tabIndex = 1">批阅</tab-item>
-    </tab>
+    <sticky :offset="46">
+      <tab>
+        <tab-item :selected="tabIndex === 0" @on-item-click="tabIndex = 0">工作日报</tab-item>
+        <tab-item :selected="tabIndex === 1" @on-item-click="tabIndex = 1">批阅</tab-item>
+      </tab>
+    </sticky>
+
+    <group v-show="false">
+      <calendar ref="calDate" title="" v-model="date" @on-change="reload"></calendar>
+    </group>
 
     <div v-show="tabIndex === 0">
       <group :gutter="0">
@@ -28,9 +34,12 @@
       <group :gutter="0">
         <cell v-for="(item, index) in reviewList" :key="index" :title="item.user">
           <img slot="icon" :src="item.avatar" class="cell-image">
-          <span style="font-size:0.8em">{{item.create_time|formatTime}}</span>
+          <span style="font-size:0.8em">
+            {{item.create_time|formatTime}}<br />
+            <span :class="{red:item.level == 0, green:item.level == 2}">[{{item.levelText}}]</span>
+          </span>
           <div slot="inline-desc">
-            <span>[{{item.levelText}}]</span>{{item.content}}
+            {{item.content}}
           </div>
         </cell>
       </group>
@@ -50,9 +59,11 @@
 
 <script>
 import { mapState } from 'vuex'
+import { Calendar } from 'vux'
 
 export default {
   components: {
+    Calendar
   },
   data () {
     return {
@@ -105,19 +116,12 @@ export default {
       })
     },
     search () {
-      let vm = this
-      vm.$vux.datetime.show({
-        cancelText: '取消',
-        confirmText: '确定',
-        format: 'YYYY-M-D',
-        value: vm.date,
-        onConfirm (val) {
-          vm.date = val
-          vm.updateTitle()
-          vm.loadListData(true)
-          vm.loadReviewData()
-        }
-      })
+      this.$refs.calDate.onClick()
+    },
+    reload () {
+      this.updateTitle()
+      this.loadListData(true)
+      this.loadReviewData()
     },
     loadListData (empty) {
       if (empty) {
@@ -188,6 +192,12 @@ export default {
 </script>
 
 <style lang="less">
+.red {
+  color:red;
+}
+.green {
+  color: green;
+}
 .vux-cell-bd {
   overflow: hidden;
   .vux-label-desc > div {

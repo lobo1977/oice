@@ -290,6 +290,18 @@ export default new Router({
         require(['../views/Daily/Review.vue'], resolve)
       }
     }, {
+      path: '/daily/reviewview/:id',
+      name: 'ReviewView',
+      meta: {
+        title: '日报批阅',
+        showBack: true,
+        hideBar: true,
+        requiresAuth: true
+      },
+      component: function (resolve) {
+        require(['../views/Daily/ReviewView.vue'], resolve)
+      }
+    }, {
       path: '/my',
       name: 'My',
       meta: {

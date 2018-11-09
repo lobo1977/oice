@@ -18,11 +18,13 @@
     </form>
 
     <div v-show="!isSearching">
-      <tab>
-        <tab-item :selected="type == 'follow'" @on-item-click="getList('follow')">跟进客户</tab-item>
-        <tab-item :selected="type == 'potential'" @on-item-click="getList('potential')">潜在客户</tab-item>
-        <tab-item :selected="type == 'pool'" @on-item-click="getList('pool')">客户池</tab-item>
-      </tab>
+      <sticky :offset="46">
+        <tab>
+          <tab-item :selected="type == 'follow'" @on-item-click="getList('follow')">跟进客户</tab-item>
+          <tab-item :selected="type == 'potential'" @on-item-click="getList('potential')">潜在客户</tab-item>
+          <tab-item :selected="type == 'pool'" @on-item-click="getList('pool')">客户池</tab-item>
+        </tab>
+      </sticky>
       <router-view ref="listCustomer"></router-view>
     </div>
   </div>
