@@ -27,7 +27,7 @@ class User extends Base
     }
     if (isset($user->avatar) && $user->avatar) {
       $find = strpos($user->avatar, 'http');
-      if ($find == false || $find > 0) {
+      if ($find === false || $find > 0) {
         $user->avatar = '/upload/user/images/60/' . $user->avatar;
       }
     } else {

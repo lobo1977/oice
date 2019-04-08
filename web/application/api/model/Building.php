@@ -88,12 +88,12 @@ class Building extends Base
       $user_id = $user->id;
       $company_id = $user->company_id;
     }
-    
+  
     $list = self::alias('a')
       ->leftJoin('file b',"b.parent_id = a.id AND b.type = 'building' AND b.default = 1")
       ->where('a.city', self::$city)
-      ->where('a.share = 1 OR a.user_id = 0 OR (a.user_id = ' . $user_id . ') OR ' . 
-        '(a.company_id > 0 AND a.company_id = ' . $company_id . ')');
+      ->where('(a.share = 1 OR a.user_id = 0 OR a.user_id = ' . $user_id . ' OR 
+        (a.company_id > 0 AND a.company_id = ' . $company_id . '))');
     
     if (isset($filter['keyword']) && $filter['keyword'] != '') {
       $list->where('a.building_name|a.pinyin', 'like', $filter['keyword'] . '%');

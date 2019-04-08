@@ -193,7 +193,7 @@ export default {
         this.info.customer_id &&
         this.$refs.inpConfirmAcreage.valid &&
         this.info.rent_sell &&
-        this.vm.isConfirmDateValid
+        this.isConfirmDateValid
     },
     rentSellSelect (key, item) {
       this.info.rent_sell = item.value

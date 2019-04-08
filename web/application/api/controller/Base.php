@@ -26,6 +26,8 @@ class Base extends Controller
             $this->user_id = $this->user->id;
             if ($this->user->company_id) {
               $this->company_id = $this->user->company_id;
+            } else {
+              $this->user->company_id = 0;
             }
           }
         }
