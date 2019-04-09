@@ -234,7 +234,7 @@ export default {
       this.loadListData(true)
     },
     districtChange (val) {
-      this.districtText = this.$refs.Picker.getNameValues()
+      this.districtText = this.$refs.pickDistrict.getNameValues()
       this.loadListData(true)
     },
     rentSellChange (val) {
@@ -242,7 +242,7 @@ export default {
       this.loadListData(true)
     },
     acreageChange (val) {
-      this.acreageText = this.$refs.Picker.getNameValues()
+      this.acreageText = this.$refs.pickAcreage.getNameValues()
       this.loadListData(true)
     },
     setTypePicker (index) {
