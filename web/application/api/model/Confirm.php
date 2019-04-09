@@ -82,6 +82,23 @@ class Confirm extends Base
   }
 
   /**
+   * 确认书撞单查询
+   */
+  private static function clashCheck($id, $customer_id, $customer_name, $building_id)
+  {
+    $keyword = mb_substr(preg_replace(Customer::$IGNORE_WORDS, '', $customer_name), 0, 3, 'utf-8');
+
+    $clashData = self::alias('a')
+      ->join('customer c', "a.customer_id = c.id")
+      ->where('building_id', $building_id)
+      ->where('a.id', '<>', $id)
+      ->where("(a.id = " . $customer_id . " OR c.customer_name like '%" . $keyword . "%'")
+      ->find();
+
+    return $clashData;
+  }
+
+  /**
    * 客户确认书详情
    */
   public static function detail($user, $id, $building_id = 0, $customer_id = 0, $operate = 'view') {
@@ -131,14 +148,12 @@ class Confirm extends Base
       } else if (!Customer::allow($user, $customer, 'confirm')) {
         self::exception('您没有权限添加确认书。');
       }
+
+      if (self::clashCheck(0, $customer->id, $customer->customer_name, $building->id)) {
+        self::exception('该确认客户和项目已有客户发生撞单，不能添加。');
+      }
       
       if ($building->company_id) {
-        if ($customer->company_id != $building->company_id) {
-          if (Customer::clashCheck(0, $customer->customer_name, '', $building->company_id)) {
-            self::exception('该确认客户和项目已有客户发生撞单，不能添加。');
-          }
-        }
-
         $company = Company::get($building->company_id);
         if ($company && $company->full_name) {
           $building->developer = $company->full_name;
@@ -253,19 +268,23 @@ class Confirm extends Base
       }
       return $id;
     } else {
+      $building = Building::get($data['building_id']);
+      if ($building == null) {
+        self::exception('项目不存在。');
+      }
       $customer = Customer::get($data['customer_id']);
       if ($customer == null) {
         self::exception('客户不存在。');
       } else if (!Customer::allow($user, $customer, 'confirm')) {
         self::exception('您没有权限添加确认书。');
       }
-      $building = Building::get($data['building_id']);
-      if ($building == null) {
-        self::exception('项目不存在。');
-      }
       $company = Company::get($data['company_id']);
       if ($company == null) {
         self::exception('代理方不存在。');
+      }
+
+      if (self::clashCheck(0, $customer->id, $customer->customer_name, $building->id)) {
+        self::exception('该确认客户和项目已有客户发生撞单，不能添加。');
       }
 
       $data['user_id'] = $user_id;

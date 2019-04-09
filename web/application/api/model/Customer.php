@@ -21,7 +21,7 @@ class Customer extends Base
 
   public static $status = ['潜在','跟进','看房','确认','成交','失败','名录'];
   public static $share = ['私有','共享'];
-  private static $IGNORE_WORDS = '/北京|上海|深圳|广州|中国|美国|日本|德国|英国|法国|（|）|\(|\)/';
+  public static $IGNORE_WORDS = '/北京|上海|深圳|广州|中国|美国|日本|德国|英国|法国|（|）|\(|\)/';
   
   /**
    * 格式化列表数据
@@ -218,7 +218,7 @@ class Customer extends Base
   /**
    * 撞单检查
    */
-  private static function clashCheck($id, $name, $mobile, $company_id) {
+  public static function clashCheck($id, $name, $mobile, $company_id) {
     if(!$company_id) {
       return false;
     }
