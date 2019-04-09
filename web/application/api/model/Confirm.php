@@ -27,7 +27,7 @@ class Confirm extends Base
 
     if ($operate == 'view') {
       return $confirm->user_id == $user->id ||
-        $confirm->building_company_id == $user->company_id ||
+        $confirm->builidng_master_id == $user->id ||
         ($confirm->company_id == $user->company_id && $user->id == $superior_id);
     } else if ($operate == 'edit' || $operate = 'delete') {
       return $confirm->user_id == $user->id &&
@@ -117,7 +117,7 @@ class Confirm extends Base
           'o.full_name as company,o.enable_stamp,o.stamp,' .
           'b.company_id as building_company_id,m.full_name as building_company,' .
           'm.enable_stamp as building_enable_stamp,m.stamp as building_stamp,' .
-          'u.title as manager,u.avatar,u.mobile')
+          'u.title as manager,u.avatar,u.mobile,m.user_id as builidng_master_id')
         ->find();
       if ($confirm == null) {
         self::exception('确认书不存在。');
