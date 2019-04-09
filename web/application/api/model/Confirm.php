@@ -51,16 +51,16 @@ class Confirm extends Base
     $list = self::alias('a')
       ->join('customer c', 'a.customer_id = c.id')
       ->join('building b', 'a.building_id = b.id')
-      ->leftJoin('user_company d', 'a.user_id = d.user_id and a.company_id = d.company_id and d.status = 1');
-
+      ->leftJoin('user_company d', 'a.user_id = d.user_id and a.company_id = d.company_id and d.status = 1')
+      ->leftJoin('company e', 'b.company_id = e.id');
     if ($customer_id) {
       $list->where('a.customer_id', $customer_id)
-      ->where('a.user_id = ' . $user_id .
+      ->where('(a.user_id = ' . $user_id .
         ' OR (a.company_id > 0 AND a.company_id = ' . $company_id .
-        ' AND d.superior_id = ' . $user_id . ')');
+        ' AND d.superior_id = ' . $user_id . '))');
     } else if ($building_id) {
       $list->where('a.building_id', $building_id)
-        ->where('(b.company_id = ' . $company_id . ' OR a.user_id = ' . $user_id . ')');
+        ->where('(e.user_id = ' . $user_id . ' OR a.user_id = ' . $user_id . ')');
     } else {
       $list->where('a.user_id', $user_id);
     }
