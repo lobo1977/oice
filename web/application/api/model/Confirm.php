@@ -60,7 +60,7 @@ class Confirm extends Base
         ' AND d.superior_id = ' . $user_id . ')');
     } else if ($building_id) {
       $list->where('a.building_id', $building_id)
-        ->where('((b.user_id = ' . $user_id . ' and b.company_id = ' . $company_id . ') OR a.user_id = ' . $user_id . ')');
+        ->where('(b.company_id = ' . $company_id . ' OR a.user_id = ' . $user_id . ')');
     } else {
       $list->where('a.user_id', $user_id);
     }
@@ -121,18 +121,24 @@ class Confirm extends Base
         return $confirm;
       }
     } else if ($building_id && $customer_id) {
+      $building = Building::get($building_id);
+      if ($building == null) {
+        self::exception('项目不存在。');
+      }
       $customer = Customer::get($customer_id);
       if ($customer == null) {
         self::exception('客户不存在。');
       } else if (!Customer::allow($user, $customer, 'confirm')) {
         self::exception('您没有权限添加确认书。');
       }
-      $building = Building::get($building_id);
-      if ($building == null) {
-        self::exception('项目不存在。');
-      }
-
+      
       if ($building->company_id) {
+        if ($customer->company_id != $building->company_id) {
+          if (Customer::clashCheck(0, $customer->customer_name, '', $building->company_id)) {
+            self::exception('该确认客户和项目已有客户发生撞单，不能添加。');
+          }
+        }
+
         $company = Company::get($building->company_id);
         if ($company && $company->full_name) {
           $building->developer = $company->full_name;
