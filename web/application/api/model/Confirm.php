@@ -89,10 +89,10 @@ class Confirm extends Base
     $keyword = mb_substr(preg_replace(Customer::$IGNORE_WORDS, '', $customer_name), 0, 3, 'utf-8');
 
     $clashData = self::alias('a')
-      ->join('customer c', "a.customer_id = c.id")
-      ->where('building_id', $building_id)
+      ->join('customer c', 'a.customer_id = c.id')
+      ->where('a.building_id', $building_id)
       ->where('a.id', '<>', $id)
-      ->where("(a.id = " . $customer_id . " OR c.customer_name like '%" . $keyword . "%'")
+      ->where("(a.customer_id = " . $customer_id . " OR c.customer_name like '%" . $keyword . "%')")
       ->find();
 
     return $clashData;
