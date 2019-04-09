@@ -60,7 +60,7 @@ class Confirm extends Base
         ' AND d.superior_id = ' . $user_id . ')');
     } else if ($building_id) {
       $list->where('a.building_id', $building_id)
-        ->where('(b.user_id = ' . $user_id . ' OR b.company_id = ' . $company_id . ')');
+        ->where('((b.user_id = ' . $user_id . ' and b.company_id = ' . $company_id . ') OR a.user_id = ' . $user_id . ')');
     } else {
       $list->where('a.user_id', $user_id);
     }
