@@ -528,7 +528,7 @@ export default {
       })
     },
     confirmRemoveImage () {
-      let index = this.$refs.previewer.getCurrentIndex()
+      let index = this.$refs.prevBuildingEdit.getCurrentIndex()
       if (index < 0) return
       let img = this.images[index]
       if (img.default === 1) {

@@ -14,11 +14,11 @@
       <previewer :list="info.images" ref="prevBuilding" :options="previewOptions"></previewer>
     </div>
 
-    <sticky :offset="46" v-if="user != null && user.id > 0">
+    <sticky :offset="46">
       <tab>
         <tab-item @on-item-click="goTab(0)" :selected="tab === 0">基本信息</tab-item>
-        <tab-item @on-item-click="goTab(1)" :selected="tab === 1">联系人</tab-item>
-        <tab-item @on-item-click="goTab(2)" :selected="tab === 2">单元销控</tab-item>
+        <tab-item @on-item-click="goTab(1)" :selected="tab === 1">单元销控</tab-item>
+        <tab-item @on-item-click="goTab(2)" :selected="tab === 2">联系人</tab-item>
         <tab-item @on-item-click="goTab(3)" :selected="tab === 3">确认书</tab-item>
       </tab>
     </sticky>
@@ -90,19 +90,6 @@
     </div>
 
     <div v-show="tab === 1">
-      <cell v-for="(item, index) in info.linkman" :key="index"
-        :title="item.title" :link="{name: 'Linkman', params: {id: item.id}}" 
-        :inline-desc="item.desc"></cell>
-      
-      <div class="bottom-bar">
-        <x-button type="primary" class="bottom-btn" :disabled="!info.allowEdit"
-          :link="{name: 'LinkmanEdit', params: {id: 0, type: 'building', oid: info.id}}">
-          <x-icon type="plus" class="btn-icon"></x-icon> 添加
-        </x-button>
-      </div>
-    </div>
-
-    <div v-show="tab === 2">
       <checker v-model="selectedUnit" type="checkbox" @on-change="selectUnit"
         class="unit-checker-box" default-item-class="unit-item" 
         selected-item-class="unit-item-selected" disabled-item-class="unit-item-disabled">
@@ -110,8 +97,9 @@
           <divider v-if="building.building">{{building.building}}</divider>
           <div v-for="(floor, f) in building.floor" :key="f">
             <h5 v-if="floor.floor">{{floor.floor|formatFloor}}</h5>
-            <checker-item v-for="(unit, index) in floor.unit" :key="index" :value="unit.id">
-              <div :class="{active: touchUnit == unit}" @touchstart="unitTouch(unit, true)" @touchmove="unitTouchMove(true)" @touchend="unitTouchEnd(true)"
+            <checker-item v-for="(unit, index) in floor.unit" :key="index" :value="unit.id" :disabled="unit.status != 1">
+              <div :class="{active: touchUnit == unit}" @touchstart="unitTouch(unit, true)" 
+                @touchmove="unitTouchMove(true)" @touchend="unitTouchEnd(true)"
                 @mousedown="unitTouch(unit)" @mousemove="unitTouchMove(false)" @mouseup="unitTouchEnd(false)">
                 #{{unit.room}}/{{unit.acreage}}
               </div>
@@ -149,10 +137,32 @@
       </flexbox>
     </div>
 
+    <div v-show="tab === 2">
+      <div v-if="user != null && user.id > 0">
+        <cell v-for="(item, index) in info.linkman" :key="index"
+          :title="item.title" :link="{name: 'Linkman', params: {id: item.id}}" 
+          :inline-desc="item.desc"></cell>
+        
+        <div class="bottom-bar">
+          <x-button type="primary" class="bottom-btn" :disabled="!info.allowEdit"
+            :link="{name: 'LinkmanEdit', params: {id: 0, type: 'building', oid: info.id}}">
+            <x-icon type="plus" class="btn-icon"></x-icon> 添加
+          </x-button>
+        </div>
+      </div>
+
+      <load-more v-if="user == null || user.id == 0"
+        :show-loading="false" tip="请登录后查看" @click.native="login" background-color="#fbf9fe"></load-more>
+    </div>
+
     <div v-show="tab === 3">
-      <cell v-for="(item, index) in info.confirm" :key="index"
-        :title="item.title" :link="{name: 'ConfirmView', params: {id: item.id}}" 
-        :inline-desc="item.desc"></cell>
+      <div v-if="user != null && user.id > 0">
+        <cell v-for="(item, index) in info.confirm" :key="index"
+          :title="item.title" :link="{name: 'ConfirmView', params: {id: item.id}}" 
+          :inline-desc="item.desc"></cell>
+      </div>
+      <load-more v-if="user == null || user.id == 0"
+        :show-loading="false" tip="请登录后查看" @click.native="login" background-color="#fbf9fe"></load-more>
     </div>
 
     <popup-picker class="popup-picker" :show.sync="showCustomerPicker" 
@@ -323,6 +333,9 @@ export default {
     })
   },
   methods: {
+    login () {
+      this.$checkAuth()
+    },
     new () {
       this.$router.push({name: 'BuildingEdit', params: {id: 0}})
     },

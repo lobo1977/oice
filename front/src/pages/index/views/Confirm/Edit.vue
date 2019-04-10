@@ -1,62 +1,74 @@
 <template>
   <div>
-      <group gutter="0" label-width="5em" label-margin-right="1em" label-align="right">
-        <cell value-align="left" :value="building.building" 
-          :link="{name: 'BuildingView', params: { id: info.building_id }}">
-          <span slot="title" :class="{warn: !info.building_id}">项目</span>
-        </cell>
-        <cell value-align="left">
-          <span slot="title" :class="{warn: !building.developer}">委托方</span>
-          <span v-if="building.developer">{{building.developer}}</span>
-          <span v-if="!building.developer" style="color:red">项目缺少开发商信息</span>
-        </cell>
-        <cell @click.native="selectCompany" :is-link="companyPickerData.length != 1" 
-          :value="companyText" value-align="left">
-          <span slot="title" :class="{warn: !info.company_id}">代理方</span>
-        </cell>
-        <cell value-align="left" :value="building.customer"
-          :link="{name: 'CustomerView', params: { id: info.customer_id }}">
-          <span slot="title" :class="{warn: !info.customer_id}">客户</span>
-        </cell>
-        <x-input ref="inpConfirmAcreage" title="面积" type="tel" :max="5" :required="true" v-model="info.acreage" :show-clear="false"
-          @on-click-error-icon="acreageError" :should-toast-error="false" @on-change="validateForm">
-          <span slot="right">平方米</span>
-        </x-input>
-        <cell :value="info.rent_sell" value-align="left" :is-link="true" @click.native="showRentSellPicker = true">
-          <span slot="title" :class="{warn: !isRentSellValid}">租售</span>
-        </cell>
-        <cell :value="info.confirm_date" value-align="left" :is-link="true" @click.native="selectConfirmDate">
-          <span slot="title" :class="{warn: !isConfirmDateValid}">确认日期</span>
-        </cell>
-        <cell title="有效期" value-align="left">
-          <inline-x-number style="float:left;margin:0 5px 0 0;" width="80px" :min="1" :max="12" :step="1" v-model="info.period"></inline-x-number>
-          <div style="float:left;display:inline-block;line-height:28px;">个月</div>
-        </cell>
-      </group>
+      <div :v-show="!showMsg">
+        <group gutter="0" label-width="5em" label-margin-right="1em" label-align="right">
+          <cell value-align="left" :value="building.building" 
+            :link="{name: 'BuildingView', params: { id: info.building_id }}">
+            <span slot="title" :class="{warn: !info.building_id}">项目</span>
+          </cell>
+          <cell value-align="left">
+            <span slot="title" :class="{warn: !building.developer}">委托方</span>
+            <span v-if="building.developer">{{building.developer}}</span>
+            <span v-if="!building.developer" style="color:red">项目缺少开发商信息</span>
+          </cell>
+          <cell @click.native="selectCompany" :is-link="companyPickerData.length != 1" 
+            :value="companyText" value-align="left">
+            <span slot="title" :class="{warn: !info.company_id}">代理方</span>
+          </cell>
+          <cell value-align="left" :value="building.customer"
+            :link="{name: 'CustomerView', params: { id: info.customer_id }}">
+            <span slot="title" :class="{warn: !info.customer_id}">客户</span>
+          </cell>
+          <x-input ref="inpConfirmAcreage" title="面积" type="tel" :max="5" :required="true" v-model="info.acreage" :show-clear="false"
+            @on-click-error-icon="acreageError" :should-toast-error="false" @on-change="validateForm">
+            <span slot="right">平方米</span>
+          </x-input>
+          <cell :value="info.rent_sell" value-align="left" :is-link="true" @click.native="showRentSellPicker = true">
+            <span slot="title" :class="{warn: !isRentSellValid}">租售</span>
+          </cell>
+          <cell :value="info.confirm_date" value-align="left" :is-link="true" @click.native="selectConfirmDate">
+            <span slot="title" :class="{warn: !isConfirmDateValid}">确认日期</span>
+          </cell>
+          <cell title="有效期" value-align="left">
+            <inline-x-number style="float:left;margin:0 5px 0 0;" width="80px" :min="1" :max="12" :step="1" v-model="info.period"></inline-x-number>
+            <div style="float:left;display:inline-block;line-height:28px;">个月</div>
+          </cell>
+        </group>
 
-      <group gutter="10px">
-        <x-textarea placeholder="备注" :rows="3" v-model="info.rem" :max="200"></x-textarea>
-      </group>
+        <group gutter="10px">
+          <x-textarea placeholder="备注" :rows="3" v-model="info.rem" :max="200"></x-textarea>
+        </group>
 
-      <actionsheet v-model="showCompanyPicker" :menus="companyPickerData" theme="android" @on-click-menu="companySelect"></actionsheet>
-      <actionsheet v-model="showRentSellPicker" :menus="rentSellPickerData" theme="android" @on-click-menu="rentSellSelect"></actionsheet>
+        <actionsheet v-model="showCompanyPicker" :menus="companyPickerData" theme="android" @on-click-menu="companySelect"></actionsheet>
+        <actionsheet v-model="showRentSellPicker" :menus="rentSellPickerData" theme="android" @on-click-menu="rentSellSelect"></actionsheet>
 
-      <div class="bottom-bar">
-        <x-button type="primary" class="bottom-btn" @click.native="save" :disabled="!formValidate">
-          <x-icon type="android-archive" class="btn-icon"></x-icon> 保存
-        </x-button>
+        <div class="bottom-bar">
+          <x-button type="primary" class="bottom-btn" @click.native="save" :disabled="!formValidate">
+            <x-icon type="android-archive" class="btn-icon"></x-icon> 保存
+          </x-button>
+        </div>
       </div>
+
+      <msg title="操作失败" icon="warn" :description="errorMessage" :v-show="showMsg">
+        <template slot="buttons">
+          <x-button plain type="primary" @click.native="goBack">返回</x-button>
+        </template>
+      </msg>
   </div>
 </template>
 
 <script>
+import { Msg } from 'vux'
 import rentSellData from '../../data/rent_sell.json'
 
 export default {
   components: {
+    Msg
   },
   data () {
     return {
+      showMsg: false,
+      errorMessage: '',
       id: 0,
       isRentSellValid: true,
       isConfirmDateValid: true,
@@ -172,15 +184,20 @@ export default {
             vm.$emit('on-view-loaded', '添加客户确认书')
           }
         } else {
-          vm.$vux.toast.show({
-            text: res.message,
-            width: '16em'
-          })
+          vm.errorMessage = res.message
+          vm.showMsg = true
+          // vm.$vux.toast.show({
+          //   text: res.message,
+          //   width: '16em'
+          // })
         }
       })
     })
   },
   methods: {
+    goBack () {
+      this.$router.back()
+    },
     acreageError () {
       this.$vux.toast.show({
         text: '请输入面积'

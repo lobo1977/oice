@@ -67,6 +67,7 @@ class Unit extends Base
       if ($unit->room) {
         $unit->title = $unit->title . $unit->room;
       }
+      $unit->statusText = self::$status[$unit->status];
     }
   }
 
@@ -85,8 +86,8 @@ class Unit extends Base
     $building = Building::get($id);
 
     $list = self::where('building_id', $id)
-      ->where('share = 1 OR (user_id = ' . $user_id . ') OR ' . 
-        '(company_id > 0 AND company_id = ' . $company_id . ')')
+      //->where('(share = 1 OR user_id = ' . $user_id . ' OR ' . 
+      //  '(company_id > 0 AND company_id = ' . $company_id . '))')
       ->field('id,building_no,floor,room,acreage,status,share,user_id,company_id')
       ->order('building_no', 'asc')
       ->order('floor', 'desc')
