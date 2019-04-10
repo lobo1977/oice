@@ -68,7 +68,7 @@
         @on-change="acreageChange" v-model="acreageValue"></popup-picker>
 
       <div style="height:50px;">
-        <load-more :show-loading="isLoading" v-show="isLoading || isEnd" :tip="loadingTip"></load-more>
+        <load-more :show-loading="isLoading" @click:native="loadMore" :tip="loadingTip"></load-more>
       </div>
     </div>
   </div>
@@ -286,6 +286,12 @@ export default {
           }
         }
       })
+    },
+    loadMore () {
+      if (!this.isLoading && !this.isEnd) {
+        this.page++
+        this.loadListData()
+      }
     }
   },
   mounted: function () {
@@ -298,10 +304,8 @@ export default {
   },
   watch: {
     scrollBottom (isBottom) {
-      if (isBottom && this.$route.name === 'Building' &&
-        !this.isLoading && !this.isEnd) {
-        this.page++
-        this.loadListData()
+      if (isBottom && this.$route.name === 'Building') {
+        this.loadMore()
       }
     }
   },
@@ -316,7 +320,7 @@ export default {
       } else if (this.isEnd) {
         return this.buildingList.length ? '没有更多了' : '暂无数据'
       } else {
-        return ''
+        return '加载更多'
       }
     }
   }

@@ -2,7 +2,7 @@
   <div>
     <panel :list="list" :type="listType" @on-img-error="onImgError"></panel>
     <div style="height:50px;">
-      <load-more :show-loading="isLoading" v-show="isLoading || isEnd" :tip="loadingTip"></load-more>
+      <load-more :show-loading="isLoading" @click:natvie="loadMore" :tip="loadingTip"></load-more>
     </div>
   </div>
 </template>
@@ -25,6 +25,12 @@ export default {
   },
   methods: {
     onImgError (item, $event) {
+    },
+    loadMore () {
+      if (!this.isLoading && !this.isEnd) {
+        this.page++
+        this.loadData()
+      }
     },
     loadData (empty) {
       if (empty) {
@@ -69,10 +75,8 @@ export default {
       if (isBottom &&
         (this.$route.name === 'Potential' ||
         this.$route.name === 'Follow' ||
-        this.$route.name === 'History') &&
-        !this.isLoading && !this.isEnd) {
-        this.page++
-        this.loadData()
+        this.$route.name === 'History')) {
+        this.loadMore()
       }
     }
   },
@@ -87,7 +91,7 @@ export default {
       } else if (this.isEnd) {
         return this.list.length ? '没有更多了' : '暂无数据'
       } else {
-        return ''
+        return '加载更多'
       }
     }
   }

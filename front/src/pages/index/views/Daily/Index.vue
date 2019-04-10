@@ -11,7 +11,7 @@
     </group>
 
     <div style="height:50px;">
-      <load-more :show-loading="isLoading" v-show="isLoading || isEnd" :tip="loadingTip"></load-more>
+      <load-more :show-loading="isLoading" @click:native="loadMore" :tip="loadingTip"></load-more>
     </div>
   </div>
 </template>
@@ -44,6 +44,12 @@ export default {
     new () {
       this.$router.push({name: 'DailyEdit', params: {id: 0}})
     },
+    loadMore () {
+      if (!this.isLoading && !this.isEnd) {
+        this.page++
+        this.loadListData()
+      }
+    },
     loadListData (empty) {
       if (empty) {
         this.isEnd = false
@@ -70,10 +76,8 @@ export default {
   },
   watch: {
     scrollBottom (isBottom) {
-      if (isBottom && this.$route.name === 'Daily' &&
-        !this.isLoading && !this.isEnd) {
-        this.page++
-        this.loadListData()
+      if (isBottom && this.$route.name === 'Daily') {
+        this.loadMore()
       }
     }
   },
@@ -88,7 +92,7 @@ export default {
       } else if (this.isEnd) {
         return this.list.length ? '没有更多了' : '暂无数据'
       } else {
-        return ''
+        return '加载更多'
       }
     }
   }
