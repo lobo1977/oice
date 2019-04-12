@@ -300,6 +300,10 @@ html, body {
   right:5px;
 }
 
+.cell-link {
+  text-decoration: none;
+}
+
 .vux-group-footer-title {
   margin-top:0.5em !important;
 }

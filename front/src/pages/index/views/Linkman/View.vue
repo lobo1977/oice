@@ -4,8 +4,12 @@
       <cell title="姓名" value-align="left" :value="info.title" v-if="info.title"></cell>
       <cell title="部门" value-align="left" :value="info.department" v-if="info.department"></cell>
       <cell title="职务" value-align="left" :value="info.job" v-if="info.job"></cell>
-      <cell title="手机号码" value-align="left" :value="info.mobile" v-if="info.mobile"></cell>
-      <cell title="办公电话" value-align="left" :value="info.tel" v-if="info.tel"></cell>
+      <cell title="手机号码" value-align="left" v-if="info.mobile">
+        <a v-bind:href="'tel:'+(info.mobile)" class="cell-link">{{info.mobile}}</a>
+      </cell>
+      <cell title="办公电话" value-align="left" v-if="info.tel">
+        <a v-bind:href="'tel:'+(info.tel)" class="cell-link">{{info.tel}}</a>
+      </cell>
       <cell title="电子邮箱" value-align="left" :value="info.email" v-if="info.email"></cell>
       <cell title="微信" value-align="left" :value="info.weixn" v-if="info.weixin"></cell>
       <cell title="QQ" value-align="left" :value="info.qq" v-if="info.qq"></cell>
