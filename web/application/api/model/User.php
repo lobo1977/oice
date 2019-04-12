@@ -118,11 +118,12 @@ class User extends Base
       ->leftJoin('user_company b', 'a.id = b.user_id and b.active = 1 and b.status = 1')
       ->leftJoin('company c', 'b.company_id = c.id')
       ->leftJoin('user u', 'b.superior_id = u.id')
+      ->leftJoin('oauth o', "a.id = o.user_id and patform = 'wechat'")
       ->where('a.id', $id)
       ->where('a.status', 0)
       ->field('a.id,a.title,a.avatar,a.mobile,a.email,a.qq,a.weixin,' . 
         'b.company_id,b.superior_id,u.title as superior,' .
-        'c.title as company,c.user_id as company_admin')
+        'c.title as company,c.user_id as company_admin,o.openid')
       ->find();
     
     if ($data) {

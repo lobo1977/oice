@@ -2,6 +2,7 @@
 namespace app\common;
 
 use think\facade\Log;
+use app\api\model\Robot;
 
 /**
  * 微信公众号接口类
@@ -325,13 +326,7 @@ class Wechat {
 			case "CLICK":
 				if ($object->EventKey == "SIGN") {
 					if ($this->user) {
-						// $Sign = D("Mobile/Sign");
-						// $res = $Sign->sign(0, $this->user['openid']);
-						// if ($res) {
-						// 	$content = '签到成功，您获得 2 聚币奖励。';
-						// } else {
-						// 	$content = $Sign->getError();
-						// }
+						
 					}
 				}
 				break;
@@ -380,13 +375,10 @@ class Wechat {
 		
 		if ($keyword == "签到") {
 			if ($this->user) {
-				// $Sign = D("Mobile/Sign");
-				// $res= $Sign->sign(0, $this->user['openid']);
-				// if ($res) {
-				// 	$content = '签到成功，您获得 2 聚币奖励。';
-				// } else {
-				// 	$content = $Sign->getError();
-				// }
+				Robot::signIn($this->user['nickname'], 
+					$this->user['openid'], 
+					$this->user['headimgurl']);
+				$content = '签到成功。';
 			}
 		}
 		
