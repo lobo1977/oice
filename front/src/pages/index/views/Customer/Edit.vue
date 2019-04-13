@@ -47,7 +47,7 @@
       </group>
 
       <group gutter="10px">
-        <x-textarea placeholder="备注" :rows="3" v-model="info.rem" :max="200"></x-textarea>
+        <x-textarea placeholder="备注" :rows="3" v-model="info.rem" :max="500"></x-textarea>
       </group>
 
       <group gutter="10px" label-width="4em" label-margin-right="1em" label-align="right">
