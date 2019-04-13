@@ -1,8 +1,8 @@
 <template>
   <div style="margin:0 auto;max-width:600px;padding:15px;">
 
-    <div style="margin:0 0 30px 0;text-align:center;">
-      <img src="/static/img/logo.png">
+    <div style="margin:30px 0 30px 0;text-align:center;">
+      <img src="/static/img/logo_s.png" style="width:120px;height:62px;">
       <h3 style="margin-top:10px;">商办云</h3>
     </div>
 
@@ -39,7 +39,10 @@
       </p>
 
       <x-button action-type="button" @click.native="login" type="primary" :disabled="!formValidated">登录</x-button>
-
+      <x-button action-type="button" @click.native="wechat" v-if="$isWechat()" type="primary" :plain="true">
+        <img src="/static/img/icon32_wx_logo.png" 
+          style="margin-right:6px;height:24px;position:relative;top:6px;">微信登录
+      </x-button>
       <p v-if="error" style="margin-top:15px;color:red;text-align:center">{{message}}</p>
     </div>
   </div>
@@ -175,6 +178,17 @@ export default {
           this.message = res.message
         }
       })
+    },
+    wechat () {
+      if (this.$isWechat()) {
+        if (this.$route.query && this.$route.query.redirect) {
+          window.location.href = '/api/wechat/login?redirect=' + encodeURI(this.$route.query.redirect)
+        } else {
+          window.location.href = '/api/wechat/login'
+        }
+      } else {
+
+      }
     }
   },
   computed: {
