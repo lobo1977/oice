@@ -718,7 +718,7 @@ class Customer extends Base
       self::exception($excel->getError());
     }
 
-    if (count($rowData) < 1 || count($rowData[0]) < 14) {
+    if (count($rowData) < 1 || count($rowData[0]) < 15) {
       self::exception('导入数据不完整，请使用导入模板。');
     }
 
@@ -740,16 +740,16 @@ class Customer extends Base
         'linkman' => $row[1],
         'tel' => $row[2],
         'area' => $row[3],
-        'address' => $row[4],
-        'demand' => $row[5],
-        'lease_buy' => $row[6],
-        'min_acreage' => $row[7],
-        'max_acreage' => $row[8],
-        'budget' => $row[9],
-        'settle_date' => $row[10],
-        'current_area' => $row[11],
-        'end_date' => $row[12],
-        'rem' => $row[13]
+        'address' => $row[4] . $row[5],
+        'demand' => $row[6],
+        'lease_buy' => $row[7],
+        'min_acreage' => $row[8],
+        'max_acreage' => $row[9],
+        'budget' => $row[10],
+        'settle_date' => $row[11],
+        'current_area' => $row[12],
+        'end_date' => $row[13],
+        'rem' => $row[14]
       ];
 
       if ($customer['customer_name'] && 
