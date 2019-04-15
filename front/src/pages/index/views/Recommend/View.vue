@@ -23,7 +23,7 @@
       <p style="margin:8px 15px 0 15px;" v-if="info.desc">{{info.desc}}</p>
       <group gutter="10px" label-align="justify" label-width="4em" label-margin-right="1em">
         <cell title="图片" is-link v-if="info.images && info.images.length" @click.native="preview(index)">
-          <img class="th-image" v-for="(img, i) in info.images" :key="i" :src="img.msrc" v-if="i < 3" />
+          <img class="th-image" v-for="(img, i) in info.images" :key="i" v-show="i < 3" :src="img.msrc" />
         </cell>
         <cell title="地址" value-align="left" :value="info.address" v-if="info.area + info.address"
           :is-link="(info.longitude || info.latitude) != 0" @click.native="openMap(index)"></cell>

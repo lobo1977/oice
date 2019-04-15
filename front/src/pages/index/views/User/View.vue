@@ -15,7 +15,9 @@
     </div>
 
     <group gutter="10px" label-width="4em" label-margin-right="1em" label-align="right">
-      <cell title="手机号码" value-align="left" :value="info.mobile" v-if="info.mobile"></cell>
+      <cell title="手机号码" value-align="left" v-if="info.mobile">
+        <a v-bind:href="'tel:'+(info.mobile)" class="cell-link">{{info.mobile}}</a>
+      </cell>
       <cell title="电子邮箱" value-align="left" :value="info.email" v-if="info.email"></cell>
       <cell title="微信" value-align="left" :value="info.weixn" v-if="info.weixin"></cell>
       <cell title="QQ" value-align="left" :value="info.qq" v-if="info.qq"></cell>
