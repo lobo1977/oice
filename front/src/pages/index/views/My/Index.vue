@@ -24,7 +24,7 @@
 
     <group gutter="0.5em">
       <cell title="我的企业" :link="{name:'Company'}">
-        <x-icon slot="icon" type="android-people" class="cell-icon"></x-icon>
+        <x-icon slot="icon" type="cube" class="cell-icon"></x-icon>
         <div style="display:inline-block;">
           <span style="vertical-align:middle;">{{user.company}}</span>
           <badge v-if="user.invite_me"></badge>
@@ -36,7 +36,10 @@
         <x-icon slot="icon" type="android-contact" class="cell-icon"></x-icon>
       </cell>
       <cell v-if="user.company_id > 0" title="通讯录" :link="{name: 'CompanyMember', params: {id: user.company_id}}">
-        <x-icon slot="icon" type="android-people" class="cell-icon"></x-icon>
+        <x-icon slot="icon" type="android-contacts" class="cell-icon"></x-icon>
+      </cell>
+      <cell v-if="user.id" title="微信机器人" :link="{name:'Robot'}">
+        <x-icon slot="icon" type="wechat" class="cell-icon"></x-icon>
       </cell>
       <cell v-if="user.id" title="修改密码" :link="{name:'Password'}">
         <x-icon slot="icon" type="android-lock" class="cell-icon"></x-icon>

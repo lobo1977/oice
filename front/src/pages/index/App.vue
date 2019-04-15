@@ -226,6 +226,16 @@ html, body {
   text-align:center !important; 
 }
 
+.weui-btn {
+  .btn-icon {
+    position: relative;
+    top: 4px;
+    width: 22px;
+    height: 22px;
+    fill: #1aad19;
+  }
+}
+
 .bottom-bar {
   position:fixed;
   bottom:0;

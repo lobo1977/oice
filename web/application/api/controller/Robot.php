@@ -1,6 +1,7 @@
 <?php
 namespace app\api\controller;
 
+use app\common\Python;
 use app\api\controller\Base;
 use app\api\model\Robot as modelRobot;
 
@@ -14,7 +15,7 @@ class Robot extends Base
    * 微信登录二维码
    */
   public function qrcode() {
-    $ret = ppython("oice::run");
+    $ret = Python::ppython("oice::run");
     return $this->succeed($ret);
   }
     

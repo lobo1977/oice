@@ -430,6 +430,17 @@ export default new Router({
         require(['../views/My/customer.vue'], resolve)
       }
     }, {
+      path: '/my/robot',
+      name: 'Robot',
+      meta: {
+        title: '微信机器人',
+        showBack: true,
+        requiresAuth: true
+      },
+      component: function (resolve) {
+        require(['../views/My/Robot.vue'], resolve)
+      }
+    }, {
       path: '/my/password',
       name: 'Password',
       meta: {

@@ -40,8 +40,7 @@
 
       <x-button action-type="button" @click.native="login" type="primary" :disabled="!formValidated">登录</x-button>
       <x-button action-type="button" @click.native="wechat" v-if="$isWechat()" type="primary" :plain="true">
-        <img src="/static/img/icon32_wx_logo.png" 
-          style="margin-right:6px;height:24px;position:relative;top:6px;">微信登录
+        <x-icon type="wechat" class="btn-icon"></x-icon> 微信登录
       </x-button>
       <p v-if="error" style="margin-top:15px;color:red;text-align:center">{{message}}</p>
     </div>

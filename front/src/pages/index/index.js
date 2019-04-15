@@ -8,7 +8,7 @@ import App from './App'
 import router from './router/index'
 import { dateFormat, LoadingPlugin, ToastPlugin, AlertPlugin, ConfirmPlugin, DatetimePlugin,
   Panel, Sticky, Tab, TabItem, Group, Cell, LoadMore, Flexbox, FlexboxItem,
-  Actionsheet, Popup, PopupPicker, Badge,
+  Actionsheet, Popup, PopupPicker, Badge, Divider,
   XButton, XInput, XSwitch, InlineXNumber, XTextarea } from 'vux'
 
 Vue.config.productionTip = false
@@ -36,6 +36,7 @@ Vue.component('actionsheet', Actionsheet)
 Vue.component('popup', Popup)
 Vue.component('popup-picker', PopupPicker)
 Vue.component('badge', Badge)
+Vue.component('divider', Divider)
 Vue.component('x-button', XButton)
 Vue.component('x-input', XInput)
 Vue.component('inline-x-number', InlineXNumber)

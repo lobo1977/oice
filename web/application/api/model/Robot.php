@@ -14,7 +14,7 @@ class Robot extends Base
 	 * @param string $openid
 	 * @return boolean
 	 */
-	public function signIn($name, $openid, $avatar) {
+	public static function signIn($name, $openid, $avatar) {
     $find = self::where('name', $name)
       ->where('openid', 'null')
       ->where('status', 1)
@@ -31,7 +31,7 @@ class Robot extends Base
 	/**
 	 * 获取在线机器人
 	 */
-	public function online($user) {
+	public static function online($user) {
     if (empty($user) || empty($user->openid)) {
       return null;
     } else {
@@ -46,7 +46,7 @@ class Robot extends Base
   /**
 	 * 获取机器人的群列表
 	 */
-	public function groups($user) {
+	public static function groups($user) {
     if (empty($user) || empty($user->openid)) {
       return null;
     } else {
