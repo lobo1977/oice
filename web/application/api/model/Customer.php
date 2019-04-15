@@ -749,7 +749,7 @@ class Customer extends Base
         'settle_date' => $row[11],
         'current_area' => $row[12],
         'end_date' => $row[13],
-        'rem' => $row[14]
+        'rem' => $row[14] . $row[15]
       ];
 
       if ($customer['customer_name'] && 
@@ -764,7 +764,9 @@ class Customer extends Base
           $clash = self::clashCheck(0, $customer['customer_name'], $customer['tel'], $company_id);
           if ($clash) {
             $clashCount++;
-            continue;
+            $customer['clash'] = $clash->id;
+            $customer['share'] = 1;
+            //continue;
           }
         }
 
