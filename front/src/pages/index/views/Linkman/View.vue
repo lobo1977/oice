@@ -7,9 +7,9 @@
       <cell title="手机号码" value-align="left" v-if="info.mobile">
         <a v-bind:href="'tel:'+(info.mobile)" class="cell-link">{{info.mobile}}</a>
       </cell>
-      <cell title="办公电话" value-align="left" v-if="info.tel">
+      <!-- <cell title="办公电话" value-align="left" v-if="info.tel">
         <a v-bind:href="'tel:'+(info.tel)" class="cell-link">{{info.tel}}</a>
-      </cell>
+      </cell> -->
       <cell title="电子邮箱" value-align="left" :value="info.email" v-if="info.email"></cell>
       <cell title="微信" value-align="left" :value="info.weixn" v-if="info.weixin"></cell>
       <cell title="QQ" value-align="left" :value="info.qq" v-if="info.qq"></cell>

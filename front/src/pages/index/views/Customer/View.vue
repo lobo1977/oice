@@ -24,6 +24,9 @@
       </flow>
 
       <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
+        <cell title="直线电话" value-align="left" v-show="info.tel.length > 0">
+          <a v-bind:href="'tel:'+(info.tel)" class="cell-link">{{info.tel}}</a>
+        </cell>
         <cell title="所在地" value-align="left" :value="info.area" v-show="info.area.length > 0"></cell>
         <cell title="详细地址" value-align="left" :value="info.address" v-show="info.address.length > 0"></cell>
         <cell title="需求项目" value-align="left" :value="info.demand" v-show="info.demand.length > 0"></cell>
@@ -245,6 +248,7 @@ export default {
       info: {
         id: 0,
         customer_name: '',    // 名称
+        tel: '',              // 直线电话
         area: '',             // 城区
         address: '',          // 地址
         demand: '',           // 需求项目

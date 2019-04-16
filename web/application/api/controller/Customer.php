@@ -71,23 +71,22 @@ class Customer extends Base
         ]);
       } else {
         $validate = Validate::make([
-          'customer_name'  => 'require|token',
-          'linkman'  => 'require',
-          'mobile' =>'require|mobile'
+          'customer_name'  => 'require|token'
+          //'tel' =>'require',
+          //'linkman'  => 'require'
         ],[
           'customer_name.require' => '必须填写客户名称。',
-          'customer_name.token' => '无效请求，请勿重复提交。',
-          'linkman.require' => '必须填写联系人姓名。',
-          'mobile.require' => '必须填写联系人手机号码',
-          'mobile.mobile' => '联系人手机号码无效'
+          'customer_name.token' => '无效请求，请勿重复提交。'
+          //'tel.require' => '必须填写直线电话',
+          //'linkman.require' => '必须填写联系人姓名。'
         ]);
       }
 
       $data = input('post.');
       
-      if (isset($data['mobile'])) {
-        $data['mobile'] = str_replace(' ', '', $data['mobile']);
-      }
+      // if (isset($data['mobile'])) {
+      //   $data['mobile'] = str_replace(' ', '', $data['mobile']);
+      // }
       
       if (!$validate->check($data)) {
         $form_token = $this->formToken();

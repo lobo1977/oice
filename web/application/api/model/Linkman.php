@@ -60,7 +60,7 @@ class Linkman extends Base
    */
   public static function detail($user, $id, $operate = 'view') {
     $linkman = self::where('id', $id)
-      ->field('id,type,owner_id,title,department,job,mobile,tel,' .
+      ->field('id,type,owner_id,title,department,job,mobile,' .
         'email,weixin,qq,rem,status,user_id')
       ->find();
     
@@ -127,13 +127,13 @@ class Linkman extends Base
         }
       }
 
-      if ($data['tel'] != $oldData->tel) {
-        if ($oldData->tel) {
-          $summary = $summary . '办公电话：' . $oldData->tel . ' -> ' . $data['tel'] . '\n';
-        } else {
-          $summary = $summary . '办公电话：' . $data['tel'] . '\n';
-        }
-      }
+      // if ($data['tel'] != $oldData->tel) {
+      //   if ($oldData->tel) {
+      //     $summary = $summary . '办公电话：' . $oldData->tel . ' -> ' . $data['tel'] . '\n';
+      //   } else {
+      //     $summary = $summary . '办公电话：' . $data['tel'] . '\n';
+      //   }
+      // }
 
       if ($data['email'] != $oldData->email) {
         if ($oldData->email) {

@@ -9,11 +9,8 @@
       <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
         <x-input ref="inpCustomerName" title="客户名称" v-model="info.customer_name" :required="true" :max="30"
           @on-click-error-icon="nameError" :should-toast-error="false" @on-change="validateForm"></x-input>
-        <x-input v-if="id === 0" ref="inpCustomerLinkman" title="联系人" v-model="info.linkman" :required="true" :max="30"
-          @on-click-error-icon="linkmanError" :should-toast-error="false" @on-change="validateForm"></x-input>
-        <x-input v-if="id === 0" ref="inpCustomerMobile" title="联系电话" placeholder="请输入手机号码" 
-          type="tel" v-model="info.mobile" :max="11" :required="true" is-type="china-mobile"
-          @on-change="validateForm" @on-click-error-icon="mobileError" :should-toast-error="false"></x-input>
+        <x-input ref="inpCustomerTel" title="直线电话" placeholder="请输入直线电话" v-model="info.tel" :max="30"></x-input>
+        <x-input v-if="id === 0" ref="inpCustomerLinkman" title="联系人" v-model="info.linkman" :max="30"></x-input>
         <popup-picker title="所在地" :data="districtPickerData" @on-change="districtChange"
           :columns="2" :fixed-columns="1"
           v-model="districtValue" value-text-align="left"></popup-picker>
@@ -109,6 +106,7 @@ export default {
       info: {
         __token__: '',
         customer_name: '',    // 名称
+        tel: '',              // 直线电话
         area: '',             // 城区
         address: '',          // 地址
         demand: '',           // 需求项目
@@ -126,7 +124,6 @@ export default {
         company_id: 0,        // 所属企业
         share: false,         // 共享状态
         linkman: '',          // 联系人
-        mobile: '',           // 联系电话
         clash: 0              // 撞单客户
       },
       showDistrictPicker: false,
@@ -269,20 +266,20 @@ export default {
         text: '请输入客户名称'
       })
     },
+    telError () {
+      this.$vux.toast.show({
+        text: this.info.tel.length ? '直线电话无效' : '请输入直线电话'
+      })
+    },
     linkmanError () {
       this.$vux.toast.show({
         text: '请输入联系人'
       })
     },
-    mobileError () {
-      this.$vux.toast.show({
-        text: this.info.mobile.length ? '联系人手机号码无效' : '请输入联系电话'
-      })
-    },
     validateForm () {
       if (this.id === 0) {
-        this.formValidate = this.$refs.inpCustomerName.valid &&
-          this.$refs.inpCustomerLinkman.valid && this.$refs.inpCustomerMobile.valid
+        this.formValidate = this.$refs.inpCustomerName.valid //&&
+          // this.$refs.inpCustomerTel.valid && this.$refs.inpCustomerLinkman.valid
       } else {
         this.formValidate = this.$refs.inpCustomerName.valid
       }

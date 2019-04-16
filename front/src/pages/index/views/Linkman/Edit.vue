@@ -8,7 +8,7 @@
       <x-input ref="inpLinkmanMobile" title="手机号码"
         type="tel" v-model="info.mobile" :max="11" :required="true" is-type="china-mobile"
         @on-change="validateForm" @on-click-error-icon="mobileError" :should-toast-error="false"></x-input>
-      <x-input title="办公电话" v-model="info.tel" :max="20"></x-input>
+      <!-- <x-input title="办公电话" v-model="info.tel" :max="20"></x-input> -->
       <x-input ref="inpLinkmanEmail" type="email" title="电子邮箱" v-model="info.email" :max="30" is-type="email"
         @on-change="validateForm" @on-click-error-icon="emailError" :should-toast-error="false"></x-input>
       <x-input title="微信" v-model="info.weixin" :max="30"></x-input>

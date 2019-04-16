@@ -170,7 +170,7 @@ class Customer extends Base
       ->leftJoin('user b','b.id = a.user_id')
       ->leftJoin('company c','c.id = a.company_id')
       ->where('a.id', $id)
-      ->field('a.id,a.customer_name,a.area,a.address,a.demand,a.lease_buy,' .
+      ->field('a.id,a.customer_name,a.tel,a.area,a.address,a.demand,a.lease_buy,' .
         'a.district,a.min_acreage,a.max_acreage,a.budget,a.settle_date,a.current_area,' .
         'a.end_date,a.remind,a.rem,a.status,a.clash,a.parallel,a.share,a.user_id,a.company_id,' .
         'b.title as manager,b.avatar,b.mobile as manager_mobile,c.title as company')
@@ -218,7 +218,7 @@ class Customer extends Base
   /**
    * 撞单检查
    */
-  public static function clashCheck($id, $name, $mobile, $company_id) {
+  public static function clashCheck($id, $name, $tel, $company_id) {
     if(!$company_id) {
       return false;
     }
@@ -227,18 +227,18 @@ class Customer extends Base
 
     $clashData = self::alias('a')
       ->join('user u', "a.user_id = u.id")
-      ->leftJoin('linkman b',"b.type = 'customer' AND b.owner_id = a.id")
+      //->leftJoin('linkman b',"b.type = 'customer' AND b.owner_id = a.id")
       ->where('a.id', '<>', $id)
       ->where('a.company_id', $company_id)
       ->where('a.clash', ['exp', 'IS NULL'], ['=', 0], 'or')
       ->where('a.parallel', ['exp', 'IS NULL'], ['=', 0], 'or')
-      ->where(function ($query) use($keyword, $mobile) {
+      ->where(function ($query) use($keyword, $tel) {
           $query->where('a.customer_name', 'like', '%' . $keyword . '%');
-          if ($mobile) {
-            $query->whereOr('b.mobile', '=', $mobile)
-              ->whereOr('b.tel', '=', $mobile);
+          if ($tel) {
+            $query->whereOr('a.tel', '=', $tel);
+              //->whereOr('b.tel', '=', $tel);
           } 
-      })->field('a.id,a.customer_name,a.status,a.user_id,u.title as user,b.title as linkman,b.mobile')
+      })->field('a.id,a.customer_name,a.tel,a.status,a.user_id,u.title as user')
       ->find();
 
     return $clashData;
@@ -275,7 +275,7 @@ class Customer extends Base
       $checkClash = false;
     }
 
-    $mobile = isset($data['mobile']) ? $data['mobile'] : '';
+    $tel = isset($data['tel']) ? $data['tel'] : '';
 
     if ((!isset($data['company_id']) || !$data['company_id']) && $company_id) {
       $data['company_id'] = $company_id;
@@ -283,7 +283,7 @@ class Customer extends Base
 
     // 撞单检查
     if ($checkClash && isset($data['company_id']) && $data['company_id'] > 0) {
-      $clash = self::clashCheck($id, $data['customer_name'], $mobile, $data['company_id']);
+      $clash = self::clashCheck($id, $data['customer_name'], $tel, $data['company_id']);
       
       if ($clash) {
         $message = '';
@@ -300,7 +300,7 @@ class Customer extends Base
             "table" => "customer",
             "owner_id" => $clash->id,
             "title" => '客户撞单',
-            "summary" => $data['customer_name'] . ' ' . $mobile
+            "summary" => $data['customer_name'] . ' ' . $tel
           ]);
 
           if ($clash->status == 5) {
@@ -342,6 +342,14 @@ class Customer extends Base
           $summary = '客户名称：' . $oldData->customer_name . ' -> ' . $data['customer_name'] . '\n';
         } else {
           $summary = '客户名称：' . $data['customer_name'] . '\n';
+        }
+      }
+
+      if ($data['tel'] != $oldData->tel) {
+        if ($oldData->tel) {
+          $summary = '直线电话：' . $oldData->tel . ' -> ' . $data['tel'] . '\n';
+        } else {
+          $summary = '直线电话：' . $data['tel'] . '\n';
         }
       }
 
@@ -513,12 +521,12 @@ class Customer extends Base
         unset($data['linkman']);
       }
 
-      if (isset($data['mobile'])) {
-        if ($data['mobile']) {
-          $linkman['mobile'] = $data['mobile'];
-        }
-        unset($data['mobile']);
-      }
+      // if (isset($data['mobile'])) {
+      //   if ($data['mobile']) {
+      //     $linkman['mobile'] = $data['mobile'];
+      //   }
+      //   unset($data['mobile']);
+      // }
 
       $newData = new Customer($data);
       $result = $newData->save();
@@ -752,8 +760,7 @@ class Customer extends Base
         'rem' => $row[14] . $row[15]
       ];
 
-      if ($customer['customer_name'] && 
-        $customer['linkman'] && $customer['tel']) {
+      if ($customer['customer_name']) {
         foreach($customer as $k=>$v) {
           if ($v == '' || $v == null || $v == 'null' || $v == 'NULL') {
             unset($customer[$k]);
@@ -761,7 +768,11 @@ class Customer extends Base
         }
 
         if ($company_id) {
-          $clash = self::clashCheck(0, $customer['customer_name'], $customer['tel'], $company_id);
+          $tel = '';
+          if (isset($customer['tel'])) {
+            $tel = $customer['tel'];
+          }
+          $clash = self::clashCheck(0, $customer['customer_name'], $tel, $company_id);
           if ($clash) {
             $clashCount++;
             $customer['clash'] = $clash->id;
@@ -787,15 +798,17 @@ class Customer extends Base
           $customer['end_date'] = gmdate('Y-m-d', $n);
         }
 
-        $linkman['type'] = 'customer';
-        $linkman['title'] = $customer['linkman'];
-        if (Validate::isMobile($customer['tel'])) {
-          $linkman['mobile'] = $customer['tel'];
-        } else {
-          $linkman['tel'] = $customer['tel'];
+        if (isset($customer['linkman'])) {
+          $linkman['type'] = 'customer';
+          $linkman['title'] = $customer['linkman'];
+          // if (Validate::isMobile($customer['tel'])) {
+          //  $linkman['mobile'] = $customer['tel'];
+          // } else {
+          //   $linkman['tel'] = $customer['tel'];
+          // }
+          unset($customer['linkman']);
+          //unset($customer['tel']);
         }
-        unset($customer['linkman']);
-        unset($customer['tel']);
 
         $newData = new Customer($customer);
         $result = $newData->save();
@@ -807,8 +820,10 @@ class Customer extends Base
             "title" => '导入客户',
             "summary" => $newData->customer_name
           ]);
-          $linkman['owner_id'] = $newData->id;
-          Linkman::addUp($user, 0, $linkman);
+          if ($linkman) {
+            $linkman['owner_id'] = $newData->id;
+            Linkman::addUp($user, 0, $linkman);
+          }
           $succCount++;
         } else {
           $failCount++;
@@ -841,7 +856,7 @@ class Customer extends Base
 
     $list = db('customer')->alias('a')
       ->leftJoin('user_company b', 'a.user_id = b.user_id and a.company_id = b.company_id and b.status = 1')
-      ->leftJoin('linkman c', 'c.type = "customer" AND c.owner_id = a.id')
+      //->leftJoin('linkman c', 'c.type = "customer" AND c.owner_id = a.id')
       ->where('a.user_id = ' . $user_id .
         ' OR (a.share = 1 AND a.company_id > 0 AND a.company_id = ' . $company_id . ')' .
         ' OR (a.company_id > 0 AND a.company_id = ' . $company_id . ' AND b.superior_id = ' . $user_id . ')');
@@ -857,7 +872,7 @@ class Customer extends Base
       $list->where('a.status', 'in', '1,2,3');
     }
 
-    $result = $list->field('a.id,a.customer_name,c.title as linkman,c.mobile,a.area,a.address,a.demand,' .
+    $result = $list->field('a.id,a.customer_name,a.tel,a.area,a.address,a.demand,' .
       'a.lease_buy,a.min_acreage,a.max_acreage,a.budget,a.settle_date,a.current_area,a.end_date,a.rem')
       ->order('a.id', 'asc')
       ->select();
@@ -865,8 +880,7 @@ class Customer extends Base
     $excel = new Excel();
     $excel->export($title, [
       '客户名称',
-      '联系人',
-      '联系电话',
+      '直线电话',
       '城区',
       '地址',
       '需求项目',
