@@ -278,7 +278,7 @@ export default {
     },
     validateForm () {
       if (this.id === 0) {
-        this.formValidate = this.$refs.inpCustomerName.valid //&&
+        this.formValidate = this.$refs.inpCustomerName.valid // &&
           // this.$refs.inpCustomerTel.valid && this.$refs.inpCustomerLinkman.valid
       } else {
         this.formValidate = this.$refs.inpCustomerName.valid
