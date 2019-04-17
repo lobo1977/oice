@@ -798,6 +798,8 @@ class Customer extends Base
           $customer['end_date'] = gmdate('Y-m-d', $n);
         }
 
+        $linkman = null;
+
         if (isset($customer['linkman'])) {
           $linkman['type'] = 'customer';
           $linkman['title'] = $customer['linkman'];
