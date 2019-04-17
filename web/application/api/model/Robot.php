@@ -44,9 +44,9 @@ class Robot extends Base
   }
   
   /**
-	 * 获取机器人的群列表
+	 * 获取机器人的联系人/群列表
 	 */
-	public static function groups($user) {
+	public static function contact($user) {
     if (empty($user) || empty($user->openid)) {
       return null;
     } else {
@@ -54,12 +54,12 @@ class Robot extends Base
     }
 
     $list = self::alias('r')
-      ->join('robot_group g', 'r.uid = g.uid')
+      ->join('robot_contact c', 'r.uid = g.uid')
       ->field('r.id as robot_id,r.name as robot_name,r.avatar as robot_avatar,
-        g.gid as group_id,g.name as group_name,g.avatar as group_avatar')
+        c.cid as contact_id,c.name as contact_name,c.avatar as contact_avatar')
       ->where('r.status', 1)
       ->where('r.openid', 'in', $openid)
-      ->order("r.id,g.id")
+      ->order("r.id,c.type,c.id")
       ->select();
 
 		return $list;
