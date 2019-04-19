@@ -130,8 +130,12 @@ class Customer extends Base
   /**
    * 转交客户
    */
-  public function turn($id, $user_id) {
-    $result = modelCustomer::transfer($this->user, $id, $user_id, null, true);
+  public function turn($id, $user_id, $company_id = 0) {
+    $data = null;
+    if ($company_id) {
+      $data = ['company_id' => $company_id];
+    }
+    $result = modelCustomer::transfer($this->user, $id, $user_id, $data, true);
     if ($result) {
       return $this->succeed();
     } else {

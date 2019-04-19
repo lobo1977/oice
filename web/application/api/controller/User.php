@@ -22,10 +22,10 @@ class User extends Base
   }
 
   /**
-   * 检索企业成员
+   * 检索同事
    */
-  public function search($company, $keyword) {
-    $result = modelUser::companyMember($this->user, $company, 1, -1, $keyword);
+  public function search($company = 0, $keyword = '') {
+    $result = modelUser::colleague($this->user, $company, $keyword, 1);
     return $this->succeed($result);
   }
 

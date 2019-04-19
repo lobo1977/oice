@@ -618,6 +618,10 @@ class Customer extends Base
       $summary = $summary . '\n客户状态：' . self::$status[$customer->status] . ' -> ' . self::$status[$data['status']];
       $customer->status = $data['status'];
     }
+    if ($data != null && isset($data['company_id']) && !empty($data['company_id'])) {
+      $customer->company_id = $data['company_id'];
+    }
+    
     $result = $customer->save();
     if ($result) {
       Log::add($user, [

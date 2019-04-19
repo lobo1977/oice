@@ -73,6 +73,41 @@ class User extends Base
   }
 
   /**
+   * 查找同事
+   */
+  public static function colleague($user, $company = 0, $keyword = '', $page = 0) {
+    $list = self::alias('a')
+      ->join('user_company b', 'a.id = b.user_id and b.status = 1')
+      ->join('user_company c', 'b.company_id = c.company_id and c.user_id = ' . $user->id)
+      ->leftJoin('company d', 'b.company_id = d.id')
+      ->field('a.id,a.title,a.avatar,a.mobile,b.company_id,d.title as company')
+      ->where('a.id', '<>', $user->id);
+
+    if ($company) {
+      $list->where('b.company_id', $company);
+    }
+    
+    if ($keyword != '') {
+      $list->where('a.title|a.mobile', 'like', '%' . $keyword . '%')
+        ->order(['a.title' => 'asc']);
+    } else {
+      $list->order(['b.company_id' => 'asc', 'b.create_time' => 'desc']);
+    }
+    
+    if ($page > 0) {
+      $list->page($page, 10);
+    }
+
+    $list = $list->select();
+
+    foreach($list as $member) {
+      $member->checked = false;
+      self::formatData($member);
+    }
+    return $list;
+  }
+
+  /**
    * 查询工作日报用户
    */
   public static function dailyUser($user, $page = 0, $date = '') {

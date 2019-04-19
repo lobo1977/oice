@@ -15,8 +15,9 @@
       :results="list" :auto-fixed="false" style="position:fixed;top:46px;"></search>
     
     <group :gutter="0" style="margin-top:92px;">
-      <cell v-for="(item, index) in list" :key="index" :title="item.title" 
+      <cell v-for="(item, index) in list" :key="index" 
         :inline-desc="item.mobile" @click.native="select(item)">
+        <span slot="title">{{item.title}} <span v-if="item.company">({{item.company}})</span></span>
         <img slot="icon" :src="item.avatar" class="cell-image">
         <div v-if="multiple" solt="default">
           <check-icon :value.sync="item.checked" @update:value="check"></check-icon>

@@ -114,7 +114,7 @@
 
     <popup v-model="showSelectUser" position="bottom"
       height="100%" style="overflow-y:hidden;">
-      <user-selecter :is-shown="showSelectUser" :company="info.company_id"
+      <user-selecter :is-shown="showSelectUser"
         @on-close="showSelectUser = false" @on-confirm="setManager"></user-selecter>
     </popup>
 
@@ -378,16 +378,21 @@ export default {
     },
     setManager (newUser) {
       let vm = this
+      let company = ''
       if (!newUser) return
       if (newUser.id === vm.info.user_id) return
+      if (newUser.company && newUser.company_id !== vm.info.company_id) {
+        company = newUser.company + '的'
+      }
       vm.$vux.confirm.show({
         title: '转交客户',
-        content: '确定要将客户转交给 <strong>' + newUser.title + '</strong> 吗？',
+        content: '确定要将客户转交给' + company + ' <strong>' + newUser.title + '</strong> 吗？',
         onConfirm () {
           vm.$vux.loading.show()
           vm.$post('/api/customer/turn', {
             id: vm.info.id,
-            user_id: newUser.id
+            user_id: newUser.id,
+            company_id: newUser.company_id
           }, (res) => {
             vm.$vux.loading.hide()
             if (res.success) {
