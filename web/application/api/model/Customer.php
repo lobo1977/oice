@@ -66,7 +66,7 @@ class Customer extends Base
       $superior_id = Company::getSuperior($customer->company_id, $customer->user_id);
       return $customer->user_id == $user->id || 
         ($customer->share && $customer->company_id == $user->company_id) || 
-        ($customer->company_id == $user->company_id && $user->id == $superior_id);
+        ($user->id == $superior_id && $customer->company_id == $user->company_id);
     } else if ($operate == 'new') {
       return true;
     } else if ($operate == 'turn') {
@@ -119,9 +119,8 @@ class Customer extends Base
     
     $list = self::alias('a')
       ->leftJoin('user_company b', 'a.user_id = b.user_id and a.company_id = b.company_id and b.status = 1')
-      ->where('a.user_id = ' . $user_id .
-        ' OR (a.share = 1 AND a.company_id > 0 AND a.company_id = ' . $company_id . ')' .
-        ' OR (a.company_id > 0 AND a.company_id = ' . $company_id . ' AND b.superior_id = ' . $user_id . ')');
+      ->where('(a.user_id = ' . $user_id . ' and a.company_id = ' . $company_id . ')
+         OR ((a.share = 1 or b.superior_id = ' . $user_id . ') and a.company_id > 0 and a.company_id = ' . $company_id . ')');
 
     if (isset($filter['keyword']) && $filter['keyword'] != '') {
       $list->where('a.customer_name', 'like', '%' . $filter['keyword'] . '%');
