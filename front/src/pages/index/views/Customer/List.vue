@@ -2,7 +2,7 @@
   <div>
     <panel :list="list" :type="listType" @on-img-error="onImgError"></panel>
     <div style="height:50px;">
-      <load-more :show-loading="isLoading" @click:natvie="loadMore" :tip="loadingTip"></load-more>
+      <load-more :show-loading="isLoading" @click.native="loadMore" :tip="loadingTip"></load-more>
     </div>
   </div>
 </template>
@@ -73,9 +73,9 @@ export default {
   watch: {
     scrollBottom (isBottom) {
       if (isBottom &&
-        (this.$route.name === 'Potential' ||
-        this.$route.name === 'Follow' ||
-        this.$route.name === 'History')) {
+        (this.$route.name === 'Follow' ||
+        this.$route.name === 'Potential' ||
+        this.$route.name === 'Pool')) {
         this.loadMore()
       }
     }
