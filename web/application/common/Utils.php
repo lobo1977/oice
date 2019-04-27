@@ -38,6 +38,18 @@ class Utils
     }
 
     /**
+     * 表情符号转义
+     */
+    public static function emojiToChar($str) {
+        return preg_replace_callback('#<span class=\"emoji emoji([A-Fa-f\d]+)\"><\/span>#',
+            create_function(
+                '$matches',
+                'return mb_convert_encoding(pack("H*", $matches[1]), "UTF-8", "UCS-2BE");'
+            ),
+            $str);
+    }
+
+    /**
      *  判断是否是微信客户端 
      */
     public static function isWechat() {

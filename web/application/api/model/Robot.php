@@ -1,12 +1,14 @@
 <?php
 namespace app\api\model;
 
+use app\common\Wechat;
 use app\api\model\Base;
 use app\api\model\User;
 
 class Robot extends Base
 {
   protected $pk = 'id';
+  protected static $action = [ 'OFFLINE', 'WEAKUP', 'SLEEP'];
 
   /**
 	 * 机器人签到
@@ -17,7 +19,7 @@ class Robot extends Base
 	public static function signIn($name, $openid, $avatar) {
     $find = self::where('name', $name)
       ->where('openid', 'null')
-      ->where('status', 1)
+      ->where('status', '>', 0)
       ->find();
     if ($find) {
       $find->openid = $openid;
@@ -38,15 +40,16 @@ class Robot extends Base
       $openid = [$user->openid];
     }
 
-    return self::where('status', 1)
+    return self::where('status', '>', 0)
       ->where('openid', 'in', $openid)
-      ->order('login', 'desc')->select();
+      ->order('login', 'desc')
+      ->select();
   }
   
   /**
 	 * 获取机器人的联系人/群列表
 	 */
-	public static function contact($user) {
+	public static function contact($user, $id = 0) {
     if (empty($user) || empty($user->openid)) {
       return null;
     } else {
@@ -54,14 +57,88 @@ class Robot extends Base
     }
 
     $list = self::alias('r')
-      ->join('robot_contact c', 'r.uid = g.uid')
+      ->join('robot_contact c', 'r.uid = c.uid')
       ->field('r.id as robot_id,r.name as robot_name,r.avatar as robot_avatar,
-        c.cid as contact_id,c.name as contact_name,c.avatar as contact_avatar')
-      ->where('r.status', 1)
-      ->where('r.openid', 'in', $openid)
-      ->order("r.id,c.type,c.id")
-      ->select();
+        c.id,c.type,c.name as contact_name,c.avatar as contact_avatar')
+      ->where('r.status', '>', 0)
+      ->where('r.openid', 'in', $openid);
+
+    if ($id) {
+      $list->where('r.id', $id);
+    }
+    $list = $list->order("r.id,c.type,c.id")->select();
+
+    if ($list)  {
+      foreach ($list as &$item) {
+        $item['checked'] = false;
+      }
+    }
 
 		return $list;
-	}
+  }
+  
+  /**
+   * 推送分享
+   */
+  public static function push($user, $all, $contact, $content, $url) {
+    if (empty($user) || empty($user->openid)) {
+      return false;
+    } else {
+      $openid = [$user->openid];
+    }
+
+    if ($url) {
+      $wechat = new Wechat();
+      $url = ' ' . $wechat->getShortUrl($url);
+    }
+
+    $list = self::alias('r')
+      ->join('robot_contact c', 'r.uid = c.uid')
+      ->field('c.uid,c.cid')
+      ->where('r.status', '>', 0)
+      ->where('r.openid', 'in', $openid);
+
+    if ($all != '1' && $all != 1) {
+      $list->where('c.id', 'in', $contact);
+    }
+    $list = $list->select();
+
+    if ($list)  {
+      foreach ($list as $item) {
+        $data['uid'] = $item['uid'];
+        $data['task'] = 'TURN|' . $item['cid'] . '|' . $content . $url;
+        $data['status'] = 0;
+        db("robot_task")->insert($data);
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * 发送指令
+   */
+  public static function sendAction($user, $id, $actionKey) {
+    if (empty($user) || empty($user->openid)) {
+      return false;
+    } else {
+      $openid = [$user->openid];
+    }
+
+    $find = self::where('status', '>', 0)
+      ->where('id', $id)
+      ->where('openid', 'in', $openid)
+      ->find();
+
+    if ($find) {
+      $data['uid'] = $find['uid'];
+      $data['task'] = self::$action[$actionKey];
+      $data['level'] = 1;
+      $data['status'] = 0;
+      db("robot_task")->insert($data);
+      return true;
+    }
+
+    return false;
+  }
 }

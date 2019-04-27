@@ -12,6 +12,9 @@
       <span slot="right" v-if="$route.meta.showSearch" @click="callSearch" style="margin-right:10px;">
         <x-icon type="search" size="24" class="header-icon"></x-icon>
       </span>
+      <span slot="right" v-if="$route.meta.robotShare" @click="callShare" style="margin-right:10px;">
+        <x-icon type="android-share" size="24" class="header-icon"></x-icon>
+      </span>
       <span slot="right" v-if="$route.meta.showPlus" @click="callNew">
         <x-icon type="plus" size="24" class="header-icon"></x-icon>
       </span>
@@ -81,6 +84,11 @@ export default {
     callNew () {
       if (this.$refs.page && this.$refs.page.new) {
         this.$refs.page.new()
+      }
+    },
+    callShare () {
+      if (this.$refs.page && this.$refs.page.share) {
+        this.$refs.page.share()
       }
     },
     callSearch () {

@@ -23,7 +23,7 @@
       </tab>
     </sticky>
 
-    <div v-show="tab === 0">
+    <div v-show="tab === 0 && !showPush">
       <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
         <cell title="项目类型" value-align="left" :value="info.building_type" v-show="info.building_type"></cell>
         <cell title="地址" value-align="left" :value="info.area + info.address" v-show="info.area || info.address" 
@@ -89,7 +89,7 @@
         @on-click-menu="buildingMenuClick"></actionsheet>
     </div>
 
-    <div v-show="tab === 1">
+    <div v-show="tab === 1 && !showPush">
       <checker v-model="selectedUnit" type="checkbox" @on-change="selectUnit"
         class="unit-checker-box" default-item-class="unit-item" 
         selected-item-class="unit-item-selected" disabled-item-class="unit-item-disabled">
@@ -137,7 +137,7 @@
       </flexbox>
     </div>
 
-    <div v-show="tab === 2">
+    <div v-show="tab === 2 && !showPush">
       <div v-if="user != null && user.id > 0">
         <cell v-for="(item, index) in info.linkman" :key="index"
           :title="item.title" :link="{name: 'Linkman', params: {id: item.id}}" 
@@ -155,7 +155,7 @@
         :show-loading="false" tip="请登录后查看" @click.native="login" background-color="#fbf9fe"></load-more>
     </div>
 
-    <div v-show="tab === 3">
+    <div v-show="tab === 3 && !showPush">
       <div v-if="user != null && user.id > 0">
         <cell v-for="(item, index) in info.confirm" :key="index"
           :title="item.title" :link="{name: 'ConfirmView', params: {id: item.id}}" 
@@ -180,6 +180,15 @@
         :latitude="info.latitude" 
         @on-close="closeMap"></baidumap>
     </popup>
+
+    <popup v-model="showPush" position="bottom"
+      height="100%" style="overflow-y:hidden;">
+      <robotpush
+        :is-shown="showPush"
+        :content="'【' + info.building_name + '】' + shareDesc"
+        :link="shareLink"
+        @on-close="closePush"></robotpush>
+    </popup>
   </div>
 </template>
 
@@ -187,6 +196,7 @@
 import { Swiper, SwiperItem, Previewer, TransferDom, Divider, Checker, CheckerItem } from 'vux'
 import Topalert from '@/components/Topalert.vue'
 import Baidumap from '@/components/BaiduMap.vue'
+import Robotpush from '@/components/RobotPush.vue'
 
 export default {
   directives: {
@@ -200,7 +210,8 @@ export default {
     Checker,
     CheckerItem,
     Topalert,
-    Baidumap
+    Baidumap,
+    Robotpush
   },
   data () {
     return {
@@ -244,7 +255,8 @@ export default {
         unit: [],
         confirm: []
       },
-
+      shareLink: window.location.href,
+      shareDesc: '',
       showCustomerPicker: false,
       myCustomer: [],
       selectCustomer: [],
@@ -261,7 +273,8 @@ export default {
       touchY: 0,
       moveX: 0,
       moveY: 0,
-      showMap: false
+      showMap: false,
+      showPush: false
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -308,10 +321,11 @@ export default {
             }
             vm.$emit('on-view-loaded', vm.info.building_name)
 
-            if (vm.$isWechat()) {
-              let shareLink = window.location.href
-              let shareDesc = (res.data.level ? res.data.level + '级' : '') + res.data.type +
+            vm.shareLink = window.location.href
+            vm.shareDesc = (res.data.level ? res.data.level + '级' : '') + res.data.type +
                   ' ' + vm.info.area + vm.info.district + ' ' + vm.info.price
+
+            if (vm.$isWechat()) {
               let shareImage = null
 
               if (vm.info.images.length) {
@@ -319,7 +333,7 @@ export default {
                   window.location.host + vm.info.images[0].src
               }
 
-              vm.$wechatShare(null, shareLink, vm.info.building_name, shareDesc, shareImage)
+              vm.$wechatShare(null, vm.shareLink, vm.info.building_name, vm.shareDesc, shareImage)
             }
           } else {
             vm.info.id = 0
@@ -338,6 +352,12 @@ export default {
     },
     new () {
       this.$router.push({name: 'BuildingEdit', params: {id: 0}})
+    },
+    share () {
+      this.showPush = true
+    },
+    closePush () {
+      this.showPush = false
     },
     goTab (tab) {
       this.$router.replace({name: 'BuildingView', id: this.info.id, query: {tab: tab}})

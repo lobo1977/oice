@@ -26,48 +26,64 @@ class Robot extends Base
     $robots = modelRobot::online($this->user);
     return $this->succeed($robots);
   }
-    
-    /**
-     * 推送活动信息到群
-     * @param number $eid
-     */
-    // public function PushEvent($eid = 0) {
-    // 	parent::checkLogin();
-    	
-    // 	$this->meta_title = '分享到微信群';
-    // 	$this->assign("meta_title", $this->meta_title);
-    	
-    // 	$groups = $this->robotModel->getGroups($this->getOpenId());
-    	
-    // 	$this->assign('eid', $eid);
-    // 	$this->assign('groups', $groups);
 
-    // 	$this->display();
-    // }
-    
-    /**
-     * 分享活动信息到微信群
-     * @param unknown $eid
-     * @param unknown $groups
-     */
-    // public function PushPost($eid, $groups) {
-    // 	if (empty($this->uid)) {
-    // 		$this->error = '操作失败，请先登录。';
-    // 	} else if (count($groups) < 1) {
-    // 		$this->error = '操作失败，请选择要分享的微信群。';
-    // 	} else {
-    // 		$url = $this->eventModel->getShortUrl($data['eventid']);
-    // 		if (!$this->robotModel->push_event_by_id($eid, $groups, $url)) {
-    // 			$this->error = '操作失败，系统错误。';
-    // 		}
-    // 	}
-    			
-    // 	if ($this->error) {
-    // 		$data['error'] = $this->error;
-    // 	} else {
-    // 		$data['success'] = '分享成功。';
-    // 	}
-    				
-    // 	$this->ajaxReturn($data, 'json');
-    // }
+  /**
+   * 机器人联系人/群列表
+   */
+  public function contact($id = 0) {
+    $contact = modelRobot::contact($this->user, $id);
+    return $this->succeed($contact);
+  }
+
+  /**
+   * 推送分享
+   */
+  public function push($all, $contact, $content, $url = "") {
+    if (!$all && empty($contact)) {
+      return $this->fail('请选择要推送的群或联系人。');
+    } else {
+      $result = modelRobot::push($this->user, $all, $contact, $content, $url);
+    }
+    if ($result) {
+      return $this->succeed();
+    } else {
+      return $this->fail();
+    }
+  }
+
+  /**
+   * 离线
+   */
+  public function offline($id) {
+    $result = modelRobot::sendAction($this->user, $id, 0);
+    if ($result) {
+      return $this->succeed();
+    } else {
+      return $this->fail();
+    }
+  }
+
+  /**
+   * 休眠
+   */
+  public function sleep($id) {
+    $result = modelRobot::sendAction($this->user, $id, 2);
+    if ($result) {
+      return $this->succeed();
+    } else {
+      return $this->fail();
+    }
+  }
+
+  /**
+   * 唤醒
+   */
+  public function weakup($id) {
+    $result = modelRobot::sendAction($this->user, $id, 1);
+    if ($result) {
+      return $this->succeed();
+    } else {
+      return $this->fail();
+    }
+  }
 }

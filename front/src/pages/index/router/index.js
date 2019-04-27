@@ -40,7 +40,8 @@ export default new Router({
         showBack: true,
         showPlus: true,
         hideBar: true,
-        canShare: true
+        canShare: true,
+        robotShare: true
       },
       component: function (resolve) {
         require(['../views/Building/View.vue'], resolve)

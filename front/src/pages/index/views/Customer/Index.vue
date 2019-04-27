@@ -152,9 +152,11 @@ export default {
     onFocus () {
       this.isSearching = true
     },
-    onSubmit () {
+    onSubmit (val) {
       this.$refs.searchCustomer.setBlur()
-      this.isSearching = false
+      if (val) {
+        this.getResult(val)
+      }
     },
     onCancel () {
       this.isSearching = false
