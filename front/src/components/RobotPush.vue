@@ -43,7 +43,7 @@
     </div>
 
     <group :title="'将发送消息给' + checkCount + '个联系人/群'" v-show="step === 2">
-      <x-textarea :max="200" v-model="message" :height="200"></x-textarea>
+      <x-textarea :max="500" v-model="message" :height="240"></x-textarea>
     </group>
     <div style="padding:10px;" v-show="step === 2">
       <x-button type="primary" @click.native="pushMessage" :disabled="message.length === 0">发送</x-button>
@@ -124,9 +124,19 @@ export default {
       this.$emit('on-close')
     },
     filter (val) {
+      this.contact.forEach((item, index) => {
+        item.checked = false
+      })
+      this.checkCount = 0
+      this.all = false
       this.keyword = val
     },
     filterType (val) {
+      this.contact.forEach((item, index) => {
+        item.checked = false
+      })
+      this.checkCount = 0
+      this.all = false
       this.type = val
     },
     onFocus () {
@@ -147,29 +157,30 @@ export default {
     },
     selectAll () {
       this.all = !this.all
-      this.contact.forEach((item, index) => {
-        item.checked = false
-      })
       this.checkCount = 0
       if (this.all) {
         this.contact.filter(item => {
           if (this.keyword.length) {
             return item.contact_name.indexOf(this.keyword) >= 0
           } else {
-            return true
+            return item.type === this.type
           }
         }).forEach((item, index) => {
           item.checked = true
           this.checkCount++
         })
+      } else {
+        this.contact.forEach((item, index) => {
+          item.checked = false
+        })
       }
     },
     pushMessage () {
       let vm = this
-      if (vm.message.length && (this.all || this.checkList.length)) {
+      if (vm.checkCount > 0) {
         vm.$vux.loading.show()
         vm.$post('/api/robot/push', {
-          all: this.all && this.keyword.length === 0 ? 1 : 0,
+          type: this.all && this.keyword.length === 0 ? vm.type : -1,
           contact: this.all && this.keyword.length === 0 ? '' : this.checkList.join(','),
           content: vm.message,
           url: vm.url

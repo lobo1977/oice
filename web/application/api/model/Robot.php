@@ -40,9 +40,13 @@ class Robot extends Base
       $openid = [$user->openid];
     }
 
-    return self::where('status', '>', 0)
-      ->where('openid', 'in', $openid)
-      ->order('login', 'desc')
+    return self::alias('r')
+      ->leftJoin('robot_task t', 'r.uid = t.uid and t.status = 0')
+      ->field('r.id,r.name,r.avatar,r.status,count(t.id) as task')
+      ->where('r.status', '>', 0)
+      ->where('r.openid', 'in', $openid)
+      ->order('r.login', 'desc')
+      ->group('r.id,r.name,r.avatar,r.status')
       ->select();
   }
   
@@ -80,7 +84,7 @@ class Robot extends Base
   /**
    * 推送分享
    */
-  public static function push($user, $all, $contact, $content, $url) {
+  public static function push($user, $type, $contact, $content, $url) {
     if (empty($user) || empty($user->openid)) {
       return false;
     } else {
@@ -89,7 +93,7 @@ class Robot extends Base
 
     if ($url) {
       $wechat = new Wechat();
-      $url = ' ' . $wechat->getShortUrl($url);
+      $content .= ' ' . $wechat->getShortUrl($url);
     }
 
     $list = self::alias('r')
@@ -98,15 +102,20 @@ class Robot extends Base
       ->where('r.status', '>', 0)
       ->where('r.openid', 'in', $openid);
 
-    if ($all != '1' && $all != 1) {
+    if ($type == '0' || $type == '1') {
+      $list->where('c.type', $type);
+    }
+    
+    if ($contact) {
       $list->where('c.id', 'in', $contact);
     }
+
     $list = $list->select();
 
     if ($list)  {
       foreach ($list as $item) {
         $data['uid'] = $item['uid'];
-        $data['task'] = 'TURN|' . $item['cid'] . '|' . $content . $url;
+        $data['task'] = 'TURN|' . $item['cid'] . '|' . $content;
         $data['status'] = 0;
         db("robot_task")->insert($data);
       }

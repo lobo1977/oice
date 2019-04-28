@@ -17,25 +17,27 @@
 
     <actionsheet v-model="showAction" :menus="actions" theme="android" @on-click-menu="excuteAction"></actionsheet>
 
-    <group-title v-show="robots.length > 0">在线机器人</group-title>
-    <grid>
-      <grid-item :cols="4" :label="robotStatus(item)" v-for="(item, i) in robots" :key="i" @click.native="robotAction(item)">
-        <img slot="icon" :src="item.avatar">
-      </grid-item>
-    </grid>
+    <group :gutter="0" title="在线机器人">
+      <cell v-for="(item, index) in robots" :key="index" :title="robotStatus(item)"
+        @click.native="robotAction(item)">
+        <img slot="icon" :src="item.avatar" class="cell-image">
+        <p slot="inline-desc" class="cell-desc">当前任务：{{item.task}}</p>
+      </cell>
+    </group>
 
     <popup v-model="showPush" position="bottom"
       height="100%" style="overflow-y:hidden;">
       <robotpush
         :is-shown="showPush"
         :robot="currentRobot"
+        content=""
         @on-close="closePush"></robotpush>
     </popup>
   </div>
 </template>
 
 <script>
-import { InlineLoading, Qrcode, GroupTitle, Grid, GridItem } from 'vux'
+import { InlineLoading, Qrcode } from 'vux'
 import Robotpush from '@/components/RobotPush.vue'
 
 const actions = {
@@ -49,9 +51,6 @@ export default {
   components: {
     InlineLoading,
     Qrcode,
-    GroupTitle,
-    Grid,
-    GridItem,
     Robotpush
   },
   data () {
@@ -131,7 +130,7 @@ export default {
         if (res.success) {
           vm.$vux.toast.show({
             type: 'success',
-            text: '机器人已' + item + '。',
+            text: item + '指令已发送成功',
             width: '13em'
           })
         } else {

@@ -38,11 +38,11 @@ class Robot extends Base
   /**
    * 推送分享
    */
-  public function push($all, $contact, $content, $url = "") {
-    if (!$all && empty($contact)) {
+  public function push($type, $contact, $content, $url = "") {
+    if ($type != '0' && $type != '1' && empty($contact)) {
       return $this->fail('请选择要推送的群或联系人。');
     } else {
-      $result = modelRobot::push($this->user, $all, $contact, $content, $url);
+      $result = modelRobot::push($this->user, $type, $contact, $content, $url);
     }
     if ($result) {
       return $this->succeed();
