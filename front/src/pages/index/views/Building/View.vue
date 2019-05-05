@@ -100,8 +100,8 @@
             <checker-item v-for="(unit, index) in floor.unit" :key="index" :value="unit.id" :disabled="unit.status != 1">
               <div :class="{active: touchUnit == unit}" @touchstart="unitTouch(unit, true)" 
                 @touchmove="unitTouchMove(true)" @touchend="unitTouchEnd(true)"
-                @mousedown="unitTouch(unit)" @mousemove="unitTouchMove(false)" @mouseup="unitTouchEnd(false)">
-                #{{unit.room}}/{{unit.acreage}}
+                @mousedown="unitTouch(unit)" @mousemove="unitTouchMove(false)" @mouseup="unitTouchEnd(false)" @click.stop="unitClick(unit)">
+                #{{unit.room}}/{{unit.acreage}}㎡/{{unit.statusText}}
               </div>
             </checker-item>
           </div>
@@ -556,6 +556,10 @@ export default {
         // })
       }
     },
+    unitClick (item) {
+      this.menuUnit = item
+      this.showUnitMenu = true && this.unitMenu != null
+    },
     unitTouch (item, isTouch) {
       let vm = this
       vm.touchUnit = item
@@ -623,7 +627,14 @@ export default {
       let vm = this
       if (vm.menuUnit != null) {
         let unitId = vm.menuUnit.id
-        if (key === 'view') {
+        if (key === 'check') {
+          vm.selectedUnit.push(vm.menuUnit.id)
+        } else if (key === 'uncheck') {
+          let index = vm.selectedUnit.indexOf(vm.menuUnit.id)
+          if (index > -1) {
+            vm.selectedUnit.splice(index, 1)
+          }
+        } else if (key === 'view') {
           vm.$router.push({name: 'Unit', params: {id: unitId}})
         } else if (key === 'edit') {
           vm.$router.push({name: 'UnitEdit', params: {id: unitId, bid: this.info.id}})
@@ -692,6 +703,16 @@ export default {
     unitMenu () {
       if (this.menuUnit) {
         let menu = null
+        if (this.menuUnit.status === 1) {
+          if (menu == null) {
+            menu = {}
+          }
+          if (this.selectedUnit.indexOf(this.menuUnit.id) >= 0) {
+            menu.uncheck = '取消选择'
+          } else {
+            menu.check = '选择'
+          }
+        }
         if (this.menuUnit.allowView) {
           if (menu == null) {
             menu = {}
