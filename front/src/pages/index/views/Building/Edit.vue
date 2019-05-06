@@ -287,7 +287,7 @@ export default {
                 label: res.data.companyList[i].title,
                 value: res.data.companyList[i].id
               })
-              if (res.data.companyList[i].default === 1) {
+              if (res.data.companyList[i].active === 1) {
                 vm.info.company_id = res.data.companyList[i].id
                 vm.companyText = res.data.companyList[i].title
               }
