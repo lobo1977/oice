@@ -70,7 +70,7 @@ export default {
     vm.getOnlineRobots()
     vm.timer = setInterval(() => {
       vm.getOnlineRobots()
-    }, 30 * 1000)
+    }, 10 * 1000)
   },
   beforeDestroy: function () {
     if (this.timer != null) {

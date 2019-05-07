@@ -151,8 +151,16 @@
         </div>
       </div>
 
-      <load-more v-if="user == null || user.id == 0"
-        :show-loading="false" tip="请登录后查看" @click.native="login" background-color="#fbf9fe"></load-more>
+      <div v-if="user == null || user.id == 0">
+        <load-more
+          :show-loading="false" tip="请登录后查看" background-color="#fbf9fe"></load-more>
+
+        <div class="bottom-bar">
+          <x-button type="primary" class="bottom-btn" @click.native="login">
+            立即登录
+          </x-button>
+        </div>
+      </div>
     </div>
 
     <div v-show="tab === 3 && !showPush">
@@ -161,8 +169,16 @@
           :title="item.title" :link="{name: 'ConfirmView', params: {id: item.id}}" 
           :inline-desc="item.desc"></cell>
       </div>
-      <load-more v-if="user == null || user.id == 0"
-        :show-loading="false" tip="请登录后查看" @click.native="login" background-color="#fbf9fe"></load-more>
+      <div v-if="user == null || user.id == 0">
+        <load-more
+          :show-loading="false" tip="请登录后查看" background-color="#fbf9fe"></load-more>
+
+        <div class="bottom-bar">
+          <x-button type="primary" class="bottom-btn" @click.native="login">
+            立即登录
+          </x-button>
+        </div>
+      </div>
     </div>
 
     <popup-picker class="popup-picker" :show.sync="showCustomerPicker" 
@@ -558,7 +574,20 @@ export default {
     },
     unitClick (item) {
       this.menuUnit = item
-      this.showUnitMenu = true && this.unitMenu != null
+      let menuLength = 0
+      let menuKey = ''
+      if (this.unitMenu != null) {
+        for (var key in this.unitMenu) {
+          menuKey = key
+          menuLength++
+        }
+        this.showUnitMenu = menuLength > 1
+        if (menuLength === 1) {
+          this.unitMenuClick(menuKey, this.unitMenu[menuKey])
+        }
+      } else {
+        this.showUnitMenu = false
+      }
     },
     unitTouch (item, isTouch) {
       let vm = this
@@ -581,8 +610,7 @@ export default {
       vm.unitTouchEvent = setTimeout(() => {
         vm.unitTouchEvent = 0
         if (!isTouch || (Math.abs(vm.moveX - vm.touchX) <= 5 && Math.abs(vm.moveY - vm.touchY) <= 5)) {
-          vm.menuUnit = item
-          vm.showUnitMenu = true && vm.unitMenu != null
+          this.unitClick(item)
         }
       }, 500)
     },
