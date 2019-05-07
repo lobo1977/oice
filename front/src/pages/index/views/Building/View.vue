@@ -663,7 +663,16 @@ export default {
             vm.selectedUnit.splice(index, 1)
           }
         } else if (key === 'view') {
-          vm.$router.push({name: 'Unit', params: {id: unitId}})
+          if (vm.menuUnit.allowView) {
+            vm.$router.push({name: 'Unit', params: {id: unitId}})
+          } else if (vm.user != null && vm.user.id > 0) {
+            vm.$vux.toast.show({
+              text: '此单元未公开，不能查看详情。',
+              width: '13em'
+            })
+          } else {
+            vm.login()
+          }
         } else if (key === 'edit') {
           vm.$router.push({name: 'UnitEdit', params: {id: unitId, bid: this.info.id}})
         } else if (key === 'delete') {
@@ -741,12 +750,12 @@ export default {
             menu.check = '选择'
           }
         }
-        if (this.menuUnit.allowView) {
-          if (menu == null) {
-            menu = {}
-          }
-          menu.view = '查看'
+
+        if (menu == null) {
+          menu = {}
         }
+        menu.view = '查看'
+
         if (this.menuUnit.allowEdit) {
           if (menu == null) {
             menu = {}
