@@ -21,7 +21,7 @@ class Unit extends Base
    * 权限检查
    */
   public static function allow($user, $unit, $operate, $building = null) {
-    if ($user == null || $unit == null) {
+    if ($unit == null) {
       return false;
     }
     if ($building == null) {
@@ -29,7 +29,7 @@ class Unit extends Base
     }
 
     if ($operate == 'view') {
-      return Building::allow($user, $building, 'view') && 
+      return 
         ($unit->share || $unit->user_id == $user->id ||
         $unit->company_id == $user->company_id);
     } else if ($operate == 'new') {
