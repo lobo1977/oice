@@ -30,17 +30,17 @@ class Unit extends Base
 
     if ($operate == 'view') {
       return 
-        ($unit->share || $unit->user_id == $user->id ||
-        $unit->company_id == $user->company_id);
+        $unit->share || ($user != null && ($unit->user_id == $user->id ||
+        $unit->company_id == $user->company_id));
     } else if ($operate == 'new') {
-      return Building::allow($user, $building, 'edit');
+      return $user != null && Building::allow($user, $building, 'edit');
     } else if ($operate == 'edit') {
-      return Building::allow($user, $building, 'edit') && 
+      return $user != null && Building::allow($user, $building, 'edit') &&
         ((($user->isAdmin || $unit->user_id == $user->id) &&
         $unit->company_id == $user->company_id) || 
         ($unit->user_id == $user->id && $unit->company_id == 0));
     } else if ($operate == 'delete') {
-      return Building::allow($user, $building, 'edit') && 
+      return $user != null && Building::allow($user, $building, 'edit') && 
         ((($user->isAdmin || $unit->user_id == $user->id) &&
         $unit->company_id == $user->company_id) || 
         ($unit->user_id == $user->id && $unit->company_id == 0));
