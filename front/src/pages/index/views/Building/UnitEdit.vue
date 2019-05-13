@@ -147,12 +147,12 @@ export default {
         rent_price: null,     // 出租价格
         sell_price: null,     // 出售价格
         decoration: '',       // 装修状况
-        status: 0,            // 状态
-        end_date: '',       // 到日期
+        status: 1,            // 状态(默认空置)
+        end_date: '',         // 到日期
         rem: '',              // 备注
         user_id: 0,
         company_id: 0,        // 所属企业
-        share: false,         // 是否公开
+        share: true,          // 是否公开
         linkman: '',          // 联系人
         mobile: ''            // 联系电话
       },
