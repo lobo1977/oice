@@ -27,7 +27,7 @@
       </sticky>
     </div>
 
-    <group :gutter="0" v-show="step === 1">
+    <group :gutter="0" v-show="step === 1" style="padding-bottom:90px;">
       <cell v-for="(item, index) in filterContact" :key="index" :title="item.contact_name">
         <!-- <img slot="icon" :src="'https://wx.qq.com' + item.contact_avatar" class="cell-image" /> -->
         <div solt="default">
@@ -42,17 +42,32 @@
         :disabled="checkCount <= 0" style="float:right;margin-right:30px;">下一步</x-button>
     </div>
 
-    <group :title="'将发送消息给' + checkCount + '个联系人/群'" v-show="step === 2">
-      <x-textarea :max="500" v-model="message" :height="240"></x-textarea>
+    <group v-if="step === 2" :title="'将发送消息给' + checkCount + '个联系人/群'" 
+      label-width="80px" label-margin-right="1em">
+      <x-textarea :max="500" v-model="message" :height="180"></x-textarea>
+      <x-switch title="循环发送" inline-desc="" v-model="cycle"></x-switch>
+      <cell title="发送间隔" value-align="left">
+        <inline-x-number style="float:left;margin:0 5px 0 0;" width="50px" 
+          :min="1" :max="8" :step="1" v-model="cycle_hour"></inline-x-number>
+        <div style="float:left;display:inline-block;line-height:28px;">小时</div>
+      </cell>
+      <cell title="发送时段" :inline-desc="'每日' + start_hour + '点开始'" primary="content">
+        <range v-model="start_hour" :max="24"></range>
+      </cell>
+      <cell title="发送时段" :inline-desc="'每日' + end_hour + '点停止'" primary="content">
+        <range v-model="end_hour" :min="start_hour" :max="24"></range>
+      </cell>
     </group>
-    <div style="padding:10px;" v-show="step === 2">
-      <x-button type="primary" @click.native="pushMessage" :disabled="message.length === 0">发送</x-button>
+
+    <div class="bottom-bar" v-if="step === 2">
+      <x-button type="primary" class="bottom-btn"
+        @click.native="pushMessage" :disabled="message.length === 0">发送</x-button>
     </div>
   </div>
 </template>
 
 <script>
-import { XHeader, Search, CheckIcon } from 'vux'
+import { XHeader, Search, CheckIcon, Range } from 'vux'
 
 export default {
   name: 'robotpush',
@@ -68,7 +83,8 @@ export default {
   components: {
     XHeader,
     Search,
-    CheckIcon
+    CheckIcon,
+    Range
   },
   data () {
     return {
@@ -83,6 +99,10 @@ export default {
       all: false,
       checkCount: 0,
       checkList: [],
+      cycle: true,
+      cycle_hour: 2,
+      start_hour: 8,
+      end_hour: 20,
       leftOptions: {
         showBack: false
       }
@@ -183,7 +203,10 @@ export default {
           type: this.all && this.keyword.length === 0 ? vm.type : -1,
           contact: this.all && this.keyword.length === 0 ? '' : this.checkList.join(','),
           content: vm.message,
-          url: vm.url
+          url: vm.url,
+          cycle: vm.cycle ? vm.cycle_hour : 0,
+          start: vm.start_hour,
+          end: vm.end_hour
         }, (res) => {
           vm.$vux.loading.hide()
           if (res.success) {
@@ -213,6 +236,10 @@ export default {
       vm.checkCount = 0
       vm.keyword = ''
       vm.checkList = []
+      vm.cycle = true
+      vm.cycle_hour = 2
+      vm.start_hour = 8
+      vm.end_hour = 20
       vm.$get('/api/robot/contact?id=' + this.robotID, (res) => {
         if (res.success) {
           if (res.data && res.data.length) {
@@ -226,6 +253,11 @@ export default {
               }
             })
           }
+        } else {
+          vm.$vux.toast.show({
+            text: res.message,
+            width: '15em'
+          })
         }
       })
     },

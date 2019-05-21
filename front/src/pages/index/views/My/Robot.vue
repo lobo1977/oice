@@ -21,7 +21,7 @@
       <cell v-for="(item, index) in robots" :key="index" :title="robotStatus(item)"
         @click.native="robotAction(item)">
         <img slot="icon" :src="item.avatar" class="cell-image">
-        <p slot="inline-desc" class="cell-desc">当前任务：{{item.task}}</p>
+        <p slot="inline-desc" class="cell-desc">待处理任务：{{item.task}} 个</p>
       </cell>
     </group>
 
@@ -44,7 +44,8 @@ const actions = {
   offline: '下线',
   sleep: '休眠',
   weakup: '唤醒',
-  push: '群发消息'
+  push: '群发消息',
+  clearTask: '删除任务'
 }
 
 export default {
@@ -130,7 +131,7 @@ export default {
         if (res.success) {
           vm.$vux.toast.show({
             type: 'success',
-            text: item + '指令已发送成功',
+            text: key !== 'clearTask' ? (item + '指令已发送成功') : '已删除所有任务',
             width: '13em'
           })
         } else {

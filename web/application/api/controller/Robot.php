@@ -38,11 +38,11 @@ class Robot extends Base
   /**
    * 推送分享
    */
-  public function push($type, $contact, $content, $url = "") {
+  public function push($type, $contact, $content, $url = "", $cycle = 0, $start = null, $end = null) {
     if ($type != '0' && $type != '1' && empty($contact)) {
       return $this->fail('请选择要推送的群或联系人。');
     } else {
-      $result = modelRobot::push($this->user, $type, $contact, $content, $url);
+      $result = modelRobot::push($this->user, $type, $contact, $content, $url, $cycle, $start, $end);
     }
     if ($result) {
       return $this->succeed();
@@ -80,6 +80,18 @@ class Robot extends Base
    */
   public function weakup($id) {
     $result = modelRobot::sendAction($this->user, $id, 1);
+    if ($result) {
+      return $this->succeed();
+    } else {
+      return $this->fail();
+    }
+  }
+
+  /**
+   * 清除所有任务
+   */
+  public function clearTask($id) {
+    $result = modelRobot::clearTask($this->user, $id);
     if ($result) {
       return $this->succeed();
     } else {

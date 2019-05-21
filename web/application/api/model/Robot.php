@@ -84,7 +84,7 @@ class Robot extends Base
   /**
    * 推送分享
    */
-  public static function push($user, $type, $contact, $content, $url) {
+  public static function push($user, $type, $contact, $content, $url, $cycle = 0, $start = null, $end = null) {
     if (empty($user) || empty($user->openid)) {
       return false;
     } else {
@@ -111,11 +111,16 @@ class Robot extends Base
     }
 
     $list = $list->select();
+    $now = date("Y-m-d H:i:s",time());
 
     if ($list)  {
       foreach ($list as $item) {
         $data['uid'] = $item['uid'];
         $data['task'] = 'TURN|' . $item['cid'] . '|' . $content;
+        $data['cycle_hour'] = $cycle;
+        $data['start_hour'] = $start;
+        $data['end_hour'] = $end;
+        $data['task_time'] = $now;
         $data['status'] = 0;
         db("robot_task")->insert($data);
       }
@@ -145,6 +150,29 @@ class Robot extends Base
       $data['level'] = 1;
       $data['status'] = 0;
       db("robot_task")->insert($data);
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * 清除所有任务
+   */
+  public static function clearTask($user, $id) {
+    if (empty($user) || empty($user->openid)) {
+      return false;
+    } else {
+      $openid = [$user->openid];
+    }
+
+    $find = self::where('status', '>', 0)
+      ->where('id', $id)
+      ->where('openid', 'in', $openid)
+      ->find();
+
+    if ($find) {
+      db("robot_task")->where('uid', $find['uid'])->delete();
       return true;
     }
 

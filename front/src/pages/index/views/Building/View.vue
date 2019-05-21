@@ -370,7 +370,11 @@ export default {
       this.$router.push({name: 'BuildingEdit', params: {id: 0}})
     },
     share () {
-      this.showPush = true
+      if (this.user != null && this.user.id > 0) {
+        this.showPush = true
+      } else {
+        this.login()
+      }
     },
     closePush () {
       this.showPush = false
