@@ -38,7 +38,7 @@
           <span slot="right">平方米</span>
         </x-input>
         <cell title="租售" @click.native="showRentSellPicker = true" :is-link="true" :value="info.rent_sell" value-align="left"></cell>
-        <x-input title="出租价格" type="tel" :max="4" v-model="info.rent_price" :show-clear="false">
+        <x-input title="出租价格" type="tel" :max="6" v-model="info.rent_price" :show-clear="false">
           <span slot="right">元/平方米/日</span>
         </x-input>
         <x-input title="出售价格" type="tel" :max="8" v-model="info.sell_price" :show-clear="false">
