@@ -1,6 +1,7 @@
 <?php
 namespace app\api\model;
 
+use app\common\Utils;
 use app\api\model\Base;
 use app\api\model\User;
 
@@ -17,6 +18,7 @@ class Oauth extends Base
 
     if ($user == null) {
       $user = new Oauth();
+      $data['nickname'] = Utils::emojiToChar($data['nickname']);
       return $user->save($data);
     } else {
       return true;
