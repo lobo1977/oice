@@ -1,5 +1,5 @@
 <template>
-  <div style="height:100%">
+  <div style="height:100%;padding-top:46px;">
     <x-header class="fix-top"
       :left-options="leftOptions" title="位置信息">
       <span slot="overwrite-left">
@@ -10,6 +10,17 @@
         确定
       </span>
     </x-header>
+
+    <search v-if="isEdit"
+      @result-click="resultClick"
+      @on-change="searchMap"
+      :results="searchResults"
+      position="absolute"
+      auto-scroll-to-top top="46px"
+      @on-focus="onFocus"
+      @on-cancel="onCancel"
+      @on-submit="onSubmit"
+      ref="searchAddress"></search>
     
     <div id="baidumap" class="map"></div>
 
@@ -21,7 +32,7 @@
 </template>
 
 <script>
-import { XHeader } from 'vux'
+import { XHeader, Search } from 'vux'
 import BMap from 'BMap'
 import BMAP_STATUS_SUCCESS from 'BMAP_STATUS_SUCCESS'
 
@@ -66,11 +77,13 @@ export default {
     }
   },
   components: {
-    XHeader
+    XHeader,
+    Search
   },
   data () {
     return {
       map: null,
+      localSearch: null,
       location: {
         city: '',
         district: '',
@@ -80,7 +93,9 @@ export default {
       },
       leftOptions: {
         showBack: false
-      }
+      },
+      isSearching: false,
+      searchResults: []
     }
   },
   mounted () {
@@ -107,6 +122,46 @@ export default {
         this.map.clearOverlays()
       }
       this.$emit('on-close')
+    },
+    onFocus () {
+      this.isSearching = true
+    },
+    onCancel () {
+      this.isSearching = false
+    },
+    onSubmit () {
+      this.$refs.searchAddress.setBlur()
+      this.isSearching = false
+    },
+    searchMap (val) {
+      if (this.localSearch != null) {
+        this.localSearch.search(val)
+      }
+    },
+    searchComplete (result) {
+      if (this.localSearch.getStatus() === BMAP_STATUS_SUCCESS) {
+        this.searchResults = []
+        if (result) {
+          let resultCount = result.getCurrentNumPois()
+          for (let i = 0; i < resultCount; i++) {
+            this.searchResults.push(result.getPoi(i))
+          }
+        }
+      }
+    },
+    resultClick (item) {
+      if (this.map != null && item != null) {
+        let marker = new BMap.Marker(item.point)
+        this.map.clearOverlays()
+        this.map.addOverlay(marker)
+        this.map.centerAndZoom(item.point, 16)
+        this.location.longitude = item.point.lng
+        this.location.latitude = item.point.lat
+        this.location.address = item.address.replace(item.city, '')
+        this.location.city = item.city
+        this.$refs.searchAddress.setBlur()
+        this.isSearching = false
+      }
     }
   },
   watch: {
@@ -124,8 +179,11 @@ export default {
         vm.map = new BMap.Map('baidumap')
         vm.map.enableScrollWheelZoom(true)
         vm.map.enableDoubleClickZoom(true)
-        let geoc = new BMap.Geocoder()
+        vm.localSearch = new BMap.LocalSearch(vm.location.city, {
+          onSearchComplete: vm.searchComplete
+        })
         if (vm.isEdit) {
+          let geoc = new BMap.Geocoder()
           vm.map.addEventListener('click', (e) => {
             vm.map.clearOverlays()
             let pt = e.point
@@ -154,6 +212,17 @@ export default {
           let marker = new BMap.Marker(point)
           vm.map.centerAndZoom(point, 14)
           vm.map.addOverlay(marker)
+        } else if (vm.location.address || vm.title) {
+          let address = vm.location.city + vm.location.district + vm.location.address + vm.title
+          let geo = new BMap.Geocoder()
+          geo.getPoint(address, (point) => {
+            if (point) {
+              vm.map.centerAndZoom(point, 16)
+              vm.map.addOverlay(new BMap.Marker(point))
+            } else {
+              vm.map.centerAndZoom(vm.location.city, 14)
+            }
+          }, vm.location.city)
         } else {
           vm.map.centerAndZoom(vm.location.city, 14)
         }

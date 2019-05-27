@@ -27,7 +27,7 @@
       <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
         <cell title="项目类型" value-align="left" :value="info.building_type" v-show="info.building_type"></cell>
         <cell title="地址" value-align="left" :value="info.area + info.address" v-show="info.area || info.address" 
-          :is-link="(info.longitude || info.latitude) != 0" @click.native="showMap = ((info.longitude || info.latitude) != 0)"></cell>
+          :is-link="true" @click.native="showMap = true"></cell>
         <cell title="竣工日期" value-align="left" :value="info.completion_date|formatDate" v-show="info.completion_date"></cell>
         <cell title="租售" value-align="left" :value="info.rent_sell" v-show="info.rent_sell"></cell>
         <cell title="价格" value-align="left" :value="info.price" v-show="info.price"></cell>
