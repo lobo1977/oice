@@ -80,6 +80,11 @@ class Wechat extends Base
               'name'=> urlencode("商住公寓"),
               'type'=> 'view',
               'url'=> $app_root . '/app/building?type=4'
+            ),
+            array(
+              'name'=> urlencode("产业园"),
+              'type'=> 'view',
+              'url'=> $app_root . '/app/building?type=5'
             )
           )
         ),
