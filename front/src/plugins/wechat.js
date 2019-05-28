@@ -1,9 +1,8 @@
 import Vue from 'vue'
+import wx from 'weixin-js-sdk'
 import HttpRequest from './http'
-import { WechatPlugin } from 'vux'
 
 Vue.use(HttpRequest)
-Vue.use(WechatPlugin)
 
 export default {
   install (Vue, options) {
@@ -20,12 +19,12 @@ export default {
       }, (res) => {
         if (res.success && res.data) {
           res.data.jsApiList = ['hideMenuItems']
-          Vue.wechat.config(res.data)
+          wx.config(res.data)
 
-          Vue.wechat.error((res) => {})
+          wx.error((res) => {})
 
-          Vue.wechat.ready(() => {
-            Vue.wechat.hideMenuItems({
+          wx.ready(() => {
+            wx.hideMenuItems({
               menuList: [
                 'menuItem:share:appMessage',
                 'menuItem:share:timeline',
@@ -44,15 +43,17 @@ export default {
         url: url || window.location.href
       }, (res) => {
         if (res.success && res.data) {
-          res.data.jsApiList = ['showMenuItems',
-            'onMenuShareTimeline', 'onMenuShareAppMessage', 'onMenuShareQQ']
+          res.data.jsApiList = [ 'showMenuItems',
+            'updateAppMessageShareData',
+            'updateTimelineShareData',
+            'getLocation']
 
-          Vue.wechat.config(res.data)
+          wx.config(res.data)
 
-          Vue.wechat.error((res) => {})
+          wx.error((res) => {})
 
-          Vue.wechat.ready(() => {
-            Vue.wechat.showMenuItems({
+          wx.ready(() => {
+            wx.showMenuItems({
               menuList: [
                 'menuItem:share:appMessage',
                 'menuItem:share:timeline',
@@ -61,33 +62,35 @@ export default {
               ]
             })
 
-            Vue.wechat.onMenuShareTimeline({
-              title: title,
-              link: link,
-              imgUrl: image
-            })
-
-            Vue.wechat.onMenuShareAppMessage({
+            wx.updateAppMessageShareData({
               title: title,
               desc: desc,
               link: link,
               imgUrl: image
             })
 
-            Vue.wechat.onMenuShareQQ({
-              title: title,
-              desc: desc,
-              link: link,
-              imgUrl: image
-            })
-
-            Vue.wechat.onMenuShareQZone({
+            wx.updateTimelineShareData({
               title: title,
               desc: desc,
               link: link,
               imgUrl: image
             })
           })
+        }
+      })
+    }
+
+    Vue.getLocation = function (cb) {
+      wx.getLocation({
+        type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回火星坐标，可传入'gcj02'
+        success: function (res) {
+          // res.latitude 纬度，浮点数，范围为90 ~ -90
+          // res.longitude 经度，浮点数，范围为180 ~ -180。
+          // res.speed 速度，以米/每秒计
+          // res.accuracy 位置精度
+          if (cb) {
+            cb(res)
+          }
         }
       })
     }
@@ -102,6 +105,10 @@ export default {
 
     Vue.prototype.$wechatHideShare = (url) => {
       Vue.wechatHideShare(url)
+    }
+
+    Vue.prototype.$getLocation = (cb) => {
+      return Vue.getLocation(cb)
     }
   }
 }
