@@ -25,8 +25,20 @@
     <div id="baidumap" class="map"></div>
 
     <div v-if="!isEdit" class="fix-bottom">
+      <x-button mini type="primary" @click.native="goNative" 
+        :disabled="location.latitude === 0 && title === ''" 
+        style="float:right;margin-right:30px;">导航</x-button>
       <h4 style="font-size:1em;">{{title}}</h4>
       <span style="font-size:0.9em;">{{'地址：' + district + address}}</span>
+      <form ref="frmGoMap" action="http://api.map.baidu.com/direction" target="_blank" method="get">
+        <input type="hidden" name="region" :value="location.city">
+        <input type="hidden" name="output" value="html" />
+        <input type="hidden" name="mode" value="driving">
+        <input type="hidden" name="origin" :value="originPoint.lat + ',' + originPoint.lng">
+        <input type="hidden" name="destination" 
+          :value="distination" />
+        <input type="hidden" name="src" value="m.o-ice.com">
+      </form>
     </div>
   </div>
 </template>
@@ -83,6 +95,10 @@ export default {
   data () {
     return {
       map: null,
+      originPoint: {
+        lat: 0,
+        lng: 0
+      },
       localSearch: null,
       location: {
         city: '',
@@ -99,16 +115,6 @@ export default {
     }
   },
   mounted () {
-    let vm = this
-    if (this.getPoint) {
-      let geolocation = new BMap.Geolocation()
-      geolocation.getCurrentPosition((r) => {
-        if (geolocation.getStatus() === BMAP_STATUS_SUCCESS) {
-          vm.location.longitude = r.point.lng
-          vm.location.latitude = r.point.lat
-        }
-      })
-    }
   },
   methods: {
     confirm () {
@@ -162,6 +168,36 @@ export default {
         this.$refs.searchAddress.setBlur()
         this.isSearching = false
       }
+    },
+    goNative () {
+      let vm = this
+      if (vm.originPoint.lat && vm.originPoint.lng) {
+        vm.$refs.frmGoMap.submit()
+      } else if (vm.$isWechat()) {
+        vm.$getLocation((data) => {
+          let convertor = new BMap.Convertor()
+          let pointArr = []
+          pointArr.push(new BMap.Point(data.longitude, data.latitude))
+          convertor.translate(pointArr, 3, 5, (result) => {
+            if (result.status === 0) {
+              vm.originPoint = result.points[0]
+              setTimeout(() => {
+                vm.$refs.frmGoMap.submit()
+              }, 300)
+            }
+          })
+        })
+      } else {
+        let geolocation = new BMap.Geolocation()
+        geolocation.getCurrentPosition((r) => {
+          if (geolocation.getStatus() === BMAP_STATUS_SUCCESS) {
+            vm.originPoint = r.point
+            setTimeout(() => {
+              vm.$refs.frmGoMap.submit()
+            }, 300)
+          }
+        })
+      }
     }
   },
   watch: {
@@ -182,6 +218,7 @@ export default {
         vm.localSearch = new BMap.LocalSearch(vm.location.city, {
           onSearchComplete: vm.searchComplete
         })
+
         if (vm.isEdit) {
           let geoc = new BMap.Geocoder()
           vm.map.addEventListener('click', (e) => {
@@ -206,6 +243,7 @@ export default {
           })
         }
       }
+
       setTimeout(() => {
         if (vm.location.longitude || vm.location.latitude) {
           let point = new BMap.Point(vm.location.longitude, vm.location.latitude)
@@ -223,10 +261,23 @@ export default {
               vm.map.centerAndZoom(vm.location.city, 14)
             }
           }, vm.location.city)
+        } else if (vm.originPoint.lat && vm.originPoint.lng) {
+          vm.map.centerAndZoom(vm.originPoint, 16)
         } else {
           vm.map.centerAndZoom(vm.location.city, 14)
         }
       }, 300)
+    }
+  },
+  computed: {
+    distination () {
+      if (this.location.latitude && this.location.longitude && this.title) {
+        return 'latlng:' + this.location.latitude + ',' + this.location.longitude + '|name:' + this.title
+      } else if (this.location.latitude && this.location.longitude) {
+        return this.location.latitude + ',' + this.location.longitude
+      } else {
+        return this.title
+      }
     }
   }
 }
