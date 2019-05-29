@@ -18,11 +18,9 @@ class Oauth extends Base
 
     if ($user == null) {
       $user = new Oauth();
-      $data['nickname'] = Utils::emojiToChar($data['nickname']);
-      return $user->save($data);
-    } else {
-      return true;
     }
+    $data['nickname'] = Utils::emojiToChar($data['nickname']);
+    return $user->save($data);
   }
 
   /**
@@ -45,7 +43,7 @@ class Oauth extends Base
     if ($oauth->save()) {
       session('oauth', $platform);
       session('oauth_openid', $token['openid']);
-      if ($oauth->user_id) {
+      if (isset($oauth['user_id']) && $oauth->user_id > 0) {
         $user = User::getById($oauth->user_id);
         if ($user != null) {
           User::loginSuccess($user, $token['openid']);
