@@ -231,7 +231,7 @@ export default {
         environment: '',      // 周边环境
         company_id: '',       // 所属企业
         user_id: 0,
-        share: false          // 是否公开
+        share: true           // 是否公开
       },
       engInfo: {
         __token__: '',
