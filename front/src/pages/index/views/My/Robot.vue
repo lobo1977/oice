@@ -44,7 +44,7 @@ const actions = {
   offline: '下线',
   sleep: '休眠',
   weakup: '唤醒',
-  push: '群发消息',
+  // push: '群发消息',
   clearTask: '删除任务'
 }
 
