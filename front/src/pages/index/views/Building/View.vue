@@ -181,6 +181,8 @@
       </div>
     </div>
 
+    <qrcode></qrcode>
+
     <popup-picker class="popup-picker" :show.sync="showCustomerPicker" 
       popup-title="选择客户" :show-cell="false" :data="myCustomer" v-model="selectCustomer"
       @on-hide="customerSelected"></popup-picker>
@@ -213,6 +215,7 @@ import { Swiper, SwiperItem, Previewer, TransferDom, Divider, Checker, CheckerIt
 import Topalert from '@/components/Topalert.vue'
 import Baidumap from '@/components/BaiduMap.vue'
 import Robotpush from '@/components/RobotPush.vue'
+import qrcode from '@/components/qrcode.vue'
 
 export default {
   directives: {
@@ -227,7 +230,8 @@ export default {
     CheckerItem,
     Topalert,
     Baidumap,
-    Robotpush
+    Robotpush,
+    qrcode
   },
   data () {
     return {
@@ -272,6 +276,7 @@ export default {
         confirm: []
       },
       shareLink: window.location.href,
+      shareImage: null,
       shareDesc: '',
       showCustomerPicker: false,
       myCustomer: [],
@@ -338,18 +343,15 @@ export default {
             vm.$emit('on-view-loaded', vm.info.building_name)
 
             vm.shareLink = window.location.href
-            vm.shareDesc = (res.data.level ? res.data.level + '级' : '') + res.data.type +
-                  ' ' + vm.info.area + vm.info.district + ' ' + vm.info.price
+            vm.setShareDesc()
+
+            if (vm.info.images.length) {
+              vm.shareImage = window.location.protocol + '//' +
+                window.location.host + vm.info.images[0].src
+            }
 
             if (vm.$isWechat()) {
-              let shareImage = null
-
-              if (vm.info.images.length) {
-                shareImage = window.location.protocol + '//' +
-                  window.location.host + vm.info.images[0].src
-              }
-
-              vm.$wechatShare(null, vm.shareLink, vm.info.building_name, vm.shareDesc, shareImage)
+              vm.$wechatShare(null, vm.shareLink, vm.info.building_name, vm.shareDesc, vm.shareImage)
             }
           } else {
             vm.info.id = 0
@@ -379,9 +381,27 @@ export default {
     closePush () {
       this.showPush = false
     },
+    setShareDesc () {
+      let vm = this
+      if (vm.tab === 1) {
+        vm.shareDesc = '单元销控'
+      } else if (vm.tab === 2) {
+        vm.shareDesc = '联系人'
+      } else if (vm.tab === 3) {
+        vm.shareDesc = '确认书'
+      } else {
+        vm.shareDesc = vm.info.building_type + ' ' + vm.info.area + vm.info.district + ' ' + vm.info.price
+      }
+    },
     goTab (tab) {
-      this.$router.replace({name: 'BuildingView', id: this.info.id, query: {tab: tab}})
-      this.tab = tab
+      let vm = this
+      vm.$router.replace({name: 'BuildingView', id: this.info.id, query: {tab: tab}})
+      vm.tab = tab
+      vm.shareLink = window.location.href
+      vm.setShareDesc()
+      if (vm.$isWechat()) {
+        vm.$wechatShare(null, vm.shareLink, vm.info.building_name, vm.shareDesc, vm.shareImage)
+      }
     },
     preview (index) {
       this.$refs.prevBuilding.show(index)

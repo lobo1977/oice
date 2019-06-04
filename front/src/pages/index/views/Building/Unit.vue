@@ -36,6 +36,8 @@
         :inline-desc="item.desc"></cell>
     </group>
 
+    <qrcode></qrcode>
+
     <flexbox :gutter="0" class="bottom-bar">
       <flexbox-item :span="5">
         <x-button type="warn" class="bottom-btn"
@@ -70,6 +72,7 @@
 
 <script>
 import { Swiper, SwiperItem, Previewer, TransferDom, GroupTitle } from 'vux'
+import qrcode from '@/components/qrcode.vue'
 
 export default {
   directives: {
@@ -79,7 +82,8 @@ export default {
     Swiper,
     SwiperItem,
     Previewer,
-    GroupTitle
+    GroupTitle,
+    qrcode
   },
   data () {
     return {
