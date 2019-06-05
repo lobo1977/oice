@@ -25,9 +25,11 @@ class Company extends Base
     $company->addin = 0;
 
     $count = db('user_company')
-      ->where('company_id', $company->id)
-      ->field('status,count(user_id) as count')
-      ->group('status')
+      ->alias('a')
+      ->join('user b', 'a.user_id = b.id')
+      ->where('a.company_id', $company->id)
+      ->field('a.status,count(a.user_id) as count')
+      ->group('a.status')
       ->select();
 
     foreach($count as $c) {
