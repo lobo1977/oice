@@ -18,7 +18,7 @@ class Filter extends Base
       ->where('a.customer_id', $customer_id)
       ->where('a.user_id', $user->id)
       ->field('a.building_id,b.building_name,b.level,b.area,b.district,b.address,b.price,
-        a.unit_id,u.building_no,u.floor,u.room,u.acreage,u.rent_price,u.sell_price')
+        a.unit_id,u.building_no,u.floor,u.room,u.acreage,u.rent_price,u.sell_price,u.status')
       ->order('a.sort', 'asc')
       ->order('a.create_time', 'asc')
       ->select();
