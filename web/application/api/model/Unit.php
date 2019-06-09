@@ -67,7 +67,9 @@ class Unit extends Base
       if ($unit->room) {
         $unit->title = $unit->title . $unit->room;
       }
-      $unit->statusText = self::$status[$unit->status];
+      if (isset($unit->status) && $unit->status != null) {
+        $unit->statusText = self::$status[$unit->status];
+      }
     }
   }
 
