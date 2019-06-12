@@ -87,7 +87,6 @@ class Recommend extends Base
     foreach($list as $building) {
       $find = false;
       $unit = array();
-      $unitImages = null;
 
       if ($building['unit_id']) {
         $unit['unit'] = $building['building_no'];
@@ -100,25 +99,36 @@ class Recommend extends Base
         }
         $unit['unit'] = $unit['unit'] . $building['room'];
         $unit['room'] = $building['room'];
-        $unit['desc'] = $building['decoration'];
-        if ($building['face']) {
-          $unit['desc'] = $unit['desc'] . ' ' . $building['face'] . '向';
-        }
         $unit['face'] = $building['face'];
         $unit['acreage'] = $building['acreage'];
         $unit['rent_price'] = $building['rent_price'];
         $unit['sell_price'] = $building['sell_price'];
         $unit['decoration'] = $building['decoration'];
-        $unitImages = File::getList(null, 'unit', $building['unit_id']);
+        $unit['desc'] = $building['decoration'];
+        if ($building['face']) {
+          $unit['desc'] = $unit['desc'] . ' ' . $building['face'] . '向';
+        }
+        if ($unit['acreage']) {
+          $unit['desc'] = $unit['desc'] . ' ' . $unit['acreage'] . '平方米';
+        }
+        if ($unit['rent_price']) {
+          $unit['desc'] = $unit['desc'] . ' ' . $unit['rent_price'] . '元/平米/天';
+        } else if ($unit['sell_price']) {
+          $unit['desc'] = $unit['desc'] . ' ' . $unit['sell_price'] . '元/平米';
+        }
+        $unit['images'] = File::getList(null, 'unit', $building['unit_id']);
+        if ($unit['images'] && count($unit['images']) > 0) {
+          $unit['src'] = $unit['images'][0]['msrc'];
+        }
+        $unit['title'] = $unit['unit'];
 
-        foreach($treeList as $key => $item) {
+        foreach($treeList as &$item) {
           if ($item['building_id'] == $building['building_id']) {
             $item['units'][] = $unit;
-            if ($unitImages) {
-              $item['images'] = array_merge($item['images'], $unitImages->toArray());
+            if ($unit['images']) {
+              $item['images'] = array_merge($item['images'], $unit['images']->toArray());
             }
             $find = true;
-            $treeList[$key] = $item;
             break;
           }
         }
@@ -138,8 +148,8 @@ class Recommend extends Base
         if ($images) {
           $building['images'] = $images->toArray();
         }
-        if ($unitImages) {
-          $building['images'] = array_merge($building['images'], $unitImages->toArray());
+        if (isset($unit['images'])) {
+          $building['images'] = array_merge($building['images'], $unit['images']->toArray());
         }
         $treeList[] = $building;
       }

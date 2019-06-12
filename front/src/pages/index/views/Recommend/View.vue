@@ -21,7 +21,7 @@
     <div v-for="(info, index) in list" :key="index">
       <h4 style="margin:0 15px;">{{info.building_name}}</h4>
       <p style="margin:8px 15px 0 15px;" v-if="info.desc">{{info.desc}}</p>
-      <group gutter="10px" label-align="justify" label-width="4em" label-margin-right="1em">
+      <group gutter="10px" label-width="4em" label-margin-right="1em">
         <cell title="图片" is-link v-if="info.images && info.images.length" @click.native="preview(index)">
           <img class="th-image" v-for="(img, i) in info.images" :key="i" v-show="i < 3" :src="img.msrc" />
         </cell>
@@ -39,30 +39,7 @@
         <cell title="停车位" value-align="left" :value="info.car_seat" v-if="info.car_seat"></cell>
       </group>
 
-      <group title="建议单元" v-if="info.units.length">
-        <x-table style="background-color:#fff;" :cell-bordered="false">
-          <thead>
-            <tr style="background-color:#f7f7f7">
-              <th>单元</th>
-              <th>面积</th>
-              <th>价格</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(unit, u) in info.units" :key="u">
-              <td class="unit">
-                <p class="title">{{unit.unit}}</p>
-                <p class="desc" v-if="unit.desc">{{unit.desc}}</p>
-              </td>
-              <td>{{unit.acreage + '平米'}}</td>
-              <td>
-                <p v-if="unit.rent_price">{{unit.rent_price + '元/平米/天'}}</p>
-                <p v-if="unit.sell_price">{{unit.sell_price + '元/平米'}}</p>
-              </td>
-            </tr>
-          </tbody>
-        </x-table>
-      </group>
+      <panel header="建议单元" :list="info.units" type="1"></panel>
 
       <group title="项目说明" v-if="info.rem">
         <p class="group-padding">{{ info.rem }}</p>
