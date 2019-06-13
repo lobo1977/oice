@@ -12,6 +12,7 @@ use app\api\model\User;
 use app\api\model\Recommend;
 use app\api\model\Confirm;
 use app\api\model\Company;
+use app\api\model\File;
 
 class Customer extends Base
 {
@@ -180,6 +181,8 @@ class Customer extends Base
     } else if (!self::allow($user, $data, $operate)) {
       self::exception('您没有权限' . ($operate == 'view' ? '查看' : '修改') . '此客户。');
     }
+
+    $data->attach = File::getList($user, 'customer', $id);
 
     if ($operate == 'view') {
       if ($data->min_acreage && $data->max_acreage) {

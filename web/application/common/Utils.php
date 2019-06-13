@@ -68,4 +68,35 @@ class Utils
         }
         return false;
     }
+
+    /**
+     * 获取文件扩展名
+     */
+    public static function getFileExt($fileName, $includeDot = false) {
+        $ext = '';
+        $pos = strrpos($fileName, '.');
+        if ($pos) {
+            if ($includeDot) {
+                $ext = substr($fileName, $pos);
+            } else {
+                $ext = substr($fileName, $pos + 1);
+            }
+        } else if ($includeDot) {
+            $ext = '.';  
+        }
+
+        return $ext;
+    }
+
+    /**
+     * 通过文件名判断是否为图片文件
+     */
+    public static function isImageFile($fileName = '') {
+        if (!$fileName) {
+            return false;
+        }
+        $images = array('jpg','jpeg','png','gif','bmp');
+        $ext = strtolower(self::getFileExt($fileName));
+        return in_array($ext, $images);
+    }
 }

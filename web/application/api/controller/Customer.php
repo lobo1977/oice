@@ -9,6 +9,7 @@ use app\api\model\Filter;
 use app\api\model\Recommend;
 use app\api\model\Confirm;
 use app\api\model\Log;
+use app\api\model\File;
 
 class Customer extends Base
 {
@@ -233,6 +234,36 @@ class Customer extends Base
    */
   public function removeLog($id) {
     $result = Log::remove($this->user, $id);
+    if ($result == 1) {
+      return $this->succeed();
+    } else {
+      return $this->fail();
+    }
+  }
+
+  /**
+   * 上传附件
+   */
+  public function uploadAttach($id) {
+    $files = request()->file('attach');
+    if ($files) {
+      $result = File::upload($this->user, 'customer', $id, $files);
+      if ($result >= 1) {
+        $attach = File::getList($this->user, 'customer', $id);
+        return $this->succeed($attach);
+      } else {
+        return $this->fail();
+      }
+    } else {
+      return $this->fail('请选择要上传的图片或文件。');
+    }
+  }
+
+  /**
+   * 删除附件
+   */
+  public function removeAttach($attach_id) {
+    $result = File::remove($this->user, $attach_id);
     if ($result == 1) {
       return $this->succeed();
     } else {

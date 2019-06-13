@@ -2,6 +2,7 @@
 namespace app\api\model;
 
 use think\model\concern\SoftDelete;
+use app\common\Utils;
 use app\api\model\Base;
 use app\api\model\Log;
 use app\api\model\Building;
@@ -40,19 +41,31 @@ class File extends Base
       ->order('default', 'desc')
       ->order('id', 'asc')->select();
 
-    if ($type == 'building' || $type == 'unit') {
-      foreach($list as $key => $img) {
-        $img->src = '/upload/' . $type . '/images/900/' . $img->file;
-        $img->msrc = '/upload/' . $type . '/images/300/' . $img->file;
+    foreach($list as $key => $file) {
+      $file->is_image = Utils::isImageFile($file->file);
+      if ($type == 'building' || $type == 'unit') {
+        $file->src = '/upload/' . $type . '/images/900/' . $file->file;
+        $file->msrc = '/upload/' . $type . '/images/300/' . $file->file;
+        $file->url = $file->src;
+      } else if ($type == 'customer') {
+        $file->src = '/upload/' . $type . '/attach/' . $file->file;
+        $file->url = $file->src;
+        if ($file->is_image) {
+          $file->msrc = '/upload/' . $type . '/attach/' . $file->file;
+        } else {
+          $file->src = '/static/img/attach.png';
+          $file->msrc = '/static/img/attach.png';
+        }
       }
     }
+
     return $list;
   }
 
   /**
-   * 上传图片
+   * 上传文件
    */
-  public static function uploadImage($user, $type, $parent_id, $files) {
+  public static function upload($user, $type, $parent_id, $files) {
     if (!self::allow($user, $type, $parent_id, 'edit')) {
       self::exception('操作失败，您没有权限。');
     }
@@ -69,14 +82,24 @@ class File extends Base
     $result = 0;
 
     foreach($files as $key => $file) {
-      $uploadPath = '../public/upload/' . $type . '/images';
-      $info = $file->validate(['size'=>6291456,'ext'=>'jpg,jpeg,png,gif'])
-        ->rule('uniqid')->move($uploadPath . '/original');
-      if ($info) {
-        if ($type == 'building' || $type == 'unit') {
+      $info = false;
+
+      if ($type == 'building' || $type == 'unit') {
+        $uploadPath = '../public/upload/' . $type . '/images';
+        $info = $file->validate(['size'=>6291456, 'ext'=>'jpg,jpeg,png,gif'])
+          ->rule('uniqid')->move($uploadPath . '/original');
+
+        if ($info) {
           self::thumbImage($info, [900,300], $uploadPath);
         }
+      } else {
+        $uploadPath = '../public/upload/' . $type . '/attach';
+        $info = $file->validate(['size'=>6291456,
+          'ext'=>'jpg,jpeg,png,gif,csv,txt,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar'])
+          ->rule('uniqid')->move($uploadPath);
+      }
 
+      if ($info) {
         $data['type'] = $type;
         $data['parent_id'] = $parent_id;
         $data['title'] = substr($info->getInfo('name'), 0, 300);
@@ -95,7 +118,7 @@ class File extends Base
           Log::add($user, [
             "table" => $type,
             "owner_id" => $parent_id,
-            "title" => '上传图片',
+            "title" => '上传' . ($type == 'building' || $type == 'unit' ? '图片' : '附件'),
             "summary" => $newData->title
           ]);
         }
@@ -147,9 +170,9 @@ class File extends Base
   }
 
   /**
-   * 删除图片
+   * 删除文件
    */
-  public static function removeImage($user, $id) {
+  public static function remove($user, $id) {
     $file = self::get($id);
     if ($file == null) {
       return true;
@@ -161,7 +184,7 @@ class File extends Base
       self::exception('操作失败，您没有权限。');
     }
 
-    if ($file->default == 1) {
+    if ($file->default == 1 && ($type == 'building' || $type == 'unit')) {
       self::exception('封面图不能删除。');
     }
 

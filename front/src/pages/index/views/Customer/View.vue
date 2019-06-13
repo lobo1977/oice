@@ -2,12 +2,27 @@
   <div>
     <topalert v-if="info.id > 0 && info.clash > 0" message="该客户已撞单，暂时不能跟进，请等候管理员处理。"></topalert>
 
-    <tab>
+    <tab :scroll-threshold="5">
       <tab-item @on-item-click="goTab(0)" :selected="tab === 0">基本信息</tab-item>
       <tab-item @on-item-click="goTab(1)" :selected="tab === 1">跟进纪要</tab-item>
-      <tab-item @on-item-click="goTab(2)" :selected="tab === 2">项目筛选</tab-item>
-      <tab-item @on-item-click="goTab(3)" :selected="tab === 3">推荐资料</tab-item>
+      <tab-item @on-item-click="goTab(2)" :selected="tab === 2">附件</tab-item>
+      <tab-item @on-item-click="goTab(3)" :selected="tab === 3">项目筛选</tab-item>
+      <tab-item @on-item-click="goTab(4)" :selected="tab === 4">推荐资料</tab-item>
     </tab>
+
+    <div v-transfer-dom v-if="attach.length">
+      <previewer :list="attach" ref="prevAttach" :options="previewOptions">
+        <template slot="button-before">
+          <span class="previewer-icon" v-if="info.allowEdit" 
+            @click.prevent.stop="confirmRemoveAttach" title="删除">
+            <x-icon type="trash-a" size="24"></x-icon>
+          </span>
+          <span class="previewer-icon" @click.prevent.stop="downloadAttach" title="下载">
+            <x-icon type="archive" size="24"></x-icon>
+          </span>
+        </template>
+      </previewer>
+    </div>
 
     <div v-show="tab === 0 && !showSelectUser">
       <flow v-if="info.id > 0 && info.status < 6">
@@ -148,6 +163,22 @@
     </div>
 
     <div v-show="tab === 2">
+      <flexbox :gutter="0" wrap="wrap">
+        <flexbox-item :span="1/3" v-for="(item, index) in attach" :key="index">
+          <img :src="item.msrc" @click="preview(index)" class="customer-img">
+        </flexbox-item>
+      </flexbox>
+      <div class="bottom-bar">
+        <form ref="frmUploadCustomerAttach">
+          <x-button type="warn" class="bottom-btn" :disabled="!info.allowEdit">上传</x-button>
+          <input type="hidden" name="id" :value="info.id">
+          <input type="file" class="upload" name="attach[]" multiple="multiple"
+            @change="upload"/>
+        </form>
+      </div>
+    </div>
+
+    <div v-show="tab === 3">
       <group :gutter="0">
         <swipeout>
           <swipeout-item v-for="(item, index) in info.filter" :key="index" transition-mode="follow"
@@ -194,7 +225,7 @@
       </flexbox>
     </div>
 
-    <div v-show="tab === 3">
+    <div v-show="tab === 4">
       <group :gutter="0">
         <swipeout>
           <swipeout-item v-for="(item, index) in info.recommend" :key="index"
@@ -219,7 +250,7 @@
 </template>
 
 <script>
-import { Flow, FlowState, FlowLine, GroupTitle,
+import { Previewer, TransferDom, Flow, FlowState, FlowLine, GroupTitle,
   Swipeout, SwipeoutItem, SwipeoutButton, CheckIcon,
   Timeline, TimelineItem } from 'vux'
 import Topalert from '@/components/Topalert.vue'
@@ -227,7 +258,11 @@ import UserSelecter from '../User/Selecter.vue'
 import printModeData from '../../data/print_mode.json'
 
 export default {
+  directives: {
+    TransferDom
+  },
   components: {
+    Previewer,
     Flow,
     FlowState,
     FlowLine,
@@ -280,6 +315,12 @@ export default {
         recommend: [],          // 推荐资料
         confirm: [],            // 确认书
         clashCustomer: null
+      },
+      attach: [],
+      previewOptions: {
+        isClickableElement: function (el) {
+          return /previewer-icon/.test(el.className)
+        }
       },
       showSelectUser: false,
       checkCount: 0,
@@ -355,6 +396,10 @@ export default {
             if (res.data[item] !== undefined && res.data[item] !== null) {
               vm.info[item] = res.data[item]
             }
+          }
+
+          if (res.data.attach) {
+            vm.attach = res.data.attach
           }
 
           vm.$emit('on-view-loaded', vm.info.customer_name)
@@ -467,6 +512,63 @@ export default {
                 width: '13em'
               })
             }
+          })
+        }
+      })
+    },
+    preview (index) {
+      if (this.attach[index].is_image) {
+        this.$refs.prevAttach.show(index)
+      } else {
+        document.location.href = this.attach[index].url
+      }
+    },
+    upload () {
+      let form = this.$refs.frmUploadCustomerAttach
+      this.$vux.loading.show()
+      this.$postFile('/api/customer/uploadAttach', form, (res) => {
+        this.$vux.loading.hide()
+        if (res.success) {
+          this.attach = res.data
+        } else {
+          this.$vux.toast.show({
+            text: res.message,
+            width: '16em'
+          })
+        }
+      })
+    },
+    downloadAttach () {
+      let index = this.$refs.prevAttach.getCurrentIndex()
+      if (index < 0) return
+      let a = this.attach[index]
+      document.location.href = a.url
+    },
+    confirmRemoveAttach () {
+      let index = this.$refs.prevAttach.getCurrentIndex()
+      if (index < 0) return
+      let a = this.attach[index]
+      let vm = this
+      this.$vux.confirm.show({
+        title: '删除附件',
+        content: '确定要删除这个附件吗？',
+        onConfirm () {
+          vm.removeAttach(index, a.id)
+        }
+      })
+    },
+    removeAttach (index, id) {
+      this.$vux.loading.show()
+      this.$post('/api/customer/removeAttach', {
+        attach_id: id
+      }, (res) => {
+        this.$vux.loading.hide()
+        if (res.success) {
+          this.attach.splice(index, 1)
+        } else {
+          this.$vux.toast.show({
+            text: res.message,
+            width: '13em'
           })
         }
       })
@@ -589,7 +691,7 @@ export default {
         vm.$vux.loading.hide()
         if (res.success) {
           vm.info.recommend = res.data
-          vm.goTab(3)
+          vm.goTab(4)
         } else {
           vm.$vux.toast.show({
             text: res.message,
@@ -776,6 +878,30 @@ export default {
     p.foot {
       font-size:0.6em
     }
+  }
+}
+
+.customer-img { width:100%; height: auto; }
+
+.bottom-bar {
+  .upload {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 3em;
+    opacity: 0;
+  }
+}
+
+.previewer-icon {
+  display:block;
+  float:right;
+  opacity: 0.75;
+  cursor: pointer;
+  width:44px;
+  height:44px;
+  svg {
+    margin:10px;fill:#fff;
   }
 }
 </style>

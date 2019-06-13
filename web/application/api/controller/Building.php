@@ -157,7 +157,7 @@ class Building extends Base
   public function uploadImage($id) {
     $files = request()->file('images');
     if ($files) {
-      $result = File::uploadImage($this->user, 'building', $id, $files);
+      $result = File::upload($this->user, 'building', $id, $files);
       if ($result >= 1) {
         $images = File::getList($this->user, 'building', $id);
         return $this->succeed($images);
@@ -175,7 +175,7 @@ class Building extends Base
   public function uploadUnitImage($id) {
     $files = request()->file('images');
     if ($files) {
-      $result = File::uploadImage($this->user, 'unit', $id, $files);
+      $result = File::upload($this->user, 'unit', $id, $files);
       if ($result >= 1) {
         $images = File::getList($this->user, 'unit', $id);
         return $this->succeed($images);
@@ -203,7 +203,7 @@ class Building extends Base
    * 移除图片
    */
   public function removeImage($image_id) {
-    $result = File::removeImage($this->user, $image_id);
+    $result = File::remove($this->user, $image_id);
     if ($result == 1) {
       return $this->succeed();
     } else {
