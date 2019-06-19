@@ -120,7 +120,7 @@ export default {
         end_date: '',         // 到期日
         remind: 8,            // 到期提醒（提前月份数）
         rem: '',              // 项目说明
-        status: 0,            // 状态
+        status: 6,            // 状态
         company_id: 0,        // 所属企业
         share: false,         // 共享状态
         linkman: '',          // 联系人

@@ -791,7 +791,7 @@ class Customer extends Base
         $customer['remind'] = 8;
         $customer['user_id'] = $user_id;
         $customer['company_id'] = $company_id;
-        $customer['status'] = 6;
+        $customer['status'] = 6; // 名录
         $customer['share'] = 0;
 
         if (isset($customer['settle_date'])) {
