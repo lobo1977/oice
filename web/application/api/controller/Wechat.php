@@ -54,7 +54,7 @@ class Wechat extends Base
    * 自定义菜单
    */
   public function menu() {
-    $app_root = 'http://' . config('app_host');
+    $app_root = 'https://' . config('app_host');
 
     $menu = array(
       'button' => array(
@@ -148,7 +148,7 @@ class Wechat extends Base
     }
 
     $wechatUrl = '';
-    $callback = urlencode('http://' . config('app_host') . '/app/wechat/login');
+    $callback = urlencode('https://' . config('app_host') . '/app/wechat/login');
 
     // 是否是微信客户端
     if (Utils::isWechat()) {

@@ -379,7 +379,7 @@ class Company extends Base
       ]);
 
       $message = $manager->title . '已将企业“' . $company->title . '”管理员权限转交给你。';
-      $url = 'http://' . config('app_host') . '/app/company/view/' . $company->id;
+      $url = 'https://' . config('app_host') . '/app/company/view/' . $company->id;
       User::pushMessage($user->id, $message, $url);
     }
 
@@ -579,7 +579,7 @@ class Company extends Base
 
       if ($status == 0) {
         $message = $user->title . '申请加入“' . $company->title . '”，请及时审核。';
-        $url = 'http://' . config('app_host') . '/app/company/view/' . $company->id;
+        $url = 'https://' . config('app_host') . '/app/company/view/' . $company->id;
         User::pushMessage($company->user_id, $message, $url);
       }
 
@@ -685,7 +685,7 @@ class Company extends Base
       Log::add($manager, $log);
 
       $message = '管理员已批准您加入企业“' . $company->title . '”。';
-      $url = 'http://' . config('app_host') . '/app/company/view/' . $company->id;
+      $url = 'https://' . config('app_host') . '/app/company/view/' . $company->id;
       User::pushMessage($user_id, $message, $url);
     }
     return $result;

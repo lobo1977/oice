@@ -504,7 +504,7 @@ class Customer extends Base
           if ($company) {
             $admin_id = $company->user_id;
             $message = $user->title . '登记的客户“' . $data['customer_name'] . '”发生撞单，已申请并行或强行转交，请及时处理。';
-            $url = 'http://' . config('app_host') . '/app/customer/view/'. $id;
+            $url = 'https://' . config('app_host') . '/app/customer/view/'. $id;
             User::pushMessage($admin_id, $message, $url);
           }
         }
@@ -553,7 +553,7 @@ class Customer extends Base
           if ($company) {
             $admin_id = $company->user_id;
             $message = $user->title . '登记的客户“' . $data['customer_name'] . '”发生撞单，已申请并行或强行转交，请及时处理。';
-            $url = 'http://' . config('app_host') . '/app/customer/view/'. $newData->id;
+            $url = 'https://' . config('app_host') . '/app/customer/view/'. $newData->id;
             User::pushMessage($admin_id, $message, $url);
           }
         }
@@ -666,14 +666,14 @@ class Customer extends Base
         self::remove($user, $id);
       }
       $message = '您登记的撞单客户已由管理员转交给您，请及时跟进。';
-      $url = 'http://' . config('app_host') . '/app/customer/view/' . $clashCustomer->id;
+      $url = 'https://' . config('app_host') . '/app/customer/view/' . $clashCustomer->id;
     } else if ($operate == 1) {   // 并行处理
       $summary = '撞单客户并行处理';
       $customer->parallel = $clashCustomer->id;
       $customer->clash = 0;
       $result = $customer->save();
       $message = '您登记的撞单客户已由管理员并行处理，请及时跟进。';
-      $url = 'http://' . config('app_host') . '/app/customer/view/' . $customer->id;
+      $url = 'https://' . config('app_host') . '/app/customer/view/' . $customer->id;
     } else if ($operate == 2) {   // 驳回
       $summary = '撞单客户驳回';
       $result = self::remove($user, $id);

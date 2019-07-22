@@ -30,7 +30,7 @@
         style="float:right;margin-right:30px;">导航</x-button>
       <h4 style="font-size:1em;">{{title}}</h4>
       <span style="font-size:0.9em;">{{'地址：' + district + address}}</span>
-      <form ref="frmGoMap" action="http://api.map.baidu.com/direction" target="_blank" method="get">
+      <form ref="frmGoMap" action="https://api.map.baidu.com/direction" target="_blank" method="get">
         <input type="hidden" name="region" :value="location.city">
         <input type="hidden" name="output" value="html" />
         <input type="hidden" name="mode" value="driving">

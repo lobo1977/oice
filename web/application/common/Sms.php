@@ -43,7 +43,7 @@ class Sms {
   public function sendInvite($mobile, $username, $company) {
     $company = $company . config('app_name');
     $wechat = new Wechat();
-    $url = 'http://' . config('app_host') . '/app/login';
+    $url = 'https://' . config('app_host') . '/app/login';
     $url = $wechat->getShortUrl($url);
     if ($this->gatway == 'TX') {
       return $this->sendSMSTX($mobile, 'sms.tmpInviteId', [$username, $company, $url]);

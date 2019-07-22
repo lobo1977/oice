@@ -89,7 +89,7 @@ class DailyReview extends Base
     $result = $review->save();
     if (!$id && $result) {
       $message = $user->title . '已批阅了你的工作日报。';
-      $url = 'http://' . config('app_host') . '/app/daily/review/' . $review->review_user . '/' . $review->review_date;
+      $url = 'https://' . config('app_host') . '/app/daily/review/' . $review->review_user . '/' . $review->review_date;
       User::pushMessage($review->review_user, $message, $url);
     }
     return $result;
