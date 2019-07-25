@@ -35,18 +35,23 @@ class Wechat extends Base
    * 用户交互
    */
   public function response() {
-    echo $this->wechat->response();
-    $user = $this->wechat->getUser();
-    if ($user != null) {
-      $data = [
-        'platform' => 'wechat',
-        'openid' => $user['openid'],
-        'unionid' => isset($user['unionid']) ? $user['unionid'] : '',
-        'nickname' => $user['nickname'],
-        'sex' => $user['sex'],
-        'avatar' => $user['headimgurl']
-      ];
-      Oauth::add($data);
+    $postStr = $GLOBALS["HTTP_RAW_POST_DATA"];
+    if (!empty($postStr)) {
+      $postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
+      $user = $this->wechat->getUserInfo($postObj->FromUserName);
+      if ($user != null) {
+        $data = [
+          'platform' => 'wechat',
+          'openid' => $user['openid'],
+          'unionid' => isset($user['unionid']) ? $user['unionid'] : '',
+          'nickname' => $user['nickname'],
+          'sex' => $user['sex'],
+          'avatar' => $user['headimgurl']
+        ];
+        Oauth::add($data);
+      }
+
+      echo $this->wechat->response($postObj);
     }
   }
 

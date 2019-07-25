@@ -148,6 +148,7 @@ class Wechat {
 			$res = json_decode($res, true);
 			if (isset($res['subscribe'])){
 				if ($res['subscribe'] == 1) {
+					$this->user = $res;
 					return $res;
 				} else {
 					$this->errmsg = '用户未关注。';
@@ -262,16 +263,9 @@ class Wechat {
 	/**
 	 * 接收并响应消息
 	 */
-	public function response() {
-		$postStr = $GLOBALS["HTTP_RAW_POST_DATA"];
-		if (!empty($postStr)){
-			
-			$this->logger("Receive: ".$postStr);
-			
-			$postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
+	public function response($postObj) {
+		if (!empty($postObj)){
 			$RX_TYPE = trim($postObj->MsgType);
-			$this->user = $this->getUserInfo($postObj->FromUserName);
-			
 			//消息类型路由
 			switch ($RX_TYPE) {
 				case "event":
@@ -372,10 +366,16 @@ class Wechat {
 	private function receiveText($object) {
 		$content = "";
 		$keyword = trim($object->Content);
+		$robot_sign = '[签到]';
 		
 		if ($keyword == "签到") {
 			if ($this->user) {
-				Robot::signIn($this->user['nickname'], 
+				$content = '签到成功。';
+			}
+		} else if (mb_substr($keyword, 0, mb_strlen($robot_sign)) === $robot_sign) {
+			$robot_id = mb_substr($keyword, mb_strlen($robot_sign));
+			if ($this->user && $robot_id) {
+				Robot::signIn($robot_id, 
 					$this->user['openid'], 
 					$this->user['headimgurl']);
 				$content = '签到成功。';

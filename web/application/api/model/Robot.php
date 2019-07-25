@@ -16,9 +16,8 @@ class Robot extends Base
 	 * @param string $openid
 	 * @return boolean
 	 */
-	public static function signIn($name, $openid, $avatar) {
-    $find = self::where('name', $name)
-      ->where('openid', 'null')
+	public static function signIn($robot_id, $openid, $avatar) {
+    $find = self::where('uid', $robot_id)
       ->where('status', '>', 0)
       ->find();
     if ($find) {
