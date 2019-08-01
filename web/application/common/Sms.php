@@ -64,25 +64,26 @@ class Sms {
    */
   public function sendSMS($mobile, $msg, $needstatus = 'false', $product = '', $extno = '') {
     //创蓝接口参数
-    $postArr = array (
-      'account' => config('sms.user'),
-      'pswd' => config('sms.pwd'),
-      'msg' => $msg,
-      'mobile' => $mobile,
-      'needstatus' => $needstatus,
-      'product' => $product,
-      'extno' => $extno
+		$postArr = array (
+			'account'  => config('sms.user'),
+			'password' => config('sms.pwd'),
+			'msg' => $msg,
+			'phone' => $mobile,
+			'report' => $needstatus,
     );
-    $result = $this->curlPost(config('sms.url'), $postArr);
+		$result = $this->curlPost(config('sms.url'), $postArr);
     if ($result) {
-      $r = $this->execResult($result);
-      if ($r[1] != 0) {
-        $this->error = '短信发送失败，错误码：' . $r[1];
+      $r = json_decode($result, true);
+      if (!is_null($r) && isset($r['code'])) {
+        if ($r['code'] != '0') {
+          $this->error = '短信发送失败，错误码：' . $r['code'];
+        }
+        return $r['code'];
+      } else {
+        $this->error = $result;
       }
-      return $r[1];
-    } else {
-      return false;
     }
+    return false;
   }
 
   /**
@@ -111,16 +112,23 @@ class Sms {
    * @return boolean
    */
   public function getBalance() {
-    $postArr = array (
+    //查询参数
+		$postArr = array ( 
       'account' => config('sms.user'),
-      'pswd' => config('sms.pwd')
+      'password' => config('sms.pwd'),
     );
     $result = $this->curlPost(config('sma.query_url'), $postArr);
     if ($result) {
-      return $this->execResult($result);
-    } else {
-      return false;
+      $r = json_decode($result, true);
+      if (!is_null($r) && isset($r['balance'])) {
+        return $r['balance'];
+      } else if (!is_null($r) && isset($r['errorMsg'])) {
+        $this->error = $r['errorMsg'];
+      } else {
+        $this->error = $result;
+      }
     }
+    return false;
   }
 
   /**
@@ -131,29 +139,38 @@ class Sms {
   }
 
   /**
-   * 处理返回值（创蓝）
-   */
-  private function execResult($result) {
-    $result = preg_split("/[,\r\n]/", $result);
-    return $result;
-  }
-
-  /**
-   * 通过CURL发送HTTP请求
-   * @param string $url  //请求URL
-   * @param array $postFields //请求参数
-   * @return mixed
-   */
-  private function curlPost($url,$postFields){
-    $postFields = http_build_query($postFields);
-    $ch = curl_init ();
-    curl_setopt ( $ch, CURLOPT_POST, 1 );
-    curl_setopt ( $ch, CURLOPT_HEADER, 0 );
-    curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
-    curl_setopt ( $ch, CURLOPT_URL, $url );
-    curl_setopt ( $ch, CURLOPT_POSTFIELDS, $postFields );
-    $result = curl_exec ( $ch );
-    curl_close ( $ch );
-    return $result;
-  }
+	 * 通过CURL发送HTTP请求
+	 * @param string $url  //请求URL
+	 * @param array $postFields //请求参数 
+	 * @return mixed
+	 */
+	private function curlPost($url,$postFields){
+		$postFields = json_encode($postFields);
+		$ch = curl_init ();
+		curl_setopt( $ch, CURLOPT_URL, $url ); 
+		curl_setopt( $ch, CURLOPT_HTTPHEADER, array(
+			  'Content-Type: application/json; charset=utf-8'   //json版本需要填写  Content-Type: application/json;
+			)
+		);
+		curl_setopt( $ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4); //若果报错 name lookup timed out 报错时添加这一行代码
+		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
+		curl_setopt( $ch, CURLOPT_POST, 1 );
+    curl_setopt( $ch, CURLOPT_POSTFIELDS, $postFields);
+    curl_setopt( $ch, CURLOPT_TIMEOUT, 60); 
+    curl_setopt( $ch, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, 0);
+		$ret = curl_exec ( $ch );
+    if (false == $ret) {
+      $result = curl_error($ch);
+    } else {
+      $rsp = curl_getinfo( $ch, CURLINFO_HTTP_CODE);
+      if (200 != $rsp) {
+        $result = "请求状态 ". $rsp . " " . curl_error($ch);
+      } else {
+        $result = $ret;
+      }
+    }
+		curl_close ( $ch );
+		return $result;
+	}
 }
