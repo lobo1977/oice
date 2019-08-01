@@ -57,10 +57,9 @@ class Building extends Base
       if ($user == null) {
         return false;
       } else {
-        return $building->user_id == 0 || 
-          (($user->isAdmin || $building->user_id == $user->id) &&
-          $building->company_id == $user->company_id) || 
-          ($building->user_id == $user->id && $building->company_id == 0);
+        return $building->user_id == 0 ||
+          ($building->company_id > 0 && $building->company_id == $user->company_id) || 
+          ($building->company_id == 0 && $building->user_id == $user->id);
       }
     } else if ($operate == 'delete') {
       return false;

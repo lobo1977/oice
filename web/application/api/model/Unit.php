@@ -36,14 +36,12 @@ class Unit extends Base
       return $user != null && Building::allow($user, $building, 'edit');
     } else if ($operate == 'edit') {
       return $user != null && Building::allow($user, $building, 'edit') &&
-        ((($user->isAdmin || $unit->user_id == $user->id) &&
-        $unit->company_id == $user->company_id) || 
-        ($unit->user_id == $user->id && $unit->company_id == 0));
+        (($unit->company_id > 0 && $unit->company_id == $user->company_id) || 
+        ($unit->company_id == 0 && $unit->user_id == $user->id));
     } else if ($operate == 'delete') {
       return $user != null && Building::allow($user, $building, 'edit') && 
-        ((($user->isAdmin || $unit->user_id == $user->id) &&
-        $unit->company_id == $user->company_id) || 
-        ($unit->user_id == $user->id && $unit->company_id == 0));
+        (($unit->company_id > 0 && $unit->company_id == $user->company_id) || 
+        ($unit->company_id == 0 && $unit->user_id == $user->id));
     } else {
       return false;
     }
