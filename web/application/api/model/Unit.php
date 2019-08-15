@@ -67,6 +67,18 @@ class Unit extends Base
       }
       if (isset($unit->status) && $unit->status != null) {
         $unit->statusText = self::$status[$unit->status];
+        $unit->title = $unit->title . '(' . $unit->statusText . ')';
+      }
+      $unit->src = empty($unit->file) ? '/static/img/error.png' : '/upload/unit/images/300/' . $unit->file;
+
+      $unit->desc = '';
+      if (!empty($unit->acreage)) {
+        $unit->desc = $unit->acreage . '㎡ ';
+      }
+      if (!empty($unit->rent_price)) {
+        $unit->desc = $unit->desc . $unit->rent_price . '元/平米/天 ';
+      } else if (!empty($unit->sell_price)) {
+        $unit->desc = $unit->desc . $unit->sell_price . '元/平米 ';
       }
     }
   }
@@ -85,14 +97,17 @@ class Unit extends Base
 
     $building = Building::get($id);
 
-    $list = self::where('building_id', $id)
+    $list = self::alias('a')
+      ->leftJoin('file b',"b.parent_id = a.id AND b.type = 'unit' AND b.default = 1")
+      ->where('a.building_id', $id)
       //->where('(share = 1 OR user_id = ' . $user_id . ' OR ' . 
       //  '(company_id > 0 AND company_id = ' . $company_id . '))')
-      ->field('id,building_no,floor,room,acreage,status,share,user_id,company_id')
-      ->order('building_no', 'asc')
-      ->order('floor', 'desc')
-      ->order('room', 'asc')
-      ->order('id', 'asc')
+      ->field('a.id,a.building_no,a.floor,a.room,a.acreage,a.rent_sell,a.rent_price,
+        a.sell_price,a.status,a.share,a.user_id,a.company_id,b.file')
+      ->order('a.building_no', 'asc')
+      ->order('a.floor', 'desc')
+      ->order('a.room', 'asc')
+      ->order('a.id', 'asc')
       ->select();
     
     foreach($list as $key=>$unit) {

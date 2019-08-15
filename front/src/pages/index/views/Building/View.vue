@@ -14,17 +14,17 @@
       <previewer :list="info.images" ref="prevBuilding" :options="previewOptions"></previewer>
     </div>
 
-    <sticky :offset="46">
+    <!-- <sticky :offset="46">
       <tab>
         <tab-item @on-item-click="goTab(0)" :selected="tab === 0">基本信息</tab-item>
         <tab-item @on-item-click="goTab(1)" :selected="tab === 1">单元销控</tab-item>
         <tab-item @on-item-click="goTab(2)" :selected="tab === 2">联系人</tab-item>
         <tab-item @on-item-click="goTab(3)" :selected="tab === 3">确认书</tab-item>
       </tab>
-    </sticky>
+    </sticky> -->
 
-    <div v-show="tab === 0 && !showPush">
-      <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
+    <div v-show="!showPush">
+      <group title="基本信息" gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
         <cell title="项目类型" value-align="left" :value="info.building_type" v-show="info.building_type"></cell>
         <cell value-align="left" :value="info.area + info.address" v-show="info.area || info.address" 
           :is-link="true" @click.native="showMap = true">
@@ -60,39 +60,21 @@
         <p class="group-padding">{{info.environment}}</p>
       </group>
 
-      <flexbox :gutter="0" class="bottom-bar">
-        <flexbox-item :span="4">
-          <x-button type="warn" class="bottom-btn"
-            @click.native="toCustomer(0)">
-              <x-icon type="funnel" class="btn-icon"></x-icon> 加入筛选
-          </x-button>
-        </flexbox-item>
-        <flexbox-item :span="4">
-          <x-button type="primary" class="bottom-btn"
-            @click.native="toCustomer(1)">
-              <x-icon type="checkmark-circled" class="btn-icon"></x-icon> 云确认
-          </x-button>
-        </flexbox-item>
-        <flexbox-item :span="2">
-          <x-button type="default" class="bottom-btn"
-            @click.native="favorite">
-            <x-icon type="star" class="btn-icon" :class="{green: info.isFavorite}"></x-icon>
-          </x-button>
-        </flexbox-item>
-        <flexbox-item>
-          <x-button type="default" class="bottom-btn" :disabled="!info.allowEdit"
-            :link="{name:'BuildingEdit', params: { id: info.id }}">
-            <x-icon type="compose" class="btn-icon"></x-icon>
-          </x-button>
-        </flexbox-item>
-      </flexbox>
+      <group>
+        <group-title slot="title">单元销控
+          <router-link style="float:right;color:#333;cursor:pointer;" v-if="info.allowEdit"
+            :to="{name: 'UnitEdit', params: { id:0, bid: info.id }}">+ 添加</router-link>
+        </group-title>
+        <cell v-for="(item, index) in info.unit" :key="index" :title="item.title" :is-link="true" @click="unitClick(item)">
+          <img slot="icon" :src="item.src" class="cell-image" />
+          <p slot="inline-desc" class="cell-desc">{{item.desc}}</p>
+        </cell>
+      </group>
 
-      <actionsheet v-model="showBuildingMenu" :menus="buildingMenu" theme="android" 
-        @on-click-menu="buildingMenuClick"></actionsheet>
-    </div>
+      <!-- <actionsheet v-model="showBuildingMenu" :menus="buildingMenu" theme="android" 
+        @on-click-menu="buildingMenuClick"></actionsheet> -->
 
-    <div v-show="tab === 1 && !showPush">
-      <checker v-model="selectedUnit" type="checkbox" @on-change="selectUnit"
+      <!-- <checker v-model="selectedUnit" type="checkbox" @on-change="selectUnit"
         class="unit-checker-box" default-item-class="unit-item" 
         selected-item-class="unit-item-selected" disabled-item-class="unit-item-disabled">
         <div v-for="(building, b) in unitTree" :key="b">
@@ -108,16 +90,13 @@
             </checker-item>
           </div>
         </div>
-      </checker>
+      </checker> -->
 
-      <div v-show="selectedUnit.length" style="padding:10px 15px;font-size:0.8em">
+      <!-- <div v-show="selectedUnit.length" style="padding:10px 15px;font-size:0.8em">
         <span>已选中 {{selectedUnit.length}} 个单元</span>
-      </div>
+      </div> -->
 
-      <actionsheet v-model="showUnitMenu" :menus="unitMenu" theme="android" 
-        @on-click-menu="unitMenuClick" @on-after-hide="menuUnit = null"></actionsheet>
-
-      <flexbox :gutter="0" class="bottom-bar">
+      <!-- <flexbox :gutter="0" class="bottom-bar">
         <flexbox-item :span="4">
           <x-button type="warn" class="bottom-btn" :disabled="selectedUnit.length === 0"
             @click.native="toCustomer(0)">
@@ -136,37 +115,37 @@
             <x-icon type="plus" class="btn-icon"></x-icon> 添加
           </x-button>
         </flexbox-item>
-      </flexbox>
-    </div>
+      </flexbox> -->
 
-    <div v-show="tab === 2 && !showPush">
-      <div v-if="user != null && user.id > 0">
-        <cell v-for="(item, index) in info.linkman" :key="index"
-          :title="item.title" :link="{name: 'Linkman', params: {id: item.id}}" 
-          :inline-desc="item.desc"></cell>
-        
-        <div class="bottom-bar">
-          <x-button type="primary" class="bottom-btn" :disabled="!info.allowEdit"
-            :link="{name: 'LinkmanEdit', params: {id: 0, type: 'building', oid: info.id}}">
-            <x-icon type="plus" class="btn-icon"></x-icon> 添加
-          </x-button>
+      <group>
+        <group-title slot="title">联系人
+          <router-link style="float:right;color:#333;cursor:pointer;" v-if="info.allowEdit"
+            :to="{name: 'LinkmanEdit', params: {id: 0, type: 'building', oid: info.id}}">+ 添加</router-link>
+        </group-title>
+        <div v-if="user != null && user.id > 0">
+          <cell v-for="(item, index) in info.linkman" :key="index"
+            :title="item.title" :link="{name: 'Linkman', params: {id: item.id}}" 
+            :inline-desc="item.desc"></cell>
+          
+          <!-- <div class="bottom-bar">
+            <x-button type="primary" class="bottom-btn" :disabled="!info.allowEdit"
+              :link="{name: 'LinkmanEdit', params: {id: 0, type: 'building', oid: info.id}}">
+              <x-icon type="plus" class="btn-icon"></x-icon> 添加
+            </x-button>
+          </div> -->
         </div>
-      </div>
 
-      <div v-if="user == null || user.id == 0">
-        <load-more
-          :show-loading="false" tip="请登录后查看" background-color="#fbf9fe"></load-more>
+        <div v-if="user == null || user.id == 0">
+          <load-more
+            :show-loading="false" tip="请登录后查看" background-color="#fbf9fe"></load-more>
 
-        <div class="bottom-bar">
-          <x-button type="primary" class="bottom-btn" @click.native="login">
-            立即登录
-          </x-button>
+            <x-button type="primary" class="bottom-btn" @click.native="login">
+              立即登录
+            </x-button>
         </div>
-      </div>
-    </div>
+      </group>
 
-    <div v-show="tab === 3 && !showPush">
-      <div v-if="user != null && user.id > 0">
+      <!--<div v-if="user != null && user.id > 0">
         <cell v-for="(item, index) in info.confirm" :key="index"
           :title="item.title" :link="{name: 'ConfirmView', params: {id: item.id}}" 
           :inline-desc="item.desc"></cell>
@@ -180,10 +159,39 @@
             立即登录
           </x-button>
         </div>
-      </div>
-    </div>
+      </div>-->
 
     <qrcode></qrcode>
+
+    <actionsheet v-model="showUnitMenu" :menus="unitMenu" theme="android" 
+      @on-click-menu="unitMenuClick" @on-after-hide="menuUnit = null"></actionsheet>
+
+    <flexbox :gutter="0" class="bottom-bar">
+      <flexbox-item :span="4">
+        <x-button type="warn" class="bottom-btn"
+          @click.native="toCustomer(0)">
+            <x-icon type="funnel" class="btn-icon"></x-icon> 加入筛选
+        </x-button>
+      </flexbox-item>
+      <!-- <flexbox-item :span="4">
+        <x-button type="primary" class="bottom-btn"
+          @click.native="toCustomer(1)">
+            <x-icon type="checkmark-circled" class="btn-icon"></x-icon> 云确认
+        </x-button>
+      </flexbox-item> -->
+      <flexbox-item :span="4">
+        <x-button type="default" class="bottom-btn"
+          @click.native="favorite">
+          <x-icon type="star" class="btn-icon" :class="{green: info.isFavorite}"></x-icon> 收藏
+        </x-button>
+      </flexbox-item>
+      <flexbox-item>
+        <x-button type="default" class="bottom-btn" :disabled="!info.allowEdit"
+          :link="{name:'BuildingEdit', params: { id: info.id }}">
+          <x-icon type="compose" class="btn-icon"></x-icon> 编辑
+        </x-button>
+      </flexbox-item>
+    </flexbox>
 
     <popup-picker class="popup-picker" :show.sync="showCustomerPicker" 
       popup-title="选择客户" :show-cell="false" :data="myCustomer" v-model="selectCustomer"
@@ -395,16 +403,16 @@ export default {
         vm.shareDesc = vm.info.building_type + ' ' + vm.info.area + vm.info.district + ' ' + vm.info.price
       }
     },
-    goTab (tab) {
-      let vm = this
-      vm.$router.replace({name: 'BuildingView', id: this.info.id, query: {tab: tab}})
-      vm.tab = tab
-      vm.shareLink = window.location.href
-      vm.setShareDesc()
-      if (vm.$isWechat()) {
-        vm.$wechatShare(null, vm.shareLink, vm.info.building_name, vm.shareDesc, vm.shareImage)
-      }
-    },
+    // goTab (tab) {
+    //   let vm = this
+    //   vm.$router.replace({name: 'BuildingView', id: this.info.id, query: {tab: tab}})
+    //   vm.tab = tab
+    //   vm.shareLink = window.location.href
+    //   vm.setShareDesc()
+    //   if (vm.$isWechat()) {
+    //     vm.$wechatShare(null, vm.shareLink, vm.info.building_name, vm.shareDesc, vm.shareImage)
+    //   }
+    // },
     preview (index) {
       this.$refs.prevBuilding.show(index)
     },
@@ -542,35 +550,35 @@ export default {
         }
       })
     },
-    toConfirm (cid, bid) {
-      this.$router.push({name: 'ConfirmEdit', params: {id: 0, bid: bid, cid: cid}})
-    },
-    batchFavorite () {
-      if (this.selectedUnit.length <= 0) {
-        return
-      }
-      if (!this.$checkAuth()) {
-        return
-      }
-      this.$vux.loading.show()
-      this.$post('/api/building/batchFavorite', {
-        ids: this.selectedUnit
-      }, (res) => {
-        this.$vux.loading.hide()
-        if (res.success) {
-          this.$vux.toast.show({
-            type: 'success',
-            text: '已添加到收藏夹。',
-            width: '13em'
-          })
-        } else {
-          this.$vux.toast.show({
-            text: res.message,
-            width: '15em'
-          })
-        }
-      })
-    },
+    // toConfirm (cid, bid) {
+    //   this.$router.push({name: 'ConfirmEdit', params: {id: 0, bid: bid, cid: cid}})
+    // },
+    // batchFavorite () {
+    //   if (this.selectedUnit.length <= 0) {
+    //     return
+    //   }
+    //   if (!this.$checkAuth()) {
+    //     return
+    //   }
+    //   this.$vux.loading.show()
+    //   this.$post('/api/building/batchFavorite', {
+    //     ids: this.selectedUnit
+    //   }, (res) => {
+    //     this.$vux.loading.hide()
+    //     if (res.success) {
+    //       this.$vux.toast.show({
+    //         type: 'success',
+    //         text: '已添加到收藏夹。',
+    //         width: '13em'
+    //       })
+    //     } else {
+    //       this.$vux.toast.show({
+    //         text: res.message,
+    //         width: '15em'
+    //       })
+    //     }
+    //   })
+    // },
     buildingMenuClick (key, item) {
       let vm = this
       if (key === 'edit') {
@@ -615,68 +623,68 @@ export default {
         this.showUnitMenu = false
       }
     },
-    unitTouch (item, isTouch) {
-      let vm = this
-      vm.touchUnit = item
-      if (isTouch) {
-        event.preventDefault()
-        if (event.touches) {
-          vm.touchX = event.touches[0].pageX
-          vm.touchY = event.touches[0].pageY
-        } else if (event.changedTouches) {
-          vm.touchX = event.changedTouches[0].pageX
-          vm.touchY = event.changedTouches[0].pageY
-        } else if (event.targetTouches) {
-          vm.touchX = event.targetTouches[0].pageX
-          vm.touchY = event.targetTouches[0].pageY
-        }
-        vm.moveX = vm.touchX
-        vm.moveY = vm.touchY
-      }
-      vm.unitTouchEvent = setTimeout(() => {
-        vm.unitTouchEvent = 0
-        if (!isTouch || (Math.abs(vm.moveX - vm.touchX) <= 5 && Math.abs(vm.moveY - vm.touchY) <= 5)) {
-          this.unitClick(item)
-        }
-      }, 500)
-    },
-    unitTouchMove (isTouch) {
-      if (isTouch) {
-        if (event.touches) {
-          this.moveX = event.touches[0].pageX
-          this.moveY = event.touches[0].pageY
-        } else if (event.changedTouches) {
-          this.moveX = event.changedTouches[0].pageX
-          this.moveY = event.changedTouches[0].pageY
-        } else if (event.targetTouches) {
-          this.moveX = event.targetTouches[0].pageX
-          this.moveY = event.targetTouches[0].pageY
-        }
-      } else {
-        this.touchUnit = null
-        clearTimeout(this.unitTouchEvent)
-        this.unitTouchEvent = 0
-      }
-    },
-    unitTouchEnd (isTouch) {
-      this.touchUnit = null
-      clearTimeout(this.unitTouchEvent)
-      if (this.unitTouchEvent !== 0 && isTouch) {
-        if (event.changedTouches) {
-          this.moveX = event.changedTouches[0].pageX
-          this.moveY = event.changedTouches[0].pageY
-        } else if (event.targetTouches) {
-          this.moveX = event.targetTouches[0].pageX
-          this.moveY = event.targetTouches[0].pageY
-        }
-        if (Math.abs(this.moveX - this.touchX) <= 5 && Math.abs(this.moveY - this.touchY) <= 5) {
-          let e = document.createEvent('MouseEvents')
-          e.initEvent('click', true, true)
-          event.target.dispatchEvent(e)
-        }
-      }
-      return false
-    },
+    // unitTouch (item, isTouch) {
+    //   let vm = this
+    //   vm.touchUnit = item
+    //   if (isTouch) {
+    //     event.preventDefault()
+    //     if (event.touches) {
+    //       vm.touchX = event.touches[0].pageX
+    //       vm.touchY = event.touches[0].pageY
+    //     } else if (event.changedTouches) {
+    //       vm.touchX = event.changedTouches[0].pageX
+    //       vm.touchY = event.changedTouches[0].pageY
+    //     } else if (event.targetTouches) {
+    //       vm.touchX = event.targetTouches[0].pageX
+    //       vm.touchY = event.targetTouches[0].pageY
+    //     }
+    //     vm.moveX = vm.touchX
+    //     vm.moveY = vm.touchY
+    //   }
+    //   vm.unitTouchEvent = setTimeout(() => {
+    //     vm.unitTouchEvent = 0
+    //     if (!isTouch || (Math.abs(vm.moveX - vm.touchX) <= 5 && Math.abs(vm.moveY - vm.touchY) <= 5)) {
+    //       this.unitClick(item)
+    //     }
+    //   }, 500)
+    // },
+    // unitTouchMove (isTouch) {
+    //   if (isTouch) {
+    //     if (event.touches) {
+    //       this.moveX = event.touches[0].pageX
+    //       this.moveY = event.touches[0].pageY
+    //     } else if (event.changedTouches) {
+    //       this.moveX = event.changedTouches[0].pageX
+    //       this.moveY = event.changedTouches[0].pageY
+    //     } else if (event.targetTouches) {
+    //       this.moveX = event.targetTouches[0].pageX
+    //       this.moveY = event.targetTouches[0].pageY
+    //     }
+    //   } else {
+    //     this.touchUnit = null
+    //     clearTimeout(this.unitTouchEvent)
+    //     this.unitTouchEvent = 0
+    //   }
+    // },
+    // unitTouchEnd (isTouch) {
+    //   this.touchUnit = null
+    //   clearTimeout(this.unitTouchEvent)
+    //   if (this.unitTouchEvent !== 0 && isTouch) {
+    //     if (event.changedTouches) {
+    //       this.moveX = event.changedTouches[0].pageX
+    //       this.moveY = event.changedTouches[0].pageY
+    //     } else if (event.targetTouches) {
+    //       this.moveX = event.targetTouches[0].pageX
+    //       this.moveY = event.targetTouches[0].pageY
+    //     }
+    //     if (Math.abs(this.moveX - this.touchX) <= 5 && Math.abs(this.moveY - this.touchY) <= 5) {
+    //       let e = document.createEvent('MouseEvents')
+    //       e.initEvent('click', true, true)
+    //       event.target.dispatchEvent(e)
+    //     }
+    //   }
+    //   return false
+    // },
     unitMenuClick (key, item) {
       let vm = this
       if (vm.menuUnit != null) {
@@ -699,6 +707,33 @@ export default {
           } else {
             vm.login()
           }
+        } else if (key === 'favorite') {
+          if (!vm.$checkAuth()) {
+            return
+          }
+          vm.$post('/api/unit/favorite', {
+            id: unitId
+          }, (res) => {
+            vm.$vux.loading.hide()
+            if (res.success) {
+              vm.$vux.toast.show({
+                type: 'success',
+                text: '已添加到收藏夹。',
+                width: '13em'
+              })
+            } else {
+              vm.$vux.toast.show({
+                text: res.message,
+                width: '15em'
+              })
+            }
+          })
+        } else if (key === 'filter') {
+          if (!vm.$checkAuth()) {
+            return
+          }
+          vm.selectedUnit = [unitId]
+          vm.toCustomer(0)
         } else if (key === 'edit') {
           vm.$router.push({name: 'UnitEdit', params: {id: unitId, bid: this.info.id}})
         } else if (key === 'delete') {
@@ -714,7 +749,6 @@ export default {
                 vm.$vux.loading.hide()
                 if (res.success) {
                   vm.info.unit = res.data
-                  vm.selectedUnit = []
                 } else {
                   vm.$vux.toast.show({
                     text: res.message,
@@ -729,30 +763,30 @@ export default {
     }
   },
   computed: {
-    unitTree () {
-      let tree = []
-      if (!this.info.unit || !this.info.unit.length) {
-        return tree
-      }
-      let building = {}
-      let floor = {}
-      let b, f
-      for (let i in this.info.unit) {
-        if (b !== this.info.unit[i].building_no) {
-          b = this.info.unit[i].building_no
-          f = null
-          building = {building: b, floor: []}
-          tree.push(building)
-        }
-        if (f !== this.info.unit[i].floor) {
-          f = this.info.unit[i].floor
-          floor = {floor: f, unit: []}
-          building.floor.push(floor)
-        }
-        floor.unit.push(this.info.unit[i])
-      }
-      return tree
-    },
+    // unitTree () {
+    //   let tree = []
+    //   if (!this.info.unit || !this.info.unit.length) {
+    //     return tree
+    //   }
+    //   let building = {}
+    //   let floor = {}
+    //   let b, f
+    //   for (let i in this.info.unit) {
+    //     if (b !== this.info.unit[i].building_no) {
+    //       b = this.info.unit[i].building_no
+    //       f = null
+    //       building = {building: b, floor: []}
+    //       tree.push(building)
+    //     }
+    //     if (f !== this.info.unit[i].floor) {
+    //       f = this.info.unit[i].floor
+    //       floor = {floor: f, unit: []}
+    //       building.floor.push(floor)
+    //     }
+    //     floor.unit.push(this.info.unit[i])
+    //   }
+    //   return tree
+    // },
     buildingMenu () {
       let menu = {}
       if (this.info.allowEdit) {
@@ -765,33 +799,23 @@ export default {
     },
     unitMenu () {
       if (this.menuUnit) {
-        let menu = null
-        if (this.menuUnit.status === 1) {
-          if (menu == null) {
-            menu = {}
-          }
-          if (this.selectedUnit.indexOf(this.menuUnit.id) >= 0) {
-            menu.uncheck = '取消选择'
-          } else {
-            menu.check = '选择'
-          }
+        let menu = {
+          view: '查看',
+          favorite: '收藏',
+          filter: '添加筛选'
         }
-
-        if (menu == null) {
-          menu = {}
-        }
-        menu.view = '查看'
+        // if (this.menuUnit.status === 1) {
+        //   if (this.selectedUnit.indexOf(this.menuUnit.id) >= 0) {
+        //     menu.uncheck = '取消选择'
+        //   } else {
+        //     menu.check = '选择'
+        //   }
+        // }
 
         if (this.menuUnit.allowEdit) {
-          if (menu == null) {
-            menu = {}
-          }
           menu.edit = '修改'
         }
         if (this.menuUnit.allowDelete) {
-          if (menu == null) {
-            menu = {}
-          }
           menu.delete = '删除'
         }
         return menu

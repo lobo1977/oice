@@ -92,7 +92,7 @@ class Robot extends Base
 
     if ($url) {
       $wechat = new Wechat();
-      $content .= ' ' . $wechat->getShortUrl($url);
+      $content .= '。项目详情：' . $wechat->getShortUrl($url);
     }
 
     $list = self::alias('r')
