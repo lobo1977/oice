@@ -52,15 +52,20 @@ class Unit extends Base
    */
   public static function formatInfo($unit) {
     if ($unit != null) {
-      if (!empty($unit->title)) {
-        $unit->title = $unit->title . $unit->building_no;
-      } else {
-        $unit->title = $unit->building_no;
+      if (!empty($unit->building_no)) {
+        if (!empty($unit->title)) {
+          $unit->title = $unit->title . $unit->building_no . ' ';
+        } else {
+          $unit->title = $unit->building_no . ' ';
+        }
+      } else if (empty($unit->title)) {
+        $unit->title = '';
       }
+
       if ($unit->floor > 0) {
-        $unit->title = $unit->title . $unit->floor . '层';
+        $unit->title = $unit->title . $unit->floor . '层 ';
       } else if ($unit->floor < 0) {
-        $unit->title = $unit->title . '地下' . abs($unit->floor) . '层';
+        $unit->title = $unit->title . '地下' . abs($unit->floor) . '层 ';
       }
       if ($unit->room) {
         $unit->title = $unit->title . $unit->room;
