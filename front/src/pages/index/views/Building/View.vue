@@ -65,7 +65,7 @@
           <router-link style="float:right;color:#333;cursor:pointer;" v-if="info.allowEdit"
             :to="{name: 'UnitEdit', params: { id:0, bid: info.id }}">+ 添加</router-link>
         </group-title>
-        <cell v-for="(item, index) in info.unit" :key="index" :title="item.title" :is-link="true" @click="unitClick(item)">
+        <cell v-for="(item, index) in info.unit" :key="index" :title="item.title" :is-link="true" @click.native="unitClick(item)">
           <img slot="icon" :src="item.src" class="cell-image" />
           <p slot="inline-desc" class="cell-desc">{{item.desc}}</p>
         </cell>
@@ -138,10 +138,12 @@
         <div v-if="user == null || user.id == 0">
           <load-more
             :show-loading="false" tip="请登录后查看" background-color="#fbf9fe"></load-more>
-
-            <x-button type="primary" class="bottom-btn" @click.native="login">
-              立即登录
-            </x-button>
+            <div style="text-align:center;margin-bottom:30px;">
+              <x-button type="primary" class="bottom-btn" @click.native="login" 
+                style="display:inline-block;width:auto;">
+                立即登录
+              </x-button>
+            </div>
         </div>
       </group>
 
@@ -160,6 +162,7 @@
           </x-button>
         </div>
       </div>-->
+    </div>
 
     <qrcode></qrcode>
 
@@ -169,7 +172,7 @@
     <flexbox :gutter="0" class="bottom-bar">
       <flexbox-item :span="4">
         <x-button type="warn" class="bottom-btn"
-          @click.native="toCustomer(0)">
+          @click.native="toCustomer(info.id)">
             <x-icon type="funnel" class="btn-icon"></x-icon> 加入筛选
         </x-button>
       </flexbox-item>
@@ -221,7 +224,7 @@
 </template>
 
 <script>
-import { Swiper, SwiperItem, Previewer, TransferDom, Divider, Checker, CheckerItem } from 'vux'
+import { Swiper, SwiperItem, Previewer, TransferDom, GroupTitle } from 'vux'
 import Topalert from '@/components/Topalert.vue'
 import Baidumap from '@/components/BaiduMap.vue'
 import Robotpush from '@/components/RobotPush.vue'
@@ -235,9 +238,7 @@ export default {
     Swiper,
     SwiperItem,
     Previewer,
-    Divider,
-    Checker,
-    CheckerItem,
+    GroupTitle,
     Topalert,
     Baidumap,
     Robotpush,
@@ -248,7 +249,7 @@ export default {
       user: {
         id: 0
       },
-      tab: 0,
+      // tab: 0,
       info: {
         id: 0,
         building_name: '',    // 名称
@@ -258,13 +259,13 @@ export default {
         address: '',          // 地址
         longitude: 0,         // 经度
         latitude: 0,          // 纬度
-        completion_date: '',   // 竣工日期
+        completion_date: '',  // 竣工日期
         rent_sell: '',        // 租售
         price: '',            // 价格
         acreage: 0,           // 建筑面积
         floor: '',            // 楼层
-        floor_area: 0,         // 层面积
-        floor_height: 0,       // 层高
+        floor_area: 0,        // 层面积
+        floor_height: 0,      // 层高
         bearing: 0,           // 楼板承重
         developer: '',        // 开发商
         manager: '',          // 物业管理
@@ -297,13 +298,14 @@ export default {
       showBuildingMenu: false,
       showUnitMenu: false,
       menuUnit: null,
-      touchUnit: null,
-      unitTouchEvent: 0,
-      selectedUnit: [],
-      touchX: 0,
-      touchY: 0,
-      moveX: 0,
-      moveY: 0,
+      tempUnitId: 0,
+      // touchUnit: null,
+      // unitTouchEvent: 0,
+      // selectedUnit: [],
+      // touchX: 0,
+      // touchY: 0,
+      // moveX: 0,
+      // moveY: 0,
       showMap: false,
       showPush: false
     }
@@ -313,12 +315,12 @@ export default {
       vm.user = vm.$store.state.oice.user || vm.user
 
       let id = parseInt(to.params.id)
-      if (to.query.tab) {
-        vm.tab = parseInt(to.query.tab)
-        if (isNaN(vm.tab)) {
-          vm.tab = 0
-        }
-      }
+      // if (to.query.tab) {
+      //   vm.tab = parseInt(to.query.tab)
+      //   if (isNaN(vm.tab)) {
+      //     vm.tab = 0
+      //   }
+      // }
       if (!isNaN(id)) {
         vm.$get('/api/building/detail?id=' + id, (res) => {
           if (res.success) {
@@ -393,15 +395,15 @@ export default {
     },
     setShareDesc () {
       let vm = this
-      if (vm.tab === 1) {
-        vm.shareDesc = '单元销控'
-      } else if (vm.tab === 2) {
-        vm.shareDesc = '联系人'
-      } else if (vm.tab === 3) {
-        vm.shareDesc = '确认书'
-      } else {
-        vm.shareDesc = vm.info.building_type + ' ' + vm.info.area + vm.info.district + ' ' + vm.info.price
-      }
+      // if (vm.tab === 1) {
+      //   vm.shareDesc = '单元销控'
+      // } else if (vm.tab === 2) {
+      //   vm.shareDesc = '联系人'
+      // } else if (vm.tab === 3) {
+      //   vm.shareDesc = '确认书'
+      // } else {
+      vm.shareDesc = vm.info.building_type + ' ' + vm.info.area + vm.info.district + ' ' + vm.info.price
+      // }
     },
     // goTab (tab) {
     //   let vm = this
@@ -466,30 +468,36 @@ export default {
     },
     selectUnit () {
     },
-    toCustomer (flag) {
+    toCustomer (bid, uid) {
       if (!this.$checkAuth()) {
         return
       }
-      this.customerFlag = flag
-      if (this.customerFlag === 1 && this.tab === 2 && this.selectedUnit.length > 1) {
-        this.$vux.toast.show({
-          text: '只能选择一个单元生成客户确认书。',
-          width: '18em'
-        })
-      } else if (this.myCustomer.length) {
+
+      this.tempUnitId = uid
+
+      // this.customerFlag = flag
+
+      // if (this.customerFlag === 1 && this.tab === 2 && this.selectedUnit.length > 1) {
+      //   this.$vux.toast.show({
+      //     text: '只能选择一个单元生成客户确认书。',
+      //     width: '18em'
+      //   })
+      // }
+
+      if (this.myCustomer.length) {
         this.showCustomerPicker = true
       } else {
-        if (this.tab === 0) {
+        if (bid) {
           this.$router.push({
             name: 'CustomerEdit',
             params: {id: 0},
-            query: {bid: this.info.id, flag: this.customerFlag === 0 ? 'filter' : 'confirm'}
+            query: {bid: this.info.id, flag: 'filter'}
           })
-        } else {
+        } else if (uid) {
           this.$router.push({
             name: 'CustomerEdit',
             params: {id: 0},
-            query: {uid: this.selectedUnit.join(','), flag: this.customerFlag === 0 ? 'filter' : 'confirm'}
+            query: {uid: uid, flag: 'filter'}
           })
         }
       }
@@ -499,33 +507,33 @@ export default {
       let customerId = this.selectCustomer[0]
       let bid = 0
       let uids = ''
-      if (this.tab === 0) {
+      if (this.tempUnitId === 0) {
         bid = this.info.id
         if (customerId === '0' || customerId === 0) {
           this.$router.push({
             name: 'CustomerEdit',
             params: {id: 0},
-            query: {bid: bid, flag: this.customerFlag === 0 ? 'filter' : 'confirm'}
+            query: {bid: bid, flag: 'filter'}
           })
           return
         }
       } else {
-        if (this.selectedUnit.length <= 0) return
-        uids = this.selectedUnit.join(',')
+        // if (this.selectedUnit.length <= 0) return
+        uids = this.menuUnit.id
         if (customerId === '0' || customerId === 0) {
           this.$router.push({
             name: 'CustomerEdit',
             params: {id: 0},
-            query: {uid: uids, flag: this.customerFlag === 0 ? 'filter' : 'confirm'}
+            query: {uid: uids, flag: 'filter'}
           })
           return
         }
       }
-      if (this.customerFlag === 1) {
-        this.toConfirm(customerId, bid)
-      } else {
-        this.toFilter(customerId, bid, uids)
-      }
+      // if (this.customerFlag === 1) {
+      //   this.toConfirm(customerId, bid)
+      // } else {
+      this.toFilter(customerId, bid, uids)
+      // }
     },
     toFilter (cid, bids, uids) {
       this.$vux.loading.show()
@@ -689,14 +697,16 @@ export default {
       let vm = this
       if (vm.menuUnit != null) {
         let unitId = vm.menuUnit.id
-        if (key === 'check') {
-          vm.selectedUnit.push(vm.menuUnit.id)
-        } else if (key === 'uncheck') {
-          let index = vm.selectedUnit.indexOf(vm.menuUnit.id)
-          if (index > -1) {
-            vm.selectedUnit.splice(index, 1)
-          }
-        } else if (key === 'view') {
+        // if (key === 'check') {
+        //   vm.selectedUnit.push(vm.menuUnit.id)
+        // } else if (key === 'uncheck') {
+        //   let index = vm.selectedUnit.indexOf(vm.menuUnit.id)
+        //   if (index > -1) {
+        //     vm.selectedUnit.splice(index, 1)
+        //   }
+        // }
+
+        if (key === 'view') {
           if (vm.menuUnit.allowView) {
             vm.$router.push({name: 'Unit', params: {id: unitId}})
           } else if (vm.user != null && vm.user.id > 0) {
@@ -732,8 +742,8 @@ export default {
           if (!vm.$checkAuth()) {
             return
           }
-          vm.selectedUnit = [unitId]
-          vm.toCustomer(0)
+          // vm.selectedUnit = [unitId]
+          vm.toCustomer(0, unitId)
         } else if (key === 'edit') {
           vm.$router.push({name: 'UnitEdit', params: {id: unitId, bid: this.info.id}})
         } else if (key === 'delete') {
@@ -760,6 +770,7 @@ export default {
           })
         }
       }
+      vm.menuUnit = null
     }
   },
   computed: {

@@ -204,18 +204,18 @@
       <actionsheet v-model="showPrintPicker" :menus="printMode" theme="android" @on-click-menu="choseMode"></actionsheet>
 
       <flexbox :gutter="0" class="bottom-bar">
-        <flexbox-item :span="4">
+        <flexbox-item :span="6">
           <x-button type="warn" class="bottom-btn" @click.native="toRecommend" 
             :disabled="!info.allowFollow || checkCount <= 0">
             <x-icon type="share" class="btn-icon"></x-icon> 生成推荐资料
           </x-button>
         </flexbox-item>
-        <flexbox-item :span="4">
+        <!-- <flexbox-item :span="4">
           <x-button type="primary" class="bottom-btn" @click.native="toConfirm" 
             :disabled="!info.allowConfirm || checkCount != 1">
             <x-icon type="checkmark-circled" class="btn-icon"></x-icon> 云确认
           </x-button>
-        </flexbox-item>
+        </flexbox-item> -->
         <flexbox-item>
           <x-button type="default" class="bottom-btn" :disabled="!info.allowFollow"
             :link="{name:'Favorite', query: { cid: info.id }}">
@@ -653,33 +653,33 @@ export default {
         this.showPrintPicker = true
       }
     },
-    toConfirm () {
-      let vm = this
-      if (vm.checkCount < 1) {
-        vm.$vux.toast.show({
-          text: '请选择要生成确认书的项目。',
-          width: '15em'
-        })
-      } else if (vm.checkCount > 1) {
-        vm.$vux.toast.show({
-          text: '只能选择一个项目生成确认书。',
-          width: '16em'
-        })
-      } else {
-        let bid = 0
-        for (let i = 0; i < vm.info.filter.length; i++) {
-          if (vm.info.filter[i].checked) {
-            bid = vm.info.filter[i].building_id
-            break
-          }
-        }
-        if (bid === 0) return
-        this.$router.push({
-          name: 'ConfirmEdit',
-          params: {id: 0, bid: bid, cid: vm.info.id}
-        })
-      }
-    },
+    // toConfirm () {
+    //   let vm = this
+    //   if (vm.checkCount < 1) {
+    //     vm.$vux.toast.show({
+    //       text: '请选择要生成确认书的项目。',
+    //       width: '15em'
+    //     })
+    //   } else if (vm.checkCount > 1) {
+    //     vm.$vux.toast.show({
+    //       text: '只能选择一个项目生成确认书。',
+    //       width: '16em'
+    //     })
+    //   } else {
+    //     let bid = 0
+    //     for (let i = 0; i < vm.info.filter.length; i++) {
+    //       if (vm.info.filter[i].checked) {
+    //         bid = vm.info.filter[i].building_id
+    //         break
+    //       }
+    //     }
+    //     if (bid === 0) return
+    //     this.$router.push({
+    //       name: 'ConfirmEdit',
+    //       params: {id: 0, bid: bid, cid: vm.info.id}
+    //     })
+    //   }
+    // },
     choseMode (key, item) {
       let vm = this
       vm.$vux.loading.show()
