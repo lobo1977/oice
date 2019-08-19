@@ -65,7 +65,7 @@
           <router-link style="float:right;color:#333;cursor:pointer;" v-if="info.allowEdit"
             :to="{name: 'UnitEdit', params: { id:0, bid: info.id }}">+ 添加</router-link>
         </group-title>
-        <cell v-for="(item, index) in info.unit" :key="index" :title="item.title" :is-link="true" @click.native="unitClick(item)">
+        <cell v-for="(item, index) in showUnits" :key="index" :title="item.title" :is-link="true" @click.native="unitClick(item)">
           <img slot="icon" :src="item.src" class="cell-image" />
           <p slot="inline-desc" class="cell-desc">{{item.desc}}</p>
         </cell>
@@ -774,6 +774,11 @@ export default {
     }
   },
   computed: {
+    showUnits() {
+      return this.info.unit.filter(function (unit) {
+        return unit.status == 1 || info.allowEdit
+      });
+    },
     // unitTree () {
     //   let tree = []
     //   if (!this.info.unit || !this.info.unit.length) {

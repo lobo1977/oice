@@ -105,8 +105,6 @@ class Unit extends Base
     $list = self::alias('a')
       ->leftJoin('file b',"b.parent_id = a.id AND b.type = 'unit' AND b.default = 1")
       ->where('a.building_id', $id)
-      //->where('(share = 1 OR user_id = ' . $user_id . ' OR ' . 
-      //  '(company_id > 0 AND company_id = ' . $company_id . '))')
       ->field('a.id,a.building_no,a.floor,a.room,a.acreage,a.rent_sell,a.rent_price,
         a.sell_price,a.status,a.share,a.user_id,a.company_id,b.file')
       ->order('a.building_no', 'asc')
