@@ -774,10 +774,10 @@ export default {
     }
   },
   computed: {
-    showUnits() {
+    showUnits () {
       return this.info.unit.filter(function (unit) {
-        return unit.status == 1 || info.allowEdit
-      });
+        return unit.status === 1 || this.info.allowEdit
+      })
     },
     // unitTree () {
     //   let tree = []
