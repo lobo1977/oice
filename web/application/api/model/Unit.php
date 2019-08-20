@@ -72,7 +72,9 @@ class Unit extends Base
       }
       if (isset($unit->status) && $unit->status != null) {
         $unit->statusText = self::$status[$unit->status];
-        $unit->title = $unit->title . '(' . $unit->statusText . ')';
+        if ($unit->status != 1) {
+          $unit->title = $unit->title . '(' . $unit->statusText . ')';
+        }
       }
       $unit->src = empty($unit->file) ? '/static/img/error.png' : '/upload/unit/images/300/' . $unit->file;
 
