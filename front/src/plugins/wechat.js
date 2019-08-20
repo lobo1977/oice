@@ -46,7 +46,9 @@ export default {
           res.data.jsApiList = [ 'showMenuItems',
             'updateAppMessageShareData',
             'updateTimelineShareData',
-            'getLocation']
+            'getLocation',
+            'openLocation',
+            'previewImage']
 
           wx.config(res.data)
 
@@ -95,6 +97,16 @@ export default {
       })
     }
 
+    Vue.previewImage = function (current, urls) {
+      wx.previewImage({
+        current: current, // 当前显示图片的http链接
+        urls: urls, // 需要预览的图片http链接列表
+        fail: (res) => {
+          // alert(res.errMsg)
+        }
+      })
+    }
+
     Vue.prototype.$isWechat = () => {
       return Vue.isWechat()
     }
@@ -109,6 +121,10 @@ export default {
 
     Vue.prototype.$getLocation = (cb) => {
       return Vue.getLocation(cb)
+    }
+
+    Vue.prototype.$previewImage = (current, urls) => {
+      Vue.previewImage(current, urls)
     }
   }
 }

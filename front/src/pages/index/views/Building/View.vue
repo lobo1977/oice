@@ -307,7 +307,8 @@ export default {
       // moveX: 0,
       // moveY: 0,
       showMap: false,
-      showPush: false
+      showPush: false,
+      wxImages: []
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -358,8 +359,12 @@ export default {
             vm.setShareDesc()
 
             if (vm.info.images.length) {
-              vm.shareImage = window.location.protocol + '//' +
-                window.location.host + vm.info.images[0].src
+              for (let i = 0; i < vm.info.images.length; i++) {
+                vm.wxImages.push(window.location.protocol + '//' +
+                window.location.host + vm.info.images[i].src)
+              }
+
+              vm.shareImage = vm.wxImages[0]
             }
 
             if (vm.$isWechat()) {
@@ -416,7 +421,11 @@ export default {
     //   }
     // },
     preview (index) {
-      this.$refs.prevBuilding.show(index)
+      if (this.$isWechat()) {
+        this.$previewImage(this.wxImages[index], this.wxImages)
+      } else {
+        this.$refs.prevBuilding.show(index)
+      }
     },
     favorite () {
       if (!this.$checkAuth()) {

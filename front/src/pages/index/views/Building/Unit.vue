@@ -118,7 +118,8 @@ export default {
       myCustomer: [],
       selectCustomer: [],
       customerFlag: 0,
-      showUnitMenu: false
+      showUnitMenu: false,
+      wxImages: []
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -162,8 +163,12 @@ export default {
               let shareImage = null
 
               if (vm.info.images.length) {
-                shareImage = window.location.protocol + '//' +
-                  window.location.host + vm.info.images[0].src
+                for (let i = 0; i < vm.info.images.length; i++) {
+                  vm.wxImages.push(window.location.protocol + '//' +
+                  window.location.host + vm.info.images[i].src)
+                }
+
+                shareImage = vm.wxImages[0]
               }
 
               vm.$wechatShare(null, shareLink, vm.info.title, shareDesc, shareImage)
@@ -183,7 +188,11 @@ export default {
   },
   methods: {
     preview (index) {
-      this.$refs.prevUnit.show(index)
+      if (this.$isWechat()) {
+        this.$previewImage(this.wxImages[index], this.wxImages)
+      } else {
+        this.$refs.prevUnit.show(index)
+      }
     },
     favorite () {
       if (!this.$checkAuth()) {
