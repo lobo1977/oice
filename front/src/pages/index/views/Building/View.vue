@@ -775,9 +775,14 @@ export default {
   },
   computed: {
     showUnits () {
-      return this.info.unit.filter(function (unit) {
-        return unit.status === 1 || this.info.allowEdit
-      })
+      let vm = this
+      if (vm.info && vm.info.unit) {
+        return this.info.unit.filter(function (unit) {
+          return unit.status === 1 || vm.info.allowEdit
+        })
+      } else {
+        return null
+      }
     },
     // unitTree () {
     //   let tree = []
