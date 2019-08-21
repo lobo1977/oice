@@ -537,7 +537,6 @@ class Building extends Base
     } else {
       $data['city'] = self::$city;
       $data['user_id'] = $user_id;
-      $data['status'] = 0;
       $newData = new Building($data);
       $result = $newData->save();
 
