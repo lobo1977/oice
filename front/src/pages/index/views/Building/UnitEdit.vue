@@ -258,14 +258,19 @@ export default {
             if (res.data.images) {
               vm.images = res.data.images
             }
-            vm.statusText = vm.statusPickerData[vm.info.status].label
             vm.info.share = vm.info.share === 1
             vm.$emit('on-view-loaded', '修改单元')
           } else {
             vm.info.__token__ = res.data.__token__
-            vm.statusText = vm.statusPickerData[vm.info.status].label
             vm.$emit('on-view-loaded', '添加单元')
           }
+
+          for (let i = 0; i < vm.statusPickerData.length; i++) {
+            if (vm.statusPickerData[i].value === vm.info.status) {
+              vm.statusText = vm.statusPickerData[i].label
+            }
+          }
+
           if (vm.info.company_id === 0 && vm.companyPickerData.length) {
             vm.info.company_id = vm.companyPickerData[0].value
             vm.companyText = vm.companyPickerData[0].label

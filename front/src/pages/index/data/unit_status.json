@@ -1,12 +1,9 @@
 [
     {
-        "label": "在驻",
-        "value": 0
-    }, {
         "label": "空置",
         "value": 1
     }, {
-        "label": "已出",
+        "label": "已出（隐藏）",
         "value": 2
     }
 ]
