@@ -42,7 +42,7 @@ class Linkman extends Base
     
     $list = self::where('type', $type)
       ->where('owner_id', $id)
-      ->field('id,title,department,job,mobile,status')
+      ->field('id,title,department,job,mobile,email,weixin,qq,status')
       ->order('id', 'asc')
       ->select();
 

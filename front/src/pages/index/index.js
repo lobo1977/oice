@@ -4,6 +4,7 @@ import FastClick from 'fastclick'
 import HttpRequest from '@/plugins/http'
 import Authenticate from '@/plugins/auth'
 import Wechat from '@/plugins/wechat'
+import VueClipboard from 'vue-clipboard2'
 import App from './App'
 import router from './router/index'
 import { dateFormat, LoadingPlugin, ToastPlugin, AlertPlugin, ConfirmPlugin, DatetimePlugin,
@@ -22,6 +23,7 @@ Vue.use(DatetimePlugin)
 Vue.use(HttpRequest)
 Vue.use(Authenticate)
 Vue.use(Wechat)
+Vue.use(VueClipboard)
 
 Vue.component('panel', Panel)
 Vue.component('sticky', Sticky)

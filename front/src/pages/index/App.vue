@@ -244,6 +244,25 @@ html, body {
   }
 }
 
+.weui-btn_disabled {
+  .vux-x-icon {
+    fill: #888;
+  }
+}
+
+.button-bar {
+  .weui-btn {
+    border:0;
+    border-radius:0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .weui-btn:after {
+    border:0;
+    border-radius:0;
+  }
+}
+
 .bottom-bar {
   position:fixed;
   bottom:0;
@@ -254,10 +273,9 @@ html, body {
     border-radius:0;
     white-space: nowrap;
     text-overflow: ellipsis;
-    font-size:0.9em;
     .btn-icon {
       position: relative;
-      top: 5px;
+      top: 4px;
       width: 20px;
       height: 20px;
     }
