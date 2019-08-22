@@ -47,7 +47,7 @@ export default new Router({
         require(['../views/Building/View.vue'], resolve)
       }
     }, {
-      path: '/building/edit/:id',
+      path: '/building/edit/:id?',
       name: 'BuildingEdit',
       meta: {
         title: '',
@@ -136,7 +136,7 @@ export default new Router({
         require(['../views/Customer/view.vue'], resolve)
       }
     }, {
-      path: '/customer/edit/:id',
+      path: '/customer/edit/:id?',
       name: 'CustomerEdit',
       meta: {
         title: '',
@@ -267,7 +267,7 @@ export default new Router({
         require(['../views/Daily/View.vue'], resolve)
       }
     }, {
-      path: '/daily/edit/:id',
+      path: '/daily/edit/:id?',
       name: 'DailyEdit',
       meta: {
         title: '',
@@ -359,7 +359,7 @@ export default new Router({
         require(['../views/Company/View.vue'], resolve)
       }
     }, {
-      path: '/company/edit/:id',
+      path: '/company/edit/:id?',
       name: 'CompanyEdit',
       meta: {
         title: '创建企业',

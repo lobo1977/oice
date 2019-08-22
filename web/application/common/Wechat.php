@@ -307,11 +307,17 @@ class Wechat {
 	 */
 	private function receiveEvent($object) {
 		$content = "";
+		$app_root = 'https://' . config('app_host');
 		
 		switch ($object->Event) {
 			//关注
 			case "subscribe":
-				$content = "欢迎关注" . config('app_name');
+				$content = "欢迎进入" . config('app_name') . '
+完善我的资料：<a href="' . $app_root . '/app/my/info">点这里</a>
+登记我的企业：<a href="' . $app_root . '/app/company/edit">点这里</a>
+开发商发布项目：<a href="' . $app_root . '/app/building/edit">点这里</a>
+用微信群发项目帖：<a href="' . $app_root . '/app/my/robot">点这里</a>
+业务合作：13901109546 王先生';
 				break;
 			//取消关注
 			case "unsubscribe":

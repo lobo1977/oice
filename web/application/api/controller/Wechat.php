@@ -67,30 +67,35 @@ class Wechat extends Base
           'name'=>urlencode("项目"),
           'sub_button'=> array(
             array(
-              'name'=> urlencode("写字楼"),
+              'name'=> urlencode("项目浏览"),
               'type'=> 'view',
-              'url'=> $app_root . '/app/building?type=1'
+              'url'=> $app_root . '/app/building'
             ),
             array(
-              'name'=> urlencode("商铺独楼"),
+              'name'=> urlencode("发布项目"),
               'type'=> 'view',
-              'url'=> $app_root . '/app/building?type=2'
-            ),
-            array(
-              'name'=> urlencode("商务中心"),
-              'type'=> 'view',
-              'url'=> $app_root . '/app/building?type=3'
-            ),
-            array(
-              'name'=> urlencode("商住公寓"),
-              'type'=> 'view',
-              'url'=> $app_root . '/app/building?type=4'
-            ),
-            array(
-              'name'=> urlencode("产业园"),
-              'type'=> 'view',
-              'url'=> $app_root . '/app/building?type=5'
+              'url'=> $app_root . '/app/building/edit'
             )
+            // array(
+            //   'name'=> urlencode("商铺独楼"),
+            //   'type'=> 'view',
+            //   'url'=> $app_root . '/app/building?type=2'
+            // ),
+            // array(
+            //   'name'=> urlencode("商务中心"),
+            //   'type'=> 'view',
+            //   'url'=> $app_root . '/app/building?type=3'
+            // ),
+            // array(
+            //   'name'=> urlencode("商住公寓"),
+            //   'type'=> 'view',
+            //   'url'=> $app_root . '/app/building?type=4'
+            // ),
+            // array(
+            //   'name'=> urlencode("产业园"),
+            //   'type'=> 'view',
+            //   'url'=> $app_root . '/app/building?type=5'
+            // )
           )
         ),
         array(
