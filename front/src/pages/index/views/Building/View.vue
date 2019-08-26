@@ -21,18 +21,6 @@
           :is-link="true" @click.native="showMap = true">
           <span slot="title"><x-icon type="android-pin" size="22" style="position:relative;top:4px;"></x-icon> <span>地址</span></span>
         </cell>
-        <!-- <cell title="竣工日期" value-align="left" :value="info.completion_date|formatDate" v-show="info.completion_date"></cell>
-        <cell title="租售" value-align="left" :value="info.rent_sell" v-show="info.rent_sell"></cell>
-        <cell title="价格" value-align="left" :value="info.price" v-show="info.price"></cell>
-        <cell title="楼层" value-align="left" :value="info.floor" v-show="info.floor"></cell>
-        <cell title="层面积" value-align="left" :value="info.floor_area + ' 平方米'" v-show="info.floor_area > 0"></cell>
-        <cell title="层高" value-align="left" :value="info.floor_height + ' 米'" v-show="info.floor_height > 0 && info.floor_height !== 2"></cell>
-        <cell title="楼板承重" value-align="left" :value="info.bearing + ' 千克/平方米'" v-show="info.bearing > 0"></cell>
-        <cell title="开发商" value-align="left" :value="info.developer" v-show="info.developer"></cell>
-        <cell title="物业管理" value-align="left" :value="info.manager" v-show="info.manager"></cell>
-        <cell title="物业费" value-align="left" :value="info.fee" v-show="info.fee"></cell>
-        <cell title="电费" value-align="left" :value="info.electricity_fee" v-show="info.electricity_fee"></cell>
-        <cell title="停车位" value-align="left" :value="info.car_seat" v-show="info.car_seat"></cell> -->
       </group>
 
       <flexbox :gutter="0" class="button-bar">
@@ -61,16 +49,18 @@
         </cell>
       </group>
 
-      <group v-if="info.allowEdit || (info.linkman && info.linkman.length)">
+      <group v-if="user == null || user.id == 0 || info.allowEdit || (info.linkman && info.linkman.length)">
         <group-title slot="title">项目通讯录
           <router-link style="float:right;color:#333;cursor:pointer;" v-if="info.allowEdit"
             :to="{name: 'LinkmanEdit', params: {id: 0, type: 'building', oid: info.id}}">+ 添加</router-link>
         </group-title>
-        <div v-if="user != null && user.id > 0">
+        <div v-if="user != null && user.id > 0 && info.linkman && info.linkman.length">
           <cell v-for="(item, index) in info.linkman" :key="index"
             :title="item.title">
-            <a v-bind:href="'tel:'+(item.mobile)" class="cell-link"><x-icon type="iphone" class="cell-icon" style="margin-right:30px;cursor:pointer;"></x-icon></a>
-            <x-icon type="wechat" class="cell-icon" style="margin-right:30px;cursor:pointer;" @click="copyWeixin(item.weixin || item.mobile)"></x-icon>
+            <a v-if="!info.allowEdit" v-bind:href="'tel:'+(item.mobile)" class="cell-link"><x-icon type="iphone" class="cell-icon" style="margin-right:30px;cursor:pointer;fill:blue;"></x-icon></a>
+            <x-icon v-if="!info.allowEdit" type="wechat" class="cell-icon" style="margin-right:30px;cursor:pointer;" @click="copyWeixin(item.weixin || item.mobile)"></x-icon>
+            <x-icon v-if="info.allowEdit" type="compose" class="cell-icon" style="margin-right:30px;cursor:pointer;" @click="editLinkman(item)"></x-icon>
+            <x-icon v-if="info.allowEdit" type="trash-a" class="cell-icon" style="margin-right:30px;cursor:pointer;fill:red;" @click="deleteLinkman(index, item)"></x-icon>
           </cell>
         </div>
 
@@ -86,7 +76,19 @@
         </div>
       </group>
 
-      <group title="项目简介">
+      <group title="项目简介" label-width="4em" label-margin-right="1em" label-align="right">
+        <cell title="竣工日期" value-align="left" :value="info.completion_date|formatDate" v-show="info.completion_date"></cell>
+        <cell title="租售" value-align="left" :value="info.rent_sell" v-show="info.rent_sell"></cell>
+        <cell title="价格" value-align="left" :value="info.price" v-show="info.price"></cell>
+        <cell title="楼层" value-align="left" :value="info.floor" v-show="info.floor"></cell>
+        <cell title="层面积" value-align="left" :value="info.floor_area + ' 平方米'" v-show="info.floor_area > 0"></cell>
+        <cell title="层高" value-align="left" :value="info.floor_height + ' 米'" v-show="info.floor_height > 0 && info.floor_height !== 2"></cell>
+        <cell title="楼板承重" value-align="left" :value="info.bearing + ' 千克/平方米'" v-show="info.bearing > 0"></cell>
+        <cell title="开发商" value-align="left" :value="info.developer" v-show="info.developer"></cell>
+        <cell title="物业管理" value-align="left" :value="info.manager" v-show="info.manager"></cell>
+        <cell title="物业费" value-align="left" :value="info.fee" v-show="info.fee"></cell>
+        <cell title="电费" value-align="left" :value="info.electricity_fee" v-show="info.electricity_fee"></cell>
+        <cell title="停车位" value-align="left" :value="info.car_seat" v-show="info.car_seat"></cell>
         <p class="group-padding" v-show="info.rem">{{info.rem}}</p>
         <p class="group-padding" v-show="info.traffic">交通状况：{{info.traffic}}</p>
         <p class="group-padding" v-show="info.equipment">楼宇设备：{{info.equipment}}</p>
@@ -390,7 +392,11 @@ export default {
         return
       }
 
-      this.tempUnitId = uid
+      if (uid) {
+        this.tempUnitId = uid
+      } else {
+        this.tempUnitId = 0
+      }
 
       if (this.myCustomer.length) {
         this.showCustomerPicker = true
@@ -426,7 +432,7 @@ export default {
           return
         }
       } else {
-        uids = this.menuUnit.id
+        uids = this.tempUnitId
         if (customerId === '0' || customerId === 0) {
           this.$router.push({
             name: 'CustomerEdit',
@@ -602,6 +608,38 @@ export default {
         }
       }
       vm.menuUnit = null
+    },
+    editLinkman (item) {
+      let vm = this
+      vm.$router.push({name: 'LinkmanEdit', params: {id: item.id}})
+    },
+    deleteLinkman (index, item) {
+      let vm = this
+
+      if (!vm.$checkAuth() || !vm.info.allowEdit) {
+        return
+      }
+
+      vm.$vux.confirm.show({
+        title: '删除联系人',
+        content: '确定要删除联系人 <strong>' + item.title + '</strong> 吗？',
+        onConfirm () {
+          vm.$vux.loading.show({text: '请稍后...'})
+          vm.$post('/api/linkman/remove', {
+            id: item.id
+          }, (res) => {
+            vm.$vux.loading.hide()
+            if (res.success) {
+              vm.info.linkman.splice(index, 1)
+            } else {
+              vm.$vux.toast.show({
+                text: res.message,
+                width: '13em'
+              })
+            }
+          })
+        }
+      })
     }
   },
   computed: {

@@ -273,6 +273,7 @@ html, body {
     border-radius:0;
     white-space: nowrap;
     text-overflow: ellipsis;
+    font-size: 0.95em;
     .btn-icon {
       position: relative;
       top: 4px;

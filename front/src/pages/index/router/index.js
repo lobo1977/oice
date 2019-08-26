@@ -170,7 +170,7 @@ export default new Router({
         require(['../views/Linkman/view.vue'], resolve)
       }
     }, {
-      path: '/linkman/edit/:id/:type/:oid',
+      path: '/linkman/edit/:id?/:type?/:oid?',
       name: 'LinkmanEdit',
       meta: {
         title: '',

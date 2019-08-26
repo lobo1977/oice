@@ -20,7 +20,7 @@
 
     <group :gutter="0" title="在线机器人">
       <cell v-for="(item, index) in robots" :key="index" :title="robotStatus(item)"
-        @click.native="robotAction(item)">
+        @click.native="robotAction(item)" value="我要群发">
         <img slot="icon" :src="item.avatar" class="cell-image">
         <p slot="inline-desc" class="cell-desc">待处理任务：{{item.task}} 个</p>
       </cell>
@@ -42,10 +42,10 @@ import { InlineLoading, Qrcode } from 'vux'
 import Robotpush from '@/components/RobotPush.vue'
 
 const actions = {
+  push: '群发消息',
   offline: '下线',
   sleep: '休眠',
   weakup: '唤醒',
-  // push: '群发消息',
   clearTask: '删除任务'
 }
 
@@ -121,8 +121,15 @@ export default {
         return
       }
       if (key === 'push') {
-        this.selectPush()
-        return
+        // this.selectPush()
+        // return
+        vm.$vux.alert.show({
+          title: "群发提示",
+          content: "请选择要群发推广的项目，在项目详情页点击“群发推广”按钮",
+          onHide () {
+            vm.$router.push({name: "MyBuilding"})
+          } 
+        })
       }
       vm.$vux.loading.show()
       vm.$post('/api/robot/' + key, {
