@@ -20,7 +20,7 @@
 
     <group :gutter="0" title="在线机器人">
       <cell v-for="(item, index) in robots" :key="index" :title="robotStatus(item)"
-        @click.native="robotAction(item)" value="我要群发">
+        @click.native="robotAction(item)" value="我要群发" :is-link="true">
         <img slot="icon" :src="item.avatar" class="cell-image">
         <p slot="inline-desc" class="cell-desc">待处理任务：{{item.task}} 个</p>
       </cell>
@@ -122,7 +122,6 @@ export default {
       }
       if (key === 'push') {
         // this.selectPush()
-        // return
         vm.$vux.alert.show({
           title: '群发提示',
           content: '请选择要群发推广的项目，在项目详情页点击“群发推广”按钮',
@@ -130,6 +129,7 @@ export default {
             vm.$router.push({name: 'MyBuilding'})
           }
         })
+        return
       }
       vm.$vux.loading.show()
       vm.$post('/api/robot/' + key, {

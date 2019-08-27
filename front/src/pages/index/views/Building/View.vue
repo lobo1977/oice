@@ -241,7 +241,9 @@ export default {
       vm.user = vm.$store.state.oice.user || vm.user
       let id = parseInt(to.params.id)
       if (!isNaN(id)) {
+        vm.$vux.loading.show()
         vm.$get('/api/building/detail?id=' + id, (res) => {
+          vm.$vux.loading.hide()
           if (res.success) {
             for (let item in vm.info) {
               if (res.data[item] !== undefined && res.data[item] !== null) {
@@ -708,7 +710,7 @@ export default {
           content += '\n【联系电话】' + vm.info.linkman[0].mobile
         }
         content += '\n【项目详情】' + vm.info.short_url
-        content += '\n推广支持-【商办云】'
+        content += '\n推广支持 -【商办云】'
         return content
       } else {
         return ''

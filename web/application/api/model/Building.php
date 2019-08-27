@@ -234,9 +234,10 @@ class Building extends Base
     }
 
     if (empty($data->short_url)) {
+      $wechat = new Wechat();
       $url = 'https://' . config('app_host') . '/app/building/view/' . $data->id;
       $data->short_url = $wechat->getShortUrl($url);
-      $user->save();
+      $data->save();
     }
 
     $data->engInfo = db('building_en')->where('id', $id)
