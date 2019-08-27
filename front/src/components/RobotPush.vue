@@ -74,7 +74,6 @@ export default {
   props: {
     robot: null,
     content: '',
-    link: '',
     isShown: {
       type: Boolean,
       default: false
@@ -91,7 +90,6 @@ export default {
       step: 1,
       robotID: 0,
       message: '',
-      url: this.link,
       isSearching: false,
       type: 0,
       keyword: '',
@@ -203,7 +201,6 @@ export default {
           type: this.all && this.keyword.length === 0 ? vm.type : -1,
           contact: this.all && this.keyword.length === 0 ? '' : this.checkList.join(','),
           content: vm.message,
-          url: vm.url,
           cycle: vm.cycle ? vm.cycle_hour : 0,
           start: vm.start_hour,
           end: vm.end_hour

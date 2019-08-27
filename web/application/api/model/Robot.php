@@ -1,7 +1,6 @@
 <?php
 namespace app\api\model;
 
-use app\common\Wechat;
 use app\api\model\Base;
 use app\api\model\User;
 
@@ -83,16 +82,11 @@ class Robot extends Base
   /**
    * 推送分享
    */
-  public static function push($user, $type, $contact, $content, $url, $cycle = 0, $start = null, $end = null) {
+  public static function push($user, $type, $contact, $content, $cycle = 0, $start = null, $end = null) {
     if (empty($user) || empty($user->openid)) {
       return false;
     } else {
       $openid = [$user->openid];
-    }
-
-    if ($url) {
-      $wechat = new Wechat();
-      $content .= '。项目详情：' . $wechat->getShortUrl($url);
     }
 
     $list = self::alias('r')

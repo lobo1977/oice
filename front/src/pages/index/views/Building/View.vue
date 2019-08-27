@@ -148,8 +148,7 @@
       height="100%" style="overflow-y:hidden;">
       <robotpush
         :is-shown="showPush"
-        :content="'【' + info.building_name + '】' + shareDesc"
-        :link="shareLink"
+        :content="pushContent"
         @on-close="closePush"></robotpush>
     </popup>
   </div>
@@ -210,6 +209,7 @@ export default {
         traffic: '',          // 交通状况
         environment: '',      // 周边环境
         user_id: 0,
+        short_url: '',
         isFavorite: false,
         allowEdit: false,
         allowDelete: false,
@@ -683,6 +683,36 @@ export default {
     },
     favoriteText () {
       return this.info.isFavorite ? '取消收藏' : '收藏'
+    },
+    pushContent () {
+      let vm = this
+      if (vm.info) {
+        let content = '【项目名称】' + vm.info.building_name
+        // if (vm.info.area || vm.info.district || vm.info.address) {
+        content += '\n【地理位置】' + vm.info.area + vm.info.district + vm.info.address
+        // }
+        content += '\n【空置面积】'
+        // if (vm.info.traffic) {
+        content += '\n【交 通】' + vm.info.traffic
+        // }
+        // if (vm.info.price) {
+        content += '\n【报 价】' + vm.info.price
+        // }
+        // if (vm.info.fee) {
+        content += '\n【物业费】' + vm.info.fee
+        // }
+        content += '\n【佣 金】'
+        content += '\n【交付标准】'
+        if (vm.info.linkman && vm.info.linkman.length) {
+          content += '\n【联系人】' + vm.info.linkman[0].title
+          content += '\n【联系电话】' + vm.info.linkman[0].mobile
+        }
+        content += '\n【项目详情】' + vm.info.short_url
+        content += '\n推广支持-【商办云】'
+        return content
+      } else {
+        return ''
+      }
     }
   },
   filters: {

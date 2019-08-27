@@ -4,6 +4,7 @@ namespace app\api\model;
 use think\model\concern\SoftDelete;
 use think\facade\Validate;
 use app\common\Excel;
+use app\common\Wechat;
 use app\api\model\Base;
 use app\api\model\File;
 use app\api\model\Log;
@@ -224,12 +225,18 @@ class Building extends Base
       ->field('id,building_name,type,level,area,district,address,longitude,latitude,' .
         'completion_date,rent_sell,price,acreage,floor,floor_area,floor_height,bearing,' .
         'developer,manager,fee,electricity_fee,car_seat,rem,facility,equipment,traffic,environment,' .
-        'share,user_id,company_id')->find();
+        'share,user_id,company_id,short_url')->find();
 
     if ($data == null) {
       self::exception('项目信息不存在。');
     } else if (!self::allow($user, $data, $operate)) {
       self::exception('您没有权限' . ($operate == 'edit' ? '编辑' : '查看') . '此项目。');
+    }
+
+    if (empty($data->short_url)) {
+      $url = 'https://' . config('app_host') . '/app/building/view/' . $data->id;
+      $data->short_url = $wechat->getShortUrl($url);
+      $user->save();
     }
 
     $data->engInfo = db('building_en')->where('id', $id)

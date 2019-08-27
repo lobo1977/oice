@@ -124,11 +124,11 @@ export default {
         // this.selectPush()
         // return
         vm.$vux.alert.show({
-          title: "群发提示",
-          content: "请选择要群发推广的项目，在项目详情页点击“群发推广”按钮",
+          title: '群发提示',
+          content: '请选择要群发推广的项目，在项目详情页点击“群发推广”按钮',
           onHide () {
-            vm.$router.push({name: "MyBuilding"})
-          } 
+            vm.$router.push({name: 'MyBuilding'})
+          }
         })
       }
       vm.$vux.loading.show()
