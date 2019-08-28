@@ -82,12 +82,20 @@ class Robot extends Base
   /**
    * 推送分享
    */
-  public static function push($user, $type, $contact, $content, $cycle = 0, $start = null, $end = null) {
+  public static function push($user, $type, $contact, $content, $url = '', $cycle = 0, $start = null, $end = null) {
     if (empty($user) || empty($user->openid)) {
       return false;
     } else {
       $openid = [$user->openid];
     }
+
+    if ($url) {
+      $content = $content . '
+【项目详情】' . $url;
+    }
+
+    $content = $content . '
+推广支持 -<a href="https://' . config('app_host') . '">【' . config('app_name') . '】</a>';
 
     $list = self::alias('r')
       ->join('robot_contact c', 'r.uid = c.uid')

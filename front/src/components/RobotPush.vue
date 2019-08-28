@@ -74,6 +74,7 @@ export default {
   props: {
     robot: null,
     content: '',
+    url: '',
     isShown: {
       type: Boolean,
       default: false
@@ -198,9 +199,10 @@ export default {
       if (vm.checkCount > 0) {
         vm.$vux.loading.show()
         vm.$post('/api/robot/push', {
-          type: this.all && this.keyword.length === 0 ? vm.type : -1,
-          contact: this.all && this.keyword.length === 0 ? '' : this.checkList.join(','),
+          type: vm.all && vm.keyword.length === 0 ? vm.type : -1,
+          contact: vm.all && vm.keyword.length === 0 ? '' : vm.checkList.join(','),
           content: vm.message,
+          url: vm.url,
           cycle: vm.cycle ? vm.cycle_hour : 0,
           start: vm.start_hour,
           end: vm.end_hour

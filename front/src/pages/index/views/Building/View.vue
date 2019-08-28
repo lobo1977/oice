@@ -149,6 +149,7 @@
       <robotpush
         :is-shown="showPush"
         :content="pushContent"
+        :url="info.short_url"
         @on-close="closePush"></robotpush>
     </popup>
   </div>
@@ -709,8 +710,6 @@ export default {
           content += '\n【联系人】' + vm.info.linkman[0].title
           content += '\n【联系电话】' + vm.info.linkman[0].mobile
         }
-        content += '\n【项目详情】' + vm.info.short_url
-        content += '\n推广支持 -【商办云】'
         return content
       } else {
         return ''
