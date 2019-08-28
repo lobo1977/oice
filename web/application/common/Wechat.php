@@ -384,7 +384,9 @@ class Wechat {
 				Robot::signIn($robot_id, 
 					$this->user['openid'], 
 					$this->user['headimgurl']);
-				$content = '签到成功。';
+				$content = '签到成功。机器人' . $this->user['nickname'] . 
+					'已经在线，如需群发推广，转到您要推广的项目页，点击“群发推广”。<a href="https://' . 
+					config('app_host') . '/app/my/building">转到我的项目页</a>。';
 			}
 		}
 		
