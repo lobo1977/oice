@@ -42,7 +42,7 @@ class Robot extends Base
     if ($type != '0' && $type != '1' && empty($contact)) {
       return $this->fail('请选择要推送的群或联系人。');
     } else {
-      $result = modelRobot::push($this->user, $type, $contact, $url = '', $content, $cycle, $start, $end);
+      $result = modelRobot::push($this->user, $type, $contact, $content, $url, $cycle, $start, $end);
     }
     if ($result) {
       return $this->succeed();

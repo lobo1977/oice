@@ -90,12 +90,12 @@ class Robot extends Base
     }
 
     if ($url) {
-      $content = $content . '
+      $content .= '
 【项目详情】' . $url;
     }
 
-    $content = $content . '
-推广支持 -<a href="https://' . config('app_host') . '">【' . config('app_name') . '】</a>';
+    $content .= '
+推广支持 -【' . config('app_name') . '】' . config('app_host');
 
     $list = self::alias('r')
       ->join('robot_contact c', 'r.uid = c.uid')
