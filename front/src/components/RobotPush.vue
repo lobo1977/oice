@@ -61,13 +61,31 @@
 
     <div class="bottom-bar" v-if="step === 2">
       <x-button type="primary" class="bottom-btn"
-        @click.native="pushMessage" :disabled="message.length === 0">发送</x-button>
+        @click.native="pushConfirm" :disabled="message.length === 0">确定</x-button>
+    </div>
+
+    <div v-transfer-dom>
+      <x-dialog v-model="showConfirm">
+        <group title="推送确认">
+          <x-textarea :height="400" readonly :value="completeMessage"></x-textarea>
+        </group>
+        <flexbox :gutter="0" class="dialog-button" style="margin-bottom: -1px;">
+          <flexbox-item>
+            <x-button type="default" @click.native="back"> 返回修改
+            </x-button>
+          </flexbox-item>
+          <flexbox-item :span="6">
+            <x-button type="primary" @click.native="pushMessage"> 提交推送
+            </x-button>
+          </flexbox-item>
+        </flexbox>
+      </x-dialog>
     </div>
   </div>
 </template>
 
 <script>
-import { XHeader, Search, CheckIcon, Range } from 'vux'
+import { XHeader, Search, CheckIcon, Range, XDialog } from 'vux'
 
 export default {
   name: 'robotpush',
@@ -84,7 +102,8 @@ export default {
     XHeader,
     Search,
     CheckIcon,
-    Range
+    Range,
+    XDialog
   },
   data () {
     return {
@@ -105,7 +124,8 @@ export default {
       end_hour: 20,
       leftOptions: {
         showBack: false
-      }
+      },
+      showConfirm: false
     }
   },
   computed: {
@@ -124,6 +144,9 @@ export default {
       } else {
         return '编辑消息'
       }
+    },
+    completeMessage () {
+      return this.message + '\n【项目详情】' + this.url
     }
   },
   methods: {
@@ -195,8 +218,15 @@ export default {
         })
       }
     },
+    pushConfirm () {
+      this.showConfirm = true
+    },
+    back () {
+      this.showConfirm = false
+    },
     pushMessage () {
       let vm = this
+      vm.showConfirm = false
       if (vm.checkCount > 0) {
         vm.$vux.loading.show()
         vm.$post('/api/robot/push', {
@@ -275,7 +305,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less">
 .icon-close {
   position:relative;
   fill:#ccc;
@@ -298,5 +328,16 @@ export default {
 
 .enable {
   color:#fff;
+}
+
+.dialog-button {
+  .weui-btn {
+    border: 0;
+    border-radius: 0
+  }
+  .weui-btn:after {
+    border: 0;
+    border-radius: 0
+  }
 }
 </style>
