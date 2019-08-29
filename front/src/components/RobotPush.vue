@@ -233,7 +233,7 @@ export default {
           type: vm.all && vm.keyword.length === 0 ? vm.type : -1,
           contact: vm.all && vm.keyword.length === 0 ? '' : vm.checkList.join(','),
           content: vm.message,
-          url: vm.link,
+          url: vm.url,
           cycle: vm.cycle ? vm.cycle_hour : 0,
           start: vm.start_hour,
           end: vm.end_hour

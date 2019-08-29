@@ -95,7 +95,7 @@ class Robot extends Base
     }
 
     $content .= '
-推广支持 -【' . config('app_name') . '】' . config('app_host');
+推广支持 -【' . config('app_name') . '】';
 
     $list = self::alias('r')
       ->join('robot_contact c', 'r.uid = c.uid')
