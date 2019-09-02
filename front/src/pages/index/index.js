@@ -147,14 +147,14 @@ store.registerModule('oice', {
 Vue.prototype.$checkAuth = () => {
   if (store.state.oice.user == null) {
     let path = router.currentRoute.fullPath
-    // if (Vue.isWechat()) {
-    //   window.location.href = '/api/wechat/login?redirect=' + encodeURI(path)
-    // } else {
-    router.push({
-      name: 'Login',
-      query: { redirect: path }
-    })
-    // }
+    if (Vue.isWechat()) {
+      window.location.href = '/api/wechat/login?redirect=' + encodeURI(path)
+    } else {
+      router.push({
+        name: 'Login',
+        query: { redirect: path }
+      })
+    }
     return false
   }
   return true

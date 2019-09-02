@@ -34,6 +34,9 @@
           <check-icon :value.sync="item.checked" @update:value="check"></check-icon>
         </div>
       </cell>
+      <div v-show="type === 0" style="padding:5px 15px 10px 15px;background-color:#FFFCD1;font-size:0.9em">
+        提示：这里只显示添加到微信通讯录的群。
+      </div>
     </group>
     
     <div class="fix-bottom" v-show="step === 1">
@@ -85,9 +88,12 @@
 </template>
 
 <script>
-import { XHeader, Search, CheckIcon, Range, XDialog } from 'vux'
+import { XHeader, Search, CheckIcon, Range, XDialog, TransferDom } from 'vux'
 
 export default {
+  directives: {
+    TransferDom
+  },
   name: 'robotpush',
   props: {
     robot: null,

@@ -44,16 +44,20 @@
       </x-button>
       <p v-if="error" style="margin-top:15px;color:red;text-align:center">{{message}}</p>
     </div>
+
+    <qrcode></qrcode>
   </div>
 </template>
 
 <script>
 import { Countdown } from 'vux'
 import { mapState, mapActions } from 'vuex'
+import qrcode from '@/components/qrcode.vue'
 
 export default {
   components: {
-    Countdown
+    Countdown,
+    qrcode
   },
   data () {
     return {
