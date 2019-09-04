@@ -90,7 +90,8 @@ export default new Router({
           meta: {
             title: '客户',
             showOutput: true,
-            showPlus: true
+            showPlus: true,
+            requiresAuth: true
           }
         },
         {
@@ -100,7 +101,8 @@ export default new Router({
           meta: {
             title: '客户',
             showOutput: true,
-            showPlus: true
+            showPlus: true,
+            requiresAuth: true
           }
         },
         {
@@ -110,7 +112,8 @@ export default new Router({
           meta: {
             title: '客户',
             showOutput: true,
-            showPlus: true
+            showPlus: true,
+            requiresAuth: true
           }
         },
         {
@@ -121,14 +124,15 @@ export default new Router({
       ],
       component: Customer
     }, {
-      path: '/customer/view/:id',
+      path: '/customer/view/:id/:key?',
       name: 'CustomerView',
       meta: {
         title: '',
         showBack: true,
         showPlus: true,
         hideBar: true,
-        canShare: true
+        canShare: true,
+        requiresAuth: true
       },
       component: function (resolve) {
         require(['../views/Customer/view.vue'], resolve)

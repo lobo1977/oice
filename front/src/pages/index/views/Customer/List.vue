@@ -53,6 +53,11 @@ export default {
           for (let item in newData) {
             this.list.push(newData[item])
           }
+        } else {
+          this.$vux.toast.show({
+            text: res.message,
+            width: '13em'
+          })
         }
       })
     },

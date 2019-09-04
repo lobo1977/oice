@@ -15,7 +15,7 @@ class Customer extends Base
 {
   protected $beforeActionList = [
     'getUser',
-    'checkAuth' => ['except'=>'index,detail,show']
+    'checkAuth' => ['except'=>'show']
   ];
 
   /**
@@ -35,9 +35,9 @@ class Customer extends Base
   /**
    * 查看客户信息
    */
-  public function detail($id = 0) {
+  public function detail($id = 0, $key = '') {
     if ($id) {
-      $data = modelCustomer::detail($this->user, $id);
+      $data = modelCustomer::detail($this->user, $id, $key);
       return $this->succeed($data);
     } else {
       return;
@@ -52,7 +52,7 @@ class Customer extends Base
       $form_token = $this->formToken();
       $companyList = Company::my($this->user);
       if ($id > 0) {
-        $data = modelCustomer::detail($this->user, $id, 'edit');
+        $data = modelCustomer::detail($this->user, $id, '', 'edit');
         $data->__token__ = $form_token;
         $data->companyList = $companyList;
         return $this->succeed($data);

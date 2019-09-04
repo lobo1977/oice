@@ -303,6 +303,7 @@ export default {
         avatar: '',
         manager_mobile: '',
         company: '',          // 所属企业
+        key: '',
         allowEdit: false,
         allowTurn: false,
         allowFollow: false,
@@ -359,7 +360,7 @@ export default {
       }
       let id = parseInt(to.params.id)
       if (!isNaN(id)) {
-        vm.getInfo(id)
+        vm.getInfo(id, to.params.key ? to.params.key : null)
       }
     })
   },
@@ -374,7 +375,7 @@ export default {
     let id = parseInt(to.params.id)
     if (!isNaN(id)) {
       if (id !== vm.info.id) {
-        vm.getInfo(id)
+        vm.getInfo(id, to.params.key ? to.params.key : null)
       }
     }
     next()
@@ -386,10 +387,13 @@ export default {
     goTab (tab) {
       this.$router.replace({name: 'CustomerView', params: {id: this.info.id}, query: {tab: tab}})
     },
-    getInfo (id) {
+    getInfo (id, key) {
       let vm = this
       vm.$vux.loading.show()
-      vm.$get('/api/Customer/detail?id=' + id, (res) => {
+      if (key === null || key === undefined) {
+        key = ''
+      }
+      vm.$get('/api/Customer/detail?id=' + id + '&key=' + key, (res) => {
         vm.$vux.loading.hide()
         if (res.success) {
           for (let item in vm.info) {
@@ -405,7 +409,7 @@ export default {
           vm.$emit('on-view-loaded', vm.info.customer_name)
 
           if (vm.$isWechat()) {
-            let shareLink = window.location.href
+            let shareLink = 'https://m.o-ice.com/app/customer/view/' + vm.info.id + '/' + vm.info.key
             let shareDesc = vm.info.lease_buy + vm.info.demand + ' ' + vm.info.acreage
             let shareImage = window.location.protocol + '//' +
               window.location.host + '/static/img/logo.png'

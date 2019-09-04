@@ -49,6 +49,12 @@ class Customer extends Base
       }
 
       $customer->url = '/customer/view/' . $customer->id;
+
+      if (!empty($customer->share_create_time)) {
+        $customer->outer_share = true;
+      } else {
+        $customer->outer_share = false;
+      }
     }
     return $list;
   }
@@ -65,7 +71,7 @@ class Customer extends Base
 
     if ($operate == 'view') {
       $superior_id = Company::getSuperior($customer->company_id, $customer->user_id);
-      return $customer->user_id == $user->id || 
+      return $customer->outer_share || $user->isAdmin || $customer->user_id == $user->id || 
         ($customer->share && $customer->company_id == $user->company_id) || 
         ($user->id == $superior_id && $customer->company_id == $user->company_id);
     } else if ($operate == 'new') {
@@ -78,9 +84,10 @@ class Customer extends Base
         $customer->company_id == $user->company_id && 
         (!$customer->clash || $customer->parallel);
     } else if ($operate == 'follow') {    // 跟进
-      return $customer->user_id == $user->id &&
-        $customer->company_id == $user->company_id && 
-        (!$customer->clash || $customer->parallel);
+      return ($customer->outer_share || $user->isAdmin || $customer->user_id == $user->id || 
+      ($customer->share && $customer->company_id == $user->company_id) || 
+      ($user->id == $superior_id && $customer->company_id == $user->company_id)) && 
+      (!$customer->clash || $customer->parallel);
     } else if ($operate == 'confirm') {   // 确认
       return $customer->user_id == $user->id &&
         $customer->company_id == $user->company_id && 
@@ -120,8 +127,10 @@ class Customer extends Base
     
     $list = self::alias('a')
       ->leftJoin('user_company b', 'a.user_id = b.user_id and a.company_id = b.company_id and b.status = 1')
+      ->leftJoin('share s', "s.type = 'customer' and a.id = s.customer_id and s.user_id = " . $user_id)
       ->where('(a.user_id = ' . $user_id . ' and a.company_id = ' . $company_id . ')
-         OR ((a.share = 1 or b.superior_id = ' . $user_id . ') and a.company_id > 0 and a.company_id = ' . $company_id . ')');
+         OR ((a.share = 1 or b.superior_id = ' . $user_id . ') and a.company_id > 0 and a.company_id = ' . $company_id . ')
+         OR s.customer_id is not null');
 
     if (isset($filter['keyword']) && $filter['keyword'] != '') {
       $list->where('a.customer_name', 'like', '%' . $filter['keyword'] . '%');
@@ -151,8 +160,9 @@ class Customer extends Base
         ->where('date_sub(a.end_date, interval a.remind month) < now()');
     }
 
-    $result = $list->field('a.id,a.customer_name,a.area,a.address,a.demand,' .
-      'a.lease_buy,a.min_acreage,a.max_acreage,a.budget,a.status,a.clash')
+    $result = $list->field('a.id,a.customer_name,a.area,a.address,a.demand,
+      a.lease_buy,a.min_acreage,a.max_acreage,a.budget,a.status,a.clash,
+      s.create_time as share_create_time,s.end_time as share_end_time')
       ->page($filter['page'], $filter['page_size'])
       ->order('a.clash', 'desc')
       ->order('a.update_time', 'desc')
@@ -165,20 +175,38 @@ class Customer extends Base
   /**
    * 获取客户详细信息
    */
-  public static function detail($user, $id, $operate = 'view') {
+  public static function detail($user, $id, $key = '', $operate = 'view') {
+    $user_id = 0;
+    // $company_id = 0;
+
+    if ($user) {
+      $user_id = $user->id;
+      // $company_id = $user->company_id;
+    }
+
     $data = self::alias('a')
       ->leftJoin('user b','b.id = a.user_id')
       ->leftJoin('company c','c.id = a.company_id')
+      ->leftJoin('share s', "s.type = 'customer' and a.id = s.customer_id and s.user_id = " . $user_id)
       ->where('a.id', $id)
-      ->field('a.id,a.customer_name,a.tel,a.area,a.address,a.demand,a.lease_buy,' .
-        'a.district,a.min_acreage,a.max_acreage,a.budget,a.settle_date,a.current_area,' .
-        'a.end_date,a.remind,a.rem,a.status,a.clash,a.parallel,a.share,a.user_id,a.company_id,' .
-        'b.title as manager,b.avatar,b.mobile as manager_mobile,c.title as company')
+      ->field('a.id,a.customer_name,a.tel,a.area,a.address,a.demand,a.lease_buy,
+        a.district,a.min_acreage,a.max_acreage,a.budget,a.settle_date,a.current_area,
+        a.end_date,a.remind,a.rem,a.status,a.clash,a.parallel,a.share,a.user_id,a.company_id,
+        b.title as manager,b.avatar,b.mobile as manager_mobile,c.title as company,
+        s.create_time as share_create_time,s.end_time as share_end_time')
       ->find();
 
     if ($data == null) {
       self::exception('客户不存在。');
-    } else if (!self::allow($user, $data, $operate)) {
+    }
+    
+    if (!empty($data->share_create_time)) {
+      $data->outer_share = true;
+    } else {
+      $data->outer_share = false;
+    }
+    
+    if (!self::allow($user, $data, $operate)) {
       self::exception('您没有权限' . ($operate == 'view' ? '查看' : '修改') . '此客户。');
     }
 
@@ -207,6 +235,11 @@ class Customer extends Base
       $data->filter = Filter::query($user, $id);
       $data->recommend = Recommend::query($user, $id);
       $data->confirm = Confirm::query($user, $id, 0);
+
+      // if ($data->allowEdit) {
+      $data->key = md5($data->id . 'customer' . config('wechat.app_secret'));
+      // }
+
       if ($data->clash && $data->allowClash) {
         $data->clashCustomer = self::alias('a')
           ->leftJoin('user b','b.id = a.user_id')

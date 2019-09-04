@@ -198,15 +198,15 @@ router.beforeEach(function (to, from, next) {
     next({name: to.name, params: to.params, query: query, replace: true})
   } else if (to.matched.some(record => record.meta.requiresAuth) &&
     store.state.oice.user == null) {
-    // if (Vue.isWechat()) {
-    //   window.location.href = '/api/wechat/login?redirect=' + encodeURI(to.fullPath)
-    //   next(false)
-    // } else {
-    next({
-      name: 'Login',
-      query: {redirect: to.fullPath}
-    })
-    // }
+    if (Vue.isWechat()) {
+      window.location.href = '/api/wechat/login?redirect=' + encodeURI(to.fullPath)
+      next(false)
+    } else {
+      next({
+        name: 'Login',
+        query: {redirect: to.fullPath}
+      })
+    }
   } else {
     next()
   }
