@@ -142,7 +142,7 @@ class Confirm extends Base
       if ($building == null) {
         self::exception('项目不存在。');
       }
-      $customer = Customer::get($customer_id);
+      $customer = Customer::getById($user, $customer_id);
       if ($customer == null) {
         self::exception('客户不存在。');
       } else if (!Customer::allow($user, $customer, 'confirm')) {
@@ -272,7 +272,7 @@ class Confirm extends Base
       if ($building == null) {
         self::exception('项目不存在。');
       }
-      $customer = Customer::get($data['customer_id']);
+      $customer = Customer::getById($user, $data['customer_id']);
       if ($customer == null) {
         self::exception('客户不存在。');
       } else if (!Customer::allow($user, $customer, 'confirm')) {

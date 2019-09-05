@@ -168,7 +168,7 @@ class Recommend extends Base
    * 生成推荐资料
    */
   public static function addNew($user, $customer_id, $mode, $ids) {
-    $customer = Customer::get($customer_id);
+    $customer = Customer::getById($user, $customer_id);
     if (!Customer::allow($user, $customer, 'follow')) {
       self::exception('您没有权限生成资料。');
     }
@@ -221,7 +221,7 @@ class Recommend extends Base
     if ($recommend == null) {
       return true;
     } else {
-      $customer = Customer::get($recommend->customer_id);
+      $customer = Customer::getById($user, $recommend->customer_id);
       if (!Customer::allow($user, $customer, 'follow') || $recommend->user_id != $user_id) {
         self::exception('您没有权限删除这份资料。');
       }
@@ -252,7 +252,7 @@ class Recommend extends Base
     if ($recommend == null) {
       self::exception('资料不存在或已被删除。');
     } else {
-      $customer = Customer::get($recommend->customer_id);
+      $customer = Customer::getById($user, $recommend->customer_id);
       if (!Customer::allow($user, $customer, 'follow') || $recommend->user_id != $user_id) {
         self::exception('您没有权限修改这份资料。');
       }

@@ -19,7 +19,7 @@ class Linkman extends Base
    */
   public static function allow($user, $type, $id, $operate) {
     if ($type == 'customer') {
-      $customer = Customer::get($id);
+      $customer = Customer::getById($user, $id);
       return Customer::allow($user, $customer, $operate);
     } else if ($type == 'building') {
       $building = Building::get($id);

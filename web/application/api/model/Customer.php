@@ -173,6 +173,39 @@ class Customer extends Base
   }
 
   /**
+   * 通过ID获取客户信息
+   */
+  public static function getById($user, $id) {
+    $user_id = 0;
+
+    if ($user) {
+      $user_id = $user->id;
+    }
+
+    $data = self::alias('a')
+      ->leftJoin('user b','b.id = a.user_id')
+      ->leftJoin('company c','c.id = a.company_id')
+      ->leftJoin('share s', "s.type = 'customer' and a.id = s.customer_id and s.user_id = " . $user_id)
+      ->where('a.id', $id)
+      ->field('a.id,a.customer_name,a.tel,a.area,a.address,a.demand,a.lease_buy,
+        a.district,a.min_acreage,a.max_acreage,a.budget,a.settle_date,a.current_area,
+        a.end_date,a.remind,a.rem,a.status,a.clash,a.parallel,a.share,a.user_id,a.company_id,
+        b.title as manager,b.avatar,b.mobile as manager_mobile,c.title as company,
+        s.create_time as share_create_time,s.end_time as share_end_time')
+      ->find();
+
+    if ($data != null) {
+      if (!empty($data->share_create_time)) {
+        $data->outer_share = true;
+      } else {
+        $data->outer_share = false;
+      }
+    }
+
+    return $data;
+  }
+
+  /**
    * 获取客户详细信息
    */
   public static function detail($user, $id, $key = '', $operate = 'view') {
