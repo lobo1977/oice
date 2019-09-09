@@ -127,10 +127,10 @@ class Customer extends Base
     
     $list = self::alias('a')
       ->leftJoin('user_company b', 'a.user_id = b.user_id and a.company_id = b.company_id and b.status = 1')
-      ->leftJoin('share s', "s.type = 'customer' and a.id = s.customer_id and s.user_id = " . $user_id)
+      ->leftJoin('share s', "s.type = 'customer' and a.id = s.object_id and s.user_id = " . $user_id)
       ->where('(a.user_id = ' . $user_id . ' and a.company_id = ' . $company_id . ')
          OR ((a.share = 1 or b.superior_id = ' . $user_id . ') and a.company_id > 0 and a.company_id = ' . $company_id . ')
-         OR s.customer_id is not null');
+         OR s.object_id is not null');
 
     if (isset($filter['keyword']) && $filter['keyword'] != '') {
       $list->where('a.customer_name', 'like', '%' . $filter['keyword'] . '%');
@@ -185,7 +185,7 @@ class Customer extends Base
     $data = self::alias('a')
       ->leftJoin('user b','b.id = a.user_id')
       ->leftJoin('company c','c.id = a.company_id')
-      ->leftJoin('share s', "s.type = 'customer' and a.id = s.customer_id and s.user_id = " . $user_id)
+      ->leftJoin('share s', "s.type = 'customer' and a.id = s.object_id and s.user_id = " . $user_id)
       ->where('a.id', $id)
       ->field('a.id,a.customer_name,a.tel,a.area,a.address,a.demand,a.lease_buy,
         a.district,a.min_acreage,a.max_acreage,a.budget,a.settle_date,a.current_area,
@@ -217,10 +217,27 @@ class Customer extends Base
       // $company_id = $user->company_id;
     }
 
+    // 通过分享链接查看自动加入共享列表
+    if (!empty($key) && $key == md5($id . 'customer' . config('wechat.app_secret'))) {
+      $share = db('share')
+        ->where('user_id', $user_id)
+        ->where('type', 'customer')
+        ->where('object_id', $id)
+        ->find();
+
+      if ($share == null) {
+        db('share')->insert([
+          'type' => 'cusotmer',
+          'user_id' => $user_id,
+          'object_id' => $id
+        ]);
+      }
+    }
+
     $data = self::alias('a')
       ->leftJoin('user b','b.id = a.user_id')
       ->leftJoin('company c','c.id = a.company_id')
-      ->leftJoin('share s', "s.type = 'customer' and a.id = s.customer_id and s.user_id = " . $user_id)
+      ->leftJoin('share s', "s.type = 'customer' and a.id = s.object_id and s.user_id = " . $user_id)
       ->where('a.id', $id)
       ->field('a.id,a.customer_name,a.tel,a.area,a.address,a.demand,a.lease_buy,
         a.district,a.min_acreage,a.max_acreage,a.budget,a.settle_date,a.current_area,
