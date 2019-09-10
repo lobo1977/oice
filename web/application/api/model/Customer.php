@@ -220,14 +220,14 @@ class Customer extends Base
     // 通过分享链接查看自动加入共享列表
     if (!empty($key) && $key == md5($id . 'customer' . config('wechat.app_secret'))) {
       $share = db('share')
-        ->where('user_id', $user_id)
         ->where('type', 'customer')
+        ->where('user_id', $user_id)
         ->where('object_id', $id)
         ->find();
 
-      if ($share == null) {
+      if (null == $share) {
         db('share')->insert([
-          'type' => 'cusotmer',
+          'type' => 'customer',
           'user_id' => $user_id,
           'object_id' => $id
         ]);
