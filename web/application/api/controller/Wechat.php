@@ -201,11 +201,25 @@ class Wechat extends Base
         } else {
           return $this->fail();
         }
-      } else {
-        return $this->fail($this->wechat->getMessage());
       }
     }
 
-    return $this->fail();
+    return $this->fail($this->wechat->getMessage());
+  }
+
+  /**
+   * 微信小程序登录
+   */
+  public function miniLogin($code = '') {
+    if (!empty($code)) {
+      $data = $this->wechat->getUserSession($code);
+      if ($data) {
+        //$user = Oauth::login('wechat', $data);
+        //if ($user) {
+        return $this->succeed($data);
+        //}
+      }
+    }
+    return $this->fail($this->wechat->getMessage());
   }
 }

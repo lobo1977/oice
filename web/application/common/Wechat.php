@@ -114,6 +114,38 @@ class Wechat {
 	}
 
 	/**
+	 * 获取用户 openid 及 access_token
+	 */
+	public function getUserToken($code) {
+		$url = sprintf(config('wechat.access_token_url'), 
+		  	config('wechat.app_id'), config('wechat.app_secret'), $code);
+		$res = file_get_contents($url);
+		$res = json_decode($res, true);
+		if (isset($res['access_token'])) {
+			return $res;
+		} else {
+			$this->parseError($res, 'getUserToken');
+			return null;
+		}
+	}
+
+	/**
+	 * 获取用户会话信息（小程序登录）
+	 */
+	public function getUserSession($code) {
+		$url = sprintf(config('wechat.mini_get_user_session_url'), 
+			config('wechat.mini_app_id'), config('wechat.mini_app_secret'), $code);
+		$res = file_get_contents($url);
+		$res = json_decode($res, true);
+		if (isset($res['openid'])) {
+			return $res;
+		} else {
+			$this->parseError($res, 'getUserSession');
+			return null;
+		}
+	}
+
+	/**
 	 * 自定义菜单
 	 */
 	public function menuCreate($menu) {
@@ -796,22 +828,6 @@ class Wechat {
 			return json_decode(htmlspecialchars_decode($output),true);
 		} else {
 			return $output;
-		}
-	}
-
-	/**
-	 * 获取用户 openid 及 access_token
-	 */
-	public function getUserToken($code) {
-		$url = sprintf(config('wechat.access_token_url'), 
-		  	config('wechat.app_id'), config('wechat.app_secret'), $code);
-		$res = file_get_contents($url);
-		$res = json_decode($res, true);
-		if (isset($res['access_token'])) {
-			return $res;
-		} else {
-			$this->parseError($res, 'getUserToken');
-			return null;
 		}
 	}
 }

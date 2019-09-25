@@ -24,4 +24,9 @@ return [
     'open_state_code' => 'OPEN_OICE',
     'open_get_code_url' => 'https://open.weixin.qq.com/connect/qrconnect?appid=%s'
         . '&redirect_uri=%s&response_type=code&scope=snsapi_login&state=%s#wechat_redirect',
-];
+
+    // 微信小程序配置
+    'mini_app_id' => 'wxa797b3aba4faaa75',
+    'mini_app_secret' => 'a168d1ddd69363276f9303d3280c6650',
+    'mini_get_user_session_url' => 'https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code'
+];  
