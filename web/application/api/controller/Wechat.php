@@ -186,7 +186,7 @@ class Wechat extends Base
           session('redirect', null);
         }
 
-        $user = Oauth::login('wechat', $data);
+        $user = Oauth::login($data);
         if ($user === true) {
           if ($redirect) {
             return $this->succeed(['redirect' => $redirect]);
@@ -214,10 +214,10 @@ class Wechat extends Base
     if (!empty($code)) {
       $data = $this->wechat->getUserSession($code);
       if ($data) {
-        //$user = Oauth::login('wechat', $data);
-        //if ($user) {
-        return $this->succeed($data);
-        //}
+        $user = Oauth::miniLogin($data);
+        if ($user) {
+          return $this->succeed($user);
+        }
       }
     }
     return $this->fail($this->wechat->getMessage());

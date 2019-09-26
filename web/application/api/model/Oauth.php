@@ -27,7 +27,8 @@ class Oauth extends Base
   /**
    * 微信公众号登录
    */
-  public static function login($platform, $token) {
+  public static function login($token) {
+    $platform = 'wechat';
     $oauth = self::where('platform', $platform)
       ->where('openid', $token['openid'])->find();
 
@@ -78,6 +79,45 @@ class Oauth extends Base
       return true;
     } else {
       return false;
+    }
+  }
+
+  public static function miniLogin($token) {
+    if (!$token || !isset($token['unionid'])) {
+      return false;
+    }
+
+    $platform = 'wechat';
+    $oauth = self::where('platform', $platform)
+      ->where('unionid', $token['unionid'])->find();
+   
+    if ($oauth == null) {
+      $oauth = new Oauth();
+      $oauth->platform = $platform;
+      $oauth->unionid = $token['unionid'];
+    }
+
+    $oauth->session_key = $token['session_key'];
+    $result = $oauth->save();
+
+    if (!$result) {
+      return false;
+    }
+
+    if (isset($oauth['user_id']) && $oauth->user_id > 0) {
+      $user = User::getById($oauth->user_id);
+      if ($user != null) {
+        User::loginSuccess($user, $token['openid']);
+        if ($oauth->nickname && empty($user->title)) {
+          $user->title = $oauth->nickname;
+        }
+        if ($oauth->avatar && empty($user->avatar)) {
+          $user->avatar = $oauth->avatar;
+        }
+        return $user;
+      }
+    } else {
+      // TODO: 自动注册小程序用户
     }
   }
 
