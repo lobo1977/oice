@@ -27,6 +27,9 @@ class Building extends Base
   protected static function formatList($list) {
     foreach($list as $key=>$building) {
       $building->title = $building->building_name;
+      if (empty($building->user_id)) {
+        $building->title .= '[待认领]';
+      }
       $building->desc = (empty($building->level) ? '' : $building->level . '级 ') .
         (empty($building->area) ? '' : $building->area . ' ') .
         (empty($building->district) ? '' : $building->district . ' ') .
@@ -48,7 +51,7 @@ class Building extends Base
     if ($operate == 'share') {
       return true;
     } else if ($operate == 'view') {
-      return $building->share ||
+      return $building->share || $building->outer_share ||
         $building->user_id == 0 ||
         ($user != null && $building->user_id == $user->id) ||
         ($user != null && $building->company_id == $user->company_id);
@@ -91,9 +94,16 @@ class Building extends Base
   
     $list = self::alias('a')
       ->leftJoin('file b',"b.parent_id = a.id AND b.type = 'building' AND b.default = 1")
-      ->where('a.city', self::$city)
-      ->where('(a.share = 1 OR a.user_id = 0 OR a.user_id = ' . $user_id . ' OR 
+      ->leftJoin('share s', "s.type = 'building' and a.id = s.object_id and s.user_id = " . $user_id)
+      ->where('a.city', self::$city);
+
+    if (isset($filter['only_my'])) {
+      $list->where('(s.object_id is not null OR a.user_id = ' . $user_id . ' OR 
         (a.company_id > 0 AND a.company_id = ' . $company_id . '))');
+    } else {
+      $list->where('(a.share = 1 OR s.object_id is not null OR a.user_id = ' . $user_id . ' OR 
+        (a.company_id > 0 AND a.company_id = ' . $company_id . '))');
+    }
     
     if (isset($filter['keyword']) && $filter['keyword'] != '') {
       $list->where('a.building_name|a.pinyin', 'like', $filter['keyword'] . '%');
@@ -114,7 +124,7 @@ class Building extends Base
       }
     }
 
-    $result = $list->field('a.id,a.building_name,a.level,a.area,a.district,a.address,a.rent_sell,a.price,b.file')
+    $result = $list->field('a.id,a.building_name,a.level,a.area,a.district,a.address,a.rent_sell,a.price,b.file,a.user_id')
       ->page($filter['page'], $filter['page_size'])
       ->order('a.update_time', 'desc')->order('a.id', 'desc')
       ->select();
@@ -139,7 +149,7 @@ class Building extends Base
       ->where('(a.user_id > 0 AND a.user_id = ' . $user_id . ') OR ' . 
         '(a.company_id > 0 AND a.company_id = ' . $company_id . ')');
 
-    $result = $list->field('a.id,a.building_name,a.level,a.area,a.district,a.address,a.rent_sell,a.price,b.file')
+    $result = $list->field('a.id,a.building_name,a.level,a.area,a.district,a.address,a.rent_sell,a.price,b.file,a.user_id')
       ->page($page, 10)
       ->order('a.update_time', 'desc')->order('a.id', 'desc')
       ->select();
@@ -220,16 +230,51 @@ class Building extends Base
   /**
    * 获取项目详细信息
    */
-  public static function detail($user, $id, $operate = 'view') {
-    $data = self::where('id', $id)
-      ->field('id,building_name,type,level,area,district,address,longitude,latitude,' .
-        'completion_date,rent_sell,price,acreage,floor,floor_area,floor_height,bearing,' .
-        'developer,manager,fee,electricity_fee,car_seat,rem,facility,equipment,traffic,environment,' .
-        'share,user_id,company_id,short_url')->find();
+  public static function detail($user, $id, $operate = 'view', $key = '') {
+    $user_id = 0;
+
+    if ($user) {
+      $user_id = $user->id;
+    }
+
+    // 通过分享链接查看自动加入共享列表
+    if (!empty($key) && $key == md5($id . 'building' . config('wechat.app_secret'))) {
+      $share = db('share')
+        ->where('type', 'building')
+        ->where('user_id', $user_id)
+        ->where('object_id', $id)
+        ->find();
+
+      if (null == $share) {
+        db('share')->insert([
+          'type' => 'building',
+          'user_id' => $user_id,
+          'object_id' => $id
+        ]);
+      }
+    }
+
+    $data = self::alias('a')
+      ->leftJoin('share s', "s.type = 'building' and a.id = s.object_id and s.user_id = " . $user_id)
+      ->field('a.id,a.building_name,a.type,a.level,a.area,a.district,a.address,a.longitude,a.latitude,
+        a.completion_date,a.rent_sell,a.price,a.acreage,a.floor,a.floor_area,a.floor_height,a.bearing,
+        a.developer,a.manager,a.fee,a.electricity_fee,a.car_seat,a.rem,a.facility,a.equipment,a.traffic,
+        a.environment,a.share,a.user_id,a.company_id,a.short_url,
+        s.create_time as share_create_time,s.end_time as share_end_time')
+      ->where('a.id', $id)
+      ->find();
 
     if ($data == null) {
       self::exception('项目信息不存在。');
-    } else if (!self::allow($user, $data, $operate)) {
+    } 
+    
+    if (!empty($data->share_create_time)) {
+      $data->outer_share = true;
+    } else {
+      $data->outer_share = false;
+    }
+
+    if (!self::allow($user, $data, $operate)) {
       self::exception('您没有权限' . ($operate == 'edit' ? '编辑' : '查看') . '此项目。');
     }
 

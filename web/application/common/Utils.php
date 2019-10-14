@@ -50,7 +50,7 @@ class Utils
     }
 
     /**
-     *  判断是否是微信客户端 
+     *  判断是否是微信客户端
      */
     public static function isWechat() {
         if (strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false) {
@@ -60,7 +60,7 @@ class Utils
     }
 
     /**
-     * 判断是否是QQ客户端 
+     * 判断是否是QQ客户端
      */
     public static function isQQ() {
         if (strpos($_SERVER['HTTP_USER_AGENT'], ' QQ/') !== false) {

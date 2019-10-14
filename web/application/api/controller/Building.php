@@ -45,9 +45,9 @@ class Building extends Base
   /**
    * 查看项目信息
    */
-  public function detail($id = 0) {
+  public function detail($id = 0, $key = '') {
     if ($id) {
-      $data = modelBuilding::detail($this->user, $id);
+      $data = modelBuilding::detail($this->user, $id, 'view', $key);
       if ($data != null && $this->user) {
         $data->customer = Customer::search($this->user, ['status' => '0,1,2,3', 'clash' => false]);
       }
