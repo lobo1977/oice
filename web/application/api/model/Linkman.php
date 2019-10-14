@@ -66,11 +66,14 @@ class Linkman extends Base
     
     if ($linkman == null) {
       self::exception('联系人不存在。');
-    } else if (!self::allow($user, $linkman->getAttr('type'), $linkman->owner_id, $operate)) {
+    } else if (
+      $linkman->user_id != $user->id &&
+      !self::allow($user, $linkman->getAttr('type'), $linkman->owner_id, $operate)) {
       self::exception('您没有权限' . ($operate == 'view' ? '查看' : '修改') . '此联系人。');
     }
     if ($operate == 'view') {
-      $linkman->allowEdit = self::allow($user, $linkman->getAttr('type'), $linkman->owner_id, 'edit');
+      $linkman->allowEdit = $linkman->user_id == $user->id ||
+        self::allow($user, $linkman->getAttr('type'), $linkman->owner_id, 'edit');
       $linkman->allowDelete = $linkman->allowEdit;
     }
     return $linkman;
@@ -89,7 +92,8 @@ class Linkman extends Base
       $oldData = self::get($id);
       if ($oldData == null) {
         self::exception('联系人不存在。');
-      } else if (!self::allow($user, $oldData->getAttr('type'), $oldData->owner_id, 'edit')) {
+      } else if ($oldData->user_id != $user_id && 
+        !self::allow($user, $oldData->getAttr('type'), $oldData->owner_id, 'edit')) {
         self::exception('您没有权限修改此联系人。');
       }
 
@@ -223,7 +227,9 @@ class Linkman extends Base
     $linkman = self::get($id);
     if ($linkman == null) {
       return true;
-    } else if (!self::allow($user, $linkman->getAttr('type'), $linkman->owner_id, 'edit')) {
+    } else if (
+      $linkman->user_id != $user->id &&
+        !self::allow($user, $linkman->getAttr('type'), $linkman->owner_id, 'edit')) {
       self::exception('您没有权限修改此联系人。');
     }
 

@@ -60,7 +60,7 @@
 
       <group v-if="info.linkman.length || info.allowEdit">
         <group-title slot="title">联系人
-          <router-link style="float:right;color:#333;cursor:pointer;" v-if="info.allowEdit"
+          <router-link style="float:right;color:#333;cursor:pointer;"
             :to="{name: 'LinkmanEdit', params: {id: 0, type: 'customer', oid: info.id}}">+ 添加</router-link>
         </group-title>
         <cell v-for="(item, index) in info.linkman" :key="index"
@@ -163,11 +163,10 @@
     </div>
 
     <div v-show="tab === 2">
-      <flexbox :gutter="0" wrap="wrap">
-        <flexbox-item :span="1/3" v-for="(item, index) in attach" :key="index">
-          <img :src="item.msrc" @click="preview(index)" class="customer-img">
-        </flexbox-item>
-      </flexbox>
+      <cell v-for="(item, index) in attach" :key="index" :title="item.title" 
+        @click.native="preview(index)">
+        <img slot="icon" :src="item.msrc" class="cell-image">
+      </cell>
       <div class="bottom-bar">
         <form ref="frmUploadCustomerAttach">
           <x-button type="warn" class="bottom-btn" :disabled="!info.allowEdit">上传</x-button>

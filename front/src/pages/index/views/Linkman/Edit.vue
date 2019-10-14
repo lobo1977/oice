@@ -6,9 +6,10 @@
       <x-input title="所在部门" v-model="info.department" :max="20"></x-input>
       <x-input title="职务" v-model="info.job" :max="20"></x-input>
       <x-input ref="inpLinkmanMobile" title="手机号码"
-        type="tel" v-model="info.mobile" :max="11" :required="true" is-type="china-mobile"
+        type="tel" v-model="info.mobile" :max="11" :required="info.tel.length === 0" is-type="china-mobile"
         @on-change="validateForm" @on-click-error-icon="mobileError" :should-toast-error="false"></x-input>
-      <!-- <x-input title="办公电话" v-model="info.tel" :max="20"></x-input> -->
+      <x-input ref="inpLinkmanTel" title="直线电话" v-model="info.tel" :required="info.mobile.length === 0" :max="20" 
+        @on-change="validateForm" @on-click-error-icon="telError" :should-toast-error="false"></x-input>
       <x-input ref="inpLinkmanEmail" type="email" title="电子邮箱" v-model="info.email" :max="30" is-type="email"
         @on-change="validateForm" @on-click-error-icon="emailError" :should-toast-error="false"></x-input>
       <x-input title="微信" v-model="info.weixin" :max="30"></x-input>
@@ -44,7 +45,7 @@ export default {
         department: '',    // 部门
         job: '',           // 职务
         mobile: '',        // 手机号码
-        tel: '',           // 办公电话
+        tel: '',           // 直线电话
         email: '',         // 电子邮箱
         weixin: '',        // 微信
         qq: '',            // QQ
@@ -104,7 +105,8 @@ export default {
     },
     mobileError () {
       this.$vux.toast.show({
-        text: this.info.mobile.length ? '手机号码无效' : '请输入手机号码'
+        text: this.info.mobile.length ? '手机号码无效' : '手机号码和直线电话至少输入一项',
+        width: '18em'
       })
     },
     emailError () {
@@ -112,9 +114,16 @@ export default {
         text: '电子邮箱无效'
       })
     },
+    telError () {
+      this.$vux.toast.show({
+        text: '手机号码和直线电话至少输入一项',
+        width: '18em'
+      })
+    },
     validateForm () {
       this.formValidate = this.$refs.inpLinkmanTitle.valid &&
-        this.$refs.inpLinkmanMobile.valid && this.$refs.inpLinkmanEmail.valid
+        (this.$refs.inpLinkmanMobile.valid || this.$refs.inpLinkmanTel.valid) &&
+        this.$refs.inpLinkmanEmail.valid
     },
     save () {
       this.validateForm()
