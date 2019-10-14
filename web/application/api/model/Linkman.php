@@ -42,12 +42,12 @@ class Linkman extends Base
     
     $list = self::where('type', $type)
       ->where('owner_id', $id)
-      ->field('id,title,department,job,mobile,email,weixin,qq,status')
+      ->field('id,title,department,job,mobile,tel,email,weixin,qq,status')
       ->order('id', 'asc')
       ->select();
 
     foreach($list as $key=>$linkman) {
-      $linkman->desc = $linkman->department . $linkman->job . ' ' . $linkman->mobile;
+      $linkman->desc = $linkman->department . $linkman->job . ' ' . $linkman->mobile . ' ' . $linkman->tel;
       if ($linkman->status == 1) {
         $linkman->title = $linkman->title . '(已离职)';
       }
@@ -60,7 +60,7 @@ class Linkman extends Base
    */
   public static function detail($user, $id, $operate = 'view') {
     $linkman = self::where('id', $id)
-      ->field('id,type,owner_id,title,department,job,mobile,' .
+      ->field('id,type,owner_id,title,department,job,mobile,tel,' .
         'email,weixin,qq,rem,status,user_id')
       ->find();
     
@@ -131,13 +131,13 @@ class Linkman extends Base
         }
       }
 
-      // if ($data['tel'] != $oldData->tel) {
-      //   if ($oldData->tel) {
-      //     $summary = $summary . '办公电话：' . $oldData->tel . ' -> ' . $data['tel'] . '\n';
-      //   } else {
-      //     $summary = $summary . '办公电话：' . $data['tel'] . '\n';
-      //   }
-      // }
+      if ($data['tel'] != $oldData->tel) {
+        if ($oldData->tel) {
+          $summary = $summary . '直线电话：' . $oldData->tel . ' -> ' . $data['tel'] . '\n';
+        } else {
+          $summary = $summary . '直线电话：' . $data['tel'] . '\n';
+        }
+      }
 
       if ($data['email'] != $oldData->email) {
         if ($oldData->email) {

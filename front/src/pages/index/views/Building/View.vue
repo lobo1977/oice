@@ -57,7 +57,7 @@
         <div v-if="user != null && user.id > 0 && info.linkman && info.linkman.length">
           <cell v-for="(item, index) in info.linkman" :key="index"
             :title="item.title">
-            <a v-if="!info.allowEdit" v-bind:href="'tel:'+(item.mobile)" class="cell-link"><x-icon type="iphone" class="cell-icon" style="margin-right:30px;cursor:pointer;fill:blue;"></x-icon></a>
+            <a v-if="!info.allowEdit" v-bind:href="'tel:'+(item.mobile || item.tel)" class="cell-link"><x-icon type="iphone" class="cell-icon" style="margin-right:30px;cursor:pointer;fill:blue;"></x-icon></a>
             <x-icon v-if="!info.allowEdit" type="wechat" class="cell-icon" style="margin-right:30px;cursor:pointer;" @click="copyWeixin(item.weixin || item.mobile)"></x-icon>
             <x-icon v-if="info.allowEdit" type="compose" class="cell-icon" style="margin-right:30px;cursor:pointer;" @click="editLinkman(item)"></x-icon>
             <x-icon v-if="info.allowEdit" type="trash-a" class="cell-icon" style="margin-right:30px;cursor:pointer;fill:red;" @click="deleteLinkman(index, item)"></x-icon>
