@@ -133,31 +133,6 @@ class Building extends Base
   }
 
   /**
-   * 我的项目
-   */
-  public static function my($user, $page = 1) {
-    $user_id = 0;
-    $company_id = 0;
-
-    if ($user) {
-      $user_id = $user->id;
-      $company_id = $user->company_id;
-    }
-
-    $list = self::alias('a')
-      ->leftJoin('file b',"b.parent_id = a.id AND b.type = 'building' AND b.default = 1")
-      ->where('(a.user_id > 0 AND a.user_id = ' . $user_id . ') OR ' . 
-        '(a.company_id > 0 AND a.company_id = ' . $company_id . ')');
-
-    $result = $list->field('a.id,a.building_name,a.level,a.area,a.district,a.address,a.rent_sell,a.price,b.file,a.user_id')
-      ->page($page, 10)
-      ->order('a.update_time', 'desc')->order('a.id', 'desc')
-      ->select();
-
-    return self::formatList($result);
-  }
-
-  /**
    * 检索收藏的项目信息
    */
   public static function myFavorite($user, $page = 1) {

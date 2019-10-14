@@ -25,7 +25,7 @@ class My extends Base
    * 我的项目
    */
   public function building($page = 1) {
-    $list = Building::my($this->user, $page);
+    $list = Building::search($this->user, ['only_my' => 1, '' => $page]);
     return $this->succeed($list);
   }
 
