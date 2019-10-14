@@ -40,12 +40,11 @@ class Linkman extends Base
     } else {
       $validate = Validate::make([
         'title'  => 'require|token',
-        'mobile' =>'require|mobile',
+        'mobile' =>'mobile',
         'email' => 'email'
       ],[
         'title.require' => '必须填写联系人姓名。',
         'title.token' => '无效请求，请勿重复提交。',
-        'mobile.require' => '必须填写手机号码',
         'mobile.mobile' => '手机号码无效',
         'email.email' => '联系人电子邮箱无效'
       ]);
