@@ -213,7 +213,7 @@ class Building extends Base
     }
 
     // 通过分享链接查看自动加入共享列表
-    if (!empty($key) && $key == md5($id . 'building' . config('wechat.app_secret'))) {
+    if (!empty($key) && $key == md5('building' . $id . config('wechat.app_secret'))) {
       $share = db('share')
         ->where('type', 'building')
         ->where('user_id', $user_id)
@@ -271,6 +271,7 @@ class Building extends Base
       $data->allowEdit = self::allow($user, $data, 'edit');
       $data->allowDelete = self::allow($user, $data, 'delete');
       $data->unit = Unit::getByBuildingId($user, $id);
+      $data->key = md5('building' . $data->id . config('wechat.app_secret'));
       
       if ($user) {
         $data->linkman = Linkman::getByOwnerId($user, 'building', $id, true);
