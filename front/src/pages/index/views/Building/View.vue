@@ -211,6 +211,7 @@ export default {
         environment: '',      // 周边环境
         user_id: 0,
         short_url: '',
+        key: '',
         isFavorite: false,
         allowEdit: false,
         allowDelete: false,
@@ -241,9 +242,10 @@ export default {
     next(vm => {
       vm.user = vm.$store.state.oice.user || vm.user
       let id = parseInt(to.params.id)
+      let key = (to.params.key ? to.params.key : '')
       if (!isNaN(id)) {
         vm.$vux.loading.show()
-        vm.$get('/api/building/detail?id=' + id, (res) => {
+        vm.$get('/api/building/detail?id=' + id + '&key=' + key, (res) => {
           vm.$vux.loading.hide()
           if (res.success) {
             for (let item in vm.info) {
@@ -276,7 +278,8 @@ export default {
             }
             vm.$emit('on-view-loaded', vm.info.building_name)
 
-            vm.shareLink = window.location.href
+            // vm.shareLink = window.location.href
+            vm.shareLink = 'https://m.o-ice.com/app/building/view/' + vm.info.id + '/' + vm.info.key
             vm.setShareDesc()
 
             if (vm.info.images.length) {

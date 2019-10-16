@@ -33,7 +33,7 @@ export default new Router({
       },
       component: Building
     }, {
-      path: '/building/view/:id',
+      path: '/building/view/:id/:key?',
       name: 'BuildingView',
       meta: {
         title: '',
