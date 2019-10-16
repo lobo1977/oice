@@ -397,6 +397,17 @@ export default new Router({
         require(['../views/User/View.vue'], resolve)
       }
     }, {
+      path: '/user/card/:id',
+      name: 'UserCard',
+      meta: {
+        title: '我的名片',
+        showBack: true,
+        hideBar: true
+      },
+      component: function (resolve) {
+        require(['../views/User/Card.vue'], resolve)
+      }
+    }, {
       path: '/my/favorite',
       name: 'Favorite',
       meta: {

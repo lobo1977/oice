@@ -61,6 +61,8 @@ export default {
         weixin: '',      // 微信
         qq: '',          // QQ
         company: '',
+        full_name: '',
+        logo: '',
         isSuperior: false,
         canSetSuperior: false
       },
@@ -85,7 +87,7 @@ export default {
 
             if (vm.$isWechat()) {
               let shareLink = window.location.href
-              let shareDesc = '商办云经纪人'
+              let shareDesc = vm.info.full_name
               let shareImage = window.location.protocol + '//' +
                 window.location.host + vm.info.avatar
 
