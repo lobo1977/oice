@@ -22,6 +22,38 @@ class My extends Base
   }
 
   /**
+   * 通讯录
+   */
+  public function contact($page = 1) {
+    $list = User::contact($this->user, $page);
+    return $this->succeed($list);
+  }
+
+  /**
+   * 添加通讯录
+   */
+  public function addContact($contact_id) {
+    $result = User::addContact($this->user, $contact_id);
+    if ($result) {
+      return $this->succeed();
+    } else {
+      return $this->fail();
+    }
+  }
+
+  /**
+   * 移除通讯录
+   */
+  public function removeContact($contact_id) {
+    $result = User::removeContact($this->user, $contact_id);
+    if ($result) {
+      return $this->succeed();
+    } else {
+      return $this->fail();
+    }
+  }
+
+  /**
    * 我的项目
    */
   public function building($page = 1) {

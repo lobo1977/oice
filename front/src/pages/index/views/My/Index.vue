@@ -35,11 +35,11 @@
         :value="user.superior">
         <x-icon slot="icon" type="android-contact" class="cell-icon"></x-icon>
       </cell>
-      <cell title="我的名片"
+      <cell v-if="user.id" title="我的名片"
         :link="{name: 'UserCard', params: { id: user.id }}">
         <x-icon slot="icon" type="filing" class="cell-icon"></x-icon>
       </cell>
-      <cell v-if="user.company_id > 0" title="通讯录" :link="{name: 'CompanyMember', params: {id: user.company_id}}">
+      <cell v-if="user.id" title="通讯录" :link="{name: 'Contact'}">
         <x-icon slot="icon" type="android-contacts" class="cell-icon"></x-icon>
       </cell>
       <cell v-if="user.id" title="微信机器人" :link="{name:'Robot'}">

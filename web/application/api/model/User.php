@@ -42,6 +42,72 @@ class User extends Base
   }
 
   /**
+   * 获取通讯录（含同事）
+   */
+  public static function contact($user, $page) {
+    $list = self::alias('a')
+      ->leftJoin('user_company b', 'a.id = b.user_id and b.status = 1 and b.active = 1')
+      ->leftJoin('company co', 'b.company_id = co.id')
+      ->field('a.id,a.title,a.avatar,a.mobile,co.full_name,b.create_time')
+      ->where('b.company_id', $user->company_id)
+      ->whereOr('a.id', 'IN', function ($query) use($user) {
+        $query->table('tbl_user_contact')->where('user_id', $user->id)->field('contact_id');
+      })
+      ->order(['b.create_time' => 'desc']);
+
+    if ($page > 0) {
+      $list->page($page, 10);
+    }
+
+    $list = $list->select();
+
+    foreach($list as &$member) {
+      if ($member->create_time) {
+        $member->is_colleague = true;
+      } else {
+        $member->is_colleague = false;
+      }
+      self::formatData($member);
+    }
+    return $list;
+  }
+
+  /**
+   * 添加通讯录
+   */
+  public static function addContact($user, $id) {
+    $find = db('user_contact')
+      ->where('user_id', $user->id)
+      ->where('contact_id', $id)
+      ->find();
+
+    if ($find) {
+      return true;
+    } else {
+      $result = db('user_contact')
+        ->data([
+          'user_id' => $user->id,
+          'contact_id' => $id,
+          'create_time' => date("Y-m-d H:i:s",time())
+        ])->insert();
+
+      return $result;
+    }
+  }
+
+  /**
+   * 移除通讯录
+   */
+  public static function removeContact($user, $id) {
+    $result = db('user_contact')
+      ->where('user_id', $user->id)
+      ->where('contact_id', $id)
+      ->delete();
+
+    return $result;
+  }
+
+  /**
    * 获取企业成员
    */
   public static function companyMember($user, $id, $status = 0, $page = 0, $keyword = '') {

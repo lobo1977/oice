@@ -402,7 +402,8 @@ export default new Router({
       meta: {
         title: '我的名片',
         showBack: true,
-        hideBar: true
+        hideBar: true,
+        requiresAuth: true
       },
       component: function (resolve) {
         require(['../views/User/Card.vue'], resolve)
@@ -417,7 +418,7 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../views/My/favorite.vue'], resolve)
+        require(['../views/My/Favorite.vue'], resolve)
       }
     }, {
       path: '/my/building',
@@ -429,7 +430,7 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../views/My/building.vue'], resolve)
+        require(['../views/My/Building.vue'], resolve)
       }
     }, {
       path: '/my/customer',
@@ -441,7 +442,19 @@ export default new Router({
         requiresAuth: true
       },
       component: function (resolve) {
-        require(['../views/My/customer.vue'], resolve)
+        require(['../views/My/Customer.vue'], resolve)
+      }
+    }, {
+      path: '/my/contact',
+      name: 'Contact',
+      meta: {
+        title: '通讯录',
+        showBack: true,
+        hideBar: true,
+        requiresAuth: true
+      },
+      component: function (resolve) {
+        require(['../views/My/Contact.vue'], resolve)
       }
     }, {
       path: '/my/robot',

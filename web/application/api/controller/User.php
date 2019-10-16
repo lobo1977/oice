@@ -39,7 +39,19 @@ class User extends Base
       if ($this->user != null && $this->user->id != $id) {
         $companyList = Company::my($data);
         $inSameCompany = false;
+        $data->in_contact = false;
+
+        // 是否在通讯录中
+        $findContact = db('user_contact')
+          ->where('user_id', $this->user->id)
+          ->where('contact_id', $id)
+          ->find();
+
+        if ($findContact) {
+          $data->in_contact = true;
+        }
         
+        // 是否是同事
         if ($companyList != null) {
           foreach($companyList as $company) {
             if ($company->id == $this->user->company_id) {
@@ -49,6 +61,7 @@ class User extends Base
           }
         }
 
+        // 是否是上级
         if ($this->user->superior_id == $id) {
           $data->isSuperior = true;
         } else if ($inSameCompany) {
