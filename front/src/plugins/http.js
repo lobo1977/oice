@@ -108,7 +108,7 @@ export default {
     Vue.postFile = (url, form, cb) => {
       let data = null
       if (form) {
-        const maxBytes = 6291456
+        const maxBytes = 10485760
         for (let i in form.elements) {
           if (form.elements[i].type === 'file') {
             for (let f in form.elements[i].files) {
@@ -116,7 +116,7 @@ export default {
                 if (cb) {
                   cb.call(this, {
                     success: false,
-                    message: '上传文件不能超过6兆字节。',
+                    message: '上传文件不能超过10兆字节。',
                     code: 0
                   })
                 }

@@ -94,8 +94,8 @@ class File extends Base
         }
       } else {
         $uploadPath = '../public/upload/' . $type . '/attach';
-        $info = $file->validate(['size'=>6291456,
-          'ext'=>'jpg,jpeg,png,gif,csv,txt,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar'])
+        $info = $file->validate(['size'=>10485760,
+          'ext'=>'jpg,jpeg,png,gif,csv,txt,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar,mp4'])
           ->rule('uniqid')->move($uploadPath);
       }
 
