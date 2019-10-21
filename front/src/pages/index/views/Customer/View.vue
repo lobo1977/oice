@@ -166,12 +166,14 @@
       <cell v-for="(item, index) in attach" :key="index" :title="item.title" 
         @click.native="preview(index)">
         <img slot="icon" :src="item.msrc" class="cell-image">
+        <x-button type="warn" v-if="info.allowEdit" 
+          @click.native.stop="confirmRemoveAttach(index)">删除</x-button>
       </cell>
       <div class="bottom-bar">
         <form ref="frmUploadCustomerAttach">
           <x-button type="warn" class="bottom-btn" :disabled="!info.allowEdit">上传</x-button>
           <input type="hidden" name="id" :value="info.id">
-          <input type="file" class="upload" name="attach[]" multiple="multiple"
+          <input v-if="info.allowEdit" type="file" class="upload" name="attach[]" multiple="multiple"
             @change="upload"/>
         </form>
       </div>
@@ -547,8 +549,13 @@ export default {
       let a = this.attach[index]
       document.location.href = a.url
     },
-    confirmRemoveAttach () {
-      let index = this.$refs.prevAttach.getCurrentIndex()
+    confirmRemoveAttach (delIndex) {
+      let index = -1
+      if (delIndex >= 0) {
+        index = delIndex
+      } else {
+        index = this.$refs.prevAttach.getCurrentIndex()
+      }
       if (index < 0) return
       let a = this.attach[index]
       let vm = this
