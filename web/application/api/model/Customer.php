@@ -218,7 +218,7 @@ class Customer extends Base
     }
 
     // 通过分享链接查看自动加入共享列表
-    if (!empty($key) && $key == md5('customer' . $id . config('wechat.app_secret'))) {
+    if ($user_id > 0 && !empty($key) && $key == md5('customer' . $id . config('wechat.app_secret'))) {
       $share = db('share')
         ->where('type', 'customer')
         ->where('user_id', $user_id)

@@ -24,6 +24,10 @@ class File extends Base
     } else if ($type == 'unit') {
       $unit = Unit::get($id);
       return Unit::allow($user, $unit, $operate);
+    } else if ($type == 'customer') {
+      $customer = Customer::getById($user, $id);
+      return Customer::allow($user, $customer, $operate);
+      // return Unit::allow($user, $unit, $operate);
     } else {
       return true;
     }
@@ -37,7 +41,7 @@ class File extends Base
     if ($type) {
       $query = $query->where('type', $type);
     }
-    $list = $query->field('id,title,file,default')
+    $list = $query->field('id,title,file,default,user_id')
       ->order('default', 'desc')
       ->order('id', 'asc')->select();
 
@@ -66,7 +70,12 @@ class File extends Base
    * 上传文件
    */
   public static function upload($user, $type, $parent_id, $files) {
-    if (!self::allow($user, $type, $parent_id, 'edit')) {
+    $operate = 'edit';
+    if ($type == 'customer') {
+      $operate = 'follow';
+    }
+
+    if (!self::allow($user, $type, $parent_id, $operate)) {
       self::exception('操作失败，您没有权限。');
     }
 
@@ -180,7 +189,7 @@ class File extends Base
 
     $type = $file->getAttr('type');
 
-    if (!self::allow($user, $type, $file->parent_id, 'edit')) {
+    if ($file->user_id != $user->id && !self::allow($user, $type, $file->parent_id, 'edit')) {
       self::exception('操作失败，您没有权限。');
     }
 

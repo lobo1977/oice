@@ -166,14 +166,14 @@
       <cell v-for="(item, index) in attach" :key="index" :title="item.title" 
         @click.native="preview(index)">
         <img slot="icon" :src="item.msrc" class="cell-image">
-        <x-button type="warn" v-if="info.allowEdit" 
+        <x-button type="warn" v-if="info.allowEdit || item.user_id == user.id" 
           @click.native.stop="confirmRemoveAttach(index)">删除</x-button>
       </cell>
       <div class="bottom-bar">
         <form ref="frmUploadCustomerAttach">
-          <x-button type="warn" class="bottom-btn" :disabled="!info.allowEdit">上传</x-button>
+          <x-button type="warn" class="bottom-btn" :disabled="!info.allowFollow">上传</x-button>
           <input type="hidden" name="id" :value="info.id">
-          <input v-if="info.allowEdit" type="file" class="upload" name="attach[]" multiple="multiple"
+          <input v-if="info.allowFollow" type="file" class="upload" name="attach[]" multiple="multiple"
             @change="upload"/>
         </form>
       </div>
@@ -281,6 +281,9 @@ export default {
     return {
       tab: 0,
       showWarn: true,
+      user: {
+        id: 0
+      },
       info: {
         id: 0,
         customer_name: '',    // 名称
@@ -353,6 +356,7 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
+      vm.user = vm.$store.state.oice.user || vm.user
       if (to.query.tab || to.query.tab === 0) {
         vm.tab = parseInt(to.query.tab)
         if (isNaN(vm.tab)) {

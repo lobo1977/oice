@@ -213,7 +213,7 @@ class Building extends Base
     }
 
     // 通过分享链接查看自动加入共享列表
-    if (!empty($key) && $key == md5('building' . $id . config('wechat.app_secret'))) {
+    if ($user_id > 0 && !empty($key) && $key == md5('building' . $id . config('wechat.app_secret'))) {
       $share = db('share')
         ->where('type', 'building')
         ->where('user_id', $user_id)

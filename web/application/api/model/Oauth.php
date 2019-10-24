@@ -100,12 +100,8 @@ class Oauth extends Base
     $oauth->session_key = $token['session_key'];
     $result = $oauth->save();
 
-    if (!$result) {
-      return false;
-    }
-
-    if (isset($oauth['user_id']) && $oauth->user_id > 0) {
-      $user = User::getById($oauth->user_id);
+    if (isset($oauth['user_id']) && $oauth['user_id'] > 0) {
+      $user = User::getById($oauth['user_id']);
       if ($user != null) {
         User::loginSuccess($user, $token['openid']);
         if ($oauth->nickname && empty($user->title)) {
