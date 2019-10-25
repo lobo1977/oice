@@ -93,7 +93,7 @@
         <p class="group-padding" v-show="info.traffic">交通状况：{{info.traffic}}</p>
         <p class="group-padding" v-show="info.equipment">楼宇设备：{{info.equipment}}</p>
         <p class="group-padding" v-show="info.facility">配套设施：{{info.facility}}</p>
-        <p class="group-padding" v-show="info.environment">周边环境:；{{info.environment}}</p>
+        <p class="group-padding" v-show="info.environment">周边环境：{{info.environment}}</p>
       </group>
     </div>
 
