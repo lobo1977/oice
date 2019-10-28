@@ -37,13 +37,15 @@ class File extends Base
    * 查询列表
    */
   public static function getList($user, $type, $parent_id) {
-    $query = self::where('parent_id', $parent_id);
+    $query = self::alias('a')
+      ->leftJoin('user u', 'a.user_id = u.id')
+      ->where('a.parent_id', $parent_id);
     if ($type) {
-      $query = $query->where('type', $type);
+      $query = $query->where('a.type', $type);
     }
-    $list = $query->field('id,title,file,default,user_id')
-      ->order('default', 'desc')
-      ->order('id', 'asc')->select();
+    $list = $query->field('a.id,a.title,a.file,a.size,a.default,a.user_id,u.title as username,a.create_time')
+      ->order('a.default', 'desc')
+      ->order('a.id', 'asc')->select();
 
     foreach($list as $key => $file) {
       $file->is_image = Utils::isImageFile($file->file);
@@ -60,6 +62,9 @@ class File extends Base
           $file->src = '/static/img/attach.png';
           $file->msrc = '/static/img/attach.png';
         }
+      }
+      if ($file->size) {
+        $file->size = round(floatval($file->size) / 1048576, 2) . 'MB';
       }
     }
 
@@ -113,12 +118,13 @@ class File extends Base
         $data['parent_id'] = $parent_id;
         $data['title'] = substr($info->getInfo('name'), 0, 300);
         $data['file'] = $info->getFilename();
+        $data['size'] = $info->getSize();
         if ($count == 0 && $key == 0) {
           $data['default'] = 1;
         } else {
           $data['default'] = 0;
         }
-        $data['use_id'] = $user_id;
+        $data['user_id'] = $user_id;
         
         $newData = new File($data);
         $result += $newData->save();
