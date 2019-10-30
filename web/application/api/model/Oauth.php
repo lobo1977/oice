@@ -82,11 +82,16 @@ class Oauth extends Base
     }
   }
 
+  /**
+   * 微信小程序用户登录
+   */
   public static function miniLogin($token) {
     if (!$token || !isset($token['unionid'])) {
       return false;
     }
 
+    $user = null;
+    $isReg = false;
     $platform = 'wechat';
     $oauth = self::where('platform', $platform)
       ->where('unionid', $token['unionid'])->find();
@@ -97,23 +102,47 @@ class Oauth extends Base
       $oauth->unionid = $token['unionid'];
     }
 
+    if (isset($token['nickname'])) {
+      $oauth->nickname = $token['nickname'];
+    }
+    if (isset($token['avatar'])) {
+      $oauth->avatar = $token['avatar'];
+    }
     $oauth->session_key = $token['session_key'];
     $result = $oauth->save();
 
     if (isset($oauth['user_id']) && $oauth['user_id'] > 0) {
       $user = User::getById($oauth['user_id']);
-      if ($user != null) {
-        User::loginSuccess($user, $token['openid']);
+      if ($user) {
         if ($oauth->nickname && empty($user->title)) {
           $user->title = $oauth->nickname;
         }
         if ($oauth->avatar && empty($user->avatar)) {
           $user->avatar = $oauth->avatar;
         }
-        return $user;
       }
     } else {
-      // TODO: 自动注册小程序用户
+      $isReg = true;
+      $user = new User();
+      $user->type = 0;
+      $user->salt = substr(md5(strval(time())), 0, 5);
+      if ($oauth->nickname) {
+        $user->title = $oauth->nickname;
+      }
+      if ($oauth->avatar) {
+        $user->avatar = $oauth->avatar;
+      }
+      if ($user->save()) {
+        $user = self::getById($user->id);
+      } else {
+        $user = null;
+      }
+    }
+
+    if ($user) {
+      return User::loginSuccess($user, $token['unionid'], $isReg);
+    } else {
+      return false;
     }
   }
 

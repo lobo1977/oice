@@ -210,10 +210,16 @@ class Wechat extends Base
   /**
    * 微信小程序登录
    */
-  public function miniLogin($code = '') {
+  public function miniLogin($code = '', $nickname = '', $avater = '') {
     if (!empty($code)) {
       $data = $this->wechat->getUserSession($code);
       if ($data) {
+        if ($nickname) {
+          $data['nickname'] = $nickname;
+        }
+        if ($avater) {
+          $data['avater'] = $avater;
+        }
         $user = Oauth::miniLogin($data);
         if ($user) {
           return $this->succeed($user);
