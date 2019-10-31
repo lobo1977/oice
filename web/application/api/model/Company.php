@@ -85,7 +85,7 @@ class Company extends Base
     $list = self::where('status', 1);
 
     if ($keyword) {
-      $list = $list->where('title|full_name', 'like', $keyword . '%');
+      $list = $list->where('title|full_name', 'like', '%' . $keyword . '%');
     }
 
     $list = $list ->field('id,title,logo,area,address,create_time')

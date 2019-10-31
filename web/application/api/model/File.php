@@ -67,7 +67,7 @@ class File extends Base
       if ($file->size) {
         $file->size = round(floatval($file->size) / 1048576, 2) . 'MB';
       }
-      $file->create_time = date('Y年n月j日 H:i', strtotime($file->create_time));
+      $file->upload_time = date('Y年n月j日 H:i', strtotime($file->create_time));
     }
 
     return $list;

@@ -174,7 +174,7 @@
       <cell v-for="(item, index) in attach" :key="index" :title="item.title" 
         @click.native="preview(index)">
         <img slot="icon" :src="item.msrc" class="cell-image">
-        <span slot="inline-desc">{{item.size}} &nbsp; {{item.username}} 于 {{item.create_time}} 上传</span>
+        <span slot="inline-desc">{{item.username}} 于 {{item.upload_time}} 上传 &nbsp; {{item.size}}</span>
         <x-button type="warn" v-if="info.allowEdit || item.user_id == user.id" 
           @click.native.stop="confirmRemoveAttach(index)">删除</x-button>
       </cell>

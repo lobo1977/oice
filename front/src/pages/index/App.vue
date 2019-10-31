@@ -311,6 +311,12 @@ html, body {
   line-height: 1.6em;
 }
 
+.weui-cell .vux-cell-bd {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow:ellipsis;
+}
+
 .cell-icon {
   fill: #09bb07;
   position: relative;
