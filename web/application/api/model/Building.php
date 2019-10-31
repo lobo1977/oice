@@ -241,7 +241,11 @@ class Building extends Base
 
     if ($data == null) {
       self::exception('项目信息不存在。');
-    } 
+    }
+
+    if ($data->completion_date) {
+      $data->completion_date = date('Y年n月j日', strtotime($data->completion_date));
+    }
     
     if (!empty($data->share_create_time)) {
       $data->outer_share = true;
@@ -251,13 +255,6 @@ class Building extends Base
 
     if (!self::allow($user, $data, $operate)) {
       self::exception('您没有权限' . ($operate == 'edit' ? '编辑' : '查看') . '此项目。');
-    }
-
-    if (empty($data->short_url)) {
-      $wechat = new Wechat();
-      $url = 'https://' . config('app_host') . '/app/building/view/' . $data->id;
-      $data->short_url = $wechat->getShortUrl($url);
-      $data->save();
     }
 
     $data->engInfo = db('building_en')->where('id', $id)
@@ -272,6 +269,13 @@ class Building extends Base
       $data->allowDelete = self::allow($user, $data, 'delete');
       $data->unit = Unit::getByBuildingId($user, $id);
       $data->key = md5('building' . $data->id . config('wechat.app_secret'));
+      
+      if (empty($data->short_url)) {
+        $wechat = new Wechat();
+        $url = 'https://' . config('app_host') . '/app/building/view/' . $data->id . '/' . $data->key;
+        $data->short_url = $wechat->getShortUrl($url);
+        $data->save();
+      }
       
       if ($user) {
         $data->linkman = Linkman::getByOwnerId($user, 'building', $id, true);

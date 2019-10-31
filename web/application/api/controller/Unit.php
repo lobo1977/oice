@@ -30,14 +30,16 @@ class Unit extends Base
   /**
    * 查看单元信息
    */
-  public function detail($id = 0) {
+  public function detail($id = 0, $key = '') {
     if ($id) {
-      $data = modelUnit::detail($this->user, $id);
-      if ($this->user != null) {
-        $data->customer = Customer::search($this->user, ['status' => '0,1,2,3', 'clash' => false]);
+      $data = modelUnit::detail($this->user, $id, 'view', $key);
+      if ($data) {
+        if ($this->user != null) {
+          $data->customer = Customer::search($this->user, ['status' => '0,1,2,3', 'clash' => false]);
+        }
+        unset($data->user_id);
+        unset($data->company_id);
       }
-      unset($data->user_id);
-      unset($data->company_id);
       return $this->succeed($data);
     } else {
       return;

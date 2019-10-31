@@ -79,6 +79,14 @@
         </cell>
       </group>
 
+      <group v-if="info.shareList && info.shareList.length" title="客户共享">
+        <cell v-for="(item, index) in info.shareList" :key="index"
+          :title="item.title" :link="{name: 'UserView', params: {id: item.id}}" 
+          :inline-desc="item.company || info.manager_mobile">
+          <img slot="icon" :src="item.avatar" class="cell-image">
+        </cell>
+      </group>
+
       <group v-if="info.clashCustomer" title="被撞单客户">
         <cell :title="info.clashCustomer.name"
           :link="{name: 'CustomerView', params: {id: info.clashCustomer.id}}"
@@ -166,6 +174,7 @@
       <cell v-for="(item, index) in attach" :key="index" :title="item.title" 
         @click.native="preview(index)">
         <img slot="icon" :src="item.msrc" class="cell-image">
+        <span slot="inline-desc">{{item.size}} &nbsp; {{item.username}} 于 {{item.create_time}} 上传</span>
         <x-button type="warn" v-if="info.allowEdit || item.user_id == user.id" 
           @click.native.stop="confirmRemoveAttach(index)">删除</x-button>
       </cell>
@@ -319,7 +328,8 @@ export default {
         filter: [],             // 项目筛选表
         recommend: [],          // 推荐资料
         confirm: [],            // 确认书
-        clashCustomer: null
+        clashCustomer: null,
+        shareList: []
       },
       attach: [],
       previewOptions: {

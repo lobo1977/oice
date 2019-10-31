@@ -19,7 +19,7 @@
       <cell title="出售价格" value-align="left" :value="info.sell_price + ' 元/平方米'" v-if="info.sell_price"></cell>
       <cell title="装修状况" value-align="left" :value="info.decoration" v-if="info.decoration"></cell>
       <cell title="状态" value-align="left" :value="info.statusText" v-if="info.statusText"></cell>
-      <cell title="到期日" value-align="left" :value="info.end_date|formatDate" v-if="info.end_date"></cell>
+      <cell title="到期日" value-align="left" :value="info.end_date" v-if="info.end_date"></cell>
     </group>
 
     <group title="备注" v-show="info.rem">
@@ -105,6 +105,7 @@ export default {
         statusText: '',
         end_date: '',      // 到日期
         rem: '',           // 备注
+        key: '',
         isFavorite: false,
         allowNew: false,
         allowEdit: false,
@@ -156,7 +157,7 @@ export default {
             vm.$emit('on-view-loaded', vm.info.title)
 
             if (vm.$isWechat()) {
-              let shareLink = window.location.href
+              let shareLink = 'https://m.o-ice.com/app/unit/view/' + vm.info.id + '/' + vm.info.key
               let shareDesc = (vm.info.acreage ? vm.info.acreage + ' 平方米 ' : '') +
                 (vm.info.rent_price ? vm.info.rent_price + ' 元/平方米/日 ' : '') +
                 vm.info.decoration

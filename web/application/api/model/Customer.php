@@ -274,6 +274,7 @@ class Customer extends Base
       }
 
       User::formatData($data);
+      $data->key = md5('customer' . $data->id . config('wechat.app_secret'));
       $data->allowEdit = self::allow($user, $data, 'edit');
       $data->allowTurn = self::allow($user, $data, 'turn');
       $data->allowFollow = self::allow($user, $data, 'follow');
@@ -285,10 +286,7 @@ class Customer extends Base
       $data->filter = Filter::query($user, $id);
       $data->recommend = Recommend::query($user, $id);
       $data->confirm = Confirm::query($user, $id, 0);
-
-      // if ($data->allowEdit) {
-      $data->key = md5('customer' . $data->id . config('wechat.app_secret'));
-      // }
+      $data->shareList = User::shareList('Customer', $id);
 
       if ($data->clash && $data->allowClash) {
         $data->clashCustomer = self::alias('a')

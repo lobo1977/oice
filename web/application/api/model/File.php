@@ -43,7 +43,8 @@ class File extends Base
     if ($type) {
       $query = $query->where('a.type', $type);
     }
-    $list = $query->field('a.id,a.title,a.file,a.size,a.default,a.user_id,u.title as username,a.create_time')
+    $list = $query->field('a.id,a.title,a.file,a.size,a.default,a.user_id,
+      u.title as username,a.create_time')
       ->order('a.default', 'desc')
       ->order('a.id', 'asc')->select();
 
@@ -66,6 +67,7 @@ class File extends Base
       if ($file->size) {
         $file->size = round(floatval($file->size) / 1048576, 2) . 'MB';
       }
+      $file->create_time = date('Y年n月j日 H:i', strtotime($file->create_time));
     }
 
     return $list;

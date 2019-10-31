@@ -87,6 +87,10 @@ class Unit extends Base
       } else if (!empty($unit->sell_price)) {
         $unit->desc = $unit->desc . $unit->sell_price . '元/平米 ';
       }
+
+      if (isset($unit->end_date) && $unit->end_date) {
+        $unit->end_date = date('Y年n月j日', strtotime($data->end_date));
+      }
     }
   }
 
@@ -128,7 +132,30 @@ class Unit extends Base
   /**
    * 根据ID获取单元信息
    */
-  public static function detail($user, $id, $operate = 'view') {
+  public static function detail($user, $id, $operate = 'view', $key = '') {
+    $user_id = 0;
+
+    if ($user) {
+      $user_id = $user->id;
+    }
+
+    // 通过分享链接查看自动加入共享列表
+    if ($user_id > 0 && !empty($key) && $key == md5('unit' . $id . config('wechat.app_secret'))) {
+      $share = db('share')
+        ->where('type', 'unit')
+        ->where('user_id', $user_id)
+        ->where('object_id', $id)
+        ->find();
+
+      if (null == $share) {
+        db('share')->insert([
+          'type' => 'unit',
+          'user_id' => $user_id,
+          'object_id' => $id
+        ]);
+      }
+    }
+    
     $unit = self::alias('a')
       ->join('building b', 'a.building_id = b.id')
       ->where('a.id', $id)
@@ -144,6 +171,7 @@ class Unit extends Base
     } else {
       $unit->images = File::getList($user, 'unit', $id);
       self::formatInfo($unit);
+      $unit->key = md5('unit' . $unit->id . config('wechat.app_secret'));
 
       if ($operate == 'view') {
         $building = Building::get($unit->building_id);
@@ -152,8 +180,8 @@ class Unit extends Base
         $unit->allowEdit = self::allow($user, $unit, 'edit', $building);
         $unit->allowDelete = self::allow($user, $unit, 'delete', $building);
         $unit->isFavorite = false;
-        if ($user) {
-          if (db('favorite')->where('user_id', $user->id)
+        if ($user_id) {
+          if (db('favorite')->where('user_id', $user_id)
             ->where('unit_id', $id)->find() != null) {
               $unit->isFavorite = true;
           }

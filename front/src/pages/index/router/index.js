@@ -57,7 +57,7 @@ export default new Router({
         require(['../views/Building/Edit.vue'], resolve)
       }
     }, {
-      path: '/unit/view/:id',
+      path: '/unit/view/:id/:key?',
       name: 'Unit',
       meta: {
         title: '',

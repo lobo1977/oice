@@ -73,6 +73,27 @@ class User extends Base
   }
 
   /**
+   * 共享用户列表
+   */
+  public static function shareList($type, $id) {
+    $list = self::alias('a')
+      ->join('share s', 's.user_id = a.id')
+      ->leftJoin('user_company b', 'a.id = b.user_id and b.status = 1 and b.active = 1')
+      ->leftJoin('company co', 'b.company_id = co.id')
+      ->field('a.id,a.title,a.avatar,a.mobile,co.full_name as company,s.create_time')
+      ->where('s.type', $type)
+      ->where('s.object_id', $id)
+      ->order(['s.create_time' => 'desc']);
+
+    $list = $list->select();
+
+    foreach($list as &$member) {
+      self::formatData($member);
+    }
+    return $list;
+  }
+
+  /**
    * 添加通讯录
    */
   public static function addContact($user, $id) {

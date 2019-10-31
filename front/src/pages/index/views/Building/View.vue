@@ -77,7 +77,7 @@
       </group>
 
       <group title="项目简介" label-width="4em" label-margin-right="1em" label-align="right">
-        <cell title="竣工日期" value-align="left" :value="info.completion_date|formatDate" v-show="info.completion_date"></cell>
+        <cell title="竣工日期" value-align="left" :value="info.completion_date" v-show="info.completion_date"></cell>
         <cell title="租售" value-align="left" :value="info.rent_sell" v-show="info.rent_sell"></cell>
         <cell title="价格" value-align="left" :value="info.price" v-show="info.price"></cell>
         <cell title="楼层" value-align="left" :value="info.floor" v-show="info.floor"></cell>
@@ -218,7 +218,8 @@ export default {
         images: [],
         linkman: [],
         unit: [],
-        confirm: []
+        confirm: [],
+        shareList: []
       },
       shareLink: window.location.href,
       shareImage: null,
@@ -278,7 +279,6 @@ export default {
             }
             vm.$emit('on-view-loaded', vm.info.building_name)
 
-            // vm.shareLink = window.location.href
             vm.shareLink = 'https://m.o-ice.com/app/building/view/' + vm.info.id + '/' + vm.info.key
             vm.setShareDesc()
 
