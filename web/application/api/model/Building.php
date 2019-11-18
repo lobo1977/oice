@@ -244,7 +244,7 @@ class Building extends Base
     }
 
     if ($data->completion_date) {
-      $data->completion_date = date('Y年n月j日', strtotime($data->completion_date));
+      $data->completion_date_text = date('Y年n月j日', strtotime($data->completion_date));
     }
     
     if (!empty($data->share_create_time)) {

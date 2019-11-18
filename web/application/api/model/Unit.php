@@ -89,7 +89,7 @@ class Unit extends Base
       }
 
       if (isset($unit->end_date) && $unit->end_date) {
-        $unit->end_date = date('Y年n月j日', strtotime($data->end_date));
+        $unit->end_date_text = date('Y年n月j日', strtotime($data->end_date));
       }
     }
   }

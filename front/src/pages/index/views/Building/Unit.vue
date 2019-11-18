@@ -19,7 +19,7 @@
       <cell title="出售价格" value-align="left" :value="info.sell_price + ' 元/平方米'" v-if="info.sell_price"></cell>
       <cell title="装修状况" value-align="left" :value="info.decoration" v-if="info.decoration"></cell>
       <cell title="状态" value-align="left" :value="info.statusText" v-if="info.statusText"></cell>
-      <cell title="到期日" value-align="left" :value="info.end_date" v-if="info.end_date"></cell>
+      <cell title="到期日" value-align="left" :value="info.end_date_text" v-if="info.end_date_text"></cell>
     </group>
 
     <group title="备注" v-show="info.rem">
@@ -103,7 +103,7 @@ export default {
         decoration: '',    // 装修状况
         status: 0,         // 状态
         statusText: '',
-        end_date: '',      // 到日期
+        end_date_text: '',      // 到日期
         rem: '',           // 备注
         key: '',
         isFavorite: false,

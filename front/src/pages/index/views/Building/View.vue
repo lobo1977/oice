@@ -77,7 +77,7 @@
       </group>
 
       <group title="项目简介" label-width="4em" label-margin-right="1em" label-align="right">
-        <cell title="竣工日期" value-align="left" :value="info.completion_date" v-show="info.completion_date"></cell>
+        <cell title="竣工日期" value-align="left" :value="info.completion_date_text" v-show="info.completion_date_text"></cell>
         <cell title="租售" value-align="left" :value="info.rent_sell" v-show="info.rent_sell"></cell>
         <cell title="价格" value-align="left" :value="info.price" v-show="info.price"></cell>
         <cell title="楼层" value-align="left" :value="info.floor" v-show="info.floor"></cell>
@@ -191,7 +191,7 @@ export default {
         address: '',          // 地址
         longitude: 0,         // 经度
         latitude: 0,          // 纬度
-        completion_date: '',  // 竣工日期
+        completion_date_text: '',  // 竣工日期
         rent_sell: '',        // 租售
         price: '',            // 价格
         acreage: 0,           // 建筑面积
