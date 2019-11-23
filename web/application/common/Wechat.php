@@ -70,6 +70,29 @@ class Wechat {
 	}
 
 	/**
+	 * 获取小程序AccessToken
+	 */
+	public function getMiniAccessToken() {
+		$token = cache('wx_mini_token');
+		if (!$token) {
+			$url = sprintf(config('wechat.mini_get_access_token_url'), 
+				config('wechat.mini_app_id'), config('wechat.mini_app_secret'));
+			
+			$res = file_get_contents($url);
+			$res = json_decode($res, true);
+			
+			if (isset($res['access_token']) && isset($res['expires_in'])) {
+				$token = $res['access_token'];
+				$expires_in = $res['expires_in'];
+				cache('wx_mini_token', $token, $expires_in - 300);
+			} else {
+				$this->parseError($res, 'getMiniAccessToken');
+			}
+		}
+		return $token;
+	}
+
+	/**
 	 * 获取微信 JS-SDK ticket
 	 * @return unknown|mixed|object
 	 */
@@ -215,6 +238,13 @@ class Wechat {
 			$this->parseError($res, 'getShortUrl');
 			return $longUrl;
 		}
+	}
+
+	/**
+	 * 获取小程序码
+	 */
+	public function getMiniCode($path) {
+
 	}
 	
 	/**
