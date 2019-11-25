@@ -165,7 +165,7 @@ class User extends Base
   }
 
   /**
-   * 查找同事
+   * 查找同事（所有企业）
    */
   public static function colleague($user, $company = 0, $keyword = '', $page = 0) {
     $list = self::alias('a')
