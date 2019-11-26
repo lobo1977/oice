@@ -35,13 +35,15 @@ class Unit extends Base
     } else if ($operate == 'new') {
       return $user != null && Building::allow($user, $building, 'edit');
     } else if ($operate == 'edit') {
-      return $user != null && Building::allow($user, $building, 'edit') &&
-        (($unit->company_id > 0 && $unit->company_id == $user->company_id) || 
-        ($unit->company_id == 0 && $unit->user_id == $user->id));
+      return $user != null && (
+        Building::allow($user, $building, 'edit') ||
+        $unit->user_id == $user->id ||
+        ($unit->company_id > 0 && $unit->company_id == $user->company_id));
     } else if ($operate == 'delete') {
-      return $user != null && Building::allow($user, $building, 'edit') && 
-        (($unit->company_id > 0 && $unit->company_id == $user->company_id) || 
-        ($unit->company_id == 0 && $unit->user_id == $user->id));
+      return $user != null && (
+        Building::allow($user, $building, 'edit') ||
+        $unit->user_id == $user->id ||
+        ($unit->company_id > 0 && $unit->company_id == $user->company_id));
     } else {
       return false;
     }

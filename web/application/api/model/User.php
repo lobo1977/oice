@@ -345,6 +345,8 @@ class User extends Base
         }
         if ($user->save()) {
           $user = self::getById($user->id);
+          // 新用户自动关联已有项目
+          self::bindUser($user);
           return self::loginSuccess($user, $mobile, true);
         } else {
           self::exception('系统异常，请稍后再试。');
@@ -597,6 +599,73 @@ class User extends Base
       return $info->getFilename();
     } else {
       self::exception($avatar->getError());
+    }
+  }
+
+  /**
+   * 根据项目和单元联系人电话绑定项目
+   */
+  private static function bindUser($user) {
+    if (empty($user->mobile)) {
+      return;
+    }
+
+    $linkman = db('linkman')
+      ->where('mobile', $user->mobile)
+      ->where('type', 'in', ['building','unit'])
+      ->where('status', 0)
+      ->where('delete_time', 'null')
+      ->field('type,owner_id')
+      ->select();
+
+    if (empty($linkman) || count($linkman) == 0) {
+      return;
+    }
+
+    foreach($linkman as $item) {
+      if ($item['type'] == 'building') {
+        $building = db('building')
+          ->where('id', $item['owner_id'])
+          ->where('delete_time', 'null')
+          ->find();
+
+        if ($building) {
+          if (empty($building['user_id'])) {
+            db('building')
+              ->where('id', $building['id'])
+              ->update(['user_id' => $user->id, 'company_id' => $user->company_id]);
+          } else if (!empty($building['company_id'])) {
+            Company::addin($user, $building['company_id'], true);
+          } else if (!empty($user->company_id)) {
+            db('building')
+              ->where('id', $building['id'])
+              ->update(['company_id' => $user->company_id]);
+          } else {
+
+          }
+        }
+      } else {
+        $unit = db('unit')
+          ->where('id', $item['owner_id'])
+          ->where('delete_time', 'null')
+          ->find();
+        
+        if ($unit) {
+          if (empty($unit['user_id'])) {
+            db('unit')
+              ->where('id', $unit['id'])
+              ->update(['user_id' => $user->id, 'company_id' => $user->company_id]);
+          } else if (!empty($unit['company_id'])) {
+            Company::addin($user, $unit['company_id'], true);
+          } else if (!empty($user->company_id)) {
+            db('unit')
+              ->where('id', $building['id'])
+              ->update(['company_id' => $user->company_id]);
+          } else {
+
+          }
+        }
+      }
     }
   }
 }

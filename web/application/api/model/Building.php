@@ -5,6 +5,7 @@ use think\model\concern\SoftDelete;
 use think\facade\Validate;
 use app\common\Excel;
 use app\common\Wechat;
+use app\common\Sms;
 use app\api\model\Base;
 use app\api\model\File;
 use app\api\model\Log;
@@ -54,7 +55,7 @@ class Building extends Base
       return $building->share || $building->outer_share ||
         $building->user_id == 0 ||
         ($user != null && $building->user_id == $user->id) ||
-        ($user != null && $building->company_id == $user->company_id);
+        ($user != null && $building->company_id > 0 && $building->company_id == $user->company_id);
     } else if ($operate == 'new') {
       return $user != null && $user->company_id > 0;
     } else if ($operate == 'edit') {
@@ -62,8 +63,8 @@ class Building extends Base
         return false;
       } else {
         return $building->user_id == 0 ||
-          ($building->company_id > 0 && $building->company_id == $user->company_id) || 
-          ($building->company_id == 0 && $building->user_id == $user->id);
+          $building->user_id == $user->id || 
+          ($building->company_id > 0 && $building->company_id == $user->company_id);
       }
     } else if ($operate == 'delete') {
       return false;
@@ -268,14 +269,8 @@ class Building extends Base
       $data->allowEdit = self::allow($user, $data, 'edit');
       $data->allowDelete = self::allow($user, $data, 'delete');
       $data->unit = Unit::getByBuildingId($user, $id);
-      $data->key = md5('building' . $data->id . config('wechat.app_secret'));
-      
-      if (empty($data->short_url)) {
-        $wechat = new Wechat();
-        $url = 'https://' . config('app_host') . '/app/building/view/' . $data->id . '/' . $data->key;
-        $data->short_url = $wechat->getShortUrl($url);
-        $data->save();
-      }
+
+      self::getShortUrl($data);
       
       if ($user) {
         $data->linkman = Linkman::getByOwnerId($user, 'building', $id, true);
@@ -564,6 +559,11 @@ class Building extends Base
           "summary" => $summary
         ]);
       }
+
+      if (isset($data['send_sms']) && $data['send_sms'] == 1) {
+        self::sendCommissionConfirm($user, $id);
+      }
+
       return $id;
     } else if (!self::allow($user, null, 'new')) {
       self::exception('您没有权限添加项目。');
@@ -920,5 +920,52 @@ class Building extends Base
       'clash' => $clashCount,
       'fail' => $failCount
     ];
+  }
+
+  /**
+   * 给项目联系人发送确认委托短信
+   */
+  public static function sendCommissionConfirm($user, $id) {
+    $building = self::get($id);
+    if ($building == null) {
+      return false;
+    } else if (!self::allow($user, $building, 'edit')) {
+      self::exception('您没有权限发送短信。');
+    }
+
+    self::getShortUrl($building);
+
+    $linkman = db('linkman')
+      ->where('type', 'building')
+      ->where('owner_id', $building->id)
+      ->where('status', 0)
+      ->where('mobile', '<>', $user->mobile)
+      ->where('delete_time', 'null')
+      ->field('mobile')
+      ->select();
+
+    if (empty($linkman) || count($linkman) == 0) {
+      return false;
+    }
+
+    // TODO:发送短信
+  }
+
+  /**
+   * 获取项目短网址
+   */
+  private static function getShortUrl(&$building) {
+    if (empty($building) || empty($building->id)) {
+      return;
+    }
+    if (empty($building->key)) {
+      $building->key = md5('building' . $building->id . config('wechat.app_secret'));
+    }
+    if (empty($building->short_url)) {
+      $wechat = new Wechat();
+      $url = 'https://' . config('app_host') . '/app/building/view/' . $building->id . '/' . $building->key;
+      $building->short_url = $wechat->getShortUrl($url);
+      $building->save();
+    }
   }
 }

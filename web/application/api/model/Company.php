@@ -516,7 +516,7 @@ class Company extends Base
   /**
    * 加入企业
    */
-  public static function addin($user, $id) {
+  public static function addin($user, $id, $confirm = false) {
     $company = self::get($id);
     if ($company == null) {
       self::exception('企业不存在。');
@@ -538,7 +538,7 @@ class Company extends Base
       ->find();
     
     if ($company->user_id != $user_id) {
-      if ($company->join_way > 1 && $invite == null) {
+      if ($company->join_way > 1 && $invite == null && $confirm == false) {
         self::exception('该企业需要通过邀请加入。');
       } else if ($company->join_way == 1 && $invite == null) {
         $status = 0;
