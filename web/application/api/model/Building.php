@@ -207,6 +207,25 @@ class Building extends Base
   }
 
   /**
+   * 通过ID获取项目信息
+   */
+  public static function getById($user, $id) {
+    $user_id = 0;
+
+    if ($user) {
+      $user_id = $user->id;
+    }
+
+    $data = self::alias('a')
+      ->leftJoin('share s', "s.type = 'building' and a.id = s.object_id and s.user_id = " . $user_id)
+      ->field('a.*,s.level as share_level')
+      ->where('a.id', $id)
+      ->find();
+
+    return $data;
+  }
+
+  /**
    * 获取项目详细信息
    */
   public static function detail($user, $id, $operate = 'view', $key = '') {
@@ -297,7 +316,7 @@ class Building extends Base
     }
 
     if ($id) {
-      $oldData = self::get($id);
+      $oldData = self::getById($user, $id);
       if ($oldData == null) {
         self::exception('项目信息不存在。');
       } else if (!self::allow($user, $oldData, 'edit')) {

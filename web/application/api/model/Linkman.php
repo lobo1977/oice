@@ -22,10 +22,10 @@ class Linkman extends Base
       $customer = Customer::getById($user, $id);
       return Customer::allow($user, $customer, $operate);
     } else if ($type == 'building') {
-      $building = Building::get($id);
+      $building = Building::getById($user, $id);
       return Building::allow($user, $building, $operate);
     } else if ($type == 'unit') {
-      $unit = Unit::get($id);
+      $unit = Unit::getById($user, $id);
       return Unit::allow($user, $unit, $operate);
     } else {
       return true;

@@ -25,7 +25,7 @@ class Unit extends Base
       return false;
     }
     if ($building == null) {
-      $building = Building::get($unit->building_id);
+      $building = Building::getById($user, $unit->building_id);
     }
 
     if ($operate == 'view') {
@@ -114,7 +114,7 @@ class Unit extends Base
       $company_id = $user->company_id;
     }
 
-    $building = Building::get($id);
+    $building = Building::getById($user, $id);
 
     $list = self::alias('a')
       ->leftJoin('file b',"b.parent_id = a.id AND b.type = 'unit' AND b.default = 1")
@@ -136,6 +136,26 @@ class Unit extends Base
     }
     
     return $list;
+  }
+
+    /**
+   * 通过ID获取单元信息
+   */
+  public static function getById($user, $id) {
+    $user_id = 0;
+
+    if ($user) {
+      $user_id = $user->id;
+    }
+
+    $data = self::alias('a')
+      ->join('building b', 'a.building_id = b.id')
+      ->leftJoin('share s', "s.type = 'unit' and a.id = s.object_id and s.user_id = " . $user_id)
+      ->where('a.id', $id)
+      ->field('a.*,s.level as share_level')
+      ->find();
+
+    return $data;
   }
 
   /**
@@ -184,7 +204,7 @@ class Unit extends Base
       $unit->key = md5('unit' . $unit->id . config('wechat.app_secret'));
 
       if ($operate == 'view') {
-        $building = Building::get($unit->building_id);
+        $building = Building::getById($user, $unit->building_id);
         $unit->linkman = Linkman::getByOwnerId($user, 'unit', $id, true);
         $unit->allowNew = self::allow($user, $unit, 'new', $building);
         $unit->allowEdit = self::allow($user, $unit, 'edit', $building);
@@ -215,7 +235,7 @@ class Unit extends Base
     }
 
     if ($id) {
-      $oldData = self::get($id);
+      $oldData = self::getById($user, $id);
       if ($oldData == null) {
         self::exception('单元不存在。');
       } else if (!self::allow($user, $oldData, 'edit')) {

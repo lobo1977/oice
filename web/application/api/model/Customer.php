@@ -63,7 +63,11 @@ class Customer extends Base
       return false;
     }
 
-    $superior_id = Company::getSuperior($customer->company_id, $customer->user_id);
+    $superior_id = -1;
+
+    if (null != $customer) {
+      $superior_id = Company::getSuperior($customer->company_id, $customer->user_id);
+    }
 
     if ($operate == 'view') {
       return $user->isAdmin || $customer->share_level !== null || $customer->user_id == $user->id || 
@@ -183,9 +187,7 @@ class Customer extends Base
       ->leftJoin('company c','c.id = a.company_id')
       ->leftJoin('share s', "s.type = 'customer' and a.id = s.object_id and s.user_id = " . $user_id)
       ->where('a.id', $id)
-      ->field('a.id,a.customer_name,a.tel,a.area,a.address,a.demand,a.lease_buy,
-        a.district,a.min_acreage,a.max_acreage,a.budget,a.settle_date,a.current_area,
-        a.end_date,a.remind,a.rem,a.status,a.clash,a.parallel,a.share,a.user_id,a.company_id,
+      ->field('a.*,
         b.title as manager,b.avatar,b.mobile as manager_mobile,c.title as company,
         s.create_time as share_create_time,s.level as share_level')
       ->find();
@@ -324,7 +326,7 @@ class Customer extends Base
     }
 
     if ($id) {
-      $oldData = self::get($id);
+      $oldData = self::getById($user, $id);
       if ($oldData == null) {
         self::exception('客户不存在。');
       } else if (!self::allow($user, $oldData, 'edit')) {

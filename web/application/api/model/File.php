@@ -19,10 +19,10 @@ class File extends Base
    */
   public static function allow($user, $type, $id, $operate) {
     if ($type == 'building') {
-      $building = Building::get($id);
+      $building = Building::getById($user, $id);
       return Building::allow($user, $building, $operate);
     } else if ($type == 'unit') {
-      $unit = Unit::get($id);
+      $unit = Unit::getById($user, $id);
       return Unit::allow($user, $unit, $operate);
     } else if ($type == 'customer') {
       $customer = Customer::getById($user, $id);

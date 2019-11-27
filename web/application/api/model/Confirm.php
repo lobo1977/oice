@@ -138,7 +138,7 @@ class Confirm extends Base
         return $confirm;
       }
     } else if ($building_id && $customer_id) {
-      $building = Building::get($building_id);
+      $building = Building::getById($user, $building_id);
       if ($building == null) {
         self::exception('项目不存在。');
       }
@@ -268,7 +268,7 @@ class Confirm extends Base
       }
       return $id;
     } else {
-      $building = Building::get($data['building_id']);
+      $building = Building::getById($user, $data['building_id']);
       if ($building == null) {
         self::exception('项目不存在。');
       }
