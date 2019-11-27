@@ -30,18 +30,24 @@ class Unit extends Base
 
     if ($operate == 'view') {
       return 
-        $unit->share || ($user != null && ($unit->user_id == $user->id ||
-        $unit->company_id == $user->company_id));
+        $unit->share || 
+        (
+          $user != null && ($unit->user_id == $user->id ||
+          $unit->share_level !== null ||
+          ($unit->company_id > 0 && $unit->company_id == $user->company_id))
+        );
     } else if ($operate == 'new') {
       return $user != null && Building::allow($user, $building, 'edit');
     } else if ($operate == 'edit') {
       return $user != null && (
-        Building::allow($user, $building, 'edit') ||
+        Building::allow($user, $building, 'edit') || 
+        $unit->share_level > 0 ||
         $unit->user_id == $user->id ||
         ($unit->company_id > 0 && $unit->company_id == $user->company_id));
     } else if ($operate == 'delete') {
       return $user != null && (
         Building::allow($user, $building, 'edit') ||
+        $unit->share_level > 1 ||
         $unit->user_id == $user->id ||
         ($unit->company_id > 0 && $unit->company_id == $user->company_id));
     } else {
@@ -112,9 +118,10 @@ class Unit extends Base
 
     $list = self::alias('a')
       ->leftJoin('file b',"b.parent_id = a.id AND b.type = 'unit' AND b.default = 1")
+      ->leftJoin('share s', "s.type = 'unit' and a.id = s.object_id and s.user_id = " . $user_id)
       ->where('a.building_id', $id)
       ->field('a.id,a.building_no,a.floor,a.room,a.acreage,a.rent_sell,a.rent_price,
-        a.sell_price,a.status,a.share,a.user_id,a.company_id,b.file')
+        a.sell_price,a.status,a.share,a.user_id,a.company_id,b.file,s.level as share_level')
       ->order('a.building_no', 'asc')
       ->order('a.floor', 'desc')
       ->order('a.room', 'asc')
@@ -160,10 +167,11 @@ class Unit extends Base
     
     $unit = self::alias('a')
       ->join('building b', 'a.building_id = b.id')
+      ->leftJoin('share s', "s.type = 'unit' and a.id = s.object_id and s.user_id = " . $user_id)
       ->where('a.id', $id)
       ->field('a.id,building_id,b.building_name,a.building_no,a.floor,a.room,a.face,' .
         'a.acreage,a.rent_sell,a.rent_price,a.sell_price,a.decoration,a.status,' . 
-        'a.end_date,a.rem,a.share,a.user_id,a.company_id')
+        'a.end_date,a.rem,a.share,a.user_id,a.company_id,s.level as share_level')
       ->find();
 
     if ($unit == null) {

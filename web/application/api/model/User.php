@@ -630,18 +630,33 @@ class User extends Base
           ->find();
 
         if ($building) {
+          // 自动认领
           if (empty($building['user_id'])) {
             db('building')
               ->where('id', $building['id'])
               ->update(['user_id' => $user->id, 'company_id' => $user->company_id]);
-          } else if (!empty($building['company_id'])) {
-            Company::addin($user, $building['company_id'], true);
-          } else if (!empty($user->company_id)) {
-            db('building')
-              ->where('id', $building['id'])
-              ->update(['company_id' => $user->company_id]);
+          // 添加共享
           } else {
+            $share = db('share')
+              ->where('type', 'building')
+              ->where('user_id', $user->id)
+              ->where('object_id', $building['id'])
+              ->find();
 
+            if (empty($share)) {
+              db('share')->insert([
+                'type' => 'building',
+                'user_id' => $user->id,
+                'object_id' => $building['id'],
+                'level' => 1
+              ]);
+            } else {
+              db('share')
+              ->where('type', 'building')
+              ->where('user_id', $user->id)
+              ->where('object_id', $building['id'])
+              ->update(['level' => 1]);
+            }
           }
         }
       } else {
@@ -651,18 +666,33 @@ class User extends Base
           ->find();
         
         if ($unit) {
+          // 自动认领
           if (empty($unit['user_id'])) {
             db('unit')
               ->where('id', $unit['id'])
               ->update(['user_id' => $user->id, 'company_id' => $user->company_id]);
-          } else if (!empty($unit['company_id'])) {
-            Company::addin($user, $unit['company_id'], true);
-          } else if (!empty($user->company_id)) {
-            db('unit')
-              ->where('id', $building['id'])
-              ->update(['company_id' => $user->company_id]);
+          // 添加共享
           } else {
+            $share = db('share')
+              ->where('type', 'unit')
+              ->where('user_id', $user->id)
+              ->where('object_id', $unit['id'])
+              ->find();
 
+            if (empty($share)) {
+              db('share')->insert([
+                'type' => 'unit',
+                'user_id' => $user->id,
+                'object_id' => $unit['id'],
+                'level' => 1
+              ]);
+            } else {
+              db('share')
+              ->where('type', 'unit')
+              ->where('user_id', $user->id)
+              ->where('object_id', $unit['id'])
+              ->update(['level' => 1]);
+            }
           }
         }
       }

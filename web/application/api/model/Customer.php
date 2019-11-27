@@ -49,12 +49,6 @@ class Customer extends Base
       }
 
       $customer->url = '/customer/view/' . $customer->id;
-
-      if (!empty($customer->share_create_time)) {
-        $customer->outer_share = true;
-      } else {
-        $customer->outer_share = false;
-      }
     }
     return $list;
   }
@@ -69,37 +63,39 @@ class Customer extends Base
       return false;
     }
 
+    $superior_id = Company::getSuperior($customer->company_id, $customer->user_id);
+
     if ($operate == 'view') {
-      $superior_id = Company::getSuperior($customer->company_id, $customer->user_id);
-      return $customer->outer_share || $user->isAdmin || $customer->user_id == $user->id || 
-        ($customer->share && $customer->company_id == $user->company_id) || 
-        ($user->id == $superior_id && $customer->company_id == $user->company_id);
+      return $user->isAdmin || $customer->share_level !== null || $customer->user_id == $user->id || 
+        ($customer->share && $customer->company_id > 0 && $customer->company_id == $user->company_id) || 
+        ($user->id == $superior_id && $customer->company_id > 0 && $customer->company_id == $user->company_id);
     } else if ($operate == 'new') {
       return true;
     } else if ($operate == 'turn') {
-      return $customer->company_id == $user->company_id &&
+      return $customer->company_id > 0 && $customer->company_id == $user->company_id &&
         ($customer->user_id == $user->id || $user->isAdmin);
     } else if ($operate == 'edit') {
-      return $customer->user_id == $user->id &&
-        $customer->company_id == $user->company_id && 
+      return ($customer->user_id == $user->id || $customer->share_level > 0) && 
         (!$customer->clash || $customer->parallel);
     } else if ($operate == 'follow') {    // 跟进
-      return ($customer->outer_share || $user->isAdmin || $customer->user_id == $user->id || 
-      ($customer->share && $customer->company_id == $user->company_id) || 
-      ($user->id == $superior_id && $customer->company_id == $user->company_id)) && 
-      (!$customer->clash || $customer->parallel);
+      return (
+        $user->isAdmin || $customer->share_level !== null || $customer->user_id == $user->id || 
+        ($customer->share && $customer->company_id > 0 && $customer->company_id == $user->company_id) || 
+        ($user->id == $superior_id && $customer->company_id > 0 && $customer->company_id == $user->company_id)
+      ) && (!$customer->clash || $customer->parallel);
     } else if ($operate == 'confirm') {   // 确认
       return $customer->user_id == $user->id &&
-        $customer->company_id == $user->company_id && 
+        $customer->company_id > 0 && $customer->company_id == $user->company_id && 
         (!$customer->clash || $customer->parallel);
     } else if ($operate == 'clash') {     // 撞单处理
       return $user->isAdmin && $customer->clash &&
         $customer->company_id == $user->company_id;
     } else if ($operate == 'delete') {    // 删除
       return ($customer->user_id == $user->id &&
-        $customer->company_id == $user->company_id) ||
+        $customer->company_id > 0 && $customer->company_id == $user->company_id) ||
         ($user->isAdmin && $customer->clash &&
-        $customer->company_id == $user->company_id);
+        $customer->company_id > 0 && $customer->company_id == $user->company_id) ||
+        $customer->share_level > 1;
     } else {
       return false;
     }
@@ -162,7 +158,7 @@ class Customer extends Base
 
     $result = $list->field('a.id,a.customer_name,a.area,a.address,a.demand,
       a.lease_buy,a.min_acreage,a.max_acreage,a.budget,a.status,a.clash,
-      s.create_time as share_create_time,s.end_time as share_end_time')
+      s.create_time as share_create_time,s.level as share_level')
       ->page($filter['page'], $filter['page_size'])
       ->order('a.clash', 'desc')
       ->order('a.update_time', 'desc')
@@ -191,16 +187,8 @@ class Customer extends Base
         a.district,a.min_acreage,a.max_acreage,a.budget,a.settle_date,a.current_area,
         a.end_date,a.remind,a.rem,a.status,a.clash,a.parallel,a.share,a.user_id,a.company_id,
         b.title as manager,b.avatar,b.mobile as manager_mobile,c.title as company,
-        s.create_time as share_create_time,s.end_time as share_end_time')
+        s.create_time as share_create_time,s.level as share_level')
       ->find();
-
-    if ($data != null) {
-      if (!empty($data->share_create_time)) {
-        $data->outer_share = true;
-      } else {
-        $data->outer_share = false;
-      }
-    }
 
     return $data;
   }
@@ -243,17 +231,11 @@ class Customer extends Base
         a.district,a.min_acreage,a.max_acreage,a.budget,a.settle_date,a.current_area,
         a.end_date,a.remind,a.rem,a.status,a.clash,a.parallel,a.share,a.user_id,a.company_id,
         b.title as manager,b.avatar,b.mobile as manager_mobile,c.title as company,
-        s.create_time as share_create_time,s.end_time as share_end_time')
+        s.create_time as share_create_time,s.level as share_level')
       ->find();
 
     if ($data == null) {
       self::exception('客户不存在。');
-    }
-    
-    if (!empty($data->share_create_time)) {
-      $data->outer_share = true;
-    } else {
-      $data->outer_share = false;
     }
     
     if (!self::allow($user, $data, $operate)) {

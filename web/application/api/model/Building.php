@@ -52,17 +52,20 @@ class Building extends Base
     if ($operate == 'share') {
       return true;
     } else if ($operate == 'view') {
-      return $building->share || $building->outer_share ||
+      return $building->share || 
         $building->user_id == 0 ||
-        ($user != null && $building->user_id == $user->id) ||
-        ($user != null && $building->company_id > 0 && $building->company_id == $user->company_id);
+        (
+          $user != null && ($building->share_level !== null || 
+          $building->user_id == $user->id ||
+          ($building->company_id > 0 && $building->company_id == $user->company_id))
+        );
     } else if ($operate == 'new') {
       return $user != null && $user->company_id > 0;
     } else if ($operate == 'edit') {
       if ($user == null) {
         return false;
       } else {
-        return $building->user_id == 0 ||
+        return $building->user_id == 0 || $building->share_level > 0 ||
           $building->user_id == $user->id || 
           ($building->company_id > 0 && $building->company_id == $user->company_id);
       }
@@ -125,7 +128,7 @@ class Building extends Base
       }
     }
 
-    $result = $list->field('a.id,a.building_name,a.level,a.area,a.district,a.address,a.rent_sell,a.price,b.file,a.user_id')
+    $result = $list->field('a.id,a.building_name,a.level,a.area,a.district,a.address,a.rent_sell,a.price,b.file,a.user_id,s.level as share_level')
       ->page($filter['page'], $filter['page_size'])
       ->order('a.update_time', 'desc')->order('a.id', 'desc')
       ->select();
@@ -225,7 +228,8 @@ class Building extends Base
         db('share')->insert([
           'type' => 'building',
           'user_id' => $user_id,
-          'object_id' => $id
+          'object_id' => $id,
+          'level' => 0
         ]);
       }
     }
@@ -236,7 +240,7 @@ class Building extends Base
         a.completion_date,a.rent_sell,a.price,a.acreage,a.floor,a.floor_area,a.floor_height,a.bearing,
         a.developer,a.manager,a.fee,a.electricity_fee,a.car_seat,a.rem,a.facility,a.equipment,a.traffic,
         a.environment,a.share,a.user_id,a.company_id,a.short_url,
-        s.create_time as share_create_time,s.end_time as share_end_time')
+        s.create_time as share_create_time,s.level as share_level')
       ->where('a.id', $id)
       ->find();
 
@@ -246,12 +250,6 @@ class Building extends Base
 
     if ($data->completion_date) {
       $data->completion_date_text = date('Y年n月j日', strtotime($data->completion_date));
-    }
-    
-    if (!empty($data->share_create_time)) {
-      $data->outer_share = true;
-    } else {
-      $data->outer_share = false;
     }
 
     if (!self::allow($user, $data, $operate)) {
@@ -948,7 +946,32 @@ class Building extends Base
       return false;
     }
 
-    // TODO:发送短信
+    $mobileList = '';
+    foreach($linkman as $item) {
+      if ($mobileList) {
+        $mobileList .= ',';
+      }
+      $mobileList .= $item['mobile'];
+    }
+
+    $summary = $building->building_name;
+    $acreage = $building->acreage;
+    
+    $unit = Unit::getByBuildingId($user, $id);
+    if ($unit && count($unit) > 0) {
+      $acreage = 0;
+      $summary .= ' ' . $unit[0]->title . '共' . count($unit) . '个房间';
+      foreach ($unit as $u) {
+        if (!empty($u->acreage)) {
+          $acreage += intval($u->acreage);
+        }
+      }
+    }
+
+    $message = sprintf(config('sms.tmp_commission_confirm'), 
+      $summary, $building->id, $acreage . '平方米', $building->short_url);
+    $sms = new Sms();
+    $sms->sendSMS($mobileList, $message);
   }
 
   /**
