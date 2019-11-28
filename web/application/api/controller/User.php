@@ -45,17 +45,8 @@ class User extends Base
         $data->recommend = Recommend::queryShare($this->user, $id);
         $companyList = Company::my($data);
         $inSameCompany = false;
-        $data->in_contact = false;
-
-        // 是否在通讯录中
-        $findContact = db('user_contact')
-          ->where('user_id', $this->user->id)
-          ->where('contact_id', $id)
-          ->find();
-
-        if ($findContact) {
-          $data->in_contact = true;
-        }
+        // 添加到联系人列表
+        $data->in_contact = modelUser::addContact($this->user, $id);
         
         // 是否是同事
         if ($companyList != null) {

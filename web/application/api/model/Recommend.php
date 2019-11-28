@@ -123,7 +123,7 @@ class Recommend extends Base
       ->field('customer_name,company_id')->find();
 
     $manager = User::where('id', $recommend->user_id)
-      ->field('title,avatar,mobile,email')
+      ->field('title,avatar,mobile,email,weixin')
       ->find();
     $manager = User::formatData($manager);
 
