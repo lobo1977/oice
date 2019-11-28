@@ -354,7 +354,7 @@ class Customer extends Base
    * 手机版推荐资料
    */
   public function show($id) {
-    $data = Recommend::detail($id);
-    return $this->succeed($data);
+    $list = Recommend::detail($this->user, $id);
+    return $this->succeed($list);
   }
 }

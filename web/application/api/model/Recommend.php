@@ -13,17 +13,12 @@ use app\api\model\File;
 class Recommend extends Base
 {
   /**
-   * 客户推荐表
+   * 格式化数据
    */
-  public static function query($user, $customer_id) {
-    $list = self::alias('a')
-      ->leftJoin('recom_building b', 'a.id = b.recom_id')
-      ->where('a.customer_id', $customer_id)
-      ->where('a.user_id', $user->id)
-      ->field('a.id,a.mode,a.token,a.create_time,count(b.id) as building_count')
-      ->group('a.id')
-      ->order('a.create_time', 'desc')
-      ->select();
+  private static function formatList($list) {
+    if (empty($list)) {
+      return $list;
+    }
 
     foreach($list as $key => $item) {
       $item->disabled = false;
@@ -31,24 +26,97 @@ class Recommend extends Base
       $building = db('recom_building')->alias('a')
         ->leftJoin('unit u', 'a.unit_id = u.id AND a.unit_id > 0')
         ->join('building b', 'a.building_id = b.id OR u.building_id = b.id')
+        ->leftJoin('file bf', "bf.parent_id = b.id AND bf.type = 'building' AND bf.default = 1")
+        ->leftJoin('file uf', "uf.parent_id = u.id AND uf.type = 'unit' AND uf.default = 1")
         ->where('a.recom_id', $item->id)
-        ->field('b.building_name')
+        ->field('b.building_name,bf.file as building_img,uf.file as unit_img')
         ->order('a.id', 'asc')
         ->find();
       
       if ($building) {
         $item->building = $building['building_name'];
+        $item->image = '/static/img/error.png';
+        
+        if ($building['unit_img']) {
+          $item->image = '/upload/building/images/300/' . $building['unit_img'];
+        } else if ($building['building_img']) {
+          $item->image = '/upload/building/images/300/' . $building['building_img'];
+        }
       }
     }
 
     return $list;
   }
 
-  public static function detail($token) {
+  /**
+   * 查询推荐资料
+   */
+  public static function query($user, $customer_id = 0) {
+    $list = self::alias('a')
+      ->leftJoin('recom_building b', 'a.id = b.recom_id')
+      ->where('a.user_id', $user->id);
+
+    if ($customer_id) {
+      $list->where('a.customer_id', $customer_id);
+    }
+     
+    $list = $list->field('a.id,a.mode,a.token,a.create_time,count(b.id) as building_count')
+      ->group('a.id')
+      ->order('a.create_time', 'desc')
+      ->select();
+
+    return self::formatList($list);
+  }
+
+  /**
+   * 查询已共享的推荐资料
+   */
+  public static function queryShare($user, $owner_id = 0) {
+    $list = self::alias('a')
+      ->join('share s', "s.type = 'recommend' and a.id = s.object_id and s.user_id = " . $user->id)
+      ->leftJoin('recom_building b', 'a.id = b.recom_id')
+      ->leftJoin('customer c', 'a.customer_id = c.id');
+    if ($owner_id) {
+      $list->where('a.user_id', $owner_id);
+    }
+     
+    $list = $list->field('a.id,a.mode,a.token,a.create_time,count(b.id) as building_count,c.customer_name')
+      ->group('a.id')
+      ->order('a.create_time', 'desc')
+      ->select();
+
+      return self::formatList($list);
+  }
+
+  public static function detail($user, $token) {
+    $user_id = 0;
+    // $company_id = 0;
+
+    if ($user) {
+      $user_id = $user->id;
+      // $company_id = $user->company_id;
+    }
+
     $recommend = self::where('token', $token)->find();
 
     if ($recommend == null) {
       self::exception('资料不存在。');
+    }
+
+    if ($user_id) {
+      $share = db('share')
+        ->where('type', 'recommend')
+        ->where('user_id', $user_id)
+        ->where('object_id', $recommend->id)
+        ->find();
+
+      if (null == $share) {
+        db('share')->insert([
+          'type' => 'recommend',
+          'user_id' => $user_id,
+          'object_id' => $recommend->id
+        ]);
+      }
     }
 
     $customer = Customer::where('id', $recommend->customer_id)

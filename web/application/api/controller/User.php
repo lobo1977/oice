@@ -5,6 +5,7 @@ use think\Validate;
 use app\api\controller\Base;
 use app\api\model\User as modelUser;
 use app\api\model\Company;
+use app\api\model\Recommend;
 
 class User extends Base
 {
@@ -35,8 +36,13 @@ class User extends Base
   public function detail($id = 0) {
     if ($id) {
       $data = modelUser::getById($id);
-      
+
+      if (empty($data)) {
+        return $this->fail('用户不存在');
+      }
+
       if ($this->user != null && $this->user->id != $id) {
+        $data->recommend = Recommend::queryShare($this->user, $id);
         $companyList = Company::my($data);
         $inSameCompany = false;
         $data->in_contact = false;

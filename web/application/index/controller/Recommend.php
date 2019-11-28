@@ -37,7 +37,7 @@ class Recommend extends Controller
    * 打印版
    */
   public function index($id, $mode = 1) {
-    $data = modelRecommend::detail($id);
+    $data = modelRecommend::detail(null, $id);
 
     $process = array(
       ['title' => '形成TEAM', 'step' => array(1)],
