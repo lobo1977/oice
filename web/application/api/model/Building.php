@@ -101,13 +101,13 @@ class Building extends Base
       ->leftJoin('share s', "s.type = 'building' and a.id = s.object_id and s.user_id = " . $user_id)
       ->where('a.city', self::$city);
 
-    if (isset($filter['only_my'])) {
-      $list->where('(s.object_id is not null OR a.user_id = ' . $user_id . ' OR 
-        (a.company_id > 0 AND a.company_id = ' . $company_id . '))');
-    } else {
+    // if (isset($filter['only_my'])) {
+    //   $list->where('(s.object_id is not null OR a.user_id = ' . $user_id . ' OR 
+    //     (a.company_id > 0 AND a.company_id = ' . $company_id . '))');
+    // } else {
       $list->where('(a.share = 1 OR s.object_id is not null OR a.user_id = ' . $user_id . ' OR 
         (a.company_id > 0 AND a.company_id = ' . $company_id . '))');
-    }
+    //}
     
     if (isset($filter['keyword']) && $filter['keyword'] != '') {
       $list->where('a.building_name|a.pinyin', 'like', $filter['keyword'] . '%');
