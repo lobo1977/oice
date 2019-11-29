@@ -81,7 +81,8 @@
       <group v-if="info.user_id == 0 || info.user_id == user.id" gutter="10px" label-width="4em" label-margin-right="1em" label-align="right">
         <cell title="所属企业" @click.native="selectCompany" :is-link="companyPickerData.length != 1" 
           :value="companyText" value-align="left"></cell>
-        <x-switch title="是否公开" inline-desc="是否全网可见" v-model="info.share"></x-switch>
+        <x-switch title="是否公开" inline-desc="公开后全网可见" v-model="info.share"></x-switch>
+        <x-switch v-if="id > 0" title="发送短信" inline-desc="发送短信给项目联系人" v-model="info.send_sms"></x-switch>
       </group>
 
       <actionsheet v-model="showRentSellPicker" :menus="rentSellPickerList" theme="android" @on-click-menu="rentSellSelect"></actionsheet>
@@ -231,7 +232,8 @@ export default {
         environment: '',      // 周边环境
         company_id: '',       // 所属企业
         user_id: 0,
-        share: true           // 是否公开
+        share: true,          // 是否公开
+        send_sms: false       // 是否发送委托确认短信
       },
       engInfo: {
         __token__: '',
@@ -350,6 +352,9 @@ export default {
                 }
               }
             }
+            if (vm.info.user_id === 0 || vm.info.user_id === vm.user.id) {
+              vm.info.send_sms = true
+            }
             vm.engInfo.__token__ = res.data.__token__
             vm.$emit('on-view-loaded', vm.info.building_name)
           } else {
@@ -437,6 +442,7 @@ export default {
       }
       this.$vux.loading.show()
       this.info.share = (this.info.share ? 1 : 0)
+      this.info.send_sms = (this.info.send_sms ? 1 : 0)
       this.$post('/api/building/edit?id=' + this.id, this.info, (res) => {
         this.$vux.loading.hide()
         if (res.success) {
