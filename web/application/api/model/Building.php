@@ -1,10 +1,12 @@
 <?php
 namespace app\api\model;
 
+use think\facade\Log as sysLog;
 use think\model\concern\SoftDelete;
 use think\facade\Validate;
 use app\common\Excel;
 use app\common\Wechat;
+use app\common\Utils;
 use app\common\Sms;
 use app\api\model\Base;
 use app\api\model\File;
@@ -608,7 +610,7 @@ class Building extends Base
    * 添加修改英文信息
    */
   public static function addUpEngInfo($user, $id, $data) {
-    $building = self::get($id);
+    $building = self::getById($user, $id);
     if ($building == null) {
       self::exception('项目信息不存在。');
     } else if (!self::allow($user, $building, 'edit')) {
@@ -789,7 +791,7 @@ class Building extends Base
    * 删除项目
    */
   public static function remove($user, $id) {
-    $building = self::get($id);
+    $building = self::getById($user, $id);
     if ($building == null) {
       return true;
     } else if (!self::allow($user, $building, 'delete')) {
@@ -943,14 +945,14 @@ class Building extends Base
    * 给项目联系人发送确认委托短信
    */
   public static function sendCommissionConfirm($user, $id) {
-    $building = self::get($id);
+    $building = self::getById($user, $id);
     if ($building == null) {
       return false;
     } else if (!self::allow($user, $building, 'edit')) {
       self::exception('您没有权限发送短信。');
     }
 
-    self::getShortUrl($building);
+    // self::getShortUrl($building);
 
     $linkman = db('linkman')
       ->where('type', 'building')
@@ -976,10 +978,10 @@ class Building extends Base
     $summary = $building->building_name;
     $acreage = $building->acreage;
     
-    $unit = Unit::getByBuildingId($user, $id);
+    $unit = Unit::getByBuildingId($user, $id, 1);
     if ($unit && count($unit) > 0) {
       $acreage = 0;
-      $summary .= ' ' . $unit[0]->title . '共' . count($unit) . '个房间';
+      $summary .= ' ' . $unit[0]->title . '共' . count($unit) . '个空置房间';
       foreach ($unit as $u) {
         if (!empty($u->acreage)) {
           $acreage += intval($u->acreage);
@@ -988,7 +990,10 @@ class Building extends Base
     }
 
     $message = sprintf(config('sms.tmp_commission_confirm'), 
-      $summary, $building->id, $acreage . '平方米', $building->short_url);
+      $summary, $acreage . '平方米', Utils::getRandNumber(6));
+
+    sysLog::info($mobileList . ':'. $message);
+
     $sms = new Sms();
     $sms->sendSMS($mobileList, $message);
   }

@@ -105,7 +105,7 @@ class Unit extends Base
   /**
    * 通过项目ID获取单元列表
    */
-  public static function getByBuildingId($user, $id) {
+  public static function getByBuildingId($user, $id, $status = -1) {
     $user_id = 0;
     $company_id = 0;
 
@@ -119,8 +119,13 @@ class Unit extends Base
     $list = self::alias('a')
       ->leftJoin('file b',"b.parent_id = a.id AND b.type = 'unit' AND b.default = 1")
       ->leftJoin('share s', "s.type = 'unit' and a.id = s.object_id and s.user_id = " . $user_id)
-      ->where('a.building_id', $id)
-      ->field('a.id,a.building_no,a.floor,a.room,a.acreage,a.rent_sell,a.rent_price,
+      ->where('a.building_id', $id);
+
+      if ($status >= 0) {
+        $list->where('a.status', $status);
+      }
+
+      $list = $list->field('a.id,a.building_no,a.floor,a.room,a.acreage,a.rent_sell,a.rent_price,
         a.sell_price,a.status,a.share,a.user_id,a.company_id,b.file,s.level as share_level')
       ->order('a.building_no', 'asc')
       ->order('a.floor', 'desc')
