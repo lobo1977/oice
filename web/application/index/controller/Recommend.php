@@ -37,6 +37,8 @@ class Recommend extends Controller
    * 打印版
    */
   public function index($id, $mode = 1) {
+    set_time_limit(0);
+    
     $data = modelRecommend::detail(null, $id);
 
     $process = array(
@@ -130,6 +132,8 @@ class Recommend extends Controller
     $pdf->writeHTML($this->fetch('expend'));
     $pdf->AddPage();
     $pdf->writeHTML($this->fetch('process'));
+    $pdf->AddPage();
+    $pdf->writeHTML($this->fetch('unit_list'));
 
     foreach($data['list'] as $key=>$building) {
       $pdf->AddPage();
@@ -150,7 +154,6 @@ class Recommend extends Controller
     $pdf->writeHTML($this->fetch('expend'));
     $pdf->AddPage();
     $pdf->writeHTML($this->fetch('process'));
-
     $pdf->AddPage();
     $pdf->writeHTML($this->fetch('unit_list'));
 
