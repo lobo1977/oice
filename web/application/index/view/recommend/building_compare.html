@@ -1,4 +1,4 @@
-<h3 style="text-align:center;">物业对比表</h3>
+<h3 style="margin-top:0;text-align:center;">物业对比表</h3>
 <table border="1" cellspacing="0" cellpadding="2" style="width:100%;text-align:center;">
     <tr>
         <td style="background-color:#c0c0c0;width:10%">项目名称</td>
@@ -89,6 +89,12 @@
         <td>{if $vo3 != null}{$vo3['developer']}{/if}</td>
     </tr>
     <tr>
+        <td style="background-color:#c0c0c0;">租金</td>
+        <td>{$vo.price}</td>
+        <td>{if $vo2 != null}{$vo2['price']}{/if}</td>
+        <td>{if $vo3 != null}{$vo3['price']}{/if}</td>
+    </tr>
+    <tr>
         <td style="background-color:#c0c0c0;">物业管理</td>
         <td>{$vo.manager}</td>
         <td>{if $vo2 != null}{$vo2['manager']}{/if}</td>
@@ -136,7 +142,7 @@
         <td style="text-align:left;">{if $vo2 != null}{$vo2['facility']}{/if}</td>
         <td style="text-align:left;">{if $vo3 != null}{$vo3['facility']}{/if}</td>
     </tr>
-    <tr>
+    <!-- <tr>
         <td style="background-color:#c0c0c0;">楼层</td>
         <td>
             {assign name="percent" value="100" /}
@@ -355,6 +361,6 @@
                 </table>
             {/if}
         </td>
-    </tr>
+    </tr> -->
 </table>
 <p style="padding:5px;">说明：上述资料及数据虽力求精确但仅供参考，一切以最终合同为准！</p>
