@@ -53,11 +53,12 @@ class Recommend extends Base
    */
   public static function query($user, $customer_id = 0) {
     $list = self::alias('a')
-      ->leftJoin('recom_building b', 'a.id = b.recom_id')
-      ->where('a.user_id', $user->id);
+      ->leftJoin('recom_building b', 'a.id = b.recom_id');
 
     if ($customer_id) {
       $list->where('a.customer_id', $customer_id);
+    } else {
+      $list->where('a.user_id', $user->id);
     }
      
     $list = $list->field('a.id,a.mode,a.token,a.create_time,count(b.id) as building_count')

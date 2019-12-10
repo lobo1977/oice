@@ -120,10 +120,10 @@ class Recommend extends Controller
   }
 
   private function pdfA($pdf, $data) {
-    if ($data['company']->rem) {
-      $pdf->AddPage();
-      $pdf->writeHTML($this->fetch('company'));
-    }
+    // if ($data['company']->rem) {
+    //   $pdf->AddPage();
+    //   $pdf->writeHTML($this->fetch('company'));
+    // }
     $pdf->AddPage();
     $pdf->writeHTML($this->fetch('area'));
     $pdf->AddPage();
@@ -142,10 +142,10 @@ class Recommend extends Controller
   }
 
   private function pdfB($pdf, $data) {
-    if ($data['company']->rem) {
-      $pdf->AddPage();
-      $pdf->writeHTML($this->fetch('company'));
-    }
+    // if ($data['company']->rem) {
+    //   $pdf->AddPage();
+    //   $pdf->writeHTML($this->fetch('company'));
+    // }
     $pdf->AddPage();
     $pdf->writeHTML($this->fetch('area'));
     $pdf->AddPage();

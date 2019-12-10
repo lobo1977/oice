@@ -16,7 +16,7 @@ class Filter extends Base
       ->leftJoin('unit u', 'a.unit_id = u.id AND a.unit_id > 0')
       ->join('building b', 'a.building_id = b.id OR u.building_id = b.id')
       ->where('a.customer_id', $customer_id)
-      ->where('a.user_id', $user->id)
+      //->where('a.user_id', $user->id)
       ->field('a.building_id,b.building_name,b.level,b.area,b.district,b.address,b.price,
         a.unit_id,u.building_no,u.floor,u.room,u.acreage,u.rent_price,u.sell_price,u.status')
       ->order('a.sort', 'asc')
@@ -145,7 +145,8 @@ class Filter extends Base
     $data = self::where('customer_id', $customer_id)
       ->where('building_id', $building_id)
       ->where('unit_id', $unit_id)
-      ->where('user_id', $user->id)->find();
+      ->where('user_id', $user->id)
+      ->find();
     
     if ($data == null) {
       return true;
