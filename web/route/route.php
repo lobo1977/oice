@@ -18,6 +18,7 @@ Route::rule('api/updateToken','api/index/updateToken');
 Route::rule('api/logout','api/index/logout');
 Route::rule('index/print/:id/:mode','index/recommend/index');
 Route::rule('index/print/:id','index/recommend/index');
+Route::rule('index/import','index/index/import');
 
 return [
 

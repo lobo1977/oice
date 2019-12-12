@@ -33,6 +33,9 @@ class Building extends Base
       if (empty($building->user_id)) {
         $building->title .= '[待认领]';
       }
+      if (!empty($building->temp_id)) {
+        $building->title .= '[D]';
+      }
       $building->desc = (empty($building->level) ? '' : $building->level . '级 ') .
         (empty($building->area) ? '' : $building->area . ' ') .
         (empty($building->district) ? '' : $building->district . ' ') .
@@ -130,7 +133,8 @@ class Building extends Base
       }
     }
 
-    $result = $list->field('a.id,a.building_name,a.level,a.area,a.district,a.address,a.rent_sell,a.price,b.file,a.user_id,s.level as share_level')
+    $result = $list->field('a.id,a.building_name,a.level,a.area,a.district,a.address,
+      a.rent_sell,a.price,b.file,a.user_id,s.level as share_level,temp_id')
       ->page($filter['page'], $filter['page_size'])
       ->order('a.update_time', 'desc')->order('a.id', 'desc')
       ->select();
