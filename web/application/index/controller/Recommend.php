@@ -89,9 +89,7 @@ class Recommend extends Controller
     $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
 
     $pdf->setPrintHeader(false);
-    $pdf->setPrintFooter(true);
-    $pdf->setFooterFont(Array($fontname, '', '9'));
-    $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+    $pdf->setPrintFooter(false);
     $pdf->AddPage();
     if ($paf_page_ori == 'L') {
       $pdf->writeHTML($this->fetch('home_hor'));
@@ -105,6 +103,10 @@ class Recommend extends Controller
     $pdf->SetHeaderData($data['company']->logo, 60, 
       '呈送：' . $data['customer']->customer_name, $data['company']->full_name);
 
+    $pdf->setPrintFooter(true);
+    $pdf->setFooterFont(Array($fontname, '', '9'));
+    $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+    
     if ($mode == 4) {
       $this->pdfCompare($pdf, $data);
     } else if ($mode == 3) {
