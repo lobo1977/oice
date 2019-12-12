@@ -107,12 +107,12 @@ class Building extends Base
       $list->where('(s.object_id is not null OR a.user_id = ' . $user_id . ' OR 
         (a.company_id > 0 AND a.company_id = ' . $company_id . '))');
     } else {
-      $list->where('(a.share = 1 OR s.object_id is not null OR a.user_id = ' . $user_id . ' OR 
+      $list->where('(a.share = 1 OR a.user_id = 0 OR s.object_id is not null OR a.user_id = ' . $user_id . ' OR 
         (a.company_id > 0 AND a.company_id = ' . $company_id . '))');
     }
     
     if (isset($filter['keyword']) && $filter['keyword'] != '') {
-      $list->where('a.building_name|a.pinyin', 'like', $filter['keyword'] . '%');
+      $list->where("(a.pinyin like '" . $filter['keyword'] . "%' OR a.building_name like '%" . $filter['keyword'] . "%')");
     } else {
       if (isset($filter['type']) && $filter['type'] != '' && $filter['type'] != 'all') {
         $list->where('a.type', 'like', '%' . $filter['type'] . '%');
