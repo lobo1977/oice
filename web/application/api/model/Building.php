@@ -960,7 +960,7 @@ class Building extends Base
       self::exception('您没有权限发送短信。');
     }
 
-    // self::getShortUrl($building);
+    self::getShortUrl($building);
 
     $linkman = db('linkman')
       ->where('type', 'building')
@@ -998,7 +998,7 @@ class Building extends Base
     }
 
     $message = sprintf(config('sms.tmp_commission_confirm'), 
-      $summary, $acreage . '平方米', Utils::getRandNumber(6));
+      $summary, $acreage . '平方米', $building->short_url);
 
     sysLog::info($mobileList . ':'. $message);
 
