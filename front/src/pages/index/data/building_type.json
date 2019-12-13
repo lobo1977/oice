@@ -23,5 +23,11 @@
     }, {
         "name": "购物中心",
         "value": "购物中心"
+    }, {
+        "name": "待认领",
+        "value": "empty"
+    }, {
+        "name": "NEW",
+        "value": "NEW"
     }
 ]

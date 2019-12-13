@@ -115,7 +115,14 @@ class Building extends Base
       $list->where("(a.pinyin like '" . $filter['keyword'] . "%' OR a.building_name like '%" . $filter['keyword'] . "%')");
     } else {
       if (isset($filter['type']) && $filter['type'] != '' && $filter['type'] != 'all') {
-        $list->where('a.type', 'like', '%' . $filter['type'] . '%');
+        if ($filter['type'] == 'empty') {
+          $list->where('a.user_id', 0)
+            ->where('a.building_name', 'not like', '%NEW');
+        } else if ($filter['type'] == 'NEW') {
+          $list->where('a.building_name', 'like', '%NEW');
+        } else {
+          $list->where('a.type', 'like', '%' . $filter['type'] . '%');
+        }
       }
       if (isset($filter['district']) && $filter['district'] != '' && $filter['district'] != 'all') {
         $list->where('a.district', $filter['district']);
