@@ -1,0 +1,42 @@
+<!--pages/contact/recommend.wxml-->
+<page-meta background-text-style="dark">
+</page-meta>
+<wxs src='../../../utils/filter.wxs' module='filter' />
+<view class="page-content">
+  <view style="margin:0 15rpx 20rpx 15rpx">
+    <view class="page-title">
+      <text>呈送：{{customer.customer_name}}</text>
+    </view>
+    <view class="page-desc">{{filter.formatDate(date)}}</view>
+  </view>
+  
+  <van-cell-group wx:if="{{list && list.length}}">
+    <van-cell wx:for="{{list}}" wx:key="index" data-data="{{item}}" 
+      title="{{item.building_name}}" is-link center use-label-slot
+      bind:click="bindViewBuilding" custom-class="cell-building">
+      <image slot="icon" mode="aspectFill" wx:if="{{item.images && item.images.length}}"
+        src="{{filter.imageUrl(item.images[0].msrc)}}" class="cell-image"></image>
+      <view slot="label">
+        <view>{{item.desc}}</view>
+        <view wx:for="{{item.units}}" wx:for-key="udx" wx:for-item="unitItem" data-data="{{unitItem}}">
+          {{unitItem.title}} {{unitItem.desc}}
+        </view>
+      </view>
+    </van-cell>
+  </van-cell-group>
+
+  <view class="button-bar">
+    <van-cell-group>
+      <van-cell title="{{manager.title}}" label="{{company.full_name}}" title-width="370rpx"
+        center custom-class="cell-building">
+        <image slot="icon" mode="aspectFill" wx:if="{{manager.avatar}}"
+          src="{{filter.imageUrl(manager.avatar)}}" class="cell-image"></image>
+        <van-icon name="phone" size="25px" wx:if="{{manager.mobile}}"
+          data-data="{{manager}}" bindtap="bindPhoneCall"
+          color="blue" custom-style="margin-right:40rpx" />
+        <van-icon name="chat" size="25px" wx:if="{{manager.weixin || manager.mobile}}" 
+          data-data="{{manager}}" bindtap="bindCopyWeixin" color="green" />
+      </van-cell>
+    </van-cell-group>
+  </view>
+</view>

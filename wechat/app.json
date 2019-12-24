@@ -1,0 +1,47 @@
+{
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "商办云",
+    "navigationBarTextStyle": "black",
+    "enablePullDownRefresh": true
+  },
+  "page": {
+    "onReachBottomDistance": 50
+  },
+  "sitemapLocation": "sitemap.json",
+  "usingComponents": {
+    "van-row": "vant-weapp/row",
+    "van-col": "vant-weapp/col",
+    "van-icon": "vant-weapp/icon",
+    "van-cell": "vant-weapp/cell",
+    "van-cell-group": "vant-weapp/cell-group",
+    "van-card": "vant-weapp/card",
+    "van-tag": "vant-weapp/tag",
+    "van-search": "vant-weapp/search"
+  },
+  "tabBar": {
+    "list": [
+      {
+        "text": "项目",
+        "pagePath": "pages/building/index/index",
+        "iconPath": "icon/building_a.png",
+        "selectedIconPath": "icon/building_b.png"
+      },
+      {
+        "text": "联系人",
+        "pagePath": "pages/contact/index/index",
+        "iconPath": "icon/contact_a.png",
+        "selectedIconPath": "icon/contact_b.png"
+      }
+    ]
+  },
+  "pages": [
+    "pages/building/index/index",
+    "pages/building/view/view",
+    "pages/building/unit/unit",
+    "pages/contact/index/index",
+    "pages/contact/view/view",
+    "pages/contact/recommend/recommend"
+  ]
+}

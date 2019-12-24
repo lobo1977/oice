@@ -1,0 +1,8 @@
+.container {
+  padding:0;
+}
+.cell-image {
+  margin-right:20rpx;
+  width:120rpx;
+  height:120rpx;
+}

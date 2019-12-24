@@ -1,0 +1,46 @@
+<!--pages/contact/view/view.wxml-->
+<page-meta background-text-style="dark">
+</page-meta>
+<wxs src='../../../utils/filter.wxs' module='filter' />
+<view class="page-content">
+  <view class="name-card">
+    <view class="row">
+      <view>
+        <text class="title">{{info.title}}</text>
+        <text class="company">{{'\n' + info.full_name}}</text>
+      </view>
+      <image
+        mode="aspectFit"
+        src="{{filter.imageUrl(info.logo)}}"
+      />
+    </view>
+    <view class="contact">
+      <view wx:if="{{info.mobile}}">
+        <van-icon name="phone-o" size="1.1em" custom-style="top:2px" /> {{info.mobile}}
+      </view>
+      <view wx:if="{{info.email}}">
+        <van-icon name="envelop-o" size="1.1em" custom-style="top:2px" /> {{info.email}}
+      </view>
+    </view>
+  </view>
+  
+  <van-cell-group title="他的推荐资料" wx:if="{{info.recommend && info.recommend.length}}">
+    <van-cell wx:for="{{info.recommend}}" wx:key="id" data-data="{{item}}" 
+      title="{{item.building}}" label="{{item.customer_name}}" is-link center
+      bind:click="bindShowRecommend" custom-class="cell-building">
+      <image slot="icon" mode="aspectFill" 
+        src="{{filter.imageUrl(item.image)}}" class="cell-image"></image>
+    </van-cell>
+  </van-cell-group>
+  
+  <van-row gutter="10" custom-class="button-bar">
+    <van-col span="12">
+      <button type="primary" bindtap="bindCopyWeixin" data-data="{{info}}">
+        <van-icon name="chat-o" size="1.1em" custom-style="top:2px" /> 加微信</button>
+    </van-col>
+    <van-col span="12">
+      <button type="primary" bindtap="bindPhoneCall" data-data="{{info}}">
+        <van-icon name="phone-o" size="1.1em" custom-style="top:2px" /> 拨打电话</button>
+    </van-col>
+  </van-row>
+</view>

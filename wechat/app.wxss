@@ -1,0 +1,59 @@
+/**app.wxss**/
+swiper {
+  height:480rpx;
+}
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 200rpx 0;
+  box-sizing: border-box;
+}
+
+.page-building {
+  width: 100%;
+  background-color: #ffffff;
+}
+
+.cell-building {
+  padding: 5px 10px !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.text-overflow-hidden {
+ white-space: nowrap;
+ overflow: hidden;
+ text-overflow:ellipsis;
+}
+
+.cell-text-area {
+  padding: 10rpx 30rpx;
+  font-size: 1em;
+  line-height: 1.8em;
+  color: #999;
+}
+
+.cell-image {
+  margin-right:20rpx;
+  width:120rpx;
+  height:120rpx;
+}
+
+.button-bar {
+  position: fixed;
+  bottom:0;
+  width:100%;
+  padding:0 0 5px 5px;
+  background-color: #fff;
+  z-index:100;
+}
+
+.button-bar button {
+  display:block;
+}

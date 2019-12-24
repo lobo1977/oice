@@ -1,0 +1,19 @@
+/* pages/contact/recommend.wxss */
+.page-content {
+  padding-bottom:200rpx;
+}
+
+.page-title {
+  margin:0 0 20rpx 0;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.page-desc {
+  font-size:0.8em;
+  line-height:1.6em;
+}
+
+.button-bar {
+  padding:0;
+}

@@ -1,0 +1,4 @@
+/**index.wxss**/
+.building-card {
+  border-bottom: 1rpx solid #f0f0f0;
+}

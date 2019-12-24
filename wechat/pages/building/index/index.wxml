@@ -1,0 +1,25 @@
+<!--index.wxml-->
+<page-meta background-text-style="dark">
+</page-meta>
+<wxs src='../../../utils/filter.wxs' module='filter' />
+<view>
+  <van-search value="{{ keyword }}" placeholder="请输入搜索关键词"
+    bind:change="onKewordChange"
+    bind:search="bindSearch"
+    shape="round" use-action-slot>
+    <view slot="action" bind:tap="bindSearch">搜索</view>
+  </van-search>
+  <van-card wx:for="{{list}}" data-data="{{item}}" wx:key="id"
+    title="{{item.building_name}}"
+    desc="{{item.address}}"
+    price="{{item.price}}"
+    currency=""
+    thumb="{{filter.imageUrl(item.src)}}"
+    bindtap="bindViewBuilding"
+    custom-class="building-card"
+    title-class="text-overflow-hidden"
+    desc-class="text-overflow-hidden"
+  >
+    <van-tag wx:if="{{item.rent_sell}}" slot="tags" round type="success">{{item.rent_sell}}</van-tag>
+  </van-card>
+</view>

@@ -1,0 +1,12 @@
+.container {
+  padding:0;
+}
+
+.cell-title {
+  font-size:1.2em;
+  font-weight: bold;
+}
+
+.cell-label .van-icon {
+  top:2rpx;
+}

@@ -1,0 +1,14 @@
+<!--pages/contact/index/index.wxml-->
+<page-meta background-text-style="dark">
+</page-meta>
+<wxs src='../../../utils/filter.wxs' module='filter' />
+<view>
+  <van-cell-group>
+    <van-cell wx:for="{{list}}" wx:key="id" data-data="{{item}}" 
+      title="{{item.title}}" label="{{item.full_name}}" center
+      bind:click="bindView" custom-class="cell-contact">
+      <image slot="icon" mode="aspectFill" 
+        src="{{filter.imageUrl(item.avatar)}}" class="cell-image"></image>
+    </van-cell>
+  </van-cell-group>
+</view>
