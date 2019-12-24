@@ -265,7 +265,7 @@ class Building extends Base
 
     $data = self::alias('a')
       ->leftJoin('share s', "s.type = 'building' and a.id = s.object_id and s.user_id = " . $user_id)
-      ->field('a.id,a.building_name,a.type,a.level,a.area,a.district,a.address,a.longitude,a.latitude,
+      ->field('a.id,a.building_name,a.type,a.level,a.area,a.district,a.address,a.subway,a.longitude,a.latitude,
         a.completion_date,a.rent_sell,a.price,a.acreage,a.floor,a.floor_area,a.floor_height,a.bearing,
         a.developer,a.manager,a.fee,a.electricity_fee,a.car_seat,a.rem,a.facility,a.equipment,a.traffic,
         a.environment,a.share,a.user_id,a.company_id,a.short_url,
