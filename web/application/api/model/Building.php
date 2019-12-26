@@ -30,7 +30,12 @@ class Building extends Base
   protected static function formatList($list) {
     foreach($list as $key=>$building) {
       $building->title = $building->building_name;
-      if (empty($building->user_id)) {
+      $linkmanCount = db('Linkman')
+        ->where('Type', 'building')
+        ->where('owner_id', $building->id)
+        ->where('status', 0)
+        ->count();
+      if ($linkmanCount == 0) {
         $building->title .= '[待认领]';
       }
       $building->desc = (empty($building->level) ? '' : $building->level . '级 ') .
