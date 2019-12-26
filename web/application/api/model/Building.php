@@ -432,21 +432,21 @@ class Building extends Base
       //   }
       // }
 
-      if ($data['floor'] != $oldData->floor) {
-        if ($oldData->floor) {
-          $summary = $summary . '楼层：' . $oldData->floor . ' -> ' . $data['floor'] . '\n';
-        } else {
-          $summary = $summary . '楼层：' . $data['floor'] . '\n';
-        }
-      }
+      // if ($data['floor'] != $oldData->floor) {
+      //   if ($oldData->floor) {
+      //     $summary = $summary . '楼层：' . $oldData->floor . ' -> ' . $data['floor'] . '\n';
+      //   } else {
+      //     $summary = $summary . '楼层：' . $data['floor'] . '\n';
+      //   }
+      // }
 
-      if ($data['floor_area'] != $oldData->floor_area) {
-        if ($oldData->floor_area) {
-          $summary = $summary . '标准层面积：' . $oldData->floor_area . '平米 -> ' . $data['floor_area'] . '平米\n';
-        } else {
-          $summary = $summary . '标准层面积：' . $data['floor_area'] . '平米\n';
-        }
-      }
+      // if ($data['floor_area'] != $oldData->floor_area) {
+      //   if ($oldData->floor_area) {
+      //     $summary = $summary . '标准层面积：' . $oldData->floor_area . '平米 -> ' . $data['floor_area'] . '平米\n';
+      //   } else {
+      //     $summary = $summary . '标准层面积：' . $data['floor_area'] . '平米\n';
+      //   }
+      // }
 
       if ($data['floor_height'] != $oldData->floor_height) {
         if ($oldData->floor_height) {
@@ -488,21 +488,21 @@ class Building extends Base
         }
       }
 
-      if ($data['electricity_fee'] != $oldData->electricity_fee) {
-        if ($oldData->electricity_fee) {
-          $summary = $summary . '电费：' . $oldData->electricity_fee . ' -> ' . $data['electricity_fee'] . '\n';
-        } else {
-          $summary = $summary . '电费：' . $data['electricity_fee'] . '\n';
-        }
-      }
+      // if ($data['electricity_fee'] != $oldData->electricity_fee) {
+      //   if ($oldData->electricity_fee) {
+      //     $summary = $summary . '电费：' . $oldData->electricity_fee . ' -> ' . $data['electricity_fee'] . '\n';
+      //   } else {
+      //     $summary = $summary . '电费：' . $data['electricity_fee'] . '\n';
+      //   }
+      // }
 
-      if ($data['car_seat'] != $oldData->car_seat) {
-        if ($oldData->car_seat) {
-          $summary = $summary . '停车位：' . $oldData->car_seat . ' -> ' . $data['car_seat'] . '\n';
-        } else {
-          $summary = $summary . '停车位：' . $data['car_seat'] . '\n';
-        }
-      }
+      // if ($data['car_seat'] != $oldData->car_seat) {
+      //   if ($oldData->car_seat) {
+      //     $summary = $summary . '停车位：' . $oldData->car_seat . ' -> ' . $data['car_seat'] . '\n';
+      //   } else {
+      //     $summary = $summary . '停车位：' . $data['car_seat'] . '\n';
+      //   }
+      // }
 
       if ($data['rem'] != $oldData->rem) {
         if ($oldData->rem) {
