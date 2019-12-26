@@ -80,7 +80,7 @@
         <cell title="竣工日期" value-align="left" :value="info.completion_date_text" v-show="info.completion_date_text"></cell>
         <cell title="租售" value-align="left" :value="info.rent_sell" v-show="info.rent_sell"></cell>
         <cell title="价格" value-align="left" :value="info.price" v-show="info.price"></cell>
-        <cell title="总建筑面积" value-align="left" :value="info.acreage + '平方米'" v-show="info.acreage > 0"></cell>
+        <cell title="建筑面积" value-align="left" :value="info.acreage + '平方米'" v-show="info.acreage > 0"></cell>
         <!-- <cell title="楼层" value-align="left" :value="info.floor" v-show="info.floor"></cell>
         <cell title="层面积" value-align="left" :value="info.floor_area + ' 平方米'" v-show="info.floor_area > 0"></cell> -->
         <cell title="层高" value-align="left" :value="info.floor_height + ' 米'" v-show="info.floor_height > 0"></cell>

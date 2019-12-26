@@ -36,8 +36,7 @@
         <cell title="竣工日期" :value="info.completion_date" value-align="left" :is-link="true" @click.native="selectCompletionDate"></cell>
         <cell title="租售" @click.native="showRentSellPicker = true" :is-link="true" :value="info.rent_sell" value-align="left"></cell>
         <x-input title="价格" v-model="info.price" :max="30"></x-input>
-        
-        <x-input v-if="false" title="总建筑面积" type="tel" :max="8" v-model="info.acreage" :show-clear="false">
+        <x-input title="建筑面积" type="tel" :max="8" v-model="info.acreage" :show-clear="false">
           <span slot="right">平方米</span>
         </x-input>
         <!-- <x-input title="楼层" v-model="info.floor" :max="10"></x-input>
