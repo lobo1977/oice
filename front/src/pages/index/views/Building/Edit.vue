@@ -37,25 +37,24 @@
         <cell title="租售" @click.native="showRentSellPicker = true" :is-link="true" :value="info.rent_sell" value-align="left"></cell>
         <x-input title="价格" v-model="info.price" :max="30"></x-input>
         
-        <x-input v-if="false" title="建筑面积" type="tel" :max="8" v-model="info.acreage" :show-clear="false">
+        <x-input v-if="false" title="总建筑面积" type="tel" :max="8" v-model="info.acreage" :show-clear="false">
           <span slot="right">平方米</span>
         </x-input>
-        <x-input title="楼层" v-model="info.floor" :max="10"></x-input>
+        <!-- <x-input title="楼层" v-model="info.floor" :max="10"></x-input>
         <x-input title="层面积" type="tel" :max="6" v-model="info.floor_area" :show-clear="false">
           <span slot="right">平方米</span>
+        </x-input> -->
+        <x-input title="层高" type="tel" :max="5" v-model="info.floor_height" :show-clear="false">
+          <span slot="right">米</span>
         </x-input>
-        <cell title="层高" value-align="left">
-          <inline-x-number style="float:left;margin:0 5px 0 0;" width="80px" :min="2" :max="8" :step="0.1" v-model="info.floor_height"></inline-x-number>
-          <div style="float:left;display:inline-block;line-height:28px;">米</div>
-        </cell>
         <x-input title="楼板承重" type="tel" :max="6" v-model="info.bearing" :show-clear="false">
           <span slot="right">千克/平方米</span>
         </x-input>
         <x-input title="开发商" v-model="info.developer" :max="50"></x-input>
         <x-input title="物业管理" v-model="info.manager" :max="50"></x-input>
         <x-input title="物业费" v-model="info.fee" :max="30"></x-input>
-        <x-input title="电费" v-model="info.electricity_fee" :max="50"></x-input>
-        <x-input title="停车位" v-model="info.car_seat" :max="50"></x-input>
+        <!-- <x-input title="电费" v-model="info.electricity_fee" :max="50"></x-input>
+        <x-input title="停车位" v-model="info.car_seat" :max="50"></x-input> -->
       </group>
 
       <group title="项目说明">
@@ -216,15 +215,15 @@ export default {
         price: '',            // 价格
         acreage: null,        // 建筑面积
         // usage_area: null,  // 使用面积
-        floor: '',            // 楼层
-        floor_area: null,     // 标准层面积
+        // floor: '',            // 楼层
+        // floor_area: null,     // 标准层面积
         floor_height: null,   // 层高
         bearing: null,        // 楼板承重
         developer: '',        // 开发商
         manager: '',          // 物业管理
         fee: '',              // 物业费
-        electricity_fee: '',  // 电费
-        car_seat: '',         // 停车位
+        // electricity_fee: '',  // 电费
+        // car_seat: '',         // 停车位
         rem: '',              // 项目说明
         facility: '',         // 配套设施
         equipment: '',        // 楼宇设备
@@ -328,9 +327,9 @@ export default {
             // if (!vm.info.usage_area || vm.info.usage_area === '0') {
             //   vm.info.usage_area = null
             // }
-            if (!vm.info.floor_area || vm.info.floor_area === '0') {
-              vm.info.floor_area = null
-            }
+            // if (!vm.info.floor_area || vm.info.floor_area === '0') {
+            //   vm.info.floor_area = null
+            // }
             if (!vm.info.floor_height || vm.info.floor_height === '0') {
               vm.info.floor_height = null
             }

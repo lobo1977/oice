@@ -80,15 +80,16 @@
         <cell title="竣工日期" value-align="left" :value="info.completion_date_text" v-show="info.completion_date_text"></cell>
         <cell title="租售" value-align="left" :value="info.rent_sell" v-show="info.rent_sell"></cell>
         <cell title="价格" value-align="left" :value="info.price" v-show="info.price"></cell>
-        <cell title="楼层" value-align="left" :value="info.floor" v-show="info.floor"></cell>
-        <cell title="层面积" value-align="left" :value="info.floor_area + ' 平方米'" v-show="info.floor_area > 0"></cell>
-        <cell title="层高" value-align="left" :value="info.floor_height + ' 米'" v-show="info.floor_height > 0 && info.floor_height !== 2"></cell>
+        <cell title="总建筑面积" value-align="left" :value="info.acreage + '平方米'" v-show="info.acreage > 0"></cell>
+        <!-- <cell title="楼层" value-align="left" :value="info.floor" v-show="info.floor"></cell>
+        <cell title="层面积" value-align="left" :value="info.floor_area + ' 平方米'" v-show="info.floor_area > 0"></cell> -->
+        <cell title="层高" value-align="left" :value="info.floor_height + ' 米'" v-show="info.floor_height > 0"></cell>
         <cell title="楼板承重" value-align="left" :value="info.bearing + ' 千克/平方米'" v-show="info.bearing > 0"></cell>
         <cell title="开发商" value-align="left" :value="info.developer" v-show="info.developer"></cell>
         <cell title="物业管理" value-align="left" :value="info.manager" v-show="info.manager"></cell>
         <cell title="物业费" value-align="left" :value="info.fee" v-show="info.fee"></cell>
-        <cell title="电费" value-align="left" :value="info.electricity_fee" v-show="info.electricity_fee"></cell>
-        <cell title="停车位" value-align="left" :value="info.car_seat" v-show="info.car_seat"></cell>
+        <!-- <cell title="电费" value-align="left" :value="info.electricity_fee" v-show="info.electricity_fee"></cell>
+        <cell title="停车位" value-align="left" :value="info.car_seat" v-show="info.car_seat"></cell> -->
         <p class="group-padding" v-show="info.rem">{{info.rem}}</p>
         <p class="group-padding" v-show="info.traffic">交通状况：{{info.traffic}}</p>
         <p class="group-padding" v-show="info.equipment">楼宇设备：{{info.equipment}}</p>
@@ -195,15 +196,15 @@ export default {
         rent_sell: '',        // 租售
         price: '',            // 价格
         acreage: 0,           // 建筑面积
-        floor: '',            // 楼层
-        floor_area: 0,        // 层面积
+        // floor: '',            // 楼层
+        // floor_area: 0,        // 层面积
         floor_height: 0,      // 层高
         bearing: 0,           // 楼板承重
         developer: '',        // 开发商
         manager: '',          // 物业管理
         fee: '',              // 物业费
-        electricity_fee: '',  // 电费
-        car_seat: '',         // 停车位
+        // electricity_fee: '',  // 电费
+        // car_seat: '',         // 停车位
         rem: '',              // 项目说明
         facility: '',         // 配套设施
         equipment: '',        // 楼宇设备

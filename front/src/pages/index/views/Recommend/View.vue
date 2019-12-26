@@ -28,15 +28,16 @@
         <cell title="地址" value-align="left" :value="info.address" v-if="info.area + info.address"
           :is-link="(info.longitude || info.latitude) != 0" @click.native="openMap(index)"></cell>
         <cell title="竣工日期" value-align="left" :value="info.completion_date|formatDate" v-if="info.completion_date"></cell>
-        <cell title="楼层" value-align="left" :value="info.building_floor" v-if="info.building_floor"></cell>
-        <cell title="层面积" value-align="left" :value="info.floor_area + ' 平方米'" v-if="info.floor_area > 0"></cell>
-        <cell title="层高" value-align="left" :value="info.floor_height + ' 米'" v-if="info.floor_height > 0 && info.floor_height != 2"></cell>
+        <cell title="总建筑面积" value-align="left" :value="info.acreage" v-show="info.acreage"></cell>
+        <!-- <cell title="楼层" value-align="left" :value="info.building_floor" v-if="info.building_floor"></cell>
+        <cell title="层面积" value-align="left" :value="info.floor_area + ' 平方米'" v-if="info.floor_area > 0"></cell> -->
+        <cell title="层高" value-align="left" :value="info.floor_height + ' 米'" v-if="info.floor_height > 0"></cell>
         <cell title="楼板承重" value-align="left" :value="info.bearing + ' 千克/平方米'" v-if="info.bearing > 0"></cell>
         <cell title="开发商" value-align="left" :value="info.developer" v-if="info.developer"></cell>
         <cell title="物业管理" value-align="left" :value="info.manager" v-if="info.manager"></cell>
         <cell title="物业费" value-align="left" :value="info.fee" v-if="info.fee"></cell>
-        <cell title="电费" value-align="left" :value="info.electricity_fee" v-if="info.electricity_fee"></cell>
-        <cell title="停车位" value-align="left" :value="info.car_seat" v-if="info.car_seat"></cell>
+        <!-- <cell title="电费" value-align="left" :value="info.electricity_fee" v-if="info.electricity_fee"></cell>
+        <cell title="停车位" value-align="left" :value="info.car_seat" v-if="info.car_seat"></cell> -->
       </group>
 
       <panel header="建议单元" :list="info.units" type="1"></panel>
