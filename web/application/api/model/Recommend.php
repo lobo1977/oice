@@ -145,7 +145,7 @@ class Recommend extends Base
       ->leftJoin('unit u', 'a.unit_id = u.id AND a.unit_id > 0')
       ->join('building b', 'a.building_id = b.id OR u.building_id = b.id')
       ->where('a.recom_id', $recommend->id)
-      ->field('b.id as building_id,b.building_name,b.type,b.level,b.area,b.district,b.address,b.longitude,b.latitude,
+      ->field('b.id as building_id,b.building_name,b.type,b.level,b.acreage,b.area,b.district,b.address,b.longitude,b.latitude,
         b.completion_date,b.rent_sell,b.price,b.floor as building_floor,b.floor_area,b.floor_height,
         b.bearing,b.developer,b.manager,b.fee,b.electricity_fee,b.car_seat,
         b.rem,b.facility,b.equipment,b.traffic,b.environment,
