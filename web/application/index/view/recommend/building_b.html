@@ -34,6 +34,8 @@
             {/if}
             {if $vo.completion_date != ''}<span>竣工日期：&nbsp;</span><span>{$vo.completion_date|date='Y年m月d日'}</span><br />
             {/if}
+            {if $vo.acreage > 0}<span>总建筑面积：&nbsp;</span><span></span>{$vo.total_acreage} 平方米</span><br />
+            {/if}
             {if $vo.developer != ''}<span>开 发 商：&nbsp;</span><span>{$vo.developer}</span><br />
             {/if}
             {if $vo.manager != ''}<span>物业管理：&nbsp;</span><span>{$vo.manager}</span><br />
