@@ -156,8 +156,17 @@ class Recommend extends Controller
     $pdf->writeHTML($this->fetch('expend'));
     $pdf->AddPage();
     $pdf->writeHTML($this->fetch('process'));
-    $pdf->AddPage();
-    $pdf->writeHTML($this->fetch('unit_list'));
+
+    $pageSize = 15;
+    $offset = 0;
+    $sliceData = array_slice($data['list'], $offset, $pageSize);
+
+    while(!empty($sliceData)) {
+      $pdf->AddPage();
+      $pdf->writeHTML($this->fetch('unit_list', ['list' => $sliceData, 'base' => $offset]));
+      $offset += $pageSize;
+      $sliceData = array_slice($data['list'], $offset, $pageSize);
+    }
 
     foreach($data['list'] as $key=>$building) {
       $pdf->AddPage();

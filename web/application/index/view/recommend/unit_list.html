@@ -8,13 +8,13 @@
         <th style="width:15%;border-bottom:1px solid #000;">面积㎡</th>
         <th style="width:20%;border-bottom:1px solid #000;">租金</th>
     </tr>
-    {foreach $data.list as $key=>$vo}
+    {foreach $list as $key=>$vo}
         {assign name="rowspan" value="$vo.units|count" /}
         <tr>
             {if $rowspan > 0 }
-                <td rowspan="{$rowspan}">{$key + 1}</td>
+                <td rowspan="{$rowspan}">{$base + $key + 1}</td>
                 <td rowspan="{$rowspan}" style="text-align:left;">{$vo.building_name}
-                    {if $rowspan > 1 && $vo.eng != null && $vo.eng.name != ''}
+                    {if $vo.eng != null && $vo.eng.name != ''}
                     <br/><span style="font-size:9pt">{$vo.eng.name}</span>
                     {/if}
                 </td>
@@ -23,7 +23,7 @@
                 <td>{$vo.units[0]["acreage"]}</td>
                 <td>{$vo.units[0]["rent_price"]}</td>
             {else /}
-                <td>{$key + 1}</td>
+                <td>{$base + $key + 1}</td>
                 <td style="text-align:left;">{$vo.building_name}</td>
                 <td>{$vo.address}</td>
                 <td>&nbsp;</td>
