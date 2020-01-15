@@ -67,8 +67,14 @@
         :show-cell="false" :data="acreagePickerList" 
         @on-change="acreageChange" v-model="acreageValue"></popup-picker>
 
-      <div style="height:50px;">
+      <div style="height:110px;">
         <load-more :show-loading="isLoading" @click.native="loadMore" :tip="loadingTip"></load-more>
+
+        <p style="text-align:center;line-height:1.8em;font-size:0.86em">
+          <a href="http://beian.miit.gov.cn" target="_blank">京ICP备13024830号-3</a>
+          <br />
+          北京云普力合信息技术有限公司 版权所有
+        </p>
       </div>
     </div>
   </div>
@@ -304,7 +310,7 @@ export default {
   },
   watch: {
     scrollBottom (isBottom) {
-      if (isBottom && this.$route.name === 'Building') {
+      if (this.$isWechat() && isBottom && this.$route.name === 'Building') {
         this.loadMore()
       }
     }
