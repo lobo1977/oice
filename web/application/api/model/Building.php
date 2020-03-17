@@ -286,7 +286,7 @@ class Building extends Base
       $data->completion_date_text = date('Y年n月j日', strtotime($data->completion_date));
     }
 
-    if (!self::allow($user, $data, $operate)) {
+    if ($operate != 'notes' && !self::allow($user, $data, $operate)) {
       self::exception('您没有权限' . ($operate == 'edit' ? '编辑' : '查看') . '此项目。');
     }
 

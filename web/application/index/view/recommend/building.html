@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <meta name="application-name" content="{$Think.config.app_name}">
+        <title>{$vo.building_name}</title>
+        {if !empty($wechat)}
+        <script src="http://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+        {/if}
+        <style>
+            body {
+                padding: 0 15px;
+                margin: 0;
+                background-color:#ffffff;
+                font-size:15px;
+                font-family:Arial, Helvetica, sans-serif,Verdana;
+                font-weight:normal;
+                color:#000000;
+            }
+        </style>
+    </head>
+    <body>
+        <p>{$vo.building_name}</p>
+        <p>
+            {if !empty($vo.area) || !empty($vo.address)}
+                【位置】{if !empty($vo.area)}{$vo.area}{/if}{if !empty($vo.address)}{$vo.address}{/if}<br/>
+            {/if}
+            {if !empty($vo.subway)}
+                【地铁】{$vo.subway}<br/>
+            {/if}
+            {if !empty($vo.completion_date_text)}
+                【竣工日期】{$vo.completion_date_text}<br/>
+            {/if}
+            {if !empty($vo.rent_sell)}
+                【租售】{$vo.rent_sell}<br/>
+            {/if}
+            {if !empty($vo.price)}
+                【价格】{$vo.price}<br/>
+            {/if}
+            {if !empty($vo.price)}
+                【总建筑面积】{$vo.acreage} 平方米<br/>
+            {/if}
+            {if !empty($vo.floor)}
+                【楼层】{$vo.floor}<br/>
+            {/if}
+            {if $vo.floor_area}
+                【层面积】{$vo.floor_area} 平方米<br/>
+            {/if}
+            {if !empty($vo.floor_height)}
+                【层高】{$vo.floor_height} 米<br/>
+            {/if}
+            {if !empty($vo.bearing)}
+                【楼板承重】{$vo.bearing} 千克/平方米<br/>
+            {/if}
+            {if !empty($vo.developer)}
+                【开发商】{$vo.developer}<br/>
+            {/if}
+            {if !empty($vo.manager)}
+                【物业管理】{$vo.manager}<br/>
+            {/if}
+            {if !empty($vo.fee)}
+                【物业费】{$vo.fee}<br/>
+            {/if}
+            {if !empty($vo.electricity_fee)}
+                【电费】{$vo.electricity_fee}<br/>
+            {/if}
+            {if !empty($vo.car_seat)}
+                【停车位】{$vo.car_seat}<br/>
+            {/if}
+        </p>
+        {if !empty($vo.rem)}
+            <p>【项目说明】{$vo.rem}</p>
+        {/if}
+        {if !empty($vo.traffic)}
+            <p>【交通状况】{$vo.traffic}</p>
+        {/if}
+        {if !empty($vo.equipment)}
+            <p>【楼宇设备】{$vo.equipment}</p>
+        {/if}
+        {if !empty($vo.facility)}
+            <p>【配套设施】{$vo.facility}</p>
+        {/if}
+        {if !empty($vo.environment)}
+            <p>【周边环境】{$vo.environment}</p>
+        {/if}
+
+        {if !empty($vo.images)}
+            {foreach $vo.images as $key=>$img}
+                <img src="https://{$Think.config.app_host}{$img.src}" style="width:100%;">
+            {/foreach}
+        {/if}
+
+        {if !empty($wechat)}
+        <script>
+            wx.config({
+                debug: false,
+                appId: '{$wechat.appId}',
+                timestamp: {$wechat.timestamp},
+                nonceStr: '{$wechat.nonceStr}', 
+                signature: '{$wechat.signature}',
+                jsApiList: ['showMenuItems',
+                    'updateAppMessageShareData',
+                    'updateTimelineShareData',
+                    'getLocation',
+                    'openLocation',
+                    'previewImage']
+            });
+
+            wx.ready(function(){
+                wx.updateAppMessageShareData({ 
+                    title: '{$vo.building_name}', // 分享标题
+                    desc: '项目笔记',
+                    link: window.location.href,
+                    imgUrl: '{$share_image}', // 分享图标
+                    success: function () {
+                    }
+                })
+
+                wx.updateTimelineShareData({ 
+                    title: '{$vo.building_name}',
+                    link: window.location.href,
+                    imgUrl: '{$share_image}',
+                    success: function () {
+                    }
+                })
+            });
+        </script>
+        {/if}
+    </body>
+</html>

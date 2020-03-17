@@ -201,7 +201,7 @@ class Unit extends Base
 
     if ($unit == null) {
       self::exception('单元不存在。');
-    } else if (!self::allow($user, $unit, $operate)) {
+    } else if ($operate != 'notes' && !self::allow($user, $unit, $operate)) {
       self::exception('您没有权限' . ($operate == 'view' ? '查看' : '修改') . '此单元。');
     } else {
       $unit->images = File::getList($user, 'unit', $id);

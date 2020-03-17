@@ -303,6 +303,8 @@ export default {
         vm.$router.push({name: 'UnitEdit', params: {id: vm.info.id, bid: vm.info.building_id}})
       } else if (key === 'delete') {
         vm.remove()
+      } else if (key === 'notes') {
+        document.location = '/index/unit/' + this.info.id
       }
     },
     remove () {
@@ -344,6 +346,7 @@ export default {
       if (this.info.allowDelete) {
         menu.delete = '删除'
       }
+      menu.notes = '生成笔记'
       return menu
     }
   }

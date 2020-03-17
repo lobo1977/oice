@@ -24,10 +24,16 @@
       </group>
 
       <flexbox :gutter="0" class="button-bar">
-        <flexbox-item :span="6">
+        <flexbox-item :span="4">
           <x-button type="default"
             @click.native="favorite">
             <x-icon type="star" class="btn-icon" :class="{green: info.isFavorite}"></x-icon> 收藏
+          </x-button>
+        </flexbox-item>
+        <flexbox-item :span="4">
+          <x-button type="default"
+            @click.native="notes">
+            生成笔记
           </x-button>
         </flexbox-item>
         <flexbox-item>
@@ -389,6 +395,9 @@ export default {
         })
       }
     },
+    notes () {
+      document.location = '/index/building/' + this.info.id
+    },
     closeMap () {
       this.showMap = false
     },
@@ -612,6 +621,8 @@ export default {
               })
             }
           })
+        } else if (key === 'notes') {
+          document.location = '/index/unit/' + unitId
         }
       }
       vm.menuUnit = null
@@ -683,6 +694,7 @@ export default {
         if (this.menuUnit.allowDelete) {
           menu.delete = '删除'
         }
+        menu.notes = '生成笔记'
         return menu
       } else {
         return null

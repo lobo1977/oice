@@ -2,6 +2,10 @@
 namespace app\index\controller;
 
 use think\Controller;
+use app\common\Utils;
+use app\common\Wechat;
+use app\api\model\Building;
+use app\api\model\Unit;
 use app\api\model\Recommend as modelRecommend;
 
 define ('K_PATH_IMAGES', $_SERVER['DOCUMENT_ROOT']);
@@ -211,5 +215,62 @@ class Recommend extends Controller
           'vo3' => $building3]));
       }
     }
+  }
+
+  /**
+   * 项目笔记
+   */
+  public function building($id) {
+    $building = Building::detail(null, $id, 'notes');
+    if (Utils::isWechat()) {
+      $share = $this->wechatConfig();
+      $this->assign('wechat', $share);
+    }
+    $this->assign('vo', $building);
+    if(!empty($building['images'])) {
+      $this->assign('share_image', 'https://' . config('app_host') . $building['images'][0]['src']);
+    } else {
+      $this->assign('share_image', '');
+    }
+    echo $this->fetch();
+  }
+
+  /**
+   * 单元笔记
+   */
+  public function unit($id) {
+    $unit = Unit::detail(null, $id, 'notes');
+    if (Utils::isWechat()) {
+      $share = $this->wechatConfig();
+      $this->assign('wechat', $share);
+    }
+    $this->assign('vo', $unit);
+    if(!empty($unit['images'])) {
+      $this->assign('share_image', 'https://' . config('app_host') . $unit['images'][0]['src']);
+    } else {
+      $this->assign('share_image', '');
+    }
+    echo $this->fetch();
+  }
+
+  /**
+   * 微信分享配置
+   */
+  private function wechatConfig() {
+    $wechat = new Wechat();
+
+    $url = htmlspecialchars_decode($_SERVER["REQUEST_SCHEME"] . '://' . $_SERVER["SERVER_NAME"] . $_SERVER["REQUEST_URI"]);
+    $randStr = Utils::getRandChar(32);
+    $timestamp = time();
+    $signature = $wechat->getJssdkSign($randStr, $timestamp, $url);
+
+    $data = [
+      "appId" => config('wechat.app_id'),
+      "timestamp" => $timestamp,
+      "nonceStr" => $randStr,
+      "signature" => $signature
+    ];
+
+    return $data;
   }
 }
