@@ -111,7 +111,7 @@
             wx.ready(function(){
                 wx.updateAppMessageShareData({ 
                     title: '{$vo.building_name}', // 分享标题
-                    desc: '项目笔记',
+                    desc: '{$vo.area}{$vo.address}',
                     link: window.location.href,
                     imgUrl: '{$share_image}', // 分享图标
                     success: function () {

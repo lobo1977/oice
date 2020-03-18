@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
         <meta name="application-name" content="{$Think.config.app_name}">
-        <title>{$vo.title}</title>
+        <title>{$vo.building_name} {$vo.title}</title>
         {if !empty($wechat)}
         <script src="http://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
         {/if}
@@ -22,7 +22,7 @@
         </style>
     </head>
     <body>
-        <p>{$vo.title}</p>
+        <p>{$vo.building_name} {$vo.title}</p>
         <p>
             {if !empty($vo.face)}
                 【朝向】{$vo.face}<br/>
@@ -74,8 +74,8 @@
 
             wx.ready(function(){
                 wx.updateAppMessageShareData({ 
-                    title: '{$vo.building_name}', // 分享标题
-                    desc: '项目笔记',
+                    title: '{$vo.building_name} {$vo.title}', // 分享标题
+                    desc: '{$vo.acreage} 平方米 {$vo.rent_price} 元',
                     link: window.location.href,
                     imgUrl: '{$share_image}', // 分享图标
                     success: function () {
@@ -83,7 +83,7 @@
                 })
 
                 wx.updateTimelineShareData({ 
-                    title: '{$vo.building_name}',
+                    title: '{$vo.building_name} {$vo.title}',
                     link: window.location.href,
                     imgUrl: '{$share_image}',
                     success: function () {

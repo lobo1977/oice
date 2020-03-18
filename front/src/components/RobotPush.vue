@@ -127,7 +127,7 @@ export default {
       cycle: true,
       cycle_hour: 2,
       start_hour: 8,
-      end_hour: 20,
+      end_hour: 22,
       leftOptions: {
         showBack: false
       },
