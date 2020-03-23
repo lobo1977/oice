@@ -11,6 +11,21 @@
       <previewer :list="info.images" ref="prevUnit" :options="previewOptions"></previewer>
     </div>
 
+    <flexbox :gutter="0" class="button-bar">
+      <flexbox-item :span="6">
+        <x-button type="default"
+          @click.native="notes">
+          生成笔记
+        </x-button>
+      </flexbox-item>
+      <flexbox-item>
+        <x-button type="default" :disabled="!info.allowEdit"
+          :link="{name:'UnitEdit', params: { id: info.id }}">
+          <x-icon type="compose" class="btn-icon"></x-icon> 编辑
+        </x-button>
+      </flexbox-item>
+    </flexbox>
+
     <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
       <cell title="朝向" value-align="left" :value="info.face" v-if="info.face"></cell>
       <cell title="面积" value-align="left" :value="info.acreage + ' 平方米'" v-if="info.acreage"></cell>
@@ -54,7 +69,7 @@
       </flexbox-item>
       <flexbox-item>
         <x-button type="default" class="bottom-btn"
-          :disabled="!info.allowNew && !info.allowEdit && !info.allowDelete"
+          :disabled="!info.allowNew && !info.allowDelete"
           @click.native="showUnitMenu = true">
           <x-icon type="ios-more" class="btn-icon"></x-icon>
         </x-button>
@@ -304,8 +319,11 @@ export default {
       } else if (key === 'delete') {
         vm.remove()
       } else if (key === 'notes') {
-        document.location = '/index/unit/' + this.info.id
+        vm.notes()
       }
+    },
+    notes () {
+      document.location = '/index/unit/' + this.info.id
     },
     remove () {
       let vm = this
@@ -338,15 +356,11 @@ export default {
     unitMenu () {
       let menu = {}
       if (this.info.allowNew) {
-        menu.new = '添加'
-      }
-      if (this.info.allowEdit) {
-        menu.edit = '修改'
+        menu.new = '添加单元'
       }
       if (this.info.allowDelete) {
         menu.delete = '删除'
       }
-      menu.notes = '生成笔记'
       return menu
     }
   }
