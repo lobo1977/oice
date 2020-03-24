@@ -63,7 +63,7 @@
       <group v-if="info.user_id == user.id || info.user_id === 0" gutter="10px" label-width="4em" label-margin-right="1em" label-align="right">
         <cell title="所属企业" @click.native="selectCompany" :is-link="companyPickerData.length != 1" 
             :value="companyText" value-align="left"></cell>
-        <x-switch title="是否公开" inline-desc="是否全网可见" v-model="info.share"></x-switch>
+        <x-switch title="是否公开" inline-desc="是否全网可见" v-model="info.bool_share"></x-switch>
       </group>
 
       <popup v-model="showDecorationSelect">
@@ -152,7 +152,8 @@ export default {
         rem: '',              // 备注
         user_id: 0,
         company_id: 0,        // 所属企业
-        share: true,          // 是否公开
+        share: 1,             // 是否公开
+        bool_share: true,
         linkman: '',          // 联系人
         mobile: ''            // 联系电话
       },
@@ -258,7 +259,7 @@ export default {
             if (res.data.images) {
               vm.images = res.data.images
             }
-            vm.info.share = vm.info.share === 1
+            vm.info.bool_share = vm.info.share === 1
             vm.$emit('on-view-loaded', '修改单元')
           } else {
             vm.info.__token__ = res.data.__token__
@@ -352,7 +353,7 @@ export default {
         return
       }
       this.$vux.loading.show()
-      this.info.share = (this.info.share ? 1 : 0)
+      this.info.share = (this.info.bool_share ? 1 : 0)
       this.$post('/api/unit/edit?id=' + this.id, this.info, (res) => {
         this.$vux.loading.hide()
         if (res.success) {

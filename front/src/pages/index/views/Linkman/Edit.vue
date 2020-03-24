@@ -14,7 +14,7 @@
         @on-change="validateForm" @on-click-error-icon="emailError" :should-toast-error="false"></x-input>
       <x-input title="微信" v-model="info.weixin" :max="30"></x-input>
       <x-input title="QQ" v-model="info.qq" :max="30"></x-input>
-      <x-switch title="是否在职" v-model="info.status"></x-switch>
+      <x-switch title="是否在职" v-model="info.boolStatus"></x-switch>
     </group>
 
     <group gutter="10px">
@@ -50,7 +50,8 @@ export default {
         weixin: '',        // 微信
         qq: '',            // QQ
         rem: '',           // 备注
-        status: true
+        boolStatus: true,
+        status: 0
       }
     }
   },
@@ -82,7 +83,7 @@ export default {
                 vm.info[item] = res.data[item]
               }
             }
-            vm.info.status = vm.info.status === 0
+            vm.info.boolStatus = vm.info.status === 0
             vm.$emit('on-view-loaded', vm.info.title)
           } else {
             vm.info.__token__ = res.data.__token__
@@ -131,7 +132,7 @@ export default {
         return
       }
       this.$vux.loading.show()
-      this.info.status = (this.info.status ? 0 : 1)
+      this.info.status = (this.info.boolStatus ? 0 : 1)
       this.$post('/api/linkman/edit?id=' + this.id, this.info, (res) => {
         this.$vux.loading.hide()
         if (res.success) {

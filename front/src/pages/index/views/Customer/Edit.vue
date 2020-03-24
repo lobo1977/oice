@@ -51,7 +51,7 @@
         <cell title="状态" @click.native="showStatusPicker = true" :is-link="true" :value="statusText" value-align="left"></cell>
         <cell title="所属企业" @click.native="selectCompany" :is-link="companyPickerData.length != 1" 
           :value="companyText" value-align="left"></cell>
-        <x-switch title="是否共享" inline-desc="共享给企业内部成员" v-model="info.share"></x-switch>
+        <x-switch title="是否共享" inline-desc="共享给企业内部成员" v-model="info.boolShare"></x-switch>
       </group>
 
       <popup v-model="showDistrictSelect">
@@ -122,7 +122,8 @@ export default {
         rem: '',              // 项目说明
         status: 6,            // 状态
         company_id: 0,        // 所属企业
-        share: false,         // 共享状态
+        share: 0,
+        boolShare: false,     // 共享状态
         linkman: '',          // 联系人
         clash: 0              // 撞单客户
       },
@@ -238,7 +239,7 @@ export default {
             if (vm.info.status >= 0 && vm.info.status < vm.statusPickerData.length) {
               vm.statusText = vm.statusPickerData[vm.info.status].label
             }
-            vm.info.share = vm.info.share === 1
+            vm.info.boolShare = vm.info.share === 1
             vm.$emit('on-view-loaded', vm.info.customer_name)
           } else {
             vm.info.__token__ = res.data.__token__
@@ -348,7 +349,7 @@ export default {
         return
       }
       vm.$vux.loading.show()
-      vm.info.share = (vm.info.share ? 1 : 0)
+      vm.info.share = (vm.info.boolShare ? 1 : 0)
       let url = '/api/customer/edit?id=' + vm.id
       if (vm.bid || vm.uid) {
         url = url + '&flag=' + vm.flag + '&bid=' + vm.bid + '&uid=' + vm.uid

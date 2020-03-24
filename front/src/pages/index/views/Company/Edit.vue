@@ -3,7 +3,7 @@
     <form ref="frmCompany">
       <input type="hidden" name="__token__" :value="info.__token__">
       <input type="hidden" name="area" :value="info.area">
-      <input type="hidden" name="status" :value="info.status ? 1 : 0">
+      <input type="hidden" name="status" :value="info.bool_status ? 1 : 0">
       <input type="hidden" name="join_way" :value="info.join_way">
       <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
         <cell title="Logo">
@@ -26,8 +26,8 @@
       </group>
 
       <group gutter="10px">
-        <x-switch title="启用公章" inline-desc="在生成的确认书中自动添加公章" v-model="info.enable_stamp"></x-switch>
-        <cell title="公章" v-show="info.enable_stamp">
+        <x-switch title="启用公章" inline-desc="在生成的确认书中自动添加公章" v-model="info.bool_enable_stamp"></x-switch>
+        <cell title="公章" v-show="info.bool_enable_stamp">
           <div solt="default" style="height:60px;line-height:0;">
             <img v-show="stampSrc != null && stampSrc != ''" :src="stampSrc" style="height:60px;">
           </div>
@@ -38,7 +38,7 @@
 
       <group gutter="10px" label-width="4em" label-margin-right="1em" label-align="right">
         <cell title="加入方式" @click.native="showJoinWayPicker = true" :is-link="true" :value="joinWayText" value-align="left"></cell>
-        <x-switch title="是否公开" inline-desc="公开企业可以被其他用户检索并加入" v-model="info.status"></x-switch>
+        <x-switch title="是否公开" inline-desc="公开企业可以被其他用户检索并加入" v-model="info.bool_status"></x-switch>
       </group>
     </form>
 
@@ -73,8 +73,10 @@ export default {
         address: '',   // 地址
         rem: '',
         join_way: 0,
-        status: false,
-        enable_stamp: true
+        status: 0,
+        bool_status: false,
+        enable_stamp: 0,
+        bool_enable_stamp: true
       },
       logoSrc: null,
       stampSrc: null,
@@ -118,8 +120,8 @@ export default {
               vm.districtValue = [vm.info.area, '']
             }
             vm.joinWayText = vm.joinWayPickerList[vm.info.join_way].label
-            vm.info.status = vm.info.status === 1
-            vm.info.enable_stamp = vm.info.enable_stamp === 1
+            vm.info.bool_status = vm.info.status === 1
+            vm.info.bool_enable_stamp = vm.info.enable_stamp === 1
             vm.$emit('on-view-loaded', vm.info.title)
           } else {
             vm.info.__token__ = res.data.__token__
@@ -182,8 +184,8 @@ export default {
       }
       let form = this.$refs.frmCompany
       this.$vux.loading.show()
-      this.info.status = (this.info.status ? 1 : 0)
-      this.info.enable_stamp = (this.info.enable_stamp ? 1 : 0)
+      this.info.status = (this.info.bool_status ? 1 : 0)
+      this.info.enable_stamp = (this.info.bool_enable_stamp ? 1 : 0)
       this.$postFile('/api/company/edit?id=' + this.id, form, (res) => {
         if (res.success) {
           this.$updateUser((res2) => {

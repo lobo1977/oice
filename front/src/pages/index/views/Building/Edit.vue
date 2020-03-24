@@ -79,7 +79,7 @@
       <group gutter="10px" label-width="4em" label-margin-right="1em" label-align="right">
         <cell v-if="info.user_id == 0 || info.user_id == user.id" title="所属企业" @click.native="selectCompany" :is-link="companyPickerData.length != 1" 
           :value="companyText" value-align="left"></cell>
-        <x-switch title="是否公开" inline-desc="公开后全网可见" v-model="info.share"></x-switch>
+        <x-switch title="是否公开" inline-desc="公开后全网可见" v-model="info.bool_share"></x-switch>
         <x-switch v-if="id > 0" title="发送短信" inline-desc="发送短信给项目联系人" v-model="info.send_sms"></x-switch>
       </group>
 
@@ -230,7 +230,8 @@ export default {
         environment: '',      // 周边环境
         company_id: '',       // 所属企业
         user_id: 0,
-        share: true,          // 是否公开
+        share: 1,             // 是否公开
+        bool_share: true,
         send_sms: false       // 是否发送委托确认短信
       },
       engInfo: {
@@ -342,7 +343,7 @@ export default {
               vm.info.company_id = vm.companyPickerData[0].value
               vm.companyText = vm.companyPickerData[0].label
             }
-            vm.info.share = vm.info.share === 1
+            vm.info.bool_share = vm.info.share === 1
             if (res.data.engInfo) {
               for (let item in vm.engInfo) {
                 if (res.data.engInfo[item] !== undefined && res.data.engInfo[item] !== null) {
@@ -439,7 +440,7 @@ export default {
         return
       }
       this.$vux.loading.show()
-      this.info.share = (this.info.share ? 1 : 0)
+      this.info.share = (this.info.bool_share ? 1 : 0)
       this.info.send_sms = (this.info.send_sms ? 1 : 0)
       this.$post('/api/building/edit?id=' + this.id, this.info, (res) => {
         this.$vux.loading.hide()
