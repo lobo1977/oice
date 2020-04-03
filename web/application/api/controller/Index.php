@@ -2,6 +2,7 @@
 namespace app\api\controller;
 
 use think\captcha\Captcha;
+use app\common\Utils;
 use app\api\controller\Base;
 use app\api\model\User;
 use app\api\model\Oauth;
@@ -128,5 +129,12 @@ class Index extends Base
    */
   public function token() {
     return $this->succeed($this->formToken());
+  }
+
+  public function test() {
+    $video = "d:\\5e86c65196cba.mp4";
+    $path = "d:\\5e86c65196cba.jpg";
+    Utils::getVideoCover($video, $path);
+    echo 'ok';
   }
 }

@@ -165,7 +165,7 @@ class Building extends Base
         return $this->fail();
       }
     } else {
-      return $this->fail('请选择要上传的图片。');
+      return $this->fail('请选择要上传的图片或视频。');
     }
   }
 
@@ -183,7 +183,7 @@ class Building extends Base
         return $this->fail();
       }
     } else {
-      return $this->fail('请选择要上传的图片。');
+      return $this->fail('请选择要上传的图片或视频。');
     }
   }
 

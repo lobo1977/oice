@@ -13,13 +13,13 @@ return [
     // 数据库类型
     'type'            => 'mysql',
     // 服务器地址
-    'hostname'        => '127.0.0.1',
+    'hostname'        => '123.206.181.181',
     // 数据库名
     'database'        => 'oice',
     // 用户名
     'username'        => 'oice',
     // 密码
-    'password'        => 'abcd1234',
+    'password'        => 'c4oSRpVxwsZcQ6GQ',
     // 端口
     'hostport'        => '',
     // 连接dsn

@@ -2,7 +2,7 @@
   <div>
     <tab v-show="id > 0">
       <tab-item selected @on-item-click="tab = 0">基本信息</tab-item>
-      <tab-item @on-item-click="tab = 1" :disabled="id===0">图片</tab-item>
+      <tab-item @on-item-click="tab = 1" :disabled="id===0">图片/视频</tab-item>
     </tab>
 
     <div v-transfer-dom>
@@ -18,7 +18,7 @@
       </previewer>
     </div>
 
-    <div v-if="tab === 0">
+    <div v-show="tab === 0">
       <group gutter="0" label-width="4em" label-margin-right="1em" label-align="right">
         <x-input title="楼栋" v-model="info.building_no" :max="10"></x-input>
         <x-input title="楼层" type="tel" :max="3" v-model="info.floor" 
@@ -91,18 +91,37 @@
       </div>
     </div>
 
-    <div v-if="tab === 1">
+    <div v-show="tab === 1">
       <flexbox :gutter="0" wrap="wrap">
+        <flexbox-item :span="1/4" v-for="(item, index) in videos" :key="index">
+          <img :src="item.msrc" @click="previewVideo(index)" class="building-img">
+        </flexbox-item>
         <flexbox-item :span="1/4" v-for="(item, index) in images" :key="index">
           <img :src="item.msrc" @click="preview(index)" class="building-img">
         </flexbox-item>
       </flexbox>
+
+      <popup v-model="showVideo" position="bottom" height="100%">
+        <x-header
+          style="width:100%;position:fixed;left:0;top:0;z-index:100;"
+          :left-options="videoHeaderLeftOptions"
+          :right-options="videoHeaderrightOptions"
+          @on-click-back="showVideo = false">
+          <span slot="right" @click="confirmRemoveVideo" style="margin-right:10px;" title="删除">
+            <x-icon type="trash-a" size="24" class="header-icon"></x-icon>
+          </span>
+        </x-header>
+        <div style="display:flex;display:-webkit-flex;align-items:center;height:100%;overflow-y:hidden;background-color:#000000;">
+          <video :src="video_src" :poster="video_msrc" width="100%" controls="controls" muted="muted"
+            x5-video-player-type="h5" x5-video-player-fullscreen="true"></video>
+        </div>
+      </popup>
+
       <div class="bottom-bar">
         <form ref="frmUploadUnitImage">
           <x-button type="warn" class="bottom-btn">上传</x-button>
           <input type="hidden" name="id" :value="id">
-          <input type="file" class="upload" name="images[]" multiple="multiple"
-            accept="image/*" @change="upload"/>
+          <input type="file" class="upload" name="images[]" multiple="multiple" @change="upload"/>
         </form>
       </div>
     </div>
@@ -111,7 +130,7 @@
 </template>
 
 <script>
-import { Previewer, TransferDom, PopupHeader, Checker, CheckerItem } from 'vux'
+import { Previewer, TransferDom, PopupHeader, Checker, CheckerItem, XHeader } from 'vux'
 import faceData from '../../data/face.json'
 import rentSellData from '../../data/rent_sell.json'
 import decorationData from '../../data/decoration.json'
@@ -125,7 +144,8 @@ export default {
     Previewer,
     PopupHeader,
     Checker,
-    CheckerItem
+    CheckerItem,
+    XHeader
   },
   data () {
     return {
@@ -158,6 +178,7 @@ export default {
         mobile: ''            // 联系电话
       },
       images: [],
+      videos: [],
       previewOptions: {
         isClickableElement: function (el) {
           return /previewer-icon/.test(el.className)
@@ -175,7 +196,15 @@ export default {
       statusText: '',
       showCompanyPicker: false,
       companyPickerData: [],
-      companyText: ''
+      companyText: '',
+      videoHeaderLeftOptions: {
+      },
+      videoHeaderRightOptions: {
+      },
+      showVideo: false,
+      video_index: -1,
+      video_src: '',
+      video_msrc: ''
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -258,6 +287,9 @@ export default {
             }
             if (res.data.images) {
               vm.images = res.data.images
+            }
+            if (res.data.videos) {
+              vm.videos = res.data.videos
             }
             vm.info.bool_share = vm.info.share === 1
             vm.$emit('on-view-loaded', '修改单元')
@@ -370,8 +402,15 @@ export default {
         }
       })
     },
+    previewVideo (index) {
+      this.video_index = index
+      this.video_src = this.videos[index].src
+      this.video_msrc = this.videos[index].msrc
+      this.showVideo = true
+    },
     preview (index) {
-      this.$refs.prevUnitEdit.show(index)
+      this.showVideo = false
+      this.$refs.prevBuildingEdit.show(index)
     },
     upload () {
       let form = this.$refs.frmUploadUnitImage
@@ -379,7 +418,17 @@ export default {
       this.$postFile('/api/building/uploadUnitImage', form, (res) => {
         this.$vux.loading.hide()
         if (res.success) {
-          this.images = res.data
+          let images = []
+          let videos = []
+          for (let i = 0; i < res.data.length; i++) {
+            if (res.data[i].is_image) {
+              images.push(res.data[i])
+            } else if (res.data[i].is_video) {
+              videos.push(res.data[i])
+            }
+          }
+          this.images = images
+          this.videos = videos
         } else {
           this.$vux.toast.show({
             text: res.message,
@@ -417,37 +466,59 @@ export default {
       })
     },
     confirmRemoveImage () {
-      let index = this.$refs.prevUnitEdit.getCurrentIndex()
+      let vm = this
+      let index = vm.$refs.prevUnitEdit.getCurrentIndex()
       if (index < 0) return
-      let img = this.images[index]
+      let img = vm.images[index]
       if (img.default === 1) {
-        this.$vux.toast.show({
+        vm.$vux.toast.show({
           text: '封面图不能删除',
           width: '16em'
         })
         return
       }
-      let vm = this
-      this.$vux.confirm.show({
+      vm.$vux.confirm.show({
         title: '删除图片',
         content: '确定要删除这张图片吗？',
         onConfirm () {
-          vm.removeImage(index, img.id)
+          vm.$vux.loading.show()
+          vm.$post('/api/building/removeImage', {
+            image_id: img.id
+          }, (res) => {
+            vm.$vux.loading.hide()
+            if (res.success) {
+              vm.images.splice(index, 1)
+            } else {
+              vm.$vux.toast.show({
+                text: res.message,
+                width: '13em'
+              })
+            }
+          })
         }
       })
     },
-    removeImage (index, imgId) {
-      this.$vux.loading.show()
-      this.$post('/api/building/removeImage', {
-        image_id: imgId
-      }, (res) => {
-        this.$vux.loading.hide()
-        if (res.success) {
-          this.images.splice(index, 1)
-        } else {
-          this.$vux.toast.show({
-            text: res.message,
-            width: '13em'
+    confirmRemoveVideo () {
+      let vm = this
+      let img = vm.videos[vm.video_index]
+      this.$vux.confirm.show({
+        title: '删除视频',
+        content: '确定要删除这个视频吗？',
+        onConfirm () {
+          vm.showVideo = false
+          vm.$vux.loading.show()
+          vm.$post('/api/building/removeImage', {
+            image_id: img.id
+          }, (res) => {
+            vm.$vux.loading.hide()
+            if (res.success) {
+              vm.videos.splice(vm.video_index, 1)
+            } else {
+              vm.$vux.toast.show({
+                text: res.message,
+                width: '13em'
+              })
+            }
           })
         }
       })

@@ -50,10 +50,17 @@ class File extends Base
 
     foreach($list as $key => $file) {
       $file->is_image = Utils::isImageFile($file->file);
+      $file->is_video = Utils::isVideoFile($file->file);
       if ($type == 'building' || $type == 'unit') {
-        $file->src = '/upload/' . $type . '/images/900/' . $file->file;
-        $file->msrc = '/upload/' . $type . '/images/300/' . $file->file;
-        $file->url = $file->src;
+        if ($file->is_image) {
+          $file->src = '/upload/' . $type . '/images/900/' . $file->file;
+          $file->msrc = '/upload/' . $type . '/images/300/' . $file->file;
+          $file->url = $file->src;
+        } else if ($file->is_video) {
+          $file->src = '/upload/' . $type . '/images/original/' . $file->file;
+          $file->msrc = '/upload/' . $type . '/images/300/' . Utils::replaceExt($file->file, 'jpg');
+          $file->url = $file->src;
+        }
       } else if ($type == 'customer') {
         $file->src = '/upload/' . $type . '/attach/' . $file->file;
         $file->url = $file->src;
@@ -102,15 +109,20 @@ class File extends Base
 
       if ($type == 'building' || $type == 'unit') {
         $uploadPath = '../public/upload/' . $type . '/images';
-        $info = $file->validate(['size'=>6291456, 'ext'=>'jpg,jpeg,png,gif'])
+        $info = $file->validate(['size'=>20971520, 'ext'=>'jpg,jpeg,png,gif,mp4'])
           ->rule('uniqid')->move($uploadPath . '/original');
 
         if ($info) {
-          self::thumbImage($info, [900,300], $uploadPath);
+          if (Utils::isImageFile($info->getFilename())) {
+            self::thumbImage($info, [900,300], $uploadPath);
+          } else if (Utils::isVideoFile($info->getFilename())) {
+            Utils::getVideoCover($uploadPath . '/original/' . $info->getFilename(), 
+              $uploadPath . '/300/' . Utils::replaceExt($info->getFilename(), 'jpg'));
+          }
         }
       } else {
         $uploadPath = '../public/upload/' . $type . '/attach';
-        $info = $file->validate(['size'=>10485760,
+        $info = $file->validate(['size'=>20971520,
           'ext'=>'jpg,jpeg,png,gif,csv,txt,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar,mp4'])
           ->rule('uniqid')->move($uploadPath);
       }
@@ -121,8 +133,9 @@ class File extends Base
         $data['title'] = substr($info->getInfo('name'), 0, 300);
         $data['file'] = $info->getFilename();
         $data['size'] = $info->getSize();
-        if ($count == 0 && $key == 0) {
+        if ($count == 0 && Utils::isImageFile($info->getFilename())) {
           $data['default'] = 1;
+          $count == 1;
         } else {
           $data['default'] = 0;
         }

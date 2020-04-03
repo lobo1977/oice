@@ -50,6 +50,16 @@
             <p>【其他说明】{$vo.rem}</p>
         {/if}
 
+        {if !empty($vo.videos)}
+            {foreach $vo.videos as $key=>$img}
+                <video src="https://{$Think.config.app_host}{$img.src}" 
+                    poster="https://{$Think.config.app_host}{$img.msrc}" 
+                    width="100%" controls="controls" muted="muted"
+                    x5-video-player-type="h5" x5-video-player-fullscreen="true">
+                </video>
+            {/foreach}
+        {/if}
+
         {if !empty($vo.images)}
             {foreach $vo.images as $key=>$img}
                 <img src="https://{$Think.config.app_host}{$img.src}" style="width:100%;">

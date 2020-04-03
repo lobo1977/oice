@@ -1,9 +1,16 @@
 <template>
   <div>
-    <swiper :auto="true" :loop="true" height="260px"
-      :show-dots="info.images.length > 1" v-show="info.images.length > 0">
+    <swiper v-if="info.videos.length || info.images.length" :auto="false" :loop="true" height="260px"
+      :show-dots="info.videos.length + info.images.length > 1">
+      <swiper-item class="swiper-img" v-for="(item, index) in info.videos" :key="index">
+        <div style="display:flex;display:-webkit-flex;align-items:center;height:100%;overflow-y:hidden;background-color:#000000;">
+          <video :src="item.src" :poster="item.msrc" 
+            width="100%" controls="controls" muted="muted">
+          </video>
+        </div>
+      </swiper-item>
       <swiper-item class="swiper-img" v-for="(item, index) in info.images" :key="index">
-        <img :src="item.src" @click="preview(index)">
+        <img :src="item.src" height="100%" @click="preview(index)">
       </swiper-item>
     </swiper>
 
@@ -126,6 +133,7 @@ export default {
         allowEdit: false,
         allowDelete: false,
         images: [],
+        videos: [],
         linkman: []
       },
       previewOptions: {

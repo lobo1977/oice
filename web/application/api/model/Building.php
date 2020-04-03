@@ -294,7 +294,22 @@ class Building extends Base
       ->field('name,location,situation,developer,manager,' .
         'network,elevator,hvac,amenities,	tenants')->find();
 
-    $data->images = File::getList($user, 'building', $id);
+    $images = [];
+    $videos = [];
+    
+    $files = File::getList($user, 'building', $id);
+    if ($files) {
+      foreach($files as $key => $file) {
+        if ($file->is_image) {
+          array_push($images, $file);
+        } else if ($file->is_video) {
+          array_push($videos, $file);
+        }
+      }
+    }
+
+    $data->images = $images;
+    $data->videos = $videos;
 
     if ($operate == 'view') {
       $data->isFavorite = false;

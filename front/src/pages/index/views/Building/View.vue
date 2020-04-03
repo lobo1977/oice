@@ -3,10 +3,17 @@
     <topalert v-if="info.id > 0 && info.user_id == 0" type="info"
       message="该项目尚未被认领，您可以通过修改完善项目信息完成认领。"></topalert>
 
-    <swiper v-if="info.images.length" :auto="true" :loop="true" height="260px"
-      :show-dots="info.images.length > 1">
+    <swiper v-if="info.videos.length || info.images.length" :auto="false" :loop="true" height="260px"
+      :show-dots="info.videos.length + info.images.length > 1">
+      <swiper-item class="swiper-img" v-for="(item, index) in info.videos" :key="index">
+        <div style="display:flex;display:-webkit-flex;align-items:center;height:100%;overflow-y:hidden;background-color:#000000;">
+          <video :src="item.src" :poster="item.msrc" 
+            width="100%" controls="controls" muted="muted">
+          </video>
+        </div>
+      </swiper-item>
       <swiper-item class="swiper-img" v-for="(item, index) in info.images" :key="index">
-        <img :src="item.src" @click="preview(index)">
+        <img :src="item.src" height="100%" @click="preview(index)">
       </swiper-item>
     </swiper>
 
@@ -223,6 +230,7 @@ export default {
         allowEdit: false,
         allowDelete: false,
         images: [],
+        videos: [],
         linkman: [],
         unit: [],
         confirm: [],
@@ -658,6 +666,19 @@ export default {
           })
         }
       })
+    },
+    playerOptions (src, posterSrc) {
+      return {
+        muted: true,
+        language: 'en',
+        height: 260,
+        playbackRates: [0.7, 1.0, 1.5, 2.0],
+        sources: [{
+          type: 'video/mp4',
+          src: src
+        }],
+        poster: posterSrc
+      }
     }
   },
   computed: {

@@ -227,7 +227,7 @@ class Recommend extends Controller
       $this->assign('wechat', $share);
     }
     $this->assign('vo', $building);
-    if(!$building->images->isEmpty()) {
+    if(!empty($building->images)) {
       $this->assign('share_image', 'https://' . config('app_host') . $building->images[0]['src']);
     } else {
       $this->assign('share_image', '');
@@ -245,7 +245,7 @@ class Recommend extends Controller
       $this->assign('wechat', $share);
     }
     $this->assign('vo', $unit);
-    if(!$unit->images->isEmpty()) {
+    if(!empty($unit->images)) {
       $this->assign('share_image', 'https://' . config('app_host') . $unit->images[0]['src']);
     } else {
       $this->assign('share_image', '');

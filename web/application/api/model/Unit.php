@@ -204,7 +204,23 @@ class Unit extends Base
     } else if ($operate != 'notes' && !self::allow($user, $unit, $operate)) {
       self::exception('您没有权限' . ($operate == 'view' ? '查看' : '修改') . '此单元。');
     } else {
-      $unit->images = File::getList($user, 'unit', $id);
+      $images = [];
+      $videos = [];
+      
+      $files = File::getList($user, 'unit', $id);
+      if ($files) {
+        foreach($files as $key => $file) {
+          if ($file->is_image) {
+            array_push($images, $file);
+          } else if ($file->is_video) {
+            array_push($videos, $file);
+          }
+        }
+      }
+
+      $unit->images = $images;
+      $unit->videos = $videos;
+
       self::formatInfo($unit);
       $unit->key = md5('unit' . $unit->id . config('wechat.app_secret'));
 

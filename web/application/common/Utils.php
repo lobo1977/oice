@@ -76,16 +76,26 @@ class Utils
         $ext = '';
         $pos = strrpos($fileName, '.');
         if ($pos) {
-            if ($includeDot) {
-                $ext = substr($fileName, $pos);
-            } else {
-                $ext = substr($fileName, $pos + 1);
+            if (!$includeDot) {
+                $pos = $pos + 1;
             }
+            $ext = strtolower(substr($fileName, $pos));
         } else if ($includeDot) {
             $ext = '.';  
         }
 
         return $ext;
+    }
+
+        /**
+     * 获取文件扩展名
+     */
+    public static function replaceExt($fileName, $newExt) {
+        $pos = strrpos($fileName, '.');
+        if ($pos) {
+            $fileName = substr($fileName, 0, $pos);
+        }
+        return $fileName . '.' . $newExt;
     }
 
     /**
@@ -98,5 +108,31 @@ class Utils
         $images = array('jpg','jpeg','png','gif','bmp');
         $ext = strtolower(self::getFileExt($fileName));
         return in_array($ext, $images);
+    }
+
+    /**
+     * 通过文件名判断是否为视频文件
+     */
+    public static function isVideoFile($fileName = '') {
+        if (!$fileName) {
+            return false;
+        }
+        $images = array('mp4');
+        $ext = strtolower(self::getFileExt($fileName));
+        return in_array($ext, $images);
+    }
+
+    /**
+     * 截取视频某一帧
+     *
+     * @param  $file  	视频文件
+     * @param  $savePath     截图保存路径
+     * @param  $time    第几帧
+     */
+    public static function getVideoCover($video, $savePath, $time = 3) {
+        $ffmpeg = \FFMpeg\FFMpeg::create(config('ffmpeg.'));
+        $video = $ffmpeg->open($video);
+        $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds($time))
+            ->save($savePath);
     }
 }
