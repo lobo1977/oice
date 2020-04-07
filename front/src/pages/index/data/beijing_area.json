@@ -44,6 +44,10 @@
         "value": "大兴区",
         "parent": 0
     }, {
+        "name": "房山区",
+        "value": "房山区",
+        "parent": 0
+    }, {
         "name": "",
         "value": "",
         "parent": "all"
@@ -151,5 +155,9 @@
         "name": "环球影城",
         "value": "环球影城",
         "parent": "通州区"
+    }, {
+        "name": "全区",
+        "value": "",
+        "parent": "房山区"
     }
 ]
