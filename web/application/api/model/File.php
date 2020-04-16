@@ -100,7 +100,8 @@ class File extends Base
 
     $count = self::where('type', $type)
       ->where('parent_id', $parent_id)
-      ->where('default', 1)->count();
+      ->where('default', 1)
+      ->count();
 
     $result = 0;
 
@@ -135,7 +136,7 @@ class File extends Base
         $data['size'] = $info->getSize();
         if ($count == 0 && Utils::isImageFile($info->getFilename())) {
           $data['default'] = 1;
-          $count == 1;
+          $count = 1;
         } else {
           $data['default'] = 0;
         }

@@ -3,13 +3,11 @@
     <swiper v-if="info.videos.length || info.images.length" :auto="false" :loop="true" height="260px"
       :show-dots="info.videos.length + info.images.length > 1">
       <swiper-item class="swiper-img" v-for="(item, index) in info.videos" :key="index">
-        <div style="display:flex;display:-webkit-flex;align-items:center;height:100%;overflow-y:hidden;background-color:#000000;">
-          <video :src="item.src" :poster="item.msrc" 
-            width="100%" controls="controls" muted="muted">
-          </video>
-        </div>
+        <img src="/static/img/play.png" @click="previewVideo(index)"
+          style="position:absolute;top:82px;left:50%;margin-left:-48px;width:96px;height:96px;">
+        <img :src="item.msrc" height="100%" @click="previewVideo(index)">
       </swiper-item>
-      <swiper-item class="swiper-img" v-for="(item, index) in info.images" :key="index">
+      <swiper-item class="swiper-img" v-for="(item, index) in info.images" :key="info.videos.length + index">
         <img :src="item.src" height="100%" @click="preview(index)">
       </swiper-item>
     </swiper>
@@ -87,13 +85,29 @@
       popup-title="选择客户" :show-cell="false" :data="myCustomer" v-model="selectCustomer"
       @on-hide="customerSelected"></popup-picker>
 
+    <popup v-model="showVideo" position="bottom" height="100%">
+      <x-header
+        style="width:100%;position:fixed;left:0;top:0;z-index:100;"
+        :left-options="leftHeaderOptions"
+        :right-options="rightHeaderOptions"
+        @on-click-back="showVideo = false">
+        <a slot="right" :href="video_src" style="margin-right:10px;" download="video" title="下载">
+          <x-icon type="ios-download" size="24" class="header-icon"></x-icon>
+        </a>
+      </x-header>
+      <div style="display:flex;display:-webkit-flex;align-items:center;height:100%;overflow-y:hidden;background-color:#000000;">
+        <video :src="video_src" :poster="video_msrc" width="100%" controls="controls" muted="muted" 
+          x5-video-player-type="h5" x5-video-player-fullscreen="true"></video>
+      </div>
+    </popup>
+
     <actionsheet v-model="showUnitMenu" :menus="unitMenu" theme="android" 
       @on-click-menu="unitMenuClick"></actionsheet>
   </div>
 </template>
 
 <script>
-import { Swiper, SwiperItem, Previewer, TransferDom, GroupTitle } from 'vux'
+import { Swiper, SwiperItem, Previewer, TransferDom, GroupTitle, XHeader } from 'vux'
 import qrcode from '@/components/qrcode.vue'
 
 export default {
@@ -105,7 +119,8 @@ export default {
     SwiperItem,
     Previewer,
     GroupTitle,
-    qrcode
+    qrcode,
+    XHeader
   },
   data () {
     return {
@@ -143,7 +158,15 @@ export default {
       selectCustomer: [],
       customerFlag: 0,
       showUnitMenu: false,
-      wxImages: []
+      wxImages: [],
+      showVideo: false,
+      video_src: '',
+      video_msrc: '',
+      leftHeaderOptions: {
+        preventGoBack: true
+      },
+      rightHeaderOptions: {
+      }
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -217,6 +240,14 @@ export default {
       } else {
         this.$refs.prevUnit.show(index)
       }
+    },
+    previewVideo (index) {
+      this.video_src = this.info.videos[index].src
+      this.video_msrc = this.info.videos[index].msrc
+      this.showVideo = true
+    },
+    downloadVideo () {
+      document.location.href = this.video_src
     },
     favorite () {
       if (!this.$checkAuth()) {

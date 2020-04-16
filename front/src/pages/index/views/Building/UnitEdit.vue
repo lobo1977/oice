@@ -34,14 +34,14 @@
             <checker-item v-for="i in faceSelectData" :key="i" :value="i">{{i}}</checker-item>
           </checker>
         </cell>
-        <x-input title="面积" type="tel" :max="5" v-model="info.acreage" :show-clear="false">
+        <x-input title="面积" type="tel" :is-type="isNumber" :max="5" v-model="info.acreage" :show-clear="false">
           <span slot="right">平方米</span>
         </x-input>
         <cell title="租售" @click.native="showRentSellPicker = true" :is-link="true" :value="info.rent_sell" value-align="left"></cell>
-        <x-input title="出租价格" type="tel" :max="6" v-model="info.rent_price" :show-clear="false">
+        <x-input title="出租价格" type="tel" :is-type="isNumber" :max="6" v-model="info.rent_price" :show-clear="false">
           <span slot="right">元/平方米/日</span>
         </x-input>
-        <x-input title="出售价格" type="tel" :max="8" v-model="info.sell_price" :show-clear="false">
+        <x-input title="出售价格" type="tel" :is-type="isNumber" :max="8" v-model="info.sell_price" :show-clear="false">
           <span slot="right">元/平方米</span>
         </x-input>
         <cell title="装修状况" @click.native="showDecorationSelect = true" is-link :value="info.decoration" value-align="left"></cell>
@@ -96,7 +96,7 @@
         <flexbox-item :span="1/4" v-for="(item, index) in videos" :key="index">
           <img :src="item.msrc" @click="previewVideo(index)" class="building-img">
         </flexbox-item>
-        <flexbox-item :span="1/4" v-for="(item, index) in images" :key="index">
+        <flexbox-item :span="1/4" v-for="(item, index) in images" :key="videos.length + index">
           <img :src="item.msrc" @click="preview(index)" class="building-img">
         </flexbox-item>
       </flexbox>
@@ -104,8 +104,8 @@
       <popup v-model="showVideo" position="bottom" height="100%">
         <x-header
           style="width:100%;position:fixed;left:0;top:0;z-index:100;"
-          :left-options="videoHeaderLeftOptions"
-          :right-options="videoHeaderrightOptions"
+          :left-options="leftHeaderOptions"
+          :right-options="rightHeaderOptions"
           @on-click-back="showVideo = false">
           <span slot="right" @click="confirmRemoveVideo" style="margin-right:10px;" title="删除">
             <x-icon type="trash-a" size="24" class="header-icon"></x-icon>
@@ -155,6 +155,12 @@ export default {
       tab: 0,
       id: 0,
       formValidate: false,
+      isNumber: function (value) {
+        return {
+          valid: !isNaN(value),
+          msg: '请输入有效数字'
+        }
+      },
       info: {
         __token__: '',
         building_id: 0,
@@ -197,14 +203,15 @@ export default {
       showCompanyPicker: false,
       companyPickerData: [],
       companyText: '',
-      videoHeaderLeftOptions: {
-      },
-      videoHeaderRightOptions: {
-      },
       showVideo: false,
       video_index: -1,
       video_src: '',
-      video_msrc: ''
+      video_msrc: '',
+      leftHeaderOptions: {
+        preventGoBack: true
+      },
+      rightHeaderOptions: {
+      }
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -245,6 +252,14 @@ export default {
                 vm.companyText = res.data.companyList[i].title
               }
             }
+          } else {
+            vm.$vux.alert.show({
+              title: '加入企业',
+              content: '您还没有加入企业，请先创建或加入企业。',
+              onHide () {
+                vm.$router.push({name: 'Company'})
+              }
+            })
           }
           if (vm.id) {
             for (let item in vm.info) {

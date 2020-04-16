@@ -36,17 +36,17 @@
         <cell title="竣工日期" :value="info.completion_date" value-align="left" :is-link="true" @click.native="selectCompletionDate"></cell>
         <cell title="租售" @click.native="showRentSellPicker = true" :is-link="true" :value="info.rent_sell" value-align="left"></cell>
         <x-input title="价格" v-model="info.price" :max="30"></x-input>
-        <x-input title="建筑面积" type="tel" :max="8" v-model="info.acreage" :show-clear="false">
+        <x-input title="建筑面积" type="tel" :is-type="isNumber" :max="8" v-model="info.acreage" :show-clear="false">
           <span slot="right">平方米</span>
         </x-input>
         <!-- <x-input title="楼层" v-model="info.floor" :max="10"></x-input>
         <x-input title="层面积" type="tel" :max="6" v-model="info.floor_area" :show-clear="false">
           <span slot="right">平方米</span>
         </x-input> -->
-        <x-input title="层高" type="tel" :max="5" v-model="info.floor_height" :show-clear="false">
+        <x-input title="层高" type="tel" :is-type="isNumber" :max="5" v-model="info.floor_height" :show-clear="false">
           <span slot="right">米</span>
         </x-input>
-        <x-input title="楼板承重" type="tel" :max="6" v-model="info.bearing" :show-clear="false">
+        <x-input title="楼板承重" type="tel" :is-type="isNumber" :max="6" v-model="info.bearing" :show-clear="false">
           <span slot="right">千克/平方米</span>
         </x-input>
         <x-input title="开发商" v-model="info.developer" :max="50"></x-input>
@@ -148,7 +148,7 @@
         <flexbox-item :span="1/4" v-for="(item, index) in videos" :key="index">
           <img :src="item.msrc" @click="previewVideo(index)" class="building-img">
         </flexbox-item>
-        <flexbox-item :span="1/4" v-for="(item, index) in images" :key="index">
+        <flexbox-item :span="1/4" v-for="(item, index) in images" :key="videos.length + index">
           <img :src="item.msrc" @click="preview(index)" class="building-img">
         </flexbox-item>
       </flexbox>
@@ -176,8 +176,8 @@
     <popup v-model="showVideo" position="bottom" height="100%">
       <x-header
         style="width:100%;position:fixed;left:0;top:0;z-index:100;"
-        :left-options="videoHeaderLeftOptions"
-        :right-options="videoHeaderrightOptions"
+        :left-options="leftHeaderOptions"
+        :right-options="rightHeaderOptions"
         @on-click-back="showVideo = false">
         <span slot="right" @click="confirmRemoveVideo" style="margin-right:10px;" title="删除">
           <x-icon type="trash-a" size="24" class="header-icon"></x-icon>
@@ -217,6 +217,12 @@ export default {
       id: 0,
       formValidate: false,
       engFormValidate: false,
+      isNumber: function (value) {
+        return {
+          valid: !isNaN(value),
+          msg: '请输入有效数字'
+        }
+      },
       info: {
         __token__: '',
         building_name: '',    // 名称
@@ -286,14 +292,15 @@ export default {
       companyPickerData: [],
       companyText: '',
       showMap: false,
-      videoHeaderLeftOptions: {
-      },
-      videoHeaderRightOptions: {
-      },
       showVideo: false,
       video_index: -1,
       video_src: '',
-      video_msrc: ''
+      video_msrc: '',
+      leftHeaderOptions: {
+        preventGoBack: true
+      },
+      rightHeaderOptions: {
+      }
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -320,6 +327,14 @@ export default {
                 vm.companyText = res.data.companyList[i].title
               }
             }
+          } else {
+            vm.$vux.alert.show({
+              title: '加入企业',
+              content: '您还没有加入企业，请先创建或加入企业。',
+              onHide () {
+                vm.$router.push({name: 'Company'})
+              }
+            })
           }
           if (vm.id) {
             for (let item in vm.info) {
