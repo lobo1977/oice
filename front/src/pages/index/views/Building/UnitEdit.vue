@@ -425,7 +425,7 @@ export default {
     },
     preview (index) {
       this.showVideo = false
-      this.$refs.prevBuildingEdit.show(index)
+      this.$refs.prevUnitEdit.show(index)
     },
     upload () {
       let form = this.$refs.frmUploadUnitImage
