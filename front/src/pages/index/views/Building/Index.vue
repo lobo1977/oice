@@ -305,7 +305,7 @@ export default {
       let i = Number(this.$route.query.type)
       this.setTypePicker(i)
     } else {
-      this.setTypePicker(1)
+      this.setTypePicker(0)
     }
   },
   watch: {

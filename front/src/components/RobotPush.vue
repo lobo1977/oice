@@ -125,7 +125,7 @@ export default {
       checkCount: 0,
       checkList: [],
       cycle: true,
-      cycle_hour: 2,
+      cycle_hour: 3,
       start_hour: 8,
       end_hour: 22,
       leftOptions: {

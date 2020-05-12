@@ -697,19 +697,6 @@ export default {
           })
         }
       })
-    },
-    playerOptions (src, posterSrc) {
-      return {
-        muted: true,
-        language: 'en',
-        height: 260,
-        playbackRates: [0.7, 1.0, 1.5, 2.0],
-        sources: [{
-          type: 'video/mp4',
-          src: src
-        }],
-        poster: posterSrc
-      }
     }
   },
   computed: {
@@ -740,9 +727,9 @@ export default {
           favorite: '收藏',
           filter: '添加筛选'
         }
-        if (this.menuUnit.allowEdit) {
-          menu.edit = '修改'
-        }
+        // if (this.menuUnit.allowEdit) {
+        //   menu.edit = '修改'
+        // }
         if (this.menuUnit.allowDelete) {
           menu.delete = '删除'
         }
