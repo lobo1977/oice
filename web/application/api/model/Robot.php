@@ -38,7 +38,7 @@ class Robot extends Base
       $openid = [$user->openid];
     }
 
-    return self::alias('r')
+    $list = self::alias('r')
       ->leftJoin('robot_task t', 'r.uid = t.uid and t.status = 0')
       ->field('r.id,r.name,r.avatar,r.status,count(t.id) as task')
       ->where('r.status', '>', 0)
@@ -46,6 +46,12 @@ class Robot extends Base
       ->order('r.login', 'desc')
       ->group('r.id,r.name,r.avatar,r.status')
       ->select();
+
+    foreach($list as &$item) {
+      $item['name'] = strip_tags($item['name']);
+    }
+
+    return $list;
   }
   
   /**
@@ -73,6 +79,8 @@ class Robot extends Base
     if ($list)  {
       foreach ($list as &$item) {
         $item['checked'] = false;
+        $item['robot_name'] = strip_tags($item['robot_name']);
+        $item['contact_name'] = strip_tags($item['contact_name']);
       }
     }
 
