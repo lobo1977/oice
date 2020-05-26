@@ -106,6 +106,28 @@ export default new Router({
           }
         },
         {
+          path: 'success',
+          name: 'Success',
+          component: CustomerList,
+          meta: {
+            title: '客户',
+            showOutput: true,
+            showPlus: true,
+            requiresAuth: true
+          }
+        },
+        {
+          path: 'fail',
+          name: 'Fail',
+          component: CustomerList,
+          meta: {
+            title: '客户',
+            showOutput: true,
+            showPlus: true,
+            requiresAuth: true
+          }
+        },
+        {
           path: 'pool',
           name: 'Pool',
           component: CustomerList,

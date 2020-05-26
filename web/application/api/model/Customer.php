@@ -20,7 +20,7 @@ class Customer extends Base
   protected $pk = 'id';
   protected $deleteTime = 'delete_time';
 
-  public static $status = ['潜在','跟进','看房','确认','成交','失败','名录'];
+  public static $status = ['潜在','跟进','看房','洽谈','成交','失败','名录'];
   public static $share = ['私有','共享'];
   public static $IGNORE_WORDS = '/北京|上海|深圳|广州|中国|美国|日本|德国|英国|法国|（|）|\(|\)/';
   
@@ -33,15 +33,18 @@ class Customer extends Base
       if ($customer->clash) {
         $customer->title = $customer->title . '<span style="color:red">（撞单）</span>';
       }
+      if ($customer->username) {
+        $customer->title = $customer->title . ' ' . $customer->username;
+      }
       $customer->desc = (empty($customer->lease_buy) ? '' : $customer->lease_buy) . 
         (empty($customer->demand) ? '' : $customer->demand . ' ');
 
       if ($customer->min_acreage && $customer->max_acreage) {
-          $customer->desc = $customer->desc . ' ' . $customer->min_acreage . ' 至 ' . $customer->max_acreage . ' 平米';
+        $customer->desc = $customer->desc . ' ' . $customer->min_acreage . ' 至 ' . $customer->max_acreage . ' 平米';
       } else if ($customer->min_acreage) {
-          $customer->desc = $customer->desc . ' ' . $customer->min_acreage . ' 平米以上';
+        $customer->desc = $customer->desc . ' ' . $customer->min_acreage . ' 平米以上';
       } else if ($customer->max_acreage) {
-          $customer->desc = $customer->desc . ' ' . $customer->max_acreage . ' 平米以内';
+        $customer->desc = $customer->desc . ' ' . $customer->max_acreage . ' 平米以内';
       }
 
       if ($customer->budget) {
@@ -127,6 +130,7 @@ class Customer extends Base
     
     $list = self::alias('a')
       ->leftJoin('user_company b', 'a.user_id = b.user_id and a.company_id = b.company_id and b.status = 1')
+      ->leftJoin('user u', 'a.user_id = u.id')
       ->leftJoin('share s', "s.type = 'customer' and a.id = s.object_id and s.user_id = " . $user_id)
       ->where('(a.user_id = ' . $user_id . ' and a.company_id = ' . $company_id . ')
          OR ((a.share = 1 or b.superior_id = ' . $user_id . ') and a.company_id > 0 and a.company_id = ' . $company_id . ')
@@ -138,7 +142,11 @@ class Customer extends Base
       $list->where('a.status', 'in', $filter['status']);
     } else if (isset($filter['type'])) {
       if ($filter['type'] == 'potential') {
-        $list->where('a.status', '0');
+        $list->where('a.status', 'in', '0,6');
+      } else if ($filter['type'] == 'success') {
+        $list->where('a.status', '4');
+      } else if ($filter['type'] == 'fail') {
+        $list->where('a.status', '5');
       } else if ($filter['type'] == 'pool') {
         $list->where('a.status', 'in', '4,5,6');
       } else {
@@ -161,7 +169,7 @@ class Customer extends Base
     }
 
     $result = $list->field('a.id,a.customer_name,a.area,a.address,a.demand,
-      a.lease_buy,a.min_acreage,a.max_acreage,a.budget,a.status,a.clash,
+      a.lease_buy,a.min_acreage,a.max_acreage,a.budget,a.status,a.clash,u.username,
       s.create_time as share_create_time,s.level as share_level')
       ->page($filter['page'], $filter['page_size'])
       ->order('a.clash', 'desc')

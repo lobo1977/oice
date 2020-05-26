@@ -32,7 +32,7 @@
         <flow-line :is-done="info.status > 1" :tip="flowTwoText"></flow-line>
         <flow-state title="看房" :is-done="info.status > 1"></flow-state>
         <flow-line :is-done="info.status > 2" :tip="flowThreeText"></flow-line>
-        <flow-state title="确认" :is-done="info.status > 2"></flow-state>
+        <flow-state title="洽谈" :is-done="info.status > 2"></flow-state>
         <flow-line :is-done="info.status > 3" :tip="flowFourText"></flow-line>
         <flow-state v-if="info.status < 5" state="√" title="成交" :is-done="info.status === 4"></flow-state>
         <flow-state v-if="info.status === 5" state="×" title="失败" is-done class="state-fail"></flow-state>

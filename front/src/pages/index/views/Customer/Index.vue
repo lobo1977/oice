@@ -20,9 +20,10 @@
     <div v-show="!isSearching">
       <sticky :offset="46">
         <tab>
-          <tab-item :selected="type == 'follow'" @on-item-click="getList('follow')">跟进客户</tab-item>
-          <tab-item :selected="type == 'potential'" @on-item-click="getList('potential')">潜在客户</tab-item>
-          <tab-item :selected="type == 'pool'" @on-item-click="getList('pool')">客户池</tab-item>
+          <tab-item :selected="type == 'follow'" @on-item-click="getList('follow')">跟进</tab-item>
+          <tab-item :selected="type == 'potential'" @on-item-click="getList('potential')">潜在</tab-item>
+          <tab-item :selected="type == 'success'" @on-item-click="getList('success')">成交</tab-item>
+          <tab-item :selected="type == 'fail'" @on-item-click="getList('fail')">失败</tab-item>
         </tab>
       </sticky>
       <router-view ref="listCustomer"></router-view>
