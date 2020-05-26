@@ -95,6 +95,17 @@ export default new Router({
           }
         },
         {
+          path: 'talk',
+          name: 'Talk',
+          component: CustomerList,
+          meta: {
+            title: '客户',
+            showOutput: true,
+            showPlus: true,
+            requiresAuth: true
+          }
+        },
+        {
           path: 'potential',
           name: 'Potential',
           component: CustomerList,

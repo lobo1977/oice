@@ -19,8 +19,9 @@
 
     <div v-show="!isSearching">
       <sticky :offset="46">
-        <tab>
+        <tab :scroll-threshold=5>
           <tab-item :selected="type == 'follow'" @on-item-click="getList('follow')">跟进</tab-item>
+          <tab-item :selected="type == 'talk'" @on-item-click="getList('talk')">洽谈</tab-item>
           <tab-item :selected="type == 'potential'" @on-item-click="getList('potential')">潜在</tab-item>
           <tab-item :selected="type == 'success'" @on-item-click="getList('success')">成交</tab-item>
           <tab-item :selected="type == 'fail'" @on-item-click="getList('fail')">失败</tab-item>

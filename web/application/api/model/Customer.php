@@ -33,9 +33,6 @@ class Customer extends Base
       if ($customer->clash) {
         $customer->title = $customer->title . '<span style="color:red">（撞单）</span>';
       }
-      if ($customer->username) {
-        $customer->title = $customer->title . ' ' . $customer->username;
-      }
       $customer->desc = (empty($customer->lease_buy) ? '' : $customer->lease_buy) . 
         (empty($customer->demand) ? '' : $customer->demand . ' ');
 
@@ -49,6 +46,10 @@ class Customer extends Base
 
       if ($customer->budget) {
         $customer->desc = $customer->desc . ' ' . $customer->budget;
+      }
+
+      if ($customer->username) {
+        $customer->desc = $customer->desc . ' &nbsp;客户经理：' . $customer->username;
       }
 
       $customer->url = '/customer/view/' . $customer->id;
@@ -142,15 +143,17 @@ class Customer extends Base
       $list->where('a.status', 'in', $filter['status']);
     } else if (isset($filter['type'])) {
       if ($filter['type'] == 'potential') {
-        $list->where('a.status', 'in', '0,6');
+        $list->where('a.status', '0');
+      } else if ($filter['type'] == 'talk') {
+        $list->where('a.status', '3');
       } else if ($filter['type'] == 'success') {
         $list->where('a.status', '4');
       } else if ($filter['type'] == 'fail') {
-        $list->where('a.status', '5');
+        $list->where('a.status', 'in', '5,6');
       } else if ($filter['type'] == 'pool') {
         $list->where('a.status', 'in', '4,5,6');
       } else {
-        $list->where('a.status', 'in', '1,2,3');
+        $list->where('a.status', 'in', '1,2');
       }
     }
 
@@ -169,7 +172,7 @@ class Customer extends Base
     }
 
     $result = $list->field('a.id,a.customer_name,a.area,a.address,a.demand,
-      a.lease_buy,a.min_acreage,a.max_acreage,a.budget,a.status,a.clash,u.username,
+      a.lease_buy,a.min_acreage,a.max_acreage,a.budget,a.status,a.clash,u.title as username,
       s.create_time as share_create_time,s.level as share_level')
       ->page($filter['page'], $filter['page_size'])
       ->order('a.clash', 'desc')
