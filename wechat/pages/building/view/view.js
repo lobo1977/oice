@@ -92,7 +92,7 @@ Page({
   
   // 预览图片
   bindViewImage(event) {
-    let url = app.serverUrl + '/' + event.currentTarget.dataset.data.src
+    let url = app.globalData.serverUrl + '/' + event.currentTarget.dataset.data.src
     wx.previewImage({
       current: url,
       urls: this.data.previewImages
@@ -160,7 +160,7 @@ Page({
         let prevList = that.data.previewImages
         if (res.data.images.length) {
           for (let i = 0; i < res.data.images.length; i++) {
-            prevList.push(app.serverUrl + '/' + res.data.images[i].src)
+            prevList.push(app.globalData.serverUrl + '/' + res.data.images[i].src)
           }
           that.setData({
             previewImages: prevList

@@ -11,14 +11,19 @@
   },
   "sitemapLocation": "sitemap.json",
   "usingComponents": {
-    "van-row": "vant-weapp/row",
-    "van-col": "vant-weapp/col",
-    "van-icon": "vant-weapp/icon",
-    "van-cell": "vant-weapp/cell",
-    "van-cell-group": "vant-weapp/cell-group",
-    "van-card": "vant-weapp/card",
-    "van-tag": "vant-weapp/tag",
-    "van-search": "vant-weapp/search"
+    "van-button": "@vant/weapp/button",
+    "van-row": "@vant/weapp/row",
+    "van-col": "@vant/weapp/col",
+    "van-icon": "@vant/weapp/icon",
+    "van-cell-group": "@vant/weapp/cell-group",
+    "van-cell": "@vant/weapp/cell",
+    "van-field": "@vant/weapp/field",
+    "van-card": "@vant/weapp/card",
+    "van-tag": "@vant/weapp/tag",
+    "van-search": "@vant/weapp/search",
+    "van-tab": "@vant/weapp/tab",
+    "van-tabs": "@vant/weapp/tabs",
+    "van-divider": "@vant/weapp/divider"
   },
   "tabBar": {
     "list": [
@@ -29,10 +34,16 @@
         "selectedIconPath": "icon/building_b.png"
       },
       {
-        "text": "联系人",
-        "pagePath": "pages/contact/index/index",
+        "text": "客户",
+        "pagePath": "pages/customer/index/index",
         "iconPath": "icon/contact_a.png",
         "selectedIconPath": "icon/contact_b.png"
+      },
+      {
+        "text": "我的",
+        "pagePath": "pages/my/index/index",
+        "iconPath": "icon/my_a.png",
+        "selectedIconPath": "icon/my_b.png"
       }
     ]
   },
@@ -42,6 +53,11 @@
     "pages/building/unit/unit",
     "pages/contact/index/index",
     "pages/contact/view/view",
-    "pages/contact/recommend/recommend"
+    "pages/contact/recommend/recommend",
+    "pages/customer/index/index",
+    "pages/my/index/index",
+    "pages/customer/view/view",
+    "pages/customer/log/log",
+    "pages/customer/edit/edit"
   ]
 }

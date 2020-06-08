@@ -34,7 +34,213 @@ App({
   globalData: {
     userInfo: null,
     appUserInfo: null,
-    serverUrl: 'https://m.o-ice.com'
+    serverUrl: 'https://m.o-ice.com',
+    area: [
+      {
+        text: "所有区域",
+        id: "all",
+        children: [
+        ]
+      },
+      {
+        text: "东城区",
+        id: "东城区",
+        children: [
+          {
+            text: "全区",
+            id: ""
+          },
+          {
+            text: "建国门",
+            id: "建国门"
+          },
+          {
+            text: "东直门",
+            id: "东直门"
+          },
+          {
+            text: "长安街",
+            id: "长安街"
+          },
+          {
+            text: "崇文门",
+            id: "崇文门"
+          }
+        ]
+      },
+      {
+        text: "西城区",
+        id: "西城区",
+        children: [
+          {
+            text:"全区",
+            id: ""
+          },
+          {
+            text:"金融街",
+            id: "金融街"
+          },
+          {
+            text:"西直门",
+            id: "西直门"
+          },
+          {
+            text:"西单",
+            id: "西单"
+          },
+          {
+            text:"复兴门",
+            id: "复兴门"
+          },
+          {
+            text:"宣武门",
+            id: "宣武门"
+          }
+        ]
+      },
+      {
+        text: "朝阳区",
+        id: "朝阳区",
+        children: [
+          {
+            text:"全区",
+            id: ""
+          },
+          {
+            text:"CBD",
+            id: "CBD"
+          },
+          {
+            text:"朝外",
+            id: "朝外"
+          },
+          {
+            text:"燕莎",
+            id: "燕莎"
+          },
+          {
+            text:"望京",
+            id: "望京"
+          },
+          {
+            text:"亚奥",
+            id: "亚奥"
+          },
+          {
+            text:"望京",
+            id: "望京"
+          },
+          {
+            text:"望京",
+            id: "望京"
+          },
+        ]
+      },
+      {
+        text: "海淀区",
+        id: "海淀区",
+        children: [
+          {
+            text:"全区",
+            id: ""
+          },
+          {
+            text:"中关村",
+            id: "中关村"
+          },
+          {
+            text:"清华科技园",
+            id: "清华科技园"
+          },
+          {
+            text:"上地",
+            id: "上地"
+          },
+          {
+            text:"公主坟",
+            id: "公主坟"
+          },
+          {
+            text:"马甸",
+            id: "马甸"
+          }
+        ]
+      },
+      {
+        text: "丰台区",
+        id: "丰台区",
+        children: [
+          {
+            text:"全区",
+            id: ""
+          },
+          {
+            text:"丽泽金融",
+            id: "丽泽金融"
+          },
+          {
+            text:"丰台科技园",
+            id: "丰台科技园"
+          }
+        ]
+      },
+      {
+        text: "石景山区",
+        id: "石景山区",
+        children: [
+        ]
+      },
+      {
+        text: "大兴区",
+        id: "大兴区",
+        children: [
+          {
+            text:"全区",
+            id: ""
+          },
+          {
+            text:"亦庄开发区",
+            id: "亦庄开发区"
+          }
+        ]
+      },
+      {
+        text: "通州区",
+        id: "通州区",
+        children: [
+          {
+            text:"全区",
+            id: ""
+          },
+          {
+            text:"副中心",
+            id: "副中心"
+          },
+          {
+            text:"环球影城",
+            id: "环球影城"
+          }
+        ]
+      },
+      {
+        text: "昌平区",
+        id: "昌平区",
+        children: [
+        ]
+      },
+      {
+        text: "顺义区",
+        id: "顺义区",
+        children: [
+        ]
+      },
+      {
+        text: "房山区",
+        id: "房山区",
+        children: [
+        ]
+      }
+    ]
   },
   
   // 登录

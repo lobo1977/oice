@@ -5,10 +5,24 @@
 <view>
   <van-search value="{{ keyword }}" placeholder="请输入搜索关键词"
     bind:change="onKewordChange"
-    bind:search="bindSearch"
+    bind:search="onSearch"
     shape="round" use-action-slot>
     <view slot="action" bind:tap="bindSearch">搜索</view>
   </van-search>
+  <van-dropdown-menu>
+  <van-dropdown-item value="" options="{{ filterType }}" bind:change="filterTypeChange" />
+  <van-dropdown-item id="dropArea" title="{{ filterDropTitle }}">
+    <van-tree-select
+      items="{{ filterArea }}"
+      main-active-index="{{ mainDropIndex }}"
+      active-id="{{ district }}"
+      bind:click-nav="onClickDropNav"
+      bind:click-item="onClickDropItem"
+    />
+  </van-dropdown-item>
+  <van-dropdown-item value="出租,出售" options="{{ filterRentSell }}" bind:change="filterRentSellChange" />
+  <van-dropdown-item value="0,0" options="{{ filterAcreage }}" bind:change="filterAcreageChange" />
+</van-dropdown-menu>
   <van-card wx:for="{{list}}" data-data="{{item}}" wx:key="id"
     title="{{item.building_name}}"
     desc="{{item.address}}"
@@ -22,4 +36,7 @@
   >
     <van-tag wx:if="{{item.rent_sell}}" slot="tags" round type="success">{{item.rent_sell}}</van-tag>
   </van-card>
+  <van-divider contentPosition="center" 
+    customStyle="margin-left:10px;margin-right:10px;"
+    wx:if="{{list.length == 0}}">暂无内容</van-divider>
 </view>

@@ -2,42 +2,41 @@
 <page-meta background-text-style="dark">
 </page-meta>
 <wxs src='../../../utils/filter.wxs' module='filter' />
-<view class="container">
-  <view class="page-building">
-    <swiper wx:if="{{info.images && info.images.length}}" indicator-dots="{{false}}" autoplay="{{true}}">
-      <swiper-item wx:for="{{info.images}}" wx:key="id" data-data="{{item}}" bindtap="bindViewImage">
-        <image style="width:100%; height:100%;background-color:#eeeeee;" 
-          mode="aspectFill" src="{{filter.imageUrl(item.msrc)}}"></image>
-      </swiper-item>
-    </swiper>
-    <van-cell-group title="{{info.building_name + ' ' +info.title}}">
-      <van-cell title="朝向" wx:if="{{info.face}}" custom-class="cell-building"
-        title-width="160rpx" value="{{info.face}}" value-class="text-left"></van-cell>
-      <van-cell title="面积" wx:if="{{info.acreage}}" custom-class="cell-building"
-        title-width="160rpx" value="{{info.acreage}} 平方米" value-class="text-left"></van-cell>
-      <van-cell title="租售" wx:if="{{info.rent_sell}}" custom-class="cell-building"
-        title-width="160rpx" value="{{info.rent_sell}}" value-class="text-left"></van-cell>
-      <van-cell title="出租价格" wx:if="{{info.rent_price > 0}}" custom-class="cell-building"
-        title-width="160rpx" value="{{info.rent_price}} 元/平方米/日" value-class="text-left"></van-cell>
-      <van-cell title="出售价格" wx:if="{{info.sell_price > 0}}" custom-class="cell-building"
-        title-width="160rpx" value="{{info.sell_price}} 元/平方米" value-class="text-left"></van-cell>
-      <van-cell title="装修状况" wx:if="{{info.decoration}}" custom-class="cell-building"
-        title-width="160rpx" value="{{info.decoration}}" value-class="text-left"></van-cell>
-      <van-cell title="状态" wx:if="{{info.statusText}}" custom-class="cell-building"
-        title-width="160rpx" value="{{info.statusText}}" value-class="text-left"></van-cell>
-      <van-cell title="到期日" wx:if="{{info.end_date_text}}" custom-class="cell-building"
-        title-width="160rpx" value="{{info.end_date_text}}" value-class="text-left"></van-cell>
-      <view class="cell-text-area" wx:if="{{info.rem}}">{{info.rem}}</view>
-    </van-cell-group>
-    <van-cell-group title="项目联系人" wx:if="{{info.linkman && info.linkman.length}}">
-      <van-cell wx:for="{{info.linkman}}" wx:key="id" data-data="{{item}}"
-        title="{{item.title}}" center custom-class="cell-building">
-        <van-icon name="phone" size="20px" wx:if="{{item.mobile || item.tel}}"
-          data-data="{{item}}" bindtap="bindPhoneCall"
-          color="blue" custom-style="margin-right:20px" />
-        <van-icon name="chat" size="20px" wx:if="{{item.weixin || item.mobile}}" 
-          data-data="{{item}}" bindtap="bindCopyWeixin" color="green" />
-      </van-cell>
-    </van-cell-group>
-  </view>
+<view class="page-view">
+  <swiper wx:if="{{info.images && info.images.length}}" indicator-dots="{{false}}" autoplay="{{true}}">
+    <swiper-item wx:for="{{info.images}}" wx:key="id" data-data="{{item}}" bindtap="bindViewImage">
+      <image style="width:100%; height:100%;background-color:#eeeeee;" 
+        mode="aspectFill" src="{{filter.imageUrl(item.msrc)}}"></image>
+    </swiper-item>
+  </swiper>
+  <van-cell-group>
+    <van-cell title="{{info.building_name + ' ' +info.title}}" custom-class="cell-title"></van-cell>
+    <van-cell title="朝向" wx:if="{{info.face}}" custom-class="cell-view"
+      title-width="160rpx" value="{{info.face}}" value-class="text-left"></van-cell>
+    <van-cell title="面积" wx:if="{{info.acreage}}" custom-class="cell-view"
+      title-width="160rpx" value="{{info.acreage}} 平方米" value-class="text-left"></van-cell>
+    <van-cell title="租售" wx:if="{{info.rent_sell}}" custom-class="cell-view"
+      title-width="160rpx" value="{{info.rent_sell}}" value-class="text-left"></van-cell>
+    <van-cell title="出租价格" wx:if="{{info.rent_price > 0}}" custom-class="cell-view"
+      title-width="160rpx" value="{{info.rent_price}} 元/平方米/日" value-class="text-left"></van-cell>
+    <van-cell title="出售价格" wx:if="{{info.sell_price > 0}}" custom-class="cell-view"
+      title-width="160rpx" value="{{info.sell_price}} 元/平方米" value-class="text-left"></van-cell>
+    <van-cell title="装修状况" wx:if="{{info.decoration}}" custom-class="cell-view"
+      title-width="160rpx" value="{{info.decoration}}" value-class="text-left"></van-cell>
+    <van-cell title="状态" wx:if="{{info.statusText}}" custom-class="cell-view"
+      title-width="160rpx" value="{{info.statusText}}" value-class="text-left"></van-cell>
+    <van-cell title="到期日" wx:if="{{info.end_date_text}}" custom-class="cell-view"
+      title-width="160rpx" value="{{info.end_date_text}}" value-class="text-left"></van-cell>
+    <view class="cell-text-area" wx:if="{{info.rem}}">{{info.rem}}</view>
+  </van-cell-group>
+  <van-cell-group title="项目联系人" wx:if="{{info.linkman && info.linkman.length}}">
+    <van-cell wx:for="{{info.linkman}}" wx:key="id" data-data="{{item}}"
+      title="{{item.title}}" center custom-class="cell-view">
+      <van-icon name="phone" size="20px" wx:if="{{item.mobile || item.tel}}"
+        data-data="{{item}}" bindtap="bindPhoneCall"
+        color="blue" custom-style="margin-right:20px" />
+      <van-icon name="chat" size="20px" wx:if="{{item.weixin || item.mobile}}" 
+        data-data="{{item}}" bindtap="bindCopyWeixin" color="green" />
+    </van-cell>
+  </van-cell-group>
 </view>

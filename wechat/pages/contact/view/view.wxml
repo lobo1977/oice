@@ -27,20 +27,18 @@
   <van-cell-group title="他的推荐资料" wx:if="{{info.recommend && info.recommend.length}}">
     <van-cell wx:for="{{info.recommend}}" wx:key="id" data-data="{{item}}" 
       title="{{item.building}}" label="{{item.customer_name}}" is-link center
-      bind:click="bindShowRecommend" custom-class="cell-building">
+      bind:click="bindShowRecommend" custom-class="cell-view">
       <image slot="icon" mode="aspectFill" 
         src="{{filter.imageUrl(item.image)}}" class="cell-image"></image>
     </van-cell>
   </van-cell-group>
   
-  <van-row gutter="10" custom-class="button-bar">
+  <van-row custom-class="button-bar">
     <van-col span="12">
-      <button type="primary" bindtap="bindCopyWeixin" data-data="{{info}}">
-        <van-icon name="chat-o" size="1.1em" custom-style="top:2px" /> 加微信</button>
+      <van-button type="primary" icon="chat-o" block bindtap="bindCopyWeixin" data-data="{{info}}">加微信</van-button>
     </van-col>
     <van-col span="12">
-      <button type="primary" bindtap="bindPhoneCall" data-data="{{info}}">
-        <van-icon name="phone-o" size="1.1em" custom-style="top:2px" /> 拨打电话</button>
+      <van-button type="danger" icon="phone-o" block bindtap="bindPhoneCall" data-data="{{info}}">拨打电话</van-button>
     </van-col>
   </van-row>
 </view>

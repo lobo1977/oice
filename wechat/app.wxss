@@ -13,12 +13,19 @@ swiper {
   box-sizing: border-box;
 }
 
-.page-building {
+.page-view {
   width: 100%;
+  margin-bottom: 50px;
   background-color: #ffffff;
 }
 
-.cell-building {
+.cell-title {
+  font-size:1.1em !important;
+  font-weight: bold;
+  padding:10px !important;
+}
+
+.cell-view {
   padding: 5px 10px !important;
 }
 
@@ -49,11 +56,6 @@ swiper {
   position: fixed;
   bottom:0;
   width:100%;
-  padding:0 0 5px 5px;
   background-color: #fff;
   z-index:100;
-}
-
-.button-bar button {
-  display:block;
 }
