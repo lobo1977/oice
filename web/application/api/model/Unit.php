@@ -84,7 +84,14 @@ class Unit extends Base
           $unit->title = $unit->title . '(' . $unit->statusText . ')';
         }
       }
-      $unit->src = empty($unit->file) ? '/static/img/error.png' : '/upload/unit/images/300/' . $unit->file;
+
+      if (empty($unit->file)) {
+        $unit->src = '/static/img/error.png';
+      } else if (!empty($unit->file_type)) {
+        $unit->src = '/upload/' . $unit->file_type . '/images/300/' . $unit->file;
+      } else {
+        $unit->src = '/upload/unit/images/300/' . $unit->file;
+      }
 
       $unit->desc = '';
       if (!empty($unit->acreage)) {

@@ -49,7 +49,7 @@ class Customer extends Base
       }
 
       if ($customer->username) {
-        $customer->desc = $customer->desc . ' &nbsp;客户经理：' . $customer->username;
+        $customer->desc = $customer->desc . ' 客户经理：' . $customer->username;
       }
 
       $customer->url = '/customer/view/' . $customer->id;

@@ -15,9 +15,10 @@ class Filter extends Base
     $list = self::alias('a')
       ->leftJoin('unit u', 'a.unit_id = u.id AND a.unit_id > 0')
       ->join('building b', 'a.building_id = b.id OR u.building_id = b.id')
+      ->leftJoin('file f',"f.parent_id = b.id AND f.type = 'building' AND f.default = 1")
       ->where('a.customer_id', $customer_id)
       //->where('a.user_id', $user->id)
-      ->field('a.building_id,b.building_name,b.level,b.area,b.district,b.address,b.price,
+      ->field('a.building_id,b.building_name,b.level,b.area,b.district,b.address,b.price,f.file,f.type as file_type,
         a.unit_id,u.building_no,u.floor,u.room,u.acreage,u.rent_price,u.sell_price,u.status')
       ->order('a.sort', 'asc')
       ->order('a.create_time', 'asc')
