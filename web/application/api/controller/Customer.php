@@ -205,15 +205,16 @@ class Customer extends Base
       $data = input('post.');
 
       $validate = Validate::make([
-        'title'  => 'require|token',
+        'title'  => 'require',
         'start_time' => 'date'
       ],[
         'title.require' => '必须填写摘要。',
-        'title.token' => '无效请求，请勿重复提交。',
         'start_time.date' => '时间无效。'
       ]);
 
-      if (!$validate->check($data)) {
+      if (!$this->checkFormToken($data)) {
+        return $this->fail('无效请求，请勿重复提交表单');
+      } else if (!$validate->check($data)) {
         $form_token = $this->formToken();
         return $this->fail($validate->getError(), $form_token);
       } else {

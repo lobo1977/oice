@@ -38,6 +38,59 @@ class Utils
     }
 
     /**
+     * 计算时间跨度
+     */
+    public static function timeSpan($time) {
+        $now = time();
+        $unixTime = strtotime($time);
+
+        $span = $now - $unixTime;
+        if ($span < 5 * 60) {
+            return '刚刚';
+        } else if ($span < 60 * 60) {
+            $minutes = round($span / 60);
+            return $minutes . '分钟前';
+        } else if ($span < 60 * 60 * 24) {
+            $hours = round($span / (60 * 60));
+            return $hours . '小时前';
+        } else if ($span < 60 * 60 * 24 * 30) {
+            $days = round($span / (60 * 60 * 24));
+            return $days . '天前';
+        } else if ($span < 60 * 60 * 24 * 360) {
+            $days = round($span / (60 * 60 * 24 * 30));
+            return $days . '个月前';
+        } else {
+            return date('Y年n月j日', $unixTime);
+        }
+    }
+
+    /**
+     * 格式化日期时间
+     */
+    public static function formatDatetime($datetime) {
+      $time = 0;
+      
+      if (Utils::isValidDate($datetime)) {
+        $time = strtotime($datetime);
+      } else if (is_numeric($datetime)) {
+        $time = floatval($datetime);
+        if ($time > 10000000000) {
+          $time = $time / 1000;
+        }
+      }
+
+      if ($time > 0) {
+        if (date('H:i', $time) == '00:00') {
+          return date('Y-m-d', $time);
+        } else {
+          return date('Y-m-d H:i', $time);
+        }
+      }
+
+      return '';
+    }
+
+    /**
      * 表情符号转义
      */
     public static function emojiToChar($str) {

@@ -1,6 +1,8 @@
 <?php
 namespace app\api\controller;
 
+use think\facade\Cache;
+use think\facade\Validate;
 use think\Controller;
 use app\common\AppException;
 use app\api\model\User;
@@ -8,18 +10,19 @@ use app\api\model\User;
 class Base extends Controller
 {
   protected $user = null;
+  protected $user_token = '';
   protected $user_id = 0;
   protected $company_id = 0;
 
   protected function getUser($update = false) {
     if ($this->user == null || $update) {
       if (input('?user-token')) {
-        $token = input('user-token');
+        $this->user_token = input('user-token');
       } else {
-        $token = request()->header('User-Token');
+        $this->user_token = request()->header('User-Token');
       }
-      if ($token) {
-        $result = User::getUserByToken($token);
+      if ($this->user_token) {
+        $result = User::getUserByToken($this->user_token);
         if ($result) {
           $this->user = $result;
           if ($this->user != null) {
@@ -37,6 +40,7 @@ class Base extends Controller
   }
 
   protected function setResult($success = false, $message = '', $data = null) {
+    ob_clean();
     return array(
       'success' => $success,
       'message' => $message,
@@ -69,6 +73,25 @@ class Base extends Controller
    * 表单令牌
    */
   protected function formToken() {
-    return $this->request->token('__token__', 'sha1');
+    $form_token = $this->request->token('__token__', 'sha1');
+    Cache::set($this->user_token, $form_token, 600);
+    return $form_token;
+  }
+
+  /**
+   * 验证表单令牌
+   */
+  protected function checkFormToken($data) {
+    if (!Validate::token(null, '__token__', $data)) {
+      if (Cache::get($this->user_token) == $data['__token__']) {
+        Cache::rm($this->user_token);
+        return true;
+      } else {
+        Cache::rm($this->user_token);
+        return false;
+      }
+    }
+    Cache::rm($this->user_token);
+    return true;
   }
 }

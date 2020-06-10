@@ -2,6 +2,7 @@
 namespace app\api\model;
 
 use think\model\concern\SoftDelete;
+use app\common\Utils;
 use app\api\model\Base;
 use app\api\model\Customer;
 use app\api\model\Company;
@@ -172,6 +173,9 @@ class Log extends Base
     }
 
     foreach($list as $key => $log) {
+      if ($log->start_time) {
+        $log->time_span = Utils::timeSpan($log->start_time);
+      }
       $log->summary = str_replace('\n', '<br/>', $log->summary);
       $log->allowEdit = self::allow($user, $log, 'edit', $customer);
       $log->allowDelete = self::allow($user, $log, 'delete', $customer);

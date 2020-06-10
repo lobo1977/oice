@@ -71,6 +71,9 @@ class File extends Base
           $file->msrc = '/static/img/attach.png';
         }
       }
+      if (mb_strlen($file->title) > 20) {
+        $file->title = mb_substr($file->title, 0, 20) . '...';
+      }
       if ($file->size) {
         $file->size = round(floatval($file->size) / 1048576, 2) . 'MB';
       }
@@ -150,7 +153,7 @@ class File extends Base
             "table" => $type,
             "owner_id" => $parent_id,
             "title" => '上传' . ($type == 'building' || $type == 'unit' ? '图片' : '附件'),
-            "summary" => $newData->title
+            "summary" => mb_strlen($newData->title) > 20 ? mb_substr($newData->title, 0, 20) . '...' : $newData->title 
           ]);
         }
       } else {
