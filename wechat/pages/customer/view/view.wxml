@@ -87,16 +87,29 @@
     </van-tab>
     <van-tab title="跟进纪要">
       <van-steps steps="{{ logs }}" active="{{ 0 }}" direction="vertical" />
+      <van-row gutter="0" custom-class="button-bar">
+        <van-col span="24">
+          <van-button type="primary" icon="notes-o" block bindtap="bindAddLog" data-data="{{info.id}}">添加</van-button>
+        </van-col>
+      </van-row>
     </van-tab>
     <van-tab title="附件">
       <van-cell-group wx:if="{{info.attach && info.attach.length}}">
-        <van-cell wx:for="{{info.attach}}" wx:key="id" data-data="{{ item }}" 
-          title="{{item.title}}" label="{{item.username + ' 于 ' + item.upload_time + ' 上传 ' + (item.size || '')}}" center is-link
-          bind:click="bindViewAttach" custom-class="cell-contact">
-          <image slot="icon" mode="aspectFill" 
-            src="{{filter.imageUrl(item.msrc)}}" class="cell-image"></image>
-        </van-cell>
+        <van-swipe-cell wx:for="{{info.attach}}" wx:key="id" right-width="{{ 65 }}">
+          <van-cell data-data="{{ item }}" 
+            title="{{item.title}}" label="{{item.username + ' 于 ' + item.upload_time + ' 上传 ' + (item.size || '')}}" center
+            bind:click="bindViewAttach" custom-class="cell-contact">
+            <image slot="icon" mode="aspectFill" 
+              src="{{filter.imageUrl(item.msrc)}}" class="cell-image"></image>
+          </van-cell>
+          <van-button slot="right" type="danger" block bindtap="bindRemoveAttach" data-data="{{item.id}}">删除</van-button>
+        </van-swipe-cell>
       </van-cell-group>
+      <van-row gutter="0" custom-class="button-bar">
+        <van-col span="24">
+          <van-button type="primary" icon="upgrade" block bindtap="bindUpload" data-data="{{info.id}}">上传</van-button>
+        </van-col>
+      </van-row>
     </van-tab>
     <van-tab title="项目筛选">
       <van-cell-group wx:if="{{info.filter && info.filter.length}}">

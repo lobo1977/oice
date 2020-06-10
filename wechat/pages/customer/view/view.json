@@ -1,5 +1,6 @@
 {
   "usingComponents": {
     "van-steps": "@vant/weapp/steps"
-  }
+  },
+  "navigationBarTitleText": "客户信息"
 }

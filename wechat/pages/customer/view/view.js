@@ -219,7 +219,54 @@ Page({
   bindAddLog: function(event) {
     let id = event.currentTarget.dataset.data
     wx.navigateTo({
-      url: '../log/log?id=' + id
+      url: '../log/log?oid=' + id
+    })
+  },
+
+  bindUpload: function(event) {
+    let that = this
+    wx.chooseMedia({
+      maxDuration: 20,
+      camera: 'back',
+      success(res) {
+        wx.showLoading({
+          title: '上传中',
+        })
+        let count = 0
+        res.tempFiles.forEach(element => {
+          wx.uploadFile({
+            header: {
+              'Content-Type': 'multipart/form-data',
+              'User-Token': app.globalData.appUserInfo && app.globalData.appUserInfo.token ? 
+                app.globalData.appUserInfo.token : ''
+            },
+            url: app.globalData.serverUrl + '/api/customer/uploadAttach',
+            filePath: element.tempFilePath,
+            name: 'attach[]',
+            formData: {
+              'id': that.data.info.id
+            },
+            success (res2) {
+              if (res2.data) {
+                let json = JSON.parse(res2.data)
+                if (json.success) {
+                  var str = 'info.attach'
+                  that.setData({
+                    [str]: json.data
+                  })
+                  that.setPrevImages(json.data)
+                }
+              }
+            },
+            complete() {
+              count++
+              if (count >= res.tempFiles.length) {
+                wx.hideLoading()
+              }
+            }
+          })
+        });
+      }
     })
   },
 
@@ -228,6 +275,20 @@ Page({
     wx.navigateTo({
       url: '../edit/edit?id=' + id
     })
+  },
+
+  setPrevImages: function(files) {
+    if (files.length) {
+      let prevList = this.data.previewImages
+      for (let i = 0; i < files.length; i++) {
+        if (files[i].is_image) {
+          prevList.push(app.globalData.serverUrl + '/' + files[i].src)
+        }
+      }
+      this.setData({
+        previewImages: prevList
+      })
+    }
   },
 
   // 获取数据
@@ -272,25 +333,15 @@ Page({
             logs.push({
               text: that.data.info.log[i].title,
               desc: that.data.info.log[i].summary.replace(/<br\/>/g, '\n')
-                + '\n' + that.data.info.log[i].user + ' ' + that.data.info.log[i].start_time
+                + '\n' + that.data.info.log[i].user + ' ' + that.data.info.log[i].time_span
             })
           }
           that.setData({
             logs
           })
         }
-        
-        if (res.data.attach.length) {
-          let prevList = that.data.previewImages
-          for (let i = 0; i < res.data.attach.length; i++) {
-            if (res.data.attach[i].is_image) {
-              prevList.push(app.globalData.serverUrl + '/' + res.data.attach[i].src)
-            }
-          }
-          that.setData({
-            previewImages: prevList
-          })
-        }
+
+        that.setPrevImages(res.data.attach)
       }
     }, () => {
       that.setData({
