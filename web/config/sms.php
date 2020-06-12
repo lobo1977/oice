@@ -22,5 +22,5 @@ return [
   'query_url' => 'https://smssh1.253.com/msg/balance/json',
   'tmp_code' => '您的验证码是：%s，请于 %s 分钟内填写，如非本人操作，请忽略本短信。',
   'tmp_invite' => '您的同事%s邀请您加入“%s”，详情请点击：%s',
-  'tmp_commission_confirm' => '请确认您在商办云（公众号）平台的委托信息：%s，总面积:%s。【项目详情】%s 。本手机号登录，可修改。'
+  'tmp_commission_confirm' => '请确认您在云普商办（公众号）平台的委托信息：%s，总面积:%s。【项目详情】%s 。本手机号登录，可修改。'
 ];
