@@ -160,7 +160,7 @@ Page({
     })
   },
 
-  bindSaveLog: function() {
+  bindSave: function() {
     let that = this
     if (!that.data.title) {
       that.setData({

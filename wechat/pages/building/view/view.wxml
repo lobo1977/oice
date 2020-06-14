@@ -12,7 +12,7 @@
   </swiper>
   <van-cell-group>
     <van-cell title="{{info.building_name}}" use-label-slot 
-      title-class="cell-title" label-class="cell-label"
+      title-class="cell-title" label-class="cell-label" custom-class="cell-view"
       is-link center bind:click="bindOpenLocation">
       <view slot="label" style="font-weight:normal;">
         <view>

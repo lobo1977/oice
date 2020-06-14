@@ -29,6 +29,12 @@ swiper {
   padding: 5px 10px !important;
 }
 
+.cell-stepper {
+  position: relative;
+  display: inline-block;
+  top: -6px;
+}
+
 .text-left {
   text-align: left !important;
 }
