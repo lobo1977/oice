@@ -67,6 +67,15 @@ Page({
       clashCustomer: null,
       shareList: []
     },
+    tapStartTime: 0,
+    tapEndTime: 0,
+    showAttachActions: false,
+    attachIndex: 0,
+    attachActions: [
+      {
+        name: '删除',
+      }
+    ],
   },
 
   /**
@@ -148,6 +157,14 @@ Page({
     return shareData
   },
 
+  bindTouchStart: function(e) {
+    this.tapStartTime = e.timeStamp;
+  },
+
+  bindTouchEnd: function(e) {
+    this.tapEndTime = e.timeStamp;
+  },
+
   bindPhoneCall(event) {
     let data = event.currentTarget.dataset.data
     if (data) {
@@ -181,7 +198,10 @@ Page({
   },
 
   bindViewAttach: function (event) {
-    let attach = event.currentTarget.dataset.data
+    if (this.tapEndTime  - this.tapStartTime > 350) {
+      return
+    }
+    let attach = this.data.info.attach[event.currentTarget.dataset.data]
     let url = app.globalData.serverUrl + '/' + attach.src
     if (attach.is_image) {
       wx.previewImage({
@@ -268,6 +288,47 @@ Page({
         });
       }
     })
+  },
+
+  bindAttachLongTap: function(event) {
+    this.setData({
+      showAttachActions: true,
+      attachIndex: event.currentTarget.dataset.data
+    })
+  },
+
+  onAttachActionsClose: function() {
+    this.setData({
+      showAttachActions: false
+    })
+  },
+
+  onAttachActionsSelect: function(event) {
+    let that = this
+    if (event.detail.name == '删除') {
+      wx.showLoading({
+        title: '删除中',
+      })
+      app.post('customer/removeAttach', {
+        attach_id: that.data.info.attach[that.data.attachIndex].id,
+      }, (res) => {
+        if (res.success) {
+          that.data.info.attach.splice(that.data.attachIndex, 1)
+          var str = 'info.attach'
+          that.setData({
+            [str]: that.data.info.attach
+          })
+        } else if (res.message) {
+          wx.showToast({
+            icon: 'none',
+            title: res.message,
+            duration: 2000
+          })
+        }
+      }, () => {
+        wx.hideLoading()
+      })
+    }
   },
 
   bindEdit: function(event) {

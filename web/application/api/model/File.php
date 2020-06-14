@@ -226,7 +226,7 @@ class File extends Base
       "table" => $file->getAttr('type'),
       "owner_id" => $file->parent_id,
       "title" => '删除图片',
-      "summary" => $file->title
+      "summary" => mb_strlen($file->title) > 20 ? mb_substr($file->title, 0, 20) . '...' : $file->title
     ];
     $result = $file->delete();
     if ($result) {
