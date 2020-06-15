@@ -18,36 +18,7 @@ Page({
     acreage: '',
     mainDropIndex: 0,
     filterDropTitle: "区域",
-    filterType: [
-      {
-        text: "类别",
-        value: ""
-      },{
-        text: "写字楼",
-        value: "写字楼"
-      }, {
-        text: "商铺独楼",
-        value: "商铺独楼"
-      }, {
-        text: "商务中心",
-        value: "商务中心"
-      }, {
-        text: "商住公寓",
-        value: "商住公寓"
-      }, {
-        text: "产业园",
-        value: "产业园"
-      }, {
-        text: "酒店",
-        value: "酒店"
-      }, {
-        text: "购物中心",
-        value: "购物中心"
-      }, {
-        text: "待认领",
-        value: "empty"
-      }
-    ],
+    filterType: [],
     filterArea: app.globalData.area,
     filterRentSell: [
       {
@@ -87,6 +58,9 @@ Page({
     list: []
   },
   onLoad: function(options) {
+    this.setData({
+      filterType: app.globalData.buildingType
+    })
     if (app.globalData.appUserInfo) {
       this.getList()
     } else {

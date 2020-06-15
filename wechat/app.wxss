@@ -58,10 +58,14 @@ swiper {
   height:120rpx;
 }
 
+.select-tag {
+  margin:0 0 5px 5px
+}
+
 .button-bar {
   position: fixed;
   bottom:0;
   width:100%;
   background-color: #fff;
-  z-index:100;
+  z-index:10;
 }

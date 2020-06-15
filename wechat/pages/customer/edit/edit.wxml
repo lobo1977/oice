@@ -3,32 +3,32 @@
 <view class="page-view">
   <van-cell-group>
     <van-field title-width="80px" label="客户名称" value="{{ info.customer_name }}" required placeholder="{{ name_error }}" error="{{is_name_empty}}" maxlength="30" bind:input="onNameInput" />
-    <van-field title-width="80px" label="直线电话" value="{{ info.tel }}" maxlength="30" />
-    <van-field wx:if="{{id == 0}}" title-width="80px" label="联系人" value="{{ info.linkman }}" maxlength="30" />
+    <van-field title-width="80px" label="直线电话" value="{{ info.tel }}" maxlength="30" bind:input="onTelInput" />
+    <van-field wx:if="{{id == 0}}" title-width="80px" label="联系人" value="{{ info.linkman }}" maxlength="30" bind:input="onLinkmanInput" />
     <van-field title-width="80px" label="所在地" value="{{ info.area }}" is-link readonly clickable bindtap="bindSelectArea" />
-    <van-field title-width="80px" label="详细地址" value="{{ info.address }}" maxlength="100" />
+    <van-field title-width="80px" label="详细地址" value="{{ info.address }}" maxlength="100" bind:input="onAddressInput" />
   </van-cell-group>
 
   <van-cell-group>
     <van-field title-width="80px" label="需求项目" value="{{ info.demand }}" is-link readonly clickable bindtap="bindSelectDemand" />
     <van-field title-width="80px" label="租购" value="{{ info.lease_buy }}" is-link readonly clickable bindtap="bindSelectLeaseBuy" />
     <van-field title-width="80px" label="意向区域" value="{{ info.district }}" is-link readonly clickable bindtap="bindSelectDistrict" />
-    <van-field title-width="80px" label="最小面积" value="{{ info.min_acreage }}" type="number" max_acreage="10">
+    <van-field title-width="80px" label="最小面积" value="{{ info.min_acreage }}" type="number" max_acreage="10" bind:input="onMinAcreageInput">
       <text slot="button">平方米</text>
     </van-field>
-    <van-field title-width="80px" label="最大面积" value="{{ info.max_acreage }}" type="number" max_acreage="10">
+    <van-field title-width="80px" label="最大面积" value="{{ info.max_acreage }}" type="number" max_acreage="10" bind:input="onMaxAcreageInput">
       <text slot="button">平方米</text>
     </van-field>
-    <van-field title-width="80px" label="预算" value="{{ info.budget }}" maxlength="30" />
+    <van-field title-width="80px" label="预算" value="{{ info.budget }}" maxlength="30" bind:input="onBudgeInput" />
     <van-field title-width="80px" label="入驻日期" value="{{ info.settle_date }}" right-icon="calender-o" readonly clickable bindtap="bindSelectSettleDate" />
-    <van-field title-width="80px" label="在驻面积" value="{{ info.current_area }}" type="number" max_acreage="10">
+    <van-field title-width="80px" label="在驻面积" value="{{ info.current_area }}" type="number" max_acreage="10" bind:input="onCurrentAreaInput">
       <text slot="button">平方米</text>
     </van-field>
     <van-field title-width="80px" label="到期日" value="{{ info.end_date }}" right-icon="calender-o" readonly clickable bindtap="bindSelectEndDate" />
     <van-cell title="到期提醒" title-width="80px">
       <view>
         <text>到期前 </text>
-        <van-stepper value="{{ info.remind }}" max="12" integer bind:change="" custom-class="cell-stepper" />
+        <van-stepper value="{{ info.remind }}" max="12" integer bind:change="onRemindChange" custom-class="cell-stepper" />
         <text> 个月提醒</text>
       </view>
     </van-cell>
@@ -36,14 +36,44 @@
   </van-cell-group>
 
   <van-cell-group>
-    <van-field title-width="80px" label="状态" value="{{ info.status }}" is-link readonly clickable bindtap="bindSelectStatus" />
+    <van-field title-width="80px" label="状态" value="{{ status[info.status].name }}" is-link readonly clickable bindtap="bindSelectStatus" />
     <van-cell title="是否共享" title-width="80px">
-      <van-switch checked="{{ info.share == 1 }}" />
+      <van-switch checked="{{ info.share == 1 }}" bind:change="onShareChange" active-color="#07c160" />
     </van-cell>
   </van-cell-group>
 
-  <van-popup show="{{ showDateTimePicker }}" position="bottom" bind:close="onDateTimePickerClose" z-index="1000">
+  <van-popup show="{{ showArea }}" position="bottom" bind:close="onAreaPickerClose">
+    <van-picker columns="{{ area }}" bind:confirm="onAreaSelected" bind:cancel="onAreaPickerClose" show-toolbar />
   </van-popup>
+
+  <van-popup show="{{ showDemand }}" position="bottom" bind:close="onDemandPickerClose">
+    <van-picker columns="{{ demand }}" bind:confirm="onDemandSelected" bind:cancel="onDemandPickerClose" show-toolbar />
+  </van-popup>
+
+  <van-action-sheet
+    show="{{ showLeaseBuy }}"
+    actions="{{ lease_buy }}"
+    bind:close="onLeaseBuyClose"
+    bind:select="onLeaseBuySelect"
+    z-index="1000"
+  />
+
+  <van-action-sheet show="{{ showDistrict }}" bind:close="onDistrictClose" title="选择意向区域">
+    <van-tag wx:for="{{ district }}" wx:for-index="idx" wx:key="text" data-data="{{ idx }}"  plain="{{ item.plain }}" 
+      type="{{item.type}}" size="large" custom-class="select-tag" bindtap="onDistrictTap">{{item.text}}</van-tag>
+  </van-action-sheet>
+
+  <van-calendar show="{{ showSettleDate }}" bind:close="onSettleDateClose" bind:confirm="onSettleDateConfirm" default-date="numberSettleDate" />
+
+  <van-calendar show="{{ showEndDate }}" bind:close="onEndDateClose" bind:confirm="onEndDateConfirm" default-date="numberEndDate" />
+
+  <van-action-sheet
+    show="{{ showStatus }}"
+    actions="{{ status }}"
+    bind:close="onStatusClose"
+    bind:select="onStatusSelect"
+    z-index="1000"
+  />
 
   <van-row gutter="0" custom-class="button-bar">
     <van-col span="24">

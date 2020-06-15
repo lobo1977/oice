@@ -125,15 +125,7 @@ App({
           {
             text:"亚奥",
             id: "亚奥"
-          },
-          {
-            text:"望京",
-            id: "望京"
-          },
-          {
-            text:"望京",
-            id: "望京"
-          },
+          }
         ]
       },
       {
@@ -240,7 +232,37 @@ App({
         children: [
         ]
       }
-    ]
+    ],
+    buildingType: [
+      {
+        text: "类别",
+        value: ""
+      },{
+        text: "写字楼",
+        value: "写字楼"
+      }, {
+        text: "商铺独楼",
+        value: "商铺独楼"
+      }, {
+        text: "商务中心",
+        value: "商务中心"
+      }, {
+        text: "商住公寓",
+        value: "商住公寓"
+      }, {
+        text: "产业园",
+        value: "产业园"
+      }, {
+        text: "酒店",
+        value: "酒店"
+      }, {
+        text: "购物中心",
+        value: "购物中心"
+      }, {
+        text: "待认领",
+        value: "empty"
+      }
+    ],
   },
   
   // 登录
