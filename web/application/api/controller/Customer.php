@@ -65,19 +65,17 @@ class Customer extends Base
     } else {
       if ($id > 0) {
         $validate = Validate::make([
-          'customer_name'  => 'require|token'
+          'customer_name'  => 'require'
         ],[
-          'customer_name.require' => '必须填写客户名称。',
-          'customer_name.token' => '无效请求，请勿重复提交。'
+          'customer_name.require' => '必须填写客户名称。'
         ]);
       } else {
         $validate = Validate::make([
-          'customer_name'  => 'require|token'
+          'customer_name'  => 'require'
           //'tel' =>'require',
           //'linkman'  => 'require'
         ],[
-          'customer_name.require' => '必须填写客户名称。',
-          'customer_name.token' => '无效请求，请勿重复提交。'
+          'customer_name.require' => '必须填写客户名称。'
           //'tel.require' => '必须填写直线电话',
           //'linkman.require' => '必须填写联系人姓名。'
         ]);
@@ -89,7 +87,9 @@ class Customer extends Base
       //   $data['mobile'] = str_replace(' ', '', $data['mobile']);
       // }
       
-      if (!$validate->check($data)) {
+      if (!$this->checkFormToken($data)) {
+        return $this->fail('无效请求，请勿重复提交表单');
+      } else if (!$validate->check($data)) {
         $form_token = $this->formToken();
         return $this->fail($validate->getError(), ['token' => $form_token]);
       } else {

@@ -75,6 +75,8 @@
     z-index="1000"
   />
 
+  <van-dialog id="van-dialog" />
+
   <van-row gutter="0" custom-class="button-bar">
     <van-col span="24">
       <van-button type="primary" icon="sign" block bindtap="bindSave">保存</van-button>

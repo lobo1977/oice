@@ -6,6 +6,7 @@ Page({
   data: {
     isLoading: false,
     isPullDown: false,
+    goEdit: false,
     steps: [
       {
         text: '潜在'
@@ -109,7 +110,9 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+    if (this.data.goEdit) {
+      this.getView()
+    }
   },
 
   /**
@@ -185,6 +188,7 @@ Page({
 
   bindViewUser: function (event) {
     let id = event.currentTarget.dataset.data
+    this.data.goEdit = false
     wx.navigateTo({
       url: '../../contact/view/view?id=' + id
     })
@@ -192,6 +196,7 @@ Page({
 
   bindViewCustomer: function (event) {
     let id = event.currentTarget.dataset.data
+    this.data.goEdit = false
     wx.navigateTo({
       url: 'view?id=' + id
     })
@@ -225,6 +230,7 @@ Page({
 
   bindViewBuilding: function (event) {
     let item = event.currentTarget.dataset.data
+    this.data.goEdit = false
     if (item.unit_id) {
       wx.navigateTo({
         url: '../../building/unit/unit?id=' + item.unit_id
@@ -238,6 +244,7 @@ Page({
 
   bindAddLog: function(event) {
     let id = event.currentTarget.dataset.data
+    this.data.goEdit = true
     wx.navigateTo({
       url: '../log/log?oid=' + id
     })
@@ -333,6 +340,7 @@ Page({
 
   bindEdit: function(event) {
     let id = event.currentTarget.dataset.data
+    this.data.goEdit = true
     wx.navigateTo({
       url: '../edit/edit?id=' + id
     })

@@ -180,7 +180,7 @@ Page({
       app.post('customer/log?id=' + that.data.id, {
         __token__: that.data.__token__,
         owner_id: that.data.owner_id,
-        start_time: app.formatTime(new Date(that.data.start_time), 'yyyy-MM-dd HH:mm:ss'),
+        start_time: app.formatTime(that.data.start_time, 'yyyy-MM-dd HH:mm:ss'),
         title: that.data.title,
         summary: that.data.summary
       }, (res) => {

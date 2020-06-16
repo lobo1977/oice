@@ -371,8 +371,8 @@ class Customer extends Base
         ];
 
         if ($clash->user_id == $user_id) {
-          $message = '客户资料和您的' . self::$status[$clash->status] . '客户：<strong>' .
-            $clash->customer_name . '</strong> 信息重复，请检查。';
+          $message = '客户资料和您的' . self::$status[$clash->status] . '客户：【' .
+            $clash->customer_name . '】信息重复，请检查。';
         } else {
           Log::add($user, [
             "table" => "customer",
@@ -383,13 +383,13 @@ class Customer extends Base
 
           if ($clash->status == 5) {
             self::transfer($user, $clash->id, $user_id, $data);
-            $message = '客户资料和 <strong>' . $clash->user . '</strong> 的' . self::$status[$clash->status] . '客户：<strong style="color:red;">' .
-              $clash->customer_name . '</strong> 发生撞单，旧客户已自动转交给您并转为' . 
+            $message = '客户资料和 【' . $clash->user . '】 的' . self::$status[$clash->status] . '客户：【' .
+              $clash->customer_name . '】 发生撞单，旧客户已自动转交给您并转为' . 
                 self::$status[$data['status']] . '客户，请及时跟进。';
           } else {
-            $message = '客户资料和 <strong>' . $clash->user . '</strong> 的' . self::$status[$clash->status] . '客户：<strong style="color:red;">' .
-              $clash->customer_name . '</strong> 发生撞单，您可以选择<strong>放弃登记</strong>或<strong>申请转交或并行</strong>，' .
-              '由管理员按照<strong>核查撞单及覆盖原则</strong>处理。点击<strong>确定</strong>申请转交或并行。';
+            $message = '客户资料和 【' . $clash->user . '】 的' . self::$status[$clash->status] . '客户：【' .
+              $clash->customer_name . '】 发生撞单，您可以选择【放弃登记】或【申请转交或并行】。' .
+              '由管理员按照【核查撞单及覆盖原则】处理。点击【确定】申请转交或并行。';
             $resultData['confirm'] = true;
           }
         }

@@ -323,6 +323,7 @@ App({
   },
 
   formatTime(time, fmt) {
+    var time = new Date(time)
     var o = {
       "M+": time.getMonth() + 1, //月份
       "d+": time.getDate(), //日

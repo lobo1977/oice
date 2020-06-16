@@ -20,7 +20,6 @@ swiper {
 }
 
 .cell-title {
-  font-size:1.1em !important;
   font-weight: bold;
   padding:10px !important;
 }

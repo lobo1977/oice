@@ -1,12 +1,9 @@
 // pages/customer/edit/edit.js
+import Dialog from '../../../miniprogram_npm/@vant/weapp/dialog/dialog';
 
 const app = getApp()
 
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
     id: 0,
     area: [],
@@ -54,6 +51,8 @@ Page({
       linkman: '',          // 联系人
       clash: 0              // 撞单客户
     },
+    is_name_empty: false,
+    name_error: ''
   },
 
   /**
@@ -86,7 +85,6 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
   },
 
   /**
@@ -138,12 +136,22 @@ Page({
         })
         if (res.data.settle_date) {
           that.setData({
+            ['info.settle_date']: app.formatTime(Date.parse(res.data.settle_date.replace(/-/g, '/')), 'yyyy-MM-dd'),
             numberSettleDate: Date.parse(res.data.settle_date.replace(/-/g, '/'))
+          })
+        } else {
+          that.setData({
+            ['info.settle_date']: ''
           })
         }
         if (res.data.end_date) {
           that.setData({
+            ['info.end_date']: app.formatTime(Date.parse(res.data.end_date.replace(/-/g, '/')), 'yyyy-MM-dd'),
             numberEndDate: Date.parse(res.data.end_date.replace(/-/g, '/'))
+          })
+        } else {
+          that.setData({
+            ['info.end_date']: ''
           })
         }
       }
@@ -154,9 +162,10 @@ Page({
         if (element.id != 'all') {
           arrArea.push(element.text)
           if (element.children && element.children.length) {
+            let dataDistrict = that.data.info.district ? that.data.info.district : ''
             element.children.forEach(d => {
               if (d.id != '') {
-                arrDistrict.push( { text: d.text, type: that.data.info.district.indexOf(d.text) >= 0 ? 'success' : 'default' })
+                arrDistrict.push( { text: d.text, type: dataDistrict.indexOf(d.text) >= 0 ? 'success' : 'default' })
               }
             })
           }
@@ -394,34 +403,80 @@ Page({
 
   bindSave: function() {
     let that = this
-    if (!that.data.title) {
+    if (!that.data.info.customer_name) {
       that.setData({
-        is_title_empty: true,
-        title_error: '请输入摘要'
+        is_name_empty: true,
+        name_error: '请输入客户名称'
       })
     } else {
       that.setData({
-        is_title_empty: false,
-        title_error: ''
+        is_name_empty: false,
+        name_error: ''
       })
 
       wx.showLoading({
         title: '保存中',
       })
 
-      app.post('customer/log?id=' + that.data.id, {
-        __token__: that.data.__token__,
-        owner_id: that.data.owner_id,
-        start_time: app.formatTime(new Date(that.data.start_time), 'yyyy-MM-dd HH:mm:ss'),
-        title: that.data.title,
-        summary: that.data.summary
-      }, (res) => {
+      app.post('customer/edit?id=' + that.data.id, that.data.info, (res) => {
         if (res.success) {
-          wx.navigateBack()
+          if (res.message) {
+            Dialog.alert({
+              title: '保存成功',
+              message: res.message
+            }).then(() => {
+              if (that.data.id == 0) {
+                let id = res.data
+                wx.redirectTo({
+                  url: '../view/view?id=' + id
+                })
+              } else {
+                wx.navigateBack()
+              }
+            })
+          } else if (that.data.id == 0) {
+            let id = res.data
+            wx.redirectTo({
+              url: '../view/view?id=' + id
+            })
+          } else {
+            wx.navigateBack()
+          }
+        } else if (res.data) {
+          if (res.data.token) {
+            that.data.info.__token__ = res.data.token
+          }
+          if (res.data.confirm && res.data.clash) {
+            Dialog.confirm({
+              title: '撞单提醒',
+              message: res.message
+            }).then(() => {
+              that.data.info.clash = res.data.clash
+              that.bindSave()
+            })
+          } else {
+            Dialog.alert({
+              title: res.data.clash ? '撞单提醒' : '发生错误',
+              message: res.message
+            }).then(() => {
+              if (res.data.clash) {
+                let id = res.data.clash
+                wx.redirectTo({
+                  url: '../view/view?id=' + id
+                })
+              }
+            })
+          }
         } else if (res.message) {
           wx.showToast({
             icon: 'none',
             title: res.message,
+            duration: 2000
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: '操作失败，系统异常',
             duration: 2000
           })
         }

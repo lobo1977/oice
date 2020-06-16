@@ -24,4 +24,6 @@
   <van-divider contentPosition="center" 
     customStyle="margin-left:10px;margin-right:10px;"
     wx:if="{{list.length == 0}}">暂无内容</van-divider>
+
+  <van-icon name="add" color="#07c160" size="40" custom-style="position:fixed;bottom:30px;right:15px;" bindtap="bindAdd" />
 </view>

@@ -44,9 +44,9 @@
           <view slot="right-icon">
             <van-icon name="phone" size="20px" wx:if="{{item.mobile || item.tel}}"
               data-data="{{item.mobile || item.tel}}" bindtap="bindPhoneCall"
-              color="blue" custom-style="margin-right:20px" />
+              color="blue" />
             <van-icon name="chat" size="20px" wx:if="{{item.weixin || item.mobile}}" 
-              data-data="{{item.weixin || item.mobile}}" bindtap="bindCopyWeixin" color="green" />
+              data-data="{{item.weixin || item.mobile}}" bindtap="bindCopyWeixin" color="green" custom-style="margin-left:20px" />
           </view>
         </van-cell>
       </van-cell-group>

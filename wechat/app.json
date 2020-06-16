@@ -16,6 +16,7 @@
     "van-col": "@vant/weapp/col",
     "van-icon": "@vant/weapp/icon",
     "van-popup": "@vant/weapp/popup",
+    "van-dialog": "@vant/weapp/dialog",
     "van-cell-group": "@vant/weapp/cell-group",
     "van-cell": "@vant/weapp/cell",
     "van-field": "@vant/weapp/field",

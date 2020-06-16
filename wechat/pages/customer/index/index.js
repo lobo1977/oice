@@ -12,7 +12,8 @@ Page({
     isLoading: false,
     isPullDown: false,
     isEnd: false,
-    list: []
+    list: [],
+    goAdd: false
   },
 
   onKewordChange(e) {
@@ -110,7 +111,9 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+    if (this.data.goAdd) {
+      this.getList()
+    }
   },
 
   /**
@@ -151,5 +154,12 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+
+  bindAdd: function() {
+    this.data.goAdd = true
+    wx.navigateTo({
+      url: '../edit/edit?id=0',
+    })
   }
 })
