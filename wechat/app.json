@@ -46,12 +46,6 @@
         "pagePath": "pages/customer/index/index",
         "iconPath": "icon/contact_a.png",
         "selectedIconPath": "icon/contact_b.png"
-      },
-      {
-        "text": "我的",
-        "pagePath": "pages/my/index/index",
-        "iconPath": "icon/my_a.png",
-        "selectedIconPath": "icon/my_b.png"
       }
     ]
   },

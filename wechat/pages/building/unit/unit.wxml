@@ -10,7 +10,7 @@
     </swiper-item>
   </swiper>
   <van-cell-group>
-    <van-cell title="{{info.building_name + ' ' +info.title}}" custom-class="cell-title"></van-cell>
+    <van-cell title="{{info.building_name + ' ' +info.title}}" title-class="cell-title" custom-class="cell-view"></van-cell>
     <van-cell title="朝向" wx:if="{{info.face}}" custom-class="cell-view"
       title-width="160rpx" value="{{info.face}}" value-class="text-left"></van-cell>
     <van-cell title="面积" wx:if="{{info.acreage}}" custom-class="cell-view"
@@ -32,11 +32,12 @@
   <van-cell-group title="项目联系人" wx:if="{{info.linkman && info.linkman.length}}">
     <van-cell wx:for="{{info.linkman}}" wx:key="id" data-data="{{item}}"
       title="{{item.title}}" center custom-class="cell-view">
-      <van-icon name="phone" size="20px" wx:if="{{item.mobile || item.tel}}"
-        data-data="{{item}}" bindtap="bindPhoneCall"
-        color="blue" custom-style="margin-right:20px" />
-      <van-icon name="chat" size="20px" wx:if="{{item.weixin || item.mobile}}" 
-        data-data="{{item}}" bindtap="bindCopyWeixin" color="green" />
+      <view slot="right-icon">
+        <van-icon name="phone" size="20px" wx:if="{{item.mobile || item.tel}}"
+          data-data="{{item}}" bindtap="bindPhoneCall" color="blue" />
+        <van-icon name="wechat" size="20px" wx:if="{{item.weixin || item.mobile}}" 
+          data-data="{{item}}" bindtap="bindCopyWeixin" color="green" custom-style="margin-left:20px" />
+      </view>
     </van-cell>
   </van-cell-group>
 </view>

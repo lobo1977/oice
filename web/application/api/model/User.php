@@ -75,17 +75,20 @@ class User extends Base
   /**
    * 共享用户列表
    */
-  public static function shareList($type, $id) {
+  public static function shareList($type, $id, $exclude = null) {
     $list = self::alias('a')
       ->join('share s', 's.user_id = a.id')
       ->leftJoin('user_company b', 'a.id = b.user_id and b.status = 1 and b.active = 1')
       ->leftJoin('company co', 'b.company_id = co.id')
-      ->field('a.id,a.title,a.avatar,a.mobile,co.full_name as company,s.create_time')
+      ->field('a.id,a.title,a.avatar,a.mobile,co.title as company,s.create_time')
       ->where('s.type', $type)
-      ->where('s.object_id', $id)
-      ->order(['s.create_time' => 'desc']);
+      ->where('s.object_id', $id);
 
-    $list = $list->select();
+    if ($exclude) {
+      $list->where('a.id', '<>', $exclude);
+    }
+
+    $list = $list->order(['s.create_time' => 'desc'])->select();
 
     foreach($list as &$member) {
       self::formatData($member);

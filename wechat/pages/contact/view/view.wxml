@@ -7,7 +7,7 @@
     <view class="row">
       <view>
         <text class="title">{{info.title}}</text>
-        <text class="company">{{'\n' + info.full_name}}</text>
+        <text class="company" wx:if="{{info.full_name}}">{{'\n' + info.full_name}}</text>
       </view>
       <image
         mode="aspectFit"

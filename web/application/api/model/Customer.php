@@ -281,7 +281,7 @@ class Customer extends Base
       $data->filter = Filter::query($user, $id);
       $data->recommend = Recommend::query($user, $id);
       $data->confirm = Confirm::query($user, $id, 0);
-      $data->shareList = User::shareList('Customer', $id);
+      $data->shareList = User::shareList('Customer', $id, $data->user_id);
 
       if ($data->clash && $data->allowClash) {
         $data->clashCustomer = self::alias('a')

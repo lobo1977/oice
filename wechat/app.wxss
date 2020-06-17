@@ -21,7 +21,7 @@ swiper {
 
 .cell-title {
   font-weight: bold;
-  padding:10px !important;
+  padding:5px 0 !important;
 }
 
 .cell-view {
@@ -55,6 +55,10 @@ swiper {
   margin-right:20rpx;
   width:120rpx;
   height:120rpx;
+}
+
+.cell-tag {
+  margin-right:5px;
 }
 
 .select-tag {

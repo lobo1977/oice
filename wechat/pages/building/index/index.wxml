@@ -9,34 +9,36 @@
     shape="round" use-action-slot>
     <view slot="action" bind:tap="bindSearch">搜索</view>
   </van-search>
+
   <van-dropdown-menu>
-  <van-dropdown-item value="" options="{{ filterType }}" bind:change="filterTypeChange" />
-  <van-dropdown-item id="dropArea" title="{{ filterDropTitle }}">
-    <van-tree-select
-      items="{{ filterArea }}"
-      main-active-index="{{ mainDropIndex }}"
-      active-id="{{ district }}"
-      bind:click-nav="onClickDropNav"
-      bind:click-item="onClickDropItem"
-    />
-  </van-dropdown-item>
-  <van-dropdown-item value="出租,出售" options="{{ filterRentSell }}" bind:change="filterRentSellChange" />
-  <van-dropdown-item value="0,0" options="{{ filterAcreage }}" bind:change="filterAcreageChange" />
-</van-dropdown-menu>
-  <van-card wx:for="{{list}}" data-data="{{item}}" wx:key="id"
-    title="{{item.building_name}}"
-    desc="{{item.address}}"
-    price="{{item.price}}"
-    currency=""
-    thumb="{{filter.imageUrl(item.src)}}"
-    bindtap="bindViewBuilding"
-    custom-class="building-card"
-    title-class="text-overflow-hidden"
-    desc-class="text-overflow-hidden"
-  >
-    <van-tag wx:if="{{item.rent_sell}}" slot="tags" round type="success">{{item.rent_sell}}</van-tag>
-  </van-card>
-  <van-divider contentPosition="center" 
+    <van-dropdown-item value="" options="{{ filterType }}" bind:change="filterTypeChange" />
+    <van-dropdown-item id="dropArea" title="{{ filterDropTitle }}">
+      <van-tree-select
+        items="{{ filterArea }}"
+        main-active-index="{{ mainDropIndex }}"
+        active-id="{{ district }}"
+        bind:click-nav="onClickDropNav"
+        bind:click-item="onClickDropItem"
+      />
+    </van-dropdown-item>
+    <van-dropdown-item value="出租,出售" options="{{ filterRentSell }}" bind:change="filterRentSellChange" />
+    <van-dropdown-item value="0,0" options="{{ filterAcreage }}" bind:change="filterAcreageChange" />
+  </van-dropdown-menu>
+
+  <van-cell-group>
+    <van-cell wx:for="{{list}}" wx:key="id" data-data="{{ item }}" 
+      title="{{item.building_name}}" use-label-slot
+      bindtap="bindViewBuilding" custom-class="cell-contact">
+      <view slot="label">
+        <van-tag type="success" wx:if="{{item.rent_sell}}" custom-class="cell-tag">{{item.rent_sell}}</van-tag>
+        <text wx:if="{{item.address}}">{{item.address}}</text>
+      </view>
+      <image slot="icon" mode="aspectFill" 
+        src="{{filter.imageUrl(item.src)}}" class="cell-image"></image>
+    </van-cell>
+  </van-cell-group>
+
+  <van-divider contentPosition="center"
     customStyle="margin-left:10px;margin-right:10px;"
     wx:if="{{list.length == 0}}">暂无内容</van-divider>
 </view>

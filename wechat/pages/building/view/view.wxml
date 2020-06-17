@@ -35,11 +35,12 @@
   <van-cell-group title="项目通讯录" wx:if="{{info.linkman && info.linkman.length}}">
     <van-cell wx:for="{{info.linkman}}" wx:key="id" data-data="{{item}}"
       title="{{item.title}}" center custom-class="cell-view">
-      <van-icon name="phone" size="20px" wx:if="{{item.mobile || item.tel}}"
-        data-data="{{item}}" bindtap="bindPhoneCall"
-        color="blue" custom-style="margin-right:20px" />
-      <van-icon name="chat" size="20px" wx:if="{{item.weixin || item.mobile}}" 
-        data-data="{{item}}" bindtap="bindCopyWeixin" color="green" />
+      <view slot="right-icon">
+        <van-icon name="phone" size="20px" wx:if="{{item.mobile || item.tel}}"
+          data-data="{{item}}" bindtap="bindPhoneCall" color="blue" />
+        <van-icon name="wechat" size="20px" wx:if="{{item.weixin || item.mobile}}" 
+          data-data="{{item}}" bindtap="bindCopyWeixin" color="green" custom-style="margin-left:20px" />
+      </view>
     </van-cell>
   </van-cell-group>
   <van-cell-group title="项目简介">

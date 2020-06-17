@@ -384,17 +384,25 @@ Page({
           info: res.data
         })
 
-        if (that.data.info.status < 5) {
-          that.setData({
-            activeStep: that.data.info.status
-          })
-        } else if (that.data.info.status == 5) {
-          that.setData({
-            activeStep: 4,
-            activeIcon: "clear",
-            activeColor: "#ff0000"
-          })
+        let arrSteps = that.data.steps
+        let step = that.data.info.status
+        let stepIcon = "checked"
+        let stepColor = "#07c160"
+        arrSteps[4].text = '成交'
+        if (step > 5) {
+          step = 0
+        } else if (step == 5) {
+          step = 4
+          arrSteps[4].text = '失败'
+          stepIcon = "clear"
+          stepColor = "#ff0000"
         }
+        that.setData({
+          steps: arrSteps,
+          activeStep: step,
+          activeIcon: stepIcon,
+          activeColor: stepColor
+        })
 
         if (that.data.info.log && that.data.info.log.length) {
           let logs = []
