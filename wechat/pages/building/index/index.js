@@ -100,13 +100,6 @@ Page({
   onShareAppMessage: function () {
     // 页面被用户分享时执行
   },
-
-  bindViewBuilding: function(event) {
-    let id = event.currentTarget.dataset.data.id
-    wx.navigateTo({
-      url: '../view/view?id=' + id
-    })
-  },
   
   onKewordChange(e) {
     this.setData({
@@ -166,19 +159,19 @@ Page({
   // 获取列表
   getList: function() {
     let that = this
+
+    if (that.data.isLoading) return
+
     that.setData({
       isLoading: true
     })
-    if (that.data.isPullDown === false) {
-      wx.showLoading({
-        title: '加载中',
-      })
-    }
+
     if (that.data.pageIndex <= 1) {
       that.setData({
         list: []
       })
     }
+
     app.post('building/index', { 
       page: that.data.pageIndex,
       keyword: that.data.keyword,
@@ -189,7 +182,13 @@ Page({
       acreage: that.data.rent_sells
     }, (res) => {
       if (!res.data || res.data.length < that.data.pageSize) {
-        that.data.isEnd = true
+        that.setData({
+          isEnd: true
+        })
+      } else {
+        that.setData({
+          isEnd: false
+        })
       }
       if (res.data) {
         let list = that.data.list.concat(res.data)
@@ -198,7 +197,6 @@ Page({
         })
       }
     }, () => {
-      wx.hideLoading()
       that.setData({
         isPullDown: false,
         isLoading: false

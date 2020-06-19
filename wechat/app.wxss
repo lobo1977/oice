@@ -16,7 +16,6 @@ swiper {
 .page-view {
   width: 100%;
   margin-bottom: 50px;
-  background-color: #ffffff;
 }
 
 .cell-title {
@@ -69,6 +68,6 @@ swiper {
   position: fixed;
   bottom:0;
   width:100%;
-  background-color: #fff;
   z-index:10;
+  background-color: #ffffff;
 }

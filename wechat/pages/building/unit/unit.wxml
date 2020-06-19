@@ -31,12 +31,13 @@
   </van-cell-group>
   <van-cell-group title="项目联系人" wx:if="{{info.linkman && info.linkman.length}}">
     <van-cell wx:for="{{info.linkman}}" wx:key="id" data-data="{{item}}"
-      title="{{item.title}}" center custom-class="cell-view">
+      title="{{item.title}}" center custom-class="cell-view"
+      link-type="navigateTo" url="../../linkman/view/view?id={{item.id}}">
       <view slot="right-icon">
         <van-icon name="phone" size="20px" wx:if="{{item.mobile || item.tel}}"
-          data-data="{{item}}" bindtap="bindPhoneCall" color="blue" />
+          data-data="{{item}}" catchtap="bindPhoneCall" color="blue" />
         <van-icon name="wechat" size="20px" wx:if="{{item.weixin || item.mobile}}" 
-          data-data="{{item}}" bindtap="bindCopyWeixin" color="green" custom-style="margin-left:20px" />
+          data-data="{{item}}" catchtap="bindCopyWeixin" color="green" custom-style="margin-left:20px" />
       </view>
     </van-cell>
   </van-cell-group>

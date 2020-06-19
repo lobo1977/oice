@@ -38,15 +38,18 @@
           title-width="160rpx" value="{{info.end_date}}" value-class="text-left"></van-cell>
         <view class="cell-text-area" wx:if="{{info.rem}}">{{info.rem}}</view>
       </van-cell-group>
-      <van-cell-group title="联系人" wx:if="{{info.linkman && info.linkman.length}}">
+
+      <van-cell-group title="联系人" wx:if="{{(info.linkman && info.linkman.length) || info.allowFollow}}">
+        <van-cell wx:if="{{info.allowFollow}}" title="添加联系人" icon="add-o" bindtap="bindAddLinkman" />
         <van-cell wx:for="{{info.linkman}}" wx:key="id" data-data="{{item}}"
-          title="{{item.title}}" center label="{{item.desc}}" custom-class="cell-view">
+          title="{{item.title}}" center label="{{item.desc}}" custom-class="cell-view"
+          link-type="navigateTo" url="../../linkman/view/view?id={{item.id}}">
           <view slot="right-icon">
             <van-icon name="phone" size="20px" wx:if="{{item.mobile || item.tel}}"
-              data-data="{{item.mobile || item.tel}}" bindtap="bindPhoneCall"
+              data-data="{{item.mobile || item.tel}}" catchtap="bindPhoneCall"
               color="blue" />
             <van-icon name="wechat" size="20px" wx:if="{{item.weixin || item.mobile}}" 
-              data-data="{{item.weixin || item.mobile}}" bindtap="bindCopyWeixin" color="green" custom-style="margin-left:20px" />
+              data-data="{{item.weixin || item.mobile}}" catchtap="bindCopyWeixin" color="green" custom-style="margin-left:20px" />
           </view>
         </van-cell>
       </van-cell-group>
@@ -54,34 +57,37 @@
       <van-cell-group title="客户经理" wx:if="{{info.manager || info.allowTurn}}">
         <van-cell data-data="{{ info.user_id }}"
           title="{{info.manager}}" label="{{info.company || info.manager_mobile}}" center is-link
-          bind:click="bindViewUser" custom-class="cell-contact">
+          link-type="navigateTo" url="../../contact/view/view?id={{info.user_id}}" custom-class="cell-contact">
           <image slot="icon" mode="aspectFill" 
             src="{{filter.imageUrl(info.avatar)}}" class="cell-image"></image>
         </van-cell>
+        <van-cell wx:if="{{info.allowTurn}}" title="转交" icon="share" bindtap="bindTurn" />
       </van-cell-group>
 
       <van-cell-group title="客户共享" wx:if="{{info.shareList && info.shareList.length}}">
         <van-cell wx:for="{{info.shareList}}" wx:key="id" data-data="{{item.id }}" 
-          title="{{item.title}}" label="{{item.company || info.manager_mobile}}" center is-link
-          bind:click="bindViewUser" custom-class="cell-contact">
+          title="{{item.title}}" label="{{item.company || item.mobile}}" center is-link
+          link-type="navigateTo" url="../../contact/view/view?id={{item.id}}"
+          custom-class="cell-contact">
           <image slot="icon" mode="aspectFill" 
             src="{{filter.imageUrl(item.avatar)}}" class="cell-image"></image>
         </van-cell>
       </van-cell-group>
 
       <van-cell-group title="被撞单客户" wx:if="{{info.clashCustomer}}">
-        <van-cell data-data="{{ info.clashCustomer.id }}"
+        <van-cell
           title="{{info.clashCustomer.name}}" label="{{info.clashCustomer.manager + ' ' + info.clashCustomer.update_time}}" center is-link
-          bind:click="bindViewCustomer" custom-class="cell-contact">
+          link-type="navigateTo" url="view?id={{info.clashCustomer.id}}"
+          custom-class="cell-contact">
         </van-cell>
       </van-cell-group>
 
       <van-row gutter="0" custom-class="button-bar">
         <van-col span="12">
-          <van-button type="primary" icon="notes-o" block bindtap="bindAddLog" data-data="{{info.id}}">跟进</van-button>
+          <van-button type="primary" icon="notes-o" block bind:click="bindAddLog" disabled="{{ !info.allowFollow }}">跟进</van-button>
         </van-col>
         <van-col span="12">
-          <van-button type="danger" icon="edit" block bindtap="bindEdit" data-data="{{info.id}}">修改资料</van-button>
+          <van-button type="danger" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}">修改资料</van-button>
         </van-col>
       </van-row>
     </van-tab>
@@ -89,7 +95,7 @@
       <van-steps steps="{{ logs }}" active="{{ 0 }}" direction="vertical" />
       <van-row gutter="0" custom-class="button-bar">
         <van-col span="24">
-          <van-button type="primary" icon="notes-o" block bindtap="bindAddLog" data-data="{{info.id}}">添加</van-button>
+          <van-button type="primary" icon="notes-o" block bind:click="bindAddLog" disabled="{{ !info.allowFollow }}">添加</van-button>
         </van-col>
       </van-row>
     </van-tab>
@@ -106,7 +112,7 @@
       </van-cell-group>
       <van-row gutter="0" custom-class="button-bar">
         <van-col span="24">
-          <van-button type="primary" icon="upgrade" block bindtap="bindUpload" data-data="{{info.id}}">上传</van-button>
+          <van-button type="primary" icon="upgrade" block bind:click="bindUpload" data-data="{{info.id}}" disabled="{{ !info.allowFollow }}">上传</van-button>
         </van-col>
       </van-row>
     </van-tab>
@@ -122,10 +128,35 @@
     </van-tab>
   </van-tabs>
 
+  <van-popup show="{{ showTurn }}" position="bottom" bind:close="onTurnClose" custom-style="height:100%;overflow-y:hidden;">
+    <van-nav-bar title="选择转交人" safe-area-inset-top="{{false}}">
+      <van-icon slot="right" name="cross" bindtap="onTurnClose" custom-style="posiation:relative;top:-13px" />
+    </van-nav-bar>
+    <van-search value="{{ keyword }}"
+      bind:change="onKewordChange"
+      bind:search="bindSearch"
+      shape="round" use-action-slot>
+      <view slot="action">
+        <view bindtap="bindSearch" wx:if="{{searching == false}}">搜索</view>
+        <van-loading wx:if="{{searching}}" />
+      </view>
+    </van-search>
+    <van-cell-group>
+      <van-cell wx:for="{{userList}}" wx:key="id" data-data="{{item}}" 
+        title="{{item.title}}" label="{{item.mobile}}" center
+        custom-class="cell-contact" bindtap="bindSelectTurnUser">
+        <image slot="icon" mode="aspectFill" 
+          src="{{filter.imageUrl(item.avatar)}}" class="cell-image"></image>
+      </van-cell>
+    </van-cell-group>
+  </van-popup>
+
   <van-action-sheet
     show="{{ showAttachActions }}"
     actions="{{ attachActions }}"
     bind:close="onAttachActionsClose"
     bind:select="onAttachActionsSelect"
   />
+
+  <van-dialog id="van-dialog" z-index="200" />
 </view>

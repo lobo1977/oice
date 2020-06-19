@@ -12,6 +12,7 @@
   "sitemapLocation": "sitemap.json",
   "usingComponents": {
     "van-button": "@vant/weapp/button",
+    "van-loading": "@vant/weapp/loading",
     "van-row": "@vant/weapp/row",
     "van-col": "@vant/weapp/col",
     "van-icon": "@vant/weapp/icon",
@@ -31,7 +32,8 @@
     "van-search": "@vant/weapp/search",
     "van-tab": "@vant/weapp/tab",
     "van-tabs": "@vant/weapp/tabs",
-    "van-divider": "@vant/weapp/divider"
+    "van-divider": "@vant/weapp/divider",
+    "van-nav-bar": "@vant/weapp/nav-bar"
   },
   "tabBar": {
     "list": [
@@ -55,7 +57,7 @@
     "pages/building/unit/unit",
     "pages/contact/index/index",
     "pages/contact/view/view",
-    "pages/contact/recommend/recommend",
+    "pages/linkman/edit/edit",
     "pages/customer/index/index",
     "pages/my/index/index",
     "pages/customer/view/view",

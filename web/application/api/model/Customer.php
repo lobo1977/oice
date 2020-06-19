@@ -675,6 +675,7 @@ class Customer extends Base
     $customer = self::alias('a')
       ->join('user u', "a.user_id = u.id")
       ->field('a.id,a.user_id,a.company_id,a.clash,a.parallel,a.status,u.title')
+      ->where('a.id', $id)
       ->find();
 
     if ($customer == null) {

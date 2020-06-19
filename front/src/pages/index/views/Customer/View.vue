@@ -175,7 +175,7 @@
         @click.native="preview(index)">
         <img slot="icon" :src="item.msrc" class="cell-image">
         <span slot="inline-desc">{{item.username}} 于 {{item.upload_time}} 上传 &nbsp; {{item.size}}</span>
-        <x-button type="warn" v-if="info.allowEdit || item.user_id == user.id" 
+        <x-button type="warn" v-if="info.allowFollow || item.user_id == user.id" 
           @click.native.stop="confirmRemoveAttach(index)">删除</x-button>
       </cell>
       <div class="bottom-bar">

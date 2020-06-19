@@ -130,7 +130,7 @@ Page({
     })
     let url = 'customer/edit?id=' + that.data.id
     app.get(url, (res) => {
-      if (res.data) {
+      if (res.success && res.data) {
         that.setData({
           info: res.data
         })
@@ -154,6 +154,13 @@ Page({
             ['info.end_date']: ''
           })
         }
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        }).then(() => {
+          wx.navigateBack()
+        })
       }
     }, () => {
       let arrArea = []

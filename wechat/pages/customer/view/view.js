@@ -1,4 +1,5 @@
 // pages/customer/view/view.js
+import Dialog from '../../../miniprogram_npm/@vant/weapp/dialog/dialog';
 
 const app = getApp()
 
@@ -66,7 +67,13 @@ Page({
       recommend: [],          // 推荐资料
       confirm: [],            // 确认书
       clashCustomer: null,
-      shareList: []
+      shareList: [],
+      allowEdit: false,
+      allowTurn: false,
+      allowFollow: false,
+      allowConfirm: false,
+      allowClash: false,
+      allowDelete: false
     },
     tapStartTime: 0,
     tapEndTime: 0,
@@ -77,6 +84,10 @@ Page({
         name: '删除',
       }
     ],
+    showTurn: false,
+    searching: false,
+    keyword: '',
+    userList: []
   },
 
   /**
@@ -103,7 +114,6 @@ Page({
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: function () {
-
   },
 
   /**
@@ -112,6 +122,7 @@ Page({
   onShow: function () {
     if (this.data.goEdit) {
       this.getView()
+      this.data.goEdit = false
     }
   },
 
@@ -119,14 +130,12 @@ Page({
    * 生命周期函数--监听页面隐藏
    */
   onHide: function () {
-
   },
 
   /**
    * 生命周期函数--监听页面卸载
    */
   onUnload: function () {
-
   },
 
   /**
@@ -145,7 +154,6 @@ Page({
    * 页面上拉触底事件的处理函数
    */
   onReachBottom: function () {
-
   },
 
   /**
@@ -186,22 +194,6 @@ Page({
     }
   },
 
-  bindViewUser: function (event) {
-    let id = event.currentTarget.dataset.data
-    this.data.goEdit = false
-    wx.navigateTo({
-      url: '../../contact/view/view?id=' + id
-    })
-  },
-
-  bindViewCustomer: function (event) {
-    let id = event.currentTarget.dataset.data
-    this.data.goEdit = false
-    wx.navigateTo({
-      url: 'view?id=' + id
-    })
-  },
-
   bindViewAttach: function (event) {
     if (this.tapEndTime  - this.tapStartTime > 350) {
       return
@@ -230,7 +222,6 @@ Page({
 
   bindViewBuilding: function (event) {
     let item = event.currentTarget.dataset.data
-    this.data.goEdit = false
     if (item.unit_id) {
       wx.navigateTo({
         url: '../../building/unit/unit?id=' + item.unit_id
@@ -242,11 +233,17 @@ Page({
     }
   },
 
-  bindAddLog: function(event) {
-    let id = event.currentTarget.dataset.data
+  bindAddLinkman: function() {
     this.data.goEdit = true
     wx.navigateTo({
-      url: '../log/log?oid=' + id
+      url: '../../linkman/edit/edit?type=customer&oid=' + this.data.info.id
+    })
+  },
+
+  bindAddLog: function(event) {
+    this.data.goEdit = true
+    wx.navigateTo({
+      url: '../log/log?oid=' + this.data.info.id
     })
   },
 
@@ -274,7 +271,7 @@ Page({
               'id': that.data.info.id
             },
             success (res2) {
-              if (res2.data) {
+              if (res2.success && res2.data) {
                 let json = JSON.parse(res2.data)
                 if (json.success) {
                   var str = 'info.attach'
@@ -283,6 +280,12 @@ Page({
                   })
                   that.setPrevImages(json.data)
                 }
+              } else {
+                Dialog.alert({
+                  title: '发生错误',
+                  message: res2.message ? res2.message : '系统异常'
+                }).then(() => {
+                })
               }
             },
             complete() {
@@ -298,10 +301,13 @@ Page({
   },
 
   bindAttachLongTap: function(event) {
-    this.setData({
-      showAttachActions: true,
-      attachIndex: event.currentTarget.dataset.data
-    })
+    let idx = event.currentTarget.dataset.data
+    if (this.data.info.allowFollow && app.globalData.appUserInfo.id == this.data.info.attach[idx].user_id) {
+      this.setData({
+        showAttachActions: true,
+        attachIndex: idx
+      })
+    }
   },
 
   onAttachActionsClose: function() {
@@ -325,10 +331,10 @@ Page({
           that.setData({
             [str]: that.data.info.attach
           })
-        } else if (res.message) {
+        } else {
           wx.showToast({
             icon: 'none',
-            title: res.message,
+            title: res.message ? res.message : '操作失败，系统异常',
             duration: 2000
           })
         }
@@ -339,10 +345,49 @@ Page({
   },
 
   bindEdit: function(event) {
-    let id = event.currentTarget.dataset.data
     this.data.goEdit = true
     wx.navigateTo({
-      url: '../edit/edit?id=' + id
+      url: '../edit/edit?id=' + this.data.info.id
+    })
+  },
+
+  bindTurn: function() {
+    this.setData({
+      keyword: '',
+      showTurn: true
+    })
+    this.searchUser('')
+  },
+
+  onTurnClose: function() {
+    this.setData({
+      showTurn: false
+    })
+  },
+
+  onKewordChange: function(event) {
+    this.setData({
+      keyword: event.detail
+    })
+  },
+
+  bindSearch: function() {
+    this.searchUser()
+  },
+
+  bindSelectTurnUser: function(event) {
+    let that = this
+    let newUser = event.currentTarget.dataset.data
+    //if (newUser.id === that.data.info.user_id) return
+    Dialog.confirm({
+      title: '转交确认',
+      message: '确定要将客户转交给【' + newUser.title + '】吗？',
+    }).then(() => {
+      that.setData({
+        showTurn: false
+      })
+      that.turn(newUser)
+    }).catch(() => {
     })
   },
 
@@ -379,7 +424,7 @@ Page({
     }
     
     app.get(url, (res) => {
-      if (res.data) {
+      if (res.success && res.data) {
         that.setData({
           info: res.data
         })
@@ -419,11 +464,70 @@ Page({
         }
 
         that.setPrevImages(res.data.attach)
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        }).then(() => {
+          wx.navigateBack()
+        })
       }
     }, () => {
       that.setData({
         isLoading: false
       })
+      wx.hideLoading()
+    })
+  },
+
+  searchUser: function() {
+    let that = this
+    that.setData({
+      searching:true
+    })
+    app.post('user/search', {
+      company: app.globalData.appUserInfo.company_id,
+      keyword: that.data.keyword,
+    }, (res) => {
+      if (res.success && res.data) {
+        that.setData({
+          userList: res.data
+        })
+      } else {
+        that.setData({
+          userList: []
+        })
+      }
+    }, () => {
+      that.setData({
+        searching:false
+      })
+    })
+  },
+
+  turn: function(newUser) {
+    let that = this
+    wx.showLoading({
+      title: '转交中',
+    })
+    app.post('customer/turn', {
+      id: that.data.info.id,
+      user_id: newUser.id,
+      company_id: newUser.company_id
+    }, (res) => {
+      if (res.success) {
+        Dialog.alert({
+          message: '转交成功',
+        }).then(() => {
+          wx.navigateBack()
+        })
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        })
+      }
+    }, () => {
       wx.hideLoading()
     })
   }

@@ -19,7 +19,7 @@ Page({
   onKewordChange(e) {
     this.setData({
       keyword: e.detail
-    });
+    })
   },
 
   // 搜索客户
@@ -45,11 +45,6 @@ Page({
     that.setData({
       isLoading: true
     })
-    if (that.data.isPullDown === false) {
-      wx.showLoading({
-        title: '加载中',
-      })
-    }
     if (that.data.pageIndex <= 1) {
       that.setData({
         list: []
@@ -61,9 +56,13 @@ Page({
       type: that.data.type
     }, (res) => {
       if (!res.data || res.data.length < that.data.pageSize) {
-        that.data.isEnd = true
+        that.setData({
+          isEnd: true
+        })
       } else {
-        that.data.isEnd = false
+        that.setData({
+          isEnd: false
+        })
       }
       if (res.data) {
         let list = that.data.list.concat(res.data)
@@ -77,13 +76,6 @@ Page({
         isPullDown: false,
         isLoading: false
       })
-    })
-  },
-
-  bindViewCustomer: function(event) {
-    let id = event.currentTarget.dataset.data.id
-    wx.navigateTo({
-      url: '../view/view?id=' + id
     })
   },
 

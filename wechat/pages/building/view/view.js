@@ -111,13 +111,6 @@ Page({
     })
   },
   
-  bindShowUnit(event) {
-    let id = event.currentTarget.dataset.data.id
-    wx.navigateTo({
-      url: '../unit/unit?id=' + id
-    })
-  },
-  
   bindPhoneCall(event) {
     let data = event.currentTarget.dataset.data
     if (data.mobile || data.tel) {

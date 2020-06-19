@@ -7,7 +7,7 @@
     bind:change="onKewordChange"
     bind:search="onSearch"
     shape="round" use-action-slot>
-    <view slot="action" bind:tap="bindSearch">搜索</view>
+    <view slot="action" bindtap="bindSearch">搜索</view>
   </van-search>
 
   <van-dropdown-menu>
@@ -26,9 +26,11 @@
   </van-dropdown-menu>
 
   <van-cell-group>
-    <van-cell wx:for="{{list}}" wx:key="id" data-data="{{ item }}" 
+    <van-cell wx:for="{{list}}" wx:key="id"
       title="{{item.building_name}}" use-label-slot
-      bindtap="bindViewBuilding" custom-class="cell-contact">
+      link-type="navigateTo"
+      url="../view/view?id={{item.id}}"
+      custom-class="cell-contact">
       <view slot="label">
         <van-tag type="success" wx:if="{{item.rent_sell}}" custom-class="cell-tag">{{item.rent_sell}}</van-tag>
         <text wx:if="{{item.address}}">{{item.address}}</text>
@@ -38,7 +40,9 @@
     </van-cell>
   </van-cell-group>
 
-  <van-divider contentPosition="center"
-    customStyle="margin-left:10px;margin-right:10px;"
-    wx:if="{{list.length == 0}}">暂无内容</van-divider>
+  <van-divider contentPosition="center" customStyle="margin-left:50px;margin-right:50px;">
+    <text wx:if="{{ list.length > 0 && isEnd && isLoading === false }}">没有更多了</text>
+    <text wx:if="{{ list.length == 0 && isLoading === false }}">暂无内容</text>
+    <van-loading wx:if="{{ isLoading && isPullDown === false }}" type="spinner" size="20px">加载中...</van-loading>
+  </van-divider>
 </view>

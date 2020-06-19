@@ -340,5 +340,13 @@ App({
       if (new RegExp('(' + k + ')').test(fmt)) 
         fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length)))
     return fmt
+  },
+
+  isMobile(str) {
+    return /^1[3456789]\d{9}$/.test(str)
+  },
+
+  isEmail(str) {
+    return /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(str)
   }
 })

@@ -39,12 +39,11 @@ class Linkman extends Base
       }
     } else {
       $validate = Validate::make([
-        'title'  => 'require|token',
+        'title'  => 'require',
         'mobile' =>'mobile',
         'email' => 'email'
       ],[
         'title.require' => '必须填写联系人姓名。',
-        'title.token' => '无效请求，请勿重复提交。',
         'mobile.mobile' => '手机号码无效',
         'email.email' => '联系人电子邮箱无效'
       ]);
@@ -55,7 +54,9 @@ class Linkman extends Base
         $data['mobile'] = str_replace(' ', '', $data['mobile']);
       }
       
-      if (!$validate->check($data)) {
+      if (!$this->checkFormToken($data)) {
+        return $this->fail('无效请求，请勿重复提交表单');
+      } else if (!$validate->check($data)) {
         $form_token = $this->formToken();
         return $this->fail($validate->getError(), $form_token);
       } else {

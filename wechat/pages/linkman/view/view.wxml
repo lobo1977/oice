@@ -1,0 +1,33 @@
+<!--pages/customer/view/view.wxml-->
+<page-meta background-text-style="dark"></page-meta>
+<view class="page-view">
+	<van-cell-group>
+		<van-cell title="{{info.title}}" title-class="cell-title" custom-class="cell-view"></van-cell>
+		<van-cell title="手机号码" wx:if="{{info.mobile}}" custom-class="cell-view" title-width="160rpx" value="{{info.mobile}}" value-class="text-left">
+			<van-icon slot="right-icon" name="phone" size="20px" data-data="{{info.mobile}}" bindtap="bindPhoneCall" color="blue" />
+		</van-cell>
+		<van-cell title="直线电话" wx:if="{{info.tel}}" custom-class="cell-view" title-width="160rpx" value="{{info.tel}}" value-class="text-left">
+			<van-icon slot="right-icon" name="phone" size="20px" data-data="{{info.tel}}" bindtap="bindPhoneCall" color="blue" />
+		</van-cell>
+		<van-cell title="部门" wx:if="{{info.department}}" custom-class="cell-view" title-width="160rpx" value="{{info.department}}" value-class="text-left"></van-cell>
+		<van-cell title="职务" wx:if="{{info.job}}" custom-class="cell-view" title-width="160rpx" value="{{info.job}}" value-class="text-left"></van-cell>
+		<van-cell title="电子信箱" wx:if="{{info.email}}" custom-class="cell-view" title-width="160rpx" value="{{info.email}}" value-class="text-left"></van-cell>
+		<van-cell title="微信" wx:if="{{info.weixin}}" custom-class="cell-view" title-width="160rpx" value="{{info.weixin}}" value-class="text-left">
+			<van-icon slot="right-icon" name="weixin" size="20px" data-data="{{info.weixin}}" bindtap="bindCopyWeixin" color="blue" />
+		</van-cell>
+		<van-cell title="QQ" wx:if="{{info.qq}}" custom-class="cell-view" title-width="160rpx" value="{{info.qq}}" value-class="text-left"></van-cell>
+		<van-cell title="状态" custom-class="cell-view" title-width="160rpx" value="{{info.status == 0 ? '在职' : '离职'}}" value-class="text-left"></van-cell>
+		<view class="cell-text-area" wx:if="{{info.rem}}">{{info.rem}}</view>
+	</van-cell-group>
+
+	<van-dialog id="van-dialog" />
+
+	<van-row gutter="0" custom-class="button-bar">
+		<van-col span="12">
+			<van-button type="primary" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}">修改</van-button>
+		</van-col>
+		<van-col span="12">
+			<van-button type="danger" icon="delete" block bind:click="bindRemove" disabled="{{ !info.allowDelete }}">删除</van-button>
+		</van-col>
+	</van-row>
+</view>
