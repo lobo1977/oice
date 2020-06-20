@@ -43,6 +43,12 @@ swiper {
  text-overflow:ellipsis;
 }
 
+.cell-group-button {
+  top: -35px;
+  padding: 5px 10px !important;
+  background-color: transparent !important;
+}
+
 .cell-text-area {
   padding: 10rpx 30rpx;
   font-size: 1em;

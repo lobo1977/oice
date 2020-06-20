@@ -16,8 +16,8 @@ class My extends Base
   /**
    * 我的收藏
    */
-  public function favorite($page = 1) {
-    $list = Building::myFavorite($this->user, $page);
+  public function favorite($page = 1, $page_size = 10) {
+    $list = Building::myFavorite($this->user, $page, $page_size);
     return $this->succeed($list);
   }
 

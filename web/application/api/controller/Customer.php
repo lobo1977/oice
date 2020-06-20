@@ -145,6 +145,18 @@ class Customer extends Base
   }
 
   /**
+   * 移除共享
+   */
+  public function removeShare($id, $user_id) {
+    $result = modelCustomer::removeShare($this->user, $id, $user_id);
+    if ($result) {
+      return $this->succeed();
+    } else {
+      return $this->fail();
+    }
+  }
+
+  /**
    * 批量导入客户
    */
   public function import() {

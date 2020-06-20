@@ -74,20 +74,23 @@ class Customer extends Base
     }
 
     if ($operate == 'view') {
-      return $user->isAdmin || $customer->share_level !== null || $customer->user_id == $user->id || 
+      return ($user->isAdmin && $customer->company_id == $user->company_id) || 
+        $customer->share_level !== null || $customer->user_id == $user->id || 
         ($customer->share && $customer->company_id > 0 && $customer->company_id == $user->company_id) || 
         ($user->id == $superior_id && $customer->company_id > 0 && $customer->company_id == $user->company_id);
     } else if ($operate == 'new') {
       return true;
     } else if ($operate == 'turn') {
-      return $customer->company_id > 0 && $customer->company_id == $user->company_id &&
+      return $customer->company_id == $user->company_id &&
         ($customer->user_id == $user->id || $user->isAdmin);
     } else if ($operate == 'edit') {
-      return ($customer->user_id == $user->id || $customer->share_level > 0) && 
+      return (($user->isAdmin && $customer->company_id == $user->company_id) || 
+        $customer->user_id == $user->id || $customer->share_level > 0) && 
         (!$customer->clash || $customer->parallel);
     } else if ($operate == 'follow') {    // 跟进
       return (
-        $user->isAdmin || $customer->share_level !== null || $customer->user_id == $user->id || 
+        ($user->isAdmin && $customer->company_id == $user->company_id) || 
+        $customer->share_level !== null || $customer->user_id == $user->id || 
         ($customer->share && $customer->company_id > 0 && $customer->company_id == $user->company_id) || 
         ($user->id == $superior_id && $customer->company_id > 0 && $customer->company_id == $user->company_id)
       ) && (!$customer->clash || $customer->parallel);
@@ -404,11 +407,23 @@ class Customer extends Base
       $data['share'] = 1;
     }
 
+    if (isset($data['min_acreage']) && (empty($data['min_acreage']) || $data['min_acreage'] == 'null')) {
+      unset($data['min_acreage']);
+    }
+
+    if (isset($data['max_acreage']) && (empty($data['max_acreage']) || $data['max_acreage'] == 'null')) {
+      unset($data['max_acreage']);
+    }
+
+    if (isset($data['current_area']) && (empty($data['current_area']) || $data['current_area'] == 'null')) {
+      unset($data['current_area']);
+    }
+
     if (isset($data['settle_date']) && empty($data['settle_date'])) {
       unset($data['settle_date']);
     }
 
-    if (isset($data['end_date']) &&empty($data['end_date'])) {
+    if (isset($data['end_date']) && empty($data['end_date'])) {
       unset($data['end_date']);
     }
 
@@ -471,7 +486,7 @@ class Customer extends Base
         }
       }
 
-      if ($data['min_acreage'] != $oldData->min_acreage) {
+      if (isset($data['min_acreage']) && $data['min_acreage'] != $oldData->min_acreage) {
         if ($oldData->min_acreage) {
           $summary = $summary . '最小面积：' . $oldData->min_acreage . '平米 -> ' . $data['min_acreage'] . '平米\n';
         } else {
@@ -479,7 +494,7 @@ class Customer extends Base
         }
       }
 
-      if ($data['max_acreage'] != $oldData->max_acreage) {
+      if (isset($data['max_acreage']) && $data['max_acreage'] != $oldData->max_acreage) {
         if ($oldData->max_acreage) {
           $summary = $summary . '最大面积：' . $oldData->max_acreage . '平米 -> ' . $data['max_acreage'] . '平米\n';
         } else {
@@ -508,7 +523,7 @@ class Customer extends Base
         }
       }
 
-      if ($data['current_area'] != $oldData->current_area) {
+      if (isset($data['current_area']) && $data['current_area'] != $oldData->current_area) {
         if ($oldData->current_area) {
           $summary = $summary . '在驻面积：' . $oldData->current_area . '平米 -> ' . $data['current_area'] . '平米\n';
         } else {
@@ -709,6 +724,43 @@ class Customer extends Base
         "owner_id" => $customer->id,
         "title" => '转交客户',
         "summary" => $summary
+      ]);
+    }
+
+    return $result;
+  }
+
+  // 移除共享
+  public static function removeShare($user, $id, $user_id) {
+    $customer = self::alias('a')
+      ->join('user u', "a.user_id = u.id")
+      ->field('a.id,a.user_id,a.company_id,a.clash,a.parallel,a.status,u.title')
+      ->where('a.id', $id)
+      ->find();
+
+    if ($customer == null) {
+      self::exception('客户不存在。');
+    } else if (!self::allow($user, $customer, 'edit')) {
+      self::exception('您没有权限修改客户共享。');
+    }
+
+    $sUser = User::get($user_id);
+    if ($sUser == null) {
+      self::exception('用户不存在。');
+    }
+
+    $result = db('share')
+      ->where('type', 'customer')
+      ->where('object_id', $id)
+      ->where('user_id', $user_id)
+      ->delete();
+    
+    if ($result) {
+      Log::add($user, [
+        "table" => 'customer',
+        "owner_id" => $customer->id,
+        "title" => '移除共享',
+        "summary" => $sUser->title
       ]);
     }
 

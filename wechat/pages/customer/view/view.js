@@ -77,6 +77,13 @@ Page({
     },
     tapStartTime: 0,
     tapEndTime: 0,
+    showShareActions:false,
+    shareIndex: 0,
+    shareActions: [
+      {
+        name: '移除',
+      }
+    ],
     showAttachActions: false,
     attachIndex: 0,
     attachActions: [
@@ -87,7 +94,14 @@ Page({
     showTurn: false,
     searching: false,
     keyword: '',
-    userList: []
+    userList: [],
+    showFilter: false,
+    isFilterLoading: false,
+    filterPage: 1,
+    filterPageSize: 10,
+    isFilterEnd: false,
+    filterList: [],
+    filterResult: []
   },
 
   /**
@@ -194,6 +208,16 @@ Page({
     }
   },
 
+  bindViewContact: function(event) {
+    if (this.tapEndTime  - this.tapStartTime > 350) {
+      return
+    }
+    let contact = this.data.info.shareList[event.currentTarget.dataset.data]
+    wx.navigateTo({
+      url: '../../contact/view/view?id=' + contact.id
+    })
+  },
+
   bindViewAttach: function (event) {
     if (this.tapEndTime  - this.tapStartTime > 350) {
       return
@@ -253,9 +277,7 @@ Page({
       maxDuration: 20,
       camera: 'back',
       success(res) {
-        wx.showLoading({
-          title: '上传中',
-        })
+        wx.showLoading()
         let count = 0
         res.tempFiles.forEach(element => {
           wx.uploadFile({
@@ -300,6 +322,48 @@ Page({
     })
   },
 
+  bindShareLongTap: function(event) {
+    let idx = event.currentTarget.dataset.data
+    if (this.data.info.allowEdit) {
+      this.setData({
+        showShareActions: true,
+        shareIndex: idx
+      })
+    }
+  },
+
+  onShareActionsClose: function() {
+    this.setData({
+      showShareActions: false
+    })
+  },
+
+  onShareActionsSelect: function(event) {
+    let that = this
+    if (event.detail.name == '移除') {
+      wx.showLoading()
+      app.post('customer/removeShare', {
+        id: that.data.info.id,
+        user_id: that.data.info.shareList[that.data.shareIndex].id,
+      }, (res) => {
+        if (res.success) {
+          that.data.info.shareList.splice(that.data.shareIndex, 1)
+          that.setData({
+            ['info.shareList']: that.data.info.shareList
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: res.message ? res.message : '操作失败，系统异常',
+            duration: 2000
+          })
+        }
+      }, () => {
+        wx.hideLoading()
+      })
+    }
+  },
+
   bindAttachLongTap: function(event) {
     let idx = event.currentTarget.dataset.data
     if (this.data.info.allowFollow && app.globalData.appUserInfo.id == this.data.info.attach[idx].user_id) {
@@ -319,9 +383,7 @@ Page({
   onAttachActionsSelect: function(event) {
     let that = this
     if (event.detail.name == '删除') {
-      wx.showLoading({
-        title: '删除中',
-      })
+      wx.showLoading()
       app.post('customer/removeAttach', {
         attach_id: that.data.info.attach[that.data.attachIndex].id,
       }, (res) => {
@@ -353,6 +415,7 @@ Page({
 
   bindTurn: function() {
     this.setData({
+      userList: [],
       keyword: '',
       showTurn: true
     })
@@ -391,6 +454,86 @@ Page({
     })
   },
 
+  bindAddFilter: function() {
+    this.setData({
+      filterPage: 1,
+      filterList: [],
+      filterResult: [],
+      showFilter: true
+    })
+    this.getFilter()
+  },
+
+  onFilterClose: function() {
+    this.setData({
+      showFilter: false
+    })
+  },
+
+  bindFilterClick: function(event) {
+    const idx = event.currentTarget.dataset.index
+    const checkbox = this.selectComponent(`.filter-${idx}`)
+    checkbox.toggle()
+  },
+
+  onFilterChange: function(event) {
+    this.setData({
+      filterResult: event.detail
+    })
+  },
+
+  onFilterConfirm: function() {
+    let that = this
+    if (that.data.filterResult.length == 0) {
+      wx.showToast({
+        title: '请选择要加入筛选的项目',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
+
+    that.setData({
+      showFilter: false
+    })
+
+    wx.showLoading()
+
+    let bids = ''
+    let uids = ''
+    that.data.filterResult.forEach(element => {
+      let arr = element.split(',')
+      if (arr[0]) {
+        if (bids) {
+          bids += ','
+        }
+        bids += arr[0]
+      }
+      if (arr[1] != '' && arr[1] != '0') {
+        if (uids) {
+          uids += ','
+        }
+        uids += arr[1]
+      }
+    })
+    app.post('customer/addFilter', {
+      cid: that.data.info.id,
+      bids: bids,
+      uids: uids
+    }, (res) => {
+      if (res.success) {
+        that.getView()
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        })
+      }
+    }, () => {
+      wx.hideLoading()
+    })
+  },
+
   setPrevImages: function(files) {
     if (files.length) {
       let prevList = this.data.previewImages
@@ -405,6 +548,34 @@ Page({
     }
   },
 
+  noop: function() {},
+
+  bindRemoveFilter: function(event) {
+    let that = this
+    const idx = event.currentTarget.dataset.index
+    const filter = that.data.info.filter[idx]
+    wx.showLoading()
+    app.post('customer/removeFilter', {
+      id: that.data.info.id,
+      building_id: filter.building_id,
+      unit_id: filter.unit_id
+    }, (res) => {
+      if (res.success) {
+        that.data.info.filter.splice(idx, 1)
+        that.setData({
+          ['info.filter']: that.data.info.filter
+        })
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        })
+      }
+    }, () => {
+      wx.hideLoading()
+    })
+  },
+
   // 获取数据
   getView: function() {
     let that = this;
@@ -413,9 +584,7 @@ Page({
     })
     
     if (that.data.isPullDown == false) {
-      wx.showLoading({
-        title: '加载中',
-      })
+      wx.showLoading()
     }
     
     let url = 'customer/detail?id=' + that.data.info.id
@@ -507,9 +676,7 @@ Page({
 
   turn: function(newUser) {
     let that = this
-    wx.showLoading({
-      title: '转交中',
-    })
+    wx.showLoading()
     app.post('customer/turn', {
       id: that.data.info.id,
       user_id: newUser.id,
@@ -530,5 +697,47 @@ Page({
     }, () => {
       wx.hideLoading()
     })
-  }
+  },
+
+  getMoreFilter: function() {
+    if (!this.data.isFilterEnd) {
+      this.data.filterPage++
+      this.getFilter()
+    }
+  },
+
+  getFilter: function() {
+    let that = this
+
+    if (that.data.isFilterLoading) 
+      return
+
+    that.setData({
+      isFilterLoading: true
+    })
+    app.get('my/favorite?page=' + that.data.filterPage + '&page_size=' + that.data.filterPageSize, (res) => {
+      if (res.success) {
+        if (!res.data || res.data.length < that.data.filterPageSize) {
+          that.setData({
+            isFilterEnd: true
+          })
+        } else {
+          that.setData({
+            isFilterEnd: false
+          })
+        }
+
+        if (res.data && res.data.length) {
+          let list = that.data.filterList.concat(res.data)
+          that.setData({
+            filterList: list
+          })
+        }
+      }
+    }, () => {
+      that.setData({
+        isFilterLoading: false
+      })
+    })
+  },
 })

@@ -154,12 +154,10 @@ class Building extends Base
   /**
    * 检索收藏的项目信息
    */
-  public static function myFavorite($user, $page = 1) {
+  public static function myFavorite($user, $page = 1, $page_size = 10) {
     if ($user == null) {
       return null;
     }
-
-    $pageSize = 10;
 
     $list = db('favorite')->alias('a')
       ->leftJoin('unit u', 'a.unit_id = u.id AND a.unit_id > 0')
@@ -168,7 +166,7 @@ class Building extends Base
       ->where('a.user_id', $user->id)
       ->field('a.building_id,b.building_name,b.level,b.area,b.district,b.address,b.price,f.file,
         a.unit_id,u.building_no,u.floor,u.room,u.acreage,u.rent_price,u.sell_price')
-      ->page($page, $pageSize)
+      ->page($page, $page_size)
       ->order('a.create_time', 'desc')
       ->select();
 

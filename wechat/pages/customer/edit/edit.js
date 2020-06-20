@@ -131,9 +131,13 @@ Page({
     let url = 'customer/edit?id=' + that.data.id
     app.get(url, (res) => {
       if (res.success && res.data) {
-        that.setData({
-          info: res.data
-        })
+        for (let item in that.data.info) {
+          if (res.data[item] !== undefined && res.data[item] !== null) {
+            that.setData({
+              ['info.' + item]: res.data[item]
+            })
+          }
+        }
         if (res.data.settle_date) {
           that.setData({
             ['info.settle_date']: app.formatTime(Date.parse(res.data.settle_date.replace(/-/g, '/')), 'yyyy-MM-dd'),

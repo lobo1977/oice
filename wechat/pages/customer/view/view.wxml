@@ -16,7 +16,7 @@
           value-class="text-left">
           <van-icon slot="right-icon" name="phone" size="20px"
             data-data="{{info.tel}}" bindtap="bindPhoneCall"
-            color="blue" />  
+            color="blue" custom-style="margin-right:10px" />  
         </van-cell>
         <van-cell title="地址" wx:if="{{info.address}}" custom-class="cell-view"
           title-width="160rpx" value="{{info.address}}" value-class="text-left"></van-cell>
@@ -40,16 +40,20 @@
       </van-cell-group>
 
       <van-cell-group title="联系人" wx:if="{{(info.linkman && info.linkman.length) || info.allowFollow}}">
-        <van-cell wx:if="{{info.allowFollow}}" title="添加联系人" icon="add-o" bindtap="bindAddLinkman" />
         <van-cell wx:for="{{info.linkman}}" wx:key="id" data-data="{{item}}"
           title="{{item.title}}" center label="{{item.desc}}" custom-class="cell-view"
           link-type="navigateTo" url="../../linkman/view/view?id={{item.id}}">
           <view slot="right-icon">
             <van-icon name="phone" size="20px" wx:if="{{item.mobile || item.tel}}"
               data-data="{{item.mobile || item.tel}}" catchtap="bindPhoneCall"
-              color="blue" />
+              color="blue" custom-style="margin-right:10px" />
             <van-icon name="wechat" size="20px" wx:if="{{item.weixin || item.mobile}}" 
-              data-data="{{item.weixin || item.mobile}}" catchtap="bindCopyWeixin" color="green" custom-style="margin-left:20px" />
+              data-data="{{item.weixin || item.mobile}}" catchtap="bindCopyWeixin" color="green" custom-style="margin-right:10px" />
+          </view>
+        </van-cell>
+        <van-cell wx:if="{{info.allowFollow}}" center custom-class="cell-view">
+          <view bindtap="bindAddLinkman" style="display:flex;justify-content:flex-end;">
+            <van-icon name="add-o" size="20px" custom-style="margin-right:5px" /><text>添加联系人</text>
           </view>
         </van-cell>
       </van-cell-group>
@@ -61,14 +65,20 @@
           <image slot="icon" mode="aspectFill" 
             src="{{filter.imageUrl(info.avatar)}}" class="cell-image"></image>
         </van-cell>
-        <van-cell wx:if="{{info.allowTurn}}" title="转交" icon="share" bindtap="bindTurn" />
+        <van-cell wx:if="{{info.allowTurn}}" center custom-class="cell-view" custom-class="cell-view">
+          <view bindtap="bindTurn" style="display:flex;justify-content:flex-end;">
+            <van-icon name="share" size="20px" custom-style="margin-right:5px" /><text>转交</text>
+          </view>
+        </van-cell>
       </van-cell-group>
 
       <van-cell-group title="客户共享" wx:if="{{info.shareList && info.shareList.length}}">
-        <van-cell wx:for="{{info.shareList}}" wx:key="id" data-data="{{item.id }}" 
+        <van-cell wx:for="{{info.shareList}}" wx:for-index="idx" wx:key="id" data-data="{{idx}}" 
           title="{{item.title}}" label="{{item.company || item.mobile}}" center is-link
-          link-type="navigateTo" url="../../contact/view/view?id={{item.id}}"
-          custom-class="cell-contact">
+          bind:click="bindViewContact"
+          custom-class="cell-contact"
+          bindtouchstart="bindTouchStart" bindtouchend="bindTouchEnd"
+          bindlongtap="bindShareLongTap">
           <image slot="icon" mode="aspectFill" 
             src="{{filter.imageUrl(item.avatar)}}" class="cell-image"></image>
         </van-cell>
@@ -112,23 +122,33 @@
       </van-cell-group>
       <van-row gutter="0" custom-class="button-bar">
         <van-col span="24">
-          <van-button type="primary" icon="upgrade" block bind:click="bindUpload" data-data="{{info.id}}" disabled="{{ !info.allowFollow }}">上传</van-button>
+          <van-button type="primary" icon="upgrade" block bind:click="bindUpload" disabled="{{ !info.allowFollow }}">上传</van-button>
         </van-col>
       </van-row>
     </van-tab>
     <van-tab title="项目筛选">
-      <van-cell-group wx:if="{{info.filter && info.filter.length}}">
-        <van-cell wx:for="{{info.filter}}" wx:key="id" data-data="{{ item }}" 
-          title="{{item.title}}" label="{{item.desc}}" center is-link
-          bind:click="bindViewBuilding" custom-class="cell-contact">
-          <image slot="icon" mode="aspectFill" 
-            src="{{filter.imageUrl(item.src)}}" class="cell-image"></image>
-        </van-cell>
+      <van-cell-group>
+        <van-swipe-cell wx:for="{{info.filter}}" wx:for-index="idx" wx:key="id" right-width="{{ 60 }}" disabled="{{!info.allowFollow}}">
+          <van-cell data-data="{{ item }}" 
+            title="{{item.title}}" label="{{item.desc}}" center
+            bind:click="bindViewBuilding" custom-class="cell-contact">
+            <image slot="icon" mode="aspectFill" 
+              src="{{filter.imageUrl(item.src)}}" class="cell-image"></image>
+          </van-cell>
+          <view slot="right" style="height:100%">
+            <van-button type="danger" data-index="{{ idx }}" custom-style="height:100%" bindtap="bindRemoveFilter">删除</van-button>
+          </view>
+        </van-swipe-cell>
       </van-cell-group>
+      <van-row gutter="0" custom-class="button-bar">
+        <van-col span="24">
+          <van-button type="primary" icon="filter-o" block bind:click="bindAddFilter" disabled="{{ !info.allowFollow }}">添加筛选</van-button>
+        </van-col>
+      </van-row>
     </van-tab>
   </van-tabs>
 
-  <van-popup show="{{ showTurn }}" position="bottom" bind:close="onTurnClose" custom-style="height:100%;overflow-y:hidden;">
+  <van-popup show="{{ showTurn }}" position="bottom" bind:close="onTurnClose" custom-style="height:100%;">
     <van-nav-bar title="选择转交人" safe-area-inset-top="{{false}}">
       <van-icon slot="right" name="cross" bindtap="onTurnClose" custom-style="posiation:relative;top:-13px" />
     </van-nav-bar>
@@ -150,6 +170,37 @@
       </van-cell>
     </van-cell-group>
   </van-popup>
+
+  <van-popup show="{{ showFilter }}" position="bottom" bind:close="onFilterClose" custom-style="height:100%;">
+    <van-nav-bar title="筛选项目" safe-area-inset-top="{{false}}" left-text="取消" right-text="确定" bind:click-left="onFilterClose"
+      bind:click-right="onFilterConfirm" />
+    <scroll-view scroll-y style="height:90%" bindscrolltolower="getMoreFilter">
+      <van-checkbox-group value="{{ filterResult }}" bind:change="onFilterChange">
+        <van-cell-group>
+          <van-cell wx:for="{{filterList}}" wx:for-index="idx" wx:key="building_id" data-index="{{idx}}" data-data="{{ item }}" 
+            title="{{item.title}}" label="{{item.desc}}" center clickable bind:click="bindFilterClick"
+            custom-class="cell-contact">
+            <image slot="icon" mode="aspectFill" 
+              src="{{filter.imageUrl(item.src)}}" class="cell-image"></image>
+            <van-checkbox slot="right-icon" name="{{item.building_id + ',' + item.unit_id}}" checked-color="#07c160" class="filter-{{idx}}" catch:tap="noop" />
+          </van-cell>
+        </van-cell-group>
+      </van-checkbox-group>
+      <van-divider contentPosition="center" customStyle="margin-left:50px;margin-right:50px;">
+        <text wx:if="{{ filterList.length > 0 && isFilterEnd && !isFilterLoading }}">没有更多了</text>
+        <text wx:if="{{ filterList.length == 0 && isFilterEnd && !isFilterLoading }}">暂无可选项目</text>
+        <text wx:if="{{ !isFilterEnd && !isFilterLoading }}" bindtap="getMoreFilter">加载更多</text>
+        <van-loading wx:if="{{ isFilterLoading }}" type="spinner" size="20px">加载中...</van-loading>
+      </van-divider>
+    </scroll-view>
+  </van-popup>
+
+  <van-action-sheet
+    show="{{ showShareActions }}"
+    actions="{{ shareActions }}"
+    bind:close="onShareActionsClose"
+    bind:select="onShareActionsSelect"
+  />
 
   <van-action-sheet
     show="{{ showAttachActions }}"
