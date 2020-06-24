@@ -14,7 +14,7 @@
     <van-cell title-width="80px" title="是否在职">
       <van-switch checked="{{ !info.status || info.status == 0 }}" bind:change="onStatusChange" active-color="#07c160" />
     </van-cell>
-    <van-field title-width="80px" label="备注" value="{{ info.rem }}" type="textarea" maxlength="200" bind:input="onRemInput" />
+    <van-field title-width="80px" label="备注" value="{{ info.rem }}" type="textarea" maxlength="200" autosize bind:input="onRemInput" />
   </van-cell-group>
 
   <van-dialog id="van-dialog" />

@@ -32,7 +32,7 @@
         <text> 个月提醒</text>
       </view>
     </van-cell>
-    <van-field title-width="80px" label="备注" value="{{ info.rem }}" type="textarea" maxlength="200" bind:input="onRemInput" />
+    <van-field title-width="80px" label="备注" value="{{ info.rem }}" type="textarea" maxlength="200" autosize bind:input="onRemInput" />
   </van-cell-group>
 
   <van-cell-group>
