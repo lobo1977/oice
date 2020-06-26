@@ -136,7 +136,7 @@ class Customer extends Base
       ->leftJoin('user_company b', 'a.user_id = b.user_id and a.company_id = b.company_id and b.status = 1')
       ->leftJoin('user u', 'a.user_id = u.id')
       ->leftJoin('share s', "s.type = 'customer' and a.id = s.object_id and s.user_id = " . $user_id)
-      ->where('a.user_id = ' . $user_id . '
+      ->where('(a.user_id = ' . $user_id . ' and a.company_id = ' . $company_id . ')
          OR ((a.share = 1 or b.superior_id = ' . $user_id . ') and a.company_id > 0 and a.company_id = ' . $company_id . ')
          OR s.object_id is not null');
 
