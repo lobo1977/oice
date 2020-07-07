@@ -54,6 +54,7 @@ Page({
       manager_mobile: '',
       company: '',          // 所属企业
       key: '',
+      isShare: false,
       allowEdit: false,
       allowTurn: false,
       allowFollow: false,
@@ -322,6 +323,17 @@ Page({
     })
   },
 
+  bindUnShare: function(event) {
+    let that = this
+    Dialog.confirm({
+      title: '取消确认',
+      message: '确定不再查看这个客户了吗？',
+    }).then(() => {
+      that.unShare(app.globalData.appUserInfo.id)
+    }).catch(() => {
+    })
+  },
+
   bindShareLongTap: function(event) {
     let idx = event.currentTarget.dataset.data
     if (this.data.info.allowEdit) {
@@ -341,26 +353,8 @@ Page({
   onShareActionsSelect: function(event) {
     let that = this
     if (event.detail.name == '移除') {
-      wx.showLoading()
-      app.post('customer/removeShare', {
-        id: that.data.info.id,
-        user_id: that.data.info.shareList[that.data.shareIndex].id,
-      }, (res) => {
-        if (res.success) {
-          that.data.info.shareList.splice(that.data.shareIndex, 1)
-          that.setData({
-            ['info.shareList']: that.data.info.shareList
-          })
-        } else {
-          wx.showToast({
-            icon: 'none',
-            title: res.message ? res.message : '操作失败，系统异常',
-            duration: 2000
-          })
-        }
-      }, () => {
-        wx.hideLoading()
-      })
+      let idx = that.data.shareIndex
+      that.unShare(that.data.info.shareList[idx].id, idx)
     }
   },
 
@@ -686,6 +680,7 @@ Page({
         Dialog.alert({
           message: '转交成功',
         }).then(() => {
+          app.globalData.refreshCustomer = true
           wx.navigateBack()
         })
       } else {
@@ -740,4 +735,33 @@ Page({
       })
     })
   },
+
+  unShare: function(user_id, idx) {
+    let that = this
+    wx.showLoading()
+    app.post('customer/removeShare', {
+      id: that.data.info.id,
+      user_id: user_id,
+    }, (res) => {
+      if (res.success) {
+        if (idx || idx === 0) {
+          that.data.info.shareList.splice(idx, 1)
+          that.setData({
+            ['info.shareList']: that.data.info.shareList
+          })
+        } else {
+          app.globalData.refreshCustomer = true
+          wx.navigateBack()
+        }
+      } else {
+        wx.showToast({
+          icon: 'none',
+          title: res.message ? res.message : '操作失败，系统异常',
+          duration: 2000
+        })
+      }
+    }, () => {
+      wx.hideLoading()
+    })
+  }
 })

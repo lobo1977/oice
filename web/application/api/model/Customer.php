@@ -199,7 +199,7 @@ class Customer extends Base
     $data = self::alias('a')
       ->leftJoin('user b','b.id = a.user_id')
       ->leftJoin('company c','c.id = a.company_id')
-      ->leftJoin('share s', "s.type = 'customer' and a.id = s.object_id and s.user_id = " . $user_id)
+      ->leftJoin('share s', "s.type = 'customer' and a.id = s.object_id and s.user_id <> a.user_id and s.user_id = " . $user_id)
       ->where('a.id', $id)
       ->field('a.*,
         b.title as manager,b.avatar,b.mobile as manager_mobile,c.title as company,
@@ -241,7 +241,7 @@ class Customer extends Base
     $data = self::alias('a')
       ->leftJoin('user b','b.id = a.user_id')
       ->leftJoin('company c','c.id = a.company_id')
-      ->leftJoin('share s', "s.type = 'customer' and a.id = s.object_id and s.user_id = " . $user_id)
+      ->leftJoin('share s', "s.type = 'customer' and a.id = s.object_id and s.user_id <> a.user_id and s.user_id = " . $user_id)
       ->where('a.id', $id)
       ->field('a.id,a.customer_name,a.tel,a.area,a.address,a.demand,a.lease_buy,
         a.district,a.min_acreage,a.max_acreage,a.budget,a.settle_date,a.current_area,
@@ -273,6 +273,7 @@ class Customer extends Base
 
       User::formatData($data);
       $data->key = md5('customer' . $data->id . config('wechat.app_secret'));
+      $data->isShare = $data->share_level !== null;
       $data->allowEdit = self::allow($user, $data, 'edit');
       $data->allowTurn = self::allow($user, $data, 'turn');
       $data->allowFollow = self::allow($user, $data, 'follow');
@@ -732,15 +733,11 @@ class Customer extends Base
 
   // 移除共享
   public static function removeShare($user, $id, $user_id) {
-    $customer = self::alias('a')
-      ->join('user u', "a.user_id = u.id")
-      ->field('a.id,a.user_id,a.company_id,a.clash,a.parallel,a.status,u.title')
-      ->where('a.id', $id)
-      ->find();
+    $customer = self::getById($user, $id);
 
     if ($customer == null) {
       self::exception('客户不存在。');
-    } else if (!self::allow($user, $customer, 'edit')) {
+    } else if (!self::allow($user, $customer, 'edit') && $user->id != $user_id) {
       self::exception('您没有权限修改客户共享。');
     }
 

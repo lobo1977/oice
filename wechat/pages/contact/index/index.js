@@ -25,6 +25,10 @@ Page({
     }
   },
   onShow: function () {
+    if (app.globalData.refreshBuilding) {
+      this.getList()
+      app.globalData.refreshBuilding = false
+    }
   },
   onReady: function () {
     // 页面首次渲染完毕时执行

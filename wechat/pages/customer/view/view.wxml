@@ -93,11 +93,14 @@
       </van-cell-group>
 
       <van-row gutter="0" custom-class="button-bar">
-        <van-col span="12">
-          <van-button type="primary" icon="notes-o" block bind:click="bindAddLog" disabled="{{ !info.allowFollow }}">跟进</van-button>
+        <van-col span="{{ info.isShare ? 8 : 12}}">
+          <van-button square type="primary" icon="notes-o" block bind:click="bindAddLog" disabled="{{ !info.allowFollow }}">跟进</van-button>
         </van-col>
-        <van-col span="12">
-          <van-button type="danger" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}">修改资料</van-button>
+        <van-col span="{{ info.isShare ? 8 : 12}}">
+          <van-button square type="danger" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}">编辑</van-button>
+        </van-col>
+        <van-col span="8" wx:if="{{info.isShare}}">
+          <van-button square type="warning" icon="closed-eye" block bind:click="bindUnShare">取消共享</van-button>
         </van-col>
       </van-row>
     </van-tab>
@@ -105,7 +108,7 @@
       <van-steps steps="{{ logs }}" active="{{ 0 }}" direction="vertical" />
       <van-row gutter="0" custom-class="button-bar">
         <van-col span="24">
-          <van-button type="primary" icon="notes-o" block bind:click="bindAddLog" disabled="{{ !info.allowFollow }}">添加</van-button>
+          <van-button square type="primary" icon="notes-o" block bind:click="bindAddLog" disabled="{{ !info.allowFollow }}">添加</van-button>
         </van-col>
       </van-row>
     </van-tab>
@@ -122,7 +125,7 @@
       </van-cell-group>
       <van-row gutter="0" custom-class="button-bar">
         <van-col span="24">
-          <van-button type="primary" icon="upgrade" block bind:click="bindUpload" disabled="{{ !info.allowFollow }}">上传</van-button>
+          <van-button square type="primary" icon="upgrade" block bind:click="bindUpload" disabled="{{ !info.allowFollow }}">上传</van-button>
         </van-col>
       </van-row>
     </van-tab>
@@ -136,13 +139,13 @@
               src="{{filter.imageUrl(item.src)}}" class="cell-image"></image>
           </van-cell>
           <view slot="right" style="height:100%">
-            <van-button type="danger" data-index="{{ idx }}" custom-style="height:100%" bindtap="bindRemoveFilter">删除</van-button>
+            <van-button square type="danger" data-index="{{ idx }}" custom-style="height:100%" bindtap="bindRemoveFilter">删除</van-button>
           </view>
         </van-swipe-cell>
       </van-cell-group>
       <van-row gutter="0" custom-class="button-bar">
         <van-col span="24">
-          <van-button type="primary" icon="filter-o" block bind:click="bindAddFilter" disabled="{{ !info.allowFollow }}">添加筛选</van-button>
+          <van-button square type="primary" icon="filter-o" block bind:click="bindAddFilter" disabled="{{ !info.allowFollow }}">添加筛选</van-button>
         </van-col>
       </van-row>
     </van-tab>

@@ -431,6 +431,7 @@ Page({
 
       app.post('customer/edit?id=' + that.data.id, that.data.info, (res) => {
         if (res.success) {
+          app.globalData.refreshCustomer = true
           if (res.message) {
             Dialog.alert({
               title: '保存成功',

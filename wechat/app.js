@@ -263,6 +263,8 @@ App({
         value: "empty"
       }
     ],
+    refreshBuilding: false,
+    refreshCustomer: false
   },
   
   // 登录
