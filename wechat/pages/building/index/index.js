@@ -155,6 +155,12 @@ Page({
     this.data.pageIndex = 1
     this.getList();
   },
+
+  bindAdd: function() {
+    wx.navigateTo({
+      url: '../edit/edit?id=0',
+    })
+  },
     
   // 获取列表
   getList: function() {

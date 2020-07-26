@@ -47,7 +47,8 @@ Page({
       confirm: []
     },
     previewImages: [],
-    showUnits: []
+    showUnits: [],
+    goEdit: false
   },
   
   onLoad(options) {
@@ -64,6 +65,13 @@ Page({
       app.userLoginCallback = () => {
         that.getView()
       }
+    }
+  },
+
+  onShow: function () {
+    if (this.data.goEdit) {
+      this.getView()
+      this.data.goEdit = false
     }
   },
   
@@ -124,6 +132,13 @@ Page({
     let data = event.currentTarget.dataset.data
     wx.setClipboardData({
       data: data.weixin || data.mobile
+    })
+  },
+
+  bindEdit: function(event) {
+    this.data.goEdit = true
+    wx.navigateTo({
+      url: '../edit/edit?id=' + this.data.info.id
     })
   },
   

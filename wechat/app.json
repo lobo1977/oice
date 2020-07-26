@@ -37,7 +37,8 @@
     "van-tab": "@vant/weapp/tab",
     "van-tabs": "@vant/weapp/tabs",
     "van-divider": "@vant/weapp/divider",
-    "van-nav-bar": "@vant/weapp/nav-bar"
+    "van-nav-bar": "@vant/weapp/nav-bar",
+    "van-notice-bar": "@vant/weapp/notice-bar"
   },
   "tabBar": {
     "list": [
@@ -66,6 +67,7 @@
     "pages/my/index/index",
     "pages/customer/view/view",
     "pages/customer/log/log",
-    "pages/customer/edit/edit"
+    "pages/customer/edit/edit",
+    "pages/building/edit/edit"
   ]
 }

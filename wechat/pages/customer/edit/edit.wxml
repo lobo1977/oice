@@ -13,15 +13,15 @@
     <van-field title-width="80px" label="需求项目" value="{{ info.demand }}" is-link readonly clickable bindtap="bindSelectDemand" />
     <van-field title-width="80px" label="租购" value="{{ info.lease_buy }}" is-link readonly clickable bindtap="bindSelectLeaseBuy" />
     <van-field title-width="80px" label="意向区域" value="{{ info.district }}" is-link readonly clickable bindtap="bindSelectDistrict" />
-    <van-field title-width="80px" label="最小面积" value="{{ info.min_acreage }}" type="number" max_acreage="10" bind:input="onMinAcreageInput">
+    <van-field title-width="80px" label="最小面积" value="{{ info.min_acreage }}" type="number" maxlength="10" bind:input="onMinAcreageInput">
       <text slot="button">平方米</text>
     </van-field>
-    <van-field title-width="80px" label="最大面积" value="{{ info.max_acreage }}" type="number" max_acreage="10" bind:input="onMaxAcreageInput">
+    <van-field title-width="80px" label="最大面积" value="{{ info.max_acreage }}" type="number" maxlength="10" bind:input="onMaxAcreageInput">
       <text slot="button">平方米</text>
     </van-field>
     <van-field title-width="80px" label="预算" value="{{ info.budget }}" maxlength="30" bind:input="onBudgeInput" />
     <van-field title-width="80px" label="入驻日期" value="{{ info.settle_date }}" right-icon="calender-o" readonly clickable bindtap="bindSelectSettleDate" />
-    <van-field title-width="80px" label="在驻面积" value="{{ info.current_area }}" type="number" max_acreage="10" bind:input="onCurrentAreaInput">
+    <van-field title-width="80px" label="在驻面积" value="{{ info.current_area }}" type="number" maxlength="10" bind:input="onCurrentAreaInput">
       <text slot="button">平方米</text>
     </van-field>
     <van-field title-width="80px" label="到期日" value="{{ info.end_date }}" right-icon="calender-o" readonly clickable bindtap="bindSelectEndDate" />
