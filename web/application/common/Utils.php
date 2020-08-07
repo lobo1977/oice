@@ -140,7 +140,7 @@ class Utils
         return $ext;
     }
 
-        /**
+    /**
      * 获取文件扩展名
      */
     public static function replaceExt($fileName, $newExt) {
@@ -187,5 +187,37 @@ class Utils
         $video = $ffmpeg->open($video);
         $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds($time))
             ->save($savePath);
+    }
+
+
+    /**
+     * 地图坐标系转换
+     * GCJ02 TO BD09
+     */
+    public static function ConvertGCJ02ToBD09($lat, $lng) {
+        $x_pi = 3.14159265358979324 * 3000.0 / 180.0;
+        $x = $lng;
+        $y = $lat;
+        $z = sqrt($x * $x + $y * $y) + 0.00002 * sin($y * $x_pi);
+        $theta = atan2($y, $x) + 0.000003 * cos($x * $x_pi);
+        $lng = $z * cos($theta) + 0.0065;
+        $lat = $z * sin($theta) + 0.006;
+        return array('lng'=>$lng,'lat'=>$lat);
+    }
+
+    /**
+     * 地图坐标系转换
+     * 腾讯地图用的也是GCJ02坐标
+     * BD09 TO GCJ02
+     */
+    public static function ConvertBD09ToGCJ02($lat, $lng) {
+        $x_pi = 3.14159265358979324 * 3000.0 / 180.0;
+        $x = $lng - 0.0065;
+        $y = $lat - 0.006;
+        $z = sqrt($x * $x + $y * $y) - 0.00002 * sin($y * $x_pi);
+        $theta = atan2($y, $x) - 0.000003 * cos($x * $x_pi);
+        $lng = $z * cos($theta);
+        $lat = $z * sin($theta);
+        return array('lng'=>$lng,'lat'=>$lat);
     }
 }

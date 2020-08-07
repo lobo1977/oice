@@ -354,5 +354,31 @@ App({
 
   isEmail(str) {
     return /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(str)
+  },
+
+  convertGCJ02ToBD09(lat, lng) {
+    const pi = 3.14159265358979324 * 3000.0 / 180.0
+    let z = Math.sqrt(lng * lng + lat * lat) + 0.00002 * Math.sin(lat * pi)
+    let theta = Math.atan2(lat, lng) + 0.000003 * Math.cos(lng * pi)
+    let lng_n = z * Math.cos(theta) + 0.0065
+    let lat_n = z * Math.sin(theta) + 0.006
+    return {
+      lat : lat_n,
+      lng : lng_n
+    }
+  },
+
+  convertBD09ToGCJ02(lat, lng) {
+    const pi = 3.14159265358979324 * 3000.0 / 180.0
+    lng = lng - 0.0065
+    lat = lat - 0.006
+    let z = Math.sqrt(lng * lng + lat * lat) + 0.00002 * Math.sin(lat * pi)
+    let theta = Math.atan2(lat, lng) + 0.000003 * Math.cos(lng * pi)
+    let lng_n = z * Math.cos(theta)
+    let lat_n = z * Math.sin(theta)
+    return {
+      lat : lat_n,
+      lng : lng_n
+    }
   }
 })

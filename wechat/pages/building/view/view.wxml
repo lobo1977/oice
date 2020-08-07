@@ -20,7 +20,7 @@
   <van-cell-group>
     <van-cell title="{{info.building_name}}" use-label-slot 
       title-class="cell-title" label-class="cell-label" custom-class="cell-view"
-      is-link center bind:click="bindOpenLocation">
+      is-link="{{info.latitude !== null && info.latitude !== 0 && info.longitude !== null && info.longitude !== 0}}" center bind:click="bindOpenLocation">
       <view slot="label" style="font-weight:normal;">
         <view>
           <van-icon name="location-o" /> {{info.area + info.address}}
@@ -40,7 +40,7 @@
         src="{{filter.imageUrl(item.src)}}" class="cell-image"></image>
     </van-cell>
   </van-cell-group>
-  <van-cell-group title="项目通讯录" wx:if="{{info.linkman && info.linkman.length}}">
+  <van-cell-group title="项目通讯录" wx:if="{{info.allowEdit || (info.linkman && info.linkman.length)}}">
     <van-cell wx:for="{{info.linkman}}" wx:key="id" data-data="{{item}}"
       title="{{item.title}}" center custom-class="cell-view"
       link-type="navigateTo" url="../../linkman/view/view?id={{item.id}}">
@@ -49,6 +49,11 @@
           data-data="{{item}}" catchtap="bindPhoneCall" color="blue" custom-style="margin-right:10px" />
         <van-icon name="wechat" size="20px" wx:if="{{item.weixin || item.mobile}}" 
           data-data="{{item}}" catchtap="bindCopyWeixin" color="green" custom-style="margin-right:10px" />
+      </view>
+    </van-cell>
+    <van-cell wx:if="{{info.allowEdit}}" center custom-class="cell-view">
+      <view bindtap="bindAddLinkman" style="display:flex;justify-content:flex-end;">
+        <van-icon name="add-o" size="20px" custom-style="margin-right:5px" /><text>添加联系人</text>
       </view>
     </van-cell>
   </van-cell-group>
@@ -85,7 +90,10 @@
   </van-cell-group>
 
   <van-row gutter="0" custom-class="button-bar">
-    <van-col span="24">
+    <van-col span="12">
+      <van-button square type="primary" icon="notes-o" block bind:click="bindViewNote">生成笔记</van-button>
+    </van-col>
+    <van-col span="12">
       <van-button square type="danger" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}">编辑</van-button>
     </van-col>
   </van-row>

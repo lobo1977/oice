@@ -68,6 +68,7 @@
     "pages/customer/view/view",
     "pages/customer/log/log",
     "pages/customer/edit/edit",
-    "pages/building/edit/edit"
+    "pages/building/edit/edit",
+    "pages/web/web"
   ]
 }

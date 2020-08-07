@@ -7,6 +7,9 @@ Page({
   data: {
     id: 0,
     area: [],
+    area_index: 0,
+    district: [],
+    district_index: 0,
     showArea: false,
     type:[],
     showType: false,
@@ -14,8 +17,6 @@ Page({
     showLevel: false,
     rent_sell: [{name: '出租'}, {name: '出售'}, {name: '出租，出售'}],
     showRentSell: false,
-    district: [],
-    showDistrict: false,
     showCompletionDate: false,
     numberCompletionDate: Date.now(),
     status: [ 
@@ -188,17 +189,31 @@ Page({
     }, () => {
       let arrArea = []
       let arrDistrict = []
+      let dataArea = that.data.info.area ? that.data.info.area : ''
+      let dataDistrict = that.data.info.district ? that.data.info.district : ''
+      let idx = 0;
+      let idx2 = 0;
       app.globalData.area.forEach(element => {
         if (element.id != 'all') {
           arrArea.push(element.text)
-          if (element.children && element.children.length) {
-            let dataDistrict = that.data.info.district ? that.data.info.district : ''
+          if (element.children && element.children.length && (dataArea == element.text || (idx == 0 && dataArea == ''))) {
+            that.setData({
+              area_index: idx
+            })
             element.children.forEach(d => {
+              idx2 = 0
               if (d.id != '') {
-                arrDistrict.push( { text: d.text, type: dataDistrict.indexOf(d.text) >= 0 ? 'success' : 'default' })
+                arrDistrict.push(d.text)
+                if (dataDistrict == d.text) {
+                  that.setData({
+                    district_index: idx2
+                  })
+                }
+                idx2++
               }
             })
           }
+          idx++;
         }
       })
       let arrType = []
@@ -246,6 +261,19 @@ Page({
     })
   },
 
+  onAreaPickerChange(event) {
+    const { picker, value, index } = event.detail
+    let arrDistrict = []
+    app.globalData.area.forEach(element => {
+      if (element.text == value[0] && element.children && element.children.length) {
+        element.children.forEach(d => {
+          arrDistrict.push(d.text)
+        })
+      }
+    })
+    picker.setColumnValues(1, arrDistrict)
+  },
+
   onAreaPickerClose: function() {
     this.setData({
       showArea: false
@@ -254,7 +282,8 @@ Page({
 
   onAreaSelected: function(event) {
     this.setData({
-      ['info.area']: event.detail.value,
+      ['info.area']: event.detail.value[0],
+      ['info.district']: event.detail.value[1],
       showArea: false
     })
   },
@@ -297,6 +326,30 @@ Page({
     })
   },
 
+  bindselectLatLng: function(event) {
+    let that = this
+    let info = that.data.info
+    let lat = null
+    let lng = null
+    if (info.latitude !== null && info.latitude !== 0 && info.longitude !== null && info.longitude !== 0) {
+      let latLng = app.convertBD09ToGCJ02(info.latitude, info.longitude)
+      lat = latLng.lat
+      lng = latLng.lng
+    }
+    wx.chooseLocation({
+      latitude: lat,
+      longitude: lng,
+      success (res) {
+        let latLng = app.convertGCJ02ToBD09(res.latitude, res.longitude)
+        that.setData({
+          ['info.address']: res.address,
+          ['info.latitude']: latLng.lat,
+          ['info.longitude']: latLng.lng,
+        })
+      }
+    })
+  },
+
   bindSelectRentSell: function() {
     this.setData({
       showRentSell: true
@@ -313,41 +366,6 @@ Page({
     this.setData({
       ['info.rent_sell']: event.detail.name,
       showRentSell: false
-    })
-  },
-
-  bindSelectDistrict: function() {
-    this.setData({
-      showDistrict: true
-    })
-  },
-
-  onDistrictClose: function() {
-    let strDistrict = ''
-    this.data.district.forEach(d => {
-      if (d.type == 'success') {
-        if (strDistrict.length) {
-          strDistrict += ','
-        }
-        strDistrict+= d.text
-      }
-    })
-    this.setData({
-      showDistrict: false,
-      ['info.district']: strDistrict
-    })
-  },
-
-  onDistrictTap: function(event) {
-    let idx = event.target.dataset.data
-    let arrDistrict = this.data.district
-    if (arrDistrict[idx].type == 'default') {
-      arrDistrict[idx].type = 'success'
-    } else {
-      arrDistrict[idx].type = 'default'
-    }
-    this.setData({
-      district: arrDistrict
     })
   },
 

@@ -110,13 +110,16 @@ Page({
   // 打开地图
   bindOpenLocation() {
     let info = this.data.info
-    wx.openLocation({
-      latitude: info.latitude,
-      longitude: info.longitude,
-      scale: 18,
-      name: info.building_name,
-      address: info.area + info.address
-    })
+    if (info.latitude !== null && info.latitude !== 0 && info.longitude !== null && info.longitude !== 0) {
+      let latLng = app.convertBD09ToGCJ02(info.latitude, info.longitude)
+      wx.openLocation({
+        latitude: latLng.lat,
+        longitude: latLng.lng,
+        scale: 18,
+        name: info.building_name,
+        address: info.area + info.address
+      })
+    }
   },
   
   bindPhoneCall(event) {
@@ -135,10 +138,23 @@ Page({
     })
   },
 
+  bindViewNote: function() {
+    wx.navigateTo({
+      url: '../../web/web?url=' + app.globalData.serverUrl + '/index/building/' + this.data.info.id
+    })
+  },
+
   bindEdit: function(event) {
     this.data.goEdit = true
     wx.navigateTo({
       url: '../edit/edit?id=' + this.data.info.id
+    })
+  },
+
+  bindAddLinkman: function() {
+    this.data.goEdit = true
+    wx.navigateTo({
+      url: '../../linkman/edit/edit?type=building&oid=' + this.data.info.id
     })
   },
   
