@@ -19,16 +19,6 @@ Page({
     showRentSell: false,
     showCompletionDate: false,
     numberCompletionDate: Date.now(),
-    status: [ 
-      {name: '潜在', value: 0}, 
-      {name: '跟进', value: 1}, 
-      {name: '看房', value: 2}, 
-      {name: '洽谈', value: 3}, 
-      {name: '成交', value: 4}, 
-      {name: '失败', value: 5}, 
-      {name: '名录', value: 6}
-    ],
-    showStatus: false,
     info: {
       __token__: '',
       building_name: '',    // 名称

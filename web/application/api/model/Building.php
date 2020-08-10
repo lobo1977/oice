@@ -343,6 +343,14 @@ class Building extends Base
       unset($data['completion_date']);
     }
 
+    if (isset($data['floor_height']) && $data['floor_height'] == 'null') {
+      unset($data['floor_height']);
+    }
+
+    if (isset($data['bearing']) && $data['bearing'] == 'null') {
+      unset($data['bearing']);
+    }
+
     if ($id) {
       $oldData = self::getById($user, $id);
       if ($oldData == null) {
@@ -461,7 +469,7 @@ class Building extends Base
       //   }
       // }
 
-      if ($data['floor_height'] != $oldData->floor_height) {
+      if (isset($data['floor_height']) && $data['floor_height'] != $oldData->floor_height) {
         if ($oldData->floor_height) {
           $summary = $summary . '层高：' . $oldData->floor_height . '米 -> ' . $data['floor_height'] . '米\n';
         } else {
@@ -469,7 +477,7 @@ class Building extends Base
         }
       }
 
-      if ($data['bearing'] != $oldData->bearing) {
+      if (isset($data['bearing']) && $data['bearing'] != $oldData->bearing) {
         if ($oldData->bearing) {
           $summary = $summary . '楼板承重：' . $oldData->bearing . '千克/平方米 -> ' . $data['bearing'] . '千克/平方米\n';
         } else {
@@ -615,6 +623,9 @@ class Building extends Base
     } else {
       $data['city'] = self::$city;
       $data['user_id'] = $user_id;
+      if (empty($data['floor_height'])) {
+        unset($data['floor_height']);
+      }
       $newData = new Building($data);
       $result = $newData->save();
 

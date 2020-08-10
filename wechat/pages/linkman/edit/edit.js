@@ -194,7 +194,7 @@ Page({
     })
     if (app.isEmail(event.detail)) {
       this.setData({
-        is_mobile_error: false,
+        is_email_error: false,
         email_error: ''
       })
     }

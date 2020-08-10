@@ -53,9 +53,9 @@
         <x-textarea placeholder="备注" :rows="3" v-model="info.rem" :max="200"></x-textarea>
       </group>
 
-      <group gutter="10px" label-width="4em" label-margin-right="1em" label-align="right">
-        <x-input v-if="id === 0" ref="inpUnitLinkman" title="联系人" v-model="info.linkman" :max="30"></x-input>
-        <x-input v-if="id === 0" ref="inpUnitMobile" title="联系电话" placeholder="请输入手机号码" 
+      <group v-if="id === 0" gutter="10px" label-width="4em" label-margin-right="1em" label-align="right">
+        <x-input ref="inpUnitLinkman" title="联系人" v-model="info.linkman" :max="30"></x-input>
+        <x-input ref="inpUnitMobile" title="联系电话" placeholder="请输入手机号码" 
           type="tel" v-model="info.mobile" :max="11" is-type="china-mobile"
           @on-change="validateForm" @on-click-error-icon="mobileError" :should-toast-error="false"></x-input>
       </group>
@@ -174,7 +174,7 @@ export default {
         sell_price: null,     // 出售价格
         decoration: '',       // 装修状况
         status: 1,            // 状态(默认空置)
-        end_date: '',         // 到日期
+        end_date: '',         // 到期日
         rem: '',              // 备注
         user_id: 0,
         company_id: 0,        // 所属企业

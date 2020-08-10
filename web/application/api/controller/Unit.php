@@ -67,18 +67,16 @@ class Unit extends Base
     } else {
       if ($id > 0) {
         $validate = Validate::make([
-          'floor'  => 'require|token'
+          'floor'  => 'require'
         ],[
-          'floor.require' => '必须填写楼层。',
-          'floor.token' => '无效请求，请勿重复提交。'
+          'floor.require' => '必须填写楼层。'
         ]);
       } else {
         $validate = Validate::make([
-          'floor'  => 'require|token',
+          'floor'  => 'require',
           'mobile' =>'mobile'
         ],[
           'floor.require' => '必须填写楼层。',
-          'floor.token' => '无效请求，请勿重复提交。',
           'mobile.mobile' => '联系人手机号码无效'
         ]);
       }
@@ -89,16 +87,19 @@ class Unit extends Base
         $data['mobile'] = str_replace(' ', '', $data['mobile']);
       }
       
-      if (!$validate->check($data)) {
+      if (!$this->checkFormToken($data)) {
+        return $this->fail('无效请求，请勿重复提交表单');
+      } else if (!$validate->check($data)) {
         $form_token = $this->formToken();
         return $this->fail($validate->getError(), $form_token);
       } else {
+        $form_token = $this->formToken();
         unset($data['__token__']);
         $result = modelUnit::addUp($this->user, $id, $data);
         if ($result) {
           return $this->succeed($result);
         } else {
-          return $this->fail();
+          return $this->fail('系统异常。', $form_token);
         }
       }
     }

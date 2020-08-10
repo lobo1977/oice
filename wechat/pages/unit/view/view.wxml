@@ -41,4 +41,16 @@
       </view>
     </van-cell>
   </van-cell-group>
+
+  <van-row gutter="0" custom-class="button-bar">
+    <van-col span="10">
+      <van-button square type="primary" icon="notes-o" block bind:click="bindViewNote">生成笔记</van-button>
+    </van-col>
+    <van-col span="7">
+      <van-button square type="warning" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}">编辑</van-button>
+    </van-col>
+    <van-col span="7">
+      <van-button square type="danger" icon="delete" block bind:click="bindDelete" disabled="{{ !info.allowDelete }}">删除</van-button>
+    </van-col>
+  </van-row>
 </view>

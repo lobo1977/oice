@@ -407,6 +407,18 @@ Page({
     })
   },
 
+  bindDelete: function(event) {
+    Dialog.confirm({
+      title: '删除确认',
+      message: '确定要删除这个客户吗？',
+    })
+    .then(() => {
+      this.remove()
+    })
+    .catch(() => {
+    });
+  },
+
   bindTurn: function() {
     this.setData({
       userList: [],
@@ -758,6 +770,28 @@ Page({
           icon: 'none',
           title: res.message ? res.message : '操作失败，系统异常',
           duration: 2000
+        })
+      }
+    }, () => {
+      wx.hideLoading()
+    })
+  },
+
+  remove: function() {
+    let that = this
+    wx.showLoading({
+      title: '删除中',
+    })
+    app.post('customer/remove', {
+      id: that.data.info.id
+    }, (res) => {
+      if (res.success) {
+        app.globalData.refreshCustomer = true
+        wx.navigateBack()
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
         })
       }
     }, () => {

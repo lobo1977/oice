@@ -101,7 +101,6 @@ class Index extends Base
     return $this->succeed($this->user);
   }
 
-
   /**
    * 更新 Token
    */

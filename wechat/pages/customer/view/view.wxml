@@ -93,13 +93,16 @@
       </van-cell-group>
 
       <van-row gutter="0" custom-class="button-bar">
-        <van-col span="{{ info.isShare ? 8 : 12}}">
+        <van-col span="12">
           <van-button square type="primary" icon="notes-o" block bind:click="bindAddLog" disabled="{{ !info.allowFollow }}">跟进</van-button>
         </van-col>
-        <van-col span="{{ info.isShare ? 8 : 12}}">
-          <van-button square type="danger" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}">编辑</van-button>
+        <van-col wx:if="{{!info.isShare}}" span="6">
+          <van-button square type="warning" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}"></van-button>
         </van-col>
-        <van-col span="8" wx:if="{{info.isShare}}">
+        <van-col wx:if="{{!info.isShare}}" span="6">
+          <van-button square type="danger" icon="delete" block bind:click="bindDelete" disabled="{{ !info.allowDelete }}"></van-button>
+        </van-col>
+        <van-col span="12" wx:if="{{info.isShare}}">
           <van-button square type="warning" icon="closed-eye" block bind:click="bindUnShare">取消共享</van-button>
         </van-col>
       </van-row>

@@ -4,7 +4,7 @@
 <wxs src='../../../utils/filter.wxs' module='filter' />
 
 <view class="page-view">
-  <van-notice-bar wx:if="{{info.id > 0 && info.user_id == 0}}"
+  <van-notice-bar wx:if="{{info.user_id == 0}}"
     left-icon="volume-o"
     mode="closeable"
     speed="30"
@@ -31,13 +31,18 @@
       </view>
     </van-cell>
   </van-cell-group>
-  <van-cell-group title="单元销控" wx:if="{{showUnits && showUnits.length}}">
+  <van-cell-group title="单元销控" wx:if="{{info.allowEdit || (showUnits && showUnits.length)}}">
     <van-cell wx:for="{{showUnits}}" wx:key="id"
       title="{{item.title}}" label="{{item.desc}}" is-link center
       custom-class="cell-view" link-type="navigateTo"
-      url="../unit/unit?id={{item.id}}">
+      url="../../unit/view/view?id={{item.id}}">
       <image slot="icon" mode="aspectFill" 
         src="{{filter.imageUrl(item.src)}}" class="cell-image"></image>
+    </van-cell>
+    <van-cell wx:if="{{info.allowEdit}}" center custom-class="cell-view">
+      <view bindtap="bindAddUnit" style="display:flex;justify-content:flex-end;">
+        <van-icon name="add-o" size="20px" custom-style="margin-right:5px" /><text>添加单元</text>
+      </view>
     </van-cell>
   </van-cell-group>
   <van-cell-group title="项目通讯录" wx:if="{{info.allowEdit || (info.linkman && info.linkman.length)}}">

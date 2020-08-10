@@ -100,15 +100,16 @@ class Building extends Base
       }
     } else {
       $validate = Validate::make([
-        'building_name'  => 'require|token'
+        'building_name'  => 'require'
       ],[
-        'building_name.require' => '必须填写项目名称。',
-        'building_name.token' => '无效请求，请勿重复提交。'
+        'building_name.require' => '必须填写项目名称。'
       ]);
 
       $data = input('post.');
       
-      if (!$validate->check($data)) {
+      if (!$this->checkFormToken($data)) {
+        return $this->fail('无效请求，请勿重复提交表单');
+      } else if (!$validate->check($data)) {
         $form_token = $this->formToken();
         return $this->fail($validate->getError(), $form_token);
       } else {
@@ -128,17 +129,10 @@ class Building extends Base
    * 添加修改项目英文信息
    */
   public function saveEngInfo($id) {
-    $validate = Validate::make([
-      'name'  => 'token'
-    ],[
-      'name.token' => '无效请求，请勿重复提交。'
-    ]);
-
     $data = input('post.');
 
-    if (!$validate->check($data)) {
-      $form_token = $this->formToken();
-      return $this->fail($validate->getError(), $form_token);
+    if (!$this->checkFormToken($data)) {
+      return $this->fail('无效请求，请勿重复提交表单');
     } else {
       $form_token = $this->formToken();
       unset($data['__token__']);

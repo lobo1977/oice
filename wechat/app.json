@@ -59,16 +59,17 @@
   "pages": [
     "pages/building/index/index",
     "pages/building/view/view",
-    "pages/building/unit/unit",
-    "pages/contact/index/index",
-    "pages/contact/view/view",
-    "pages/linkman/edit/edit",
+    "pages/building/edit/edit",
+    "pages/unit/view/view",
+    "pages/unit/edit/edit",
     "pages/customer/index/index",
-    "pages/my/index/index",
     "pages/customer/view/view",
     "pages/customer/log/log",
     "pages/customer/edit/edit",
-    "pages/building/edit/edit",
+    "pages/contact/index/index",
+    "pages/contact/view/view",
+    "pages/linkman/edit/edit",
+    "pages/my/index/index",
     "pages/web/web"
   ]
 }

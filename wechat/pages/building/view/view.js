@@ -151,6 +151,13 @@ Page({
     })
   },
 
+  bindAddUnit: function() {
+    this.data.goEdit = true
+    wx.navigateTo({
+      url: '../../unit/edit/edit?bid=' + this.data.info.id
+    })
+  },
+
   bindAddLinkman: function() {
     this.data.goEdit = true
     wx.navigateTo({

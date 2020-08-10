@@ -8,6 +8,7 @@ Page({
     isLoading: false,
     isPullDown: false,
     info: {
+      id: 0,
       title: '',
       building_name: '',
       building_id: 0,
@@ -99,6 +100,31 @@ Page({
       data: data.weixin || data.mobile
     })
   },
+
+  bindViewNote: function() {
+    wx.navigateTo({
+      url: '../../web/web?url=' + app.globalData.serverUrl + '/index/unit/' + this.data.info.id
+    })
+  },
+
+  bindEdit: function(event) {
+    this.data.goEdit = true
+    wx.navigateTo({
+      url: '../edit/edit?id=' + this.data.info.id
+    })
+  },
+
+  bindDelete: function() {
+    Dialog.confirm({
+      title: '删除确认',
+      message: '确定要删除这个单元吗？',
+    })
+    .then(() => {
+      this.remove()
+    })
+    .catch(() => {
+    });
+  },
   
   // 获取数据
   getView: function() {
@@ -137,6 +163,27 @@ Page({
       that.setData({
         isLoading: false,
       })
+      wx.hideLoading()
+    })
+  },
+
+  remove: function() {
+    let that = this
+    wx.showLoading({
+      title: '删除中',
+    })
+    app.post('unit/remove', {
+      id: that.data.info.id
+    }, (res) => {
+      if (res.success) {
+        wx.navigateBack()
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        })
+      }
+    }, () => {
       wx.hideLoading()
     })
   }
