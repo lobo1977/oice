@@ -7,7 +7,7 @@
     bind:change="onKewordChange"
     bind:search="onSearch"
     shape="round" use-action-slot>
-    <view slot="action" bindtap="bindSearch">搜索</view>
+    <view slot="action" bindtap="onSearch">搜索</view>
   </van-search>
 
   <van-dropdown-menu>

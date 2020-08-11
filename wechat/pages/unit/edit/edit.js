@@ -5,6 +5,7 @@ const app = getApp()
 
 Page({
   data: {
+    activeTab: 1,
     id: 0,
     face: [{name: '东', type: 'default'},{name: '西', type: 'default'},{name: '南', type: 'default'},{name: '北', type: 'default'}],
     showFace: false,
@@ -19,6 +20,7 @@ Page({
     showStatus: false,
     showEndDate: false,
     numberEndDate: Date.now(),
+    maxEndDate: Date.now() + 365 * 24 * 60 * 60 * 1000,
     info: {
       __token__: '',
       building_id: 0,
@@ -45,6 +47,7 @@ Page({
     room_error: '',
     is_mobile_error: false,
     mobile_error: '',
+    images: []
   },
 
   /**
@@ -108,6 +111,12 @@ Page({
   onShareAppMessage: function () {
   },
 
+  bindTabChange: function(event) {
+    this.setData({
+      activeTab: event.detail.index + 1
+    })
+  },
+
   // 获取数据
   getData: function() {
     let that = this
@@ -132,6 +141,57 @@ Page({
         } else {
           that.setData({
             ['info.end_date']: ''
+          })
+        }
+
+        if (res.data.face) {
+          that.face.forEach((element, idx) => {
+            if (res.data.face.indexOf(element.name) >= 0) {
+              that.setData({
+                ['face[' + idx + '].type']: 'success'
+              })
+            }
+          })
+        }
+
+        if (res.data.decoration) {
+          that.decoration.forEach((element, idx) => {
+            if (res.data.decoration.indexOf(element.name) >= 0) {
+              that.setData({
+                ['decoration[' + idx + '].type']: 'success'
+              })
+            }
+          })
+        }
+
+        if (res.data.images) {
+          let imageList = []
+          res.data.images.forEach(element => {
+            imageList.push({
+              url: app.globalData.serverUrl + '/' + element.msrc,
+              path: app.globalData.serverUrl + '/' + element.src,
+              name: element.title,
+              deletable: true
+            })
+          })
+          that.setData({
+            images: imageList
+          })
+        }
+
+        if (res.data.videos) {
+          let imageList = that.data.images
+          res.data.videos.forEach(element => {
+            imageList.push({
+              url: app.globalData.serverUrl + '/' + element.msrc,
+              path: app.globalData.serverUrl + '/' + element.src,
+              name: element.title,
+              isImage: false,
+              deletable: true
+            })
+          })
+          that.setData({
+            images: imageList
           })
         }
       } else {
@@ -173,7 +233,7 @@ Page({
 
   onFaceClose: function() {
     let strFace = ''
-    this.data.decoration.forEach(d => {
+    this.data.face.forEach(d => {
       if (d.type == 'success') {
         strFace+= d.name
       }
@@ -186,14 +246,9 @@ Page({
 
   onFaceTap: function(event) {
     let idx = event.target.dataset.data
-    let arrFace = this.data.face
-    if (arrFace[idx].type == 'default') {
-      arrFace[idx].type = 'success'
-    } else {
-      arrFace[idx].type = 'default'
-    }
+    let type = this.data.face[idx].type
     this.setData({
-      face: arrFace
+      ['face[' + idx + '].type']: type == 'success' ? 'default' : 'success'
     })
   },
 
@@ -258,14 +313,9 @@ Page({
 
   onDecorationTap: function(event) {
     let idx = event.target.dataset.data
-    let arrDecoration = this.data.decoration
-    if (arrDecoration[idx].type == 'default') {
-      arrDecoration[idx].type = 'success'
-    } else {
-      arrDecoration[idx].type = 'default'
-    }
+    let type = this.data.decoration[idx].type
     this.setData({
-      decoration: arrDecoration
+      ['decoration[' + idx + '].type']: type == 'success' ? 'default' : 'success'
     })
   },
 

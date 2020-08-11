@@ -302,14 +302,9 @@ Page({
 
   onDistrictTap: function(event) {
     let idx = event.target.dataset.data
-    let arrDistrict = this.data.district
-    if (arrDistrict[idx].type == 'default') {
-      arrDistrict[idx].type = 'success'
-    } else {
-      arrDistrict[idx].type = 'default'
-    }
+    let type = this.data.district[idx].type
     this.setData({
-      district: arrDistrict
+      ['district[' + idx + '].type']: type == 'success' ? 'default' : 'success'
     })
   },
 

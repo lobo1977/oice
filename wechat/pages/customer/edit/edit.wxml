@@ -63,9 +63,9 @@
       type="{{item.type}}" size="large" custom-class="select-tag" bindtap="onDistrictTap">{{item.text}}</van-tag>
   </van-action-sheet>
 
-  <van-calendar show="{{ showSettleDate }}" bind:close="onSettleDateClose" bind:confirm="onSettleDateConfirm" default-date="numberSettleDate" />
+  <van-calendar show="{{ showSettleDate }}" bind:close="onSettleDateClose" bind:confirm="onSettleDateConfirm" default-date="{{ numberSettleDate }}" />
 
-  <van-calendar show="{{ showEndDate }}" bind:close="onEndDateClose" bind:confirm="onEndDateConfirm" default-date="numberEndDate" />
+  <van-calendar show="{{ showEndDate }}" bind:close="onEndDateClose" bind:confirm="onEndDateConfirm" default-date="{{ numberEndDate }}" />
 
   <van-action-sheet
     show="{{ showStatus }}"

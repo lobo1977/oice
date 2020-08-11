@@ -97,7 +97,7 @@
           <van-button square type="primary" icon="notes-o" block bind:click="bindAddLog" disabled="{{ !info.allowFollow }}">跟进</van-button>
         </van-col>
         <van-col wx:if="{{!info.isShare}}" span="6">
-          <van-button square type="warning" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}"></van-button>
+          <van-button square type="default" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}"></van-button>
         </van-col>
         <van-col wx:if="{{!info.isShare}}" span="6">
           <van-button square type="danger" icon="delete" block bind:click="bindDelete" disabled="{{ !info.allowDelete }}"></van-button>

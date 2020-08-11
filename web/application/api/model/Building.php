@@ -343,12 +343,16 @@ class Building extends Base
       unset($data['completion_date']);
     }
 
+    if (isset($data['acreage']) && $data['acreage'] == 'null') {
+      $data['acreage'] = null;
+    }
+
     if (isset($data['floor_height']) && $data['floor_height'] == 'null') {
-      unset($data['floor_height']);
+      $data['floor_height'] = null;
     }
 
     if (isset($data['bearing']) && $data['bearing'] == 'null') {
-      unset($data['bearing']);
+      $data['bearing'] = null;
     }
 
     if ($id) {

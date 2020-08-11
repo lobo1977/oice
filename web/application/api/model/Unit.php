@@ -262,6 +262,22 @@ class Unit extends Base
       $user_id = $user->id;
     }
 
+    if (isset($data['floor']) && ($data['floor'] == 'null' || empty($data['floor']))) {
+      $data['floor'] = null;
+    }
+
+    if (isset($data['acreage']) && ($data['acreage'] == 'null' || empty($data['acreage']))) {
+      $data['acreage'] = null;
+    }
+
+    if (isset($data['rent_price']) && ($data['rent_price'] == 'null' || empty($data['rent_price']))) {
+      $data['rent_price'] = null;
+    }
+
+    if (isset($data['sell_price']) && ($data['sell_price'] == 'null' || empty($data['rent_price']))) {
+      $data['sell_price'] = null;
+    }
+
     if ($id) {
       $oldData = self::getById($user, $id);
       if ($oldData == null) {

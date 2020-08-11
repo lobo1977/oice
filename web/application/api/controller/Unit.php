@@ -67,16 +67,16 @@ class Unit extends Base
     } else {
       if ($id > 0) {
         $validate = Validate::make([
-          'floor'  => 'require'
+          'room'  => 'require'
         ],[
-          'floor.require' => '必须填写楼层。'
+          'room.require' => '必须填写房间号'
         ]);
       } else {
         $validate = Validate::make([
-          'floor'  => 'require',
+          'room'  => 'require',
           'mobile' =>'mobile'
         ],[
-          'floor.require' => '必须填写楼层。',
+          'room.require' => '必须填写房间号',
           'mobile.mobile' => '联系人手机号码无效'
         ]);
       }

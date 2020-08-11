@@ -38,7 +38,8 @@
     "van-tabs": "@vant/weapp/tabs",
     "van-divider": "@vant/weapp/divider",
     "van-nav-bar": "@vant/weapp/nav-bar",
-    "van-notice-bar": "@vant/weapp/notice-bar"
+    "van-notice-bar": "@vant/weapp/notice-bar",
+    "van-uploader": "@vant/weapp/uploader"
   },
   "tabBar": {
     "list": [

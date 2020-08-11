@@ -67,7 +67,9 @@ Page({
       tenants: ''
     },
     is_name_empty: false,
-    name_error: ''
+    name_error: '',
+    images: [],
+    videos: []
   },
 
   /**
@@ -166,6 +168,18 @@ Page({
         } else {
           that.setData({
             ['info.completion_date']: ''
+          })
+        }
+        
+        if (res.data.images) {
+          that.setData({
+            images: res.data.images
+          })
+        }
+        
+        if (res.data.videos) {
+          that.setData({
+            videos: res.data.videos
           })
         }
       } else {
