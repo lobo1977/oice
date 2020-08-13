@@ -5,8 +5,8 @@
   <van-search value="{{ keyword }}" placeholder="请输入搜索关键词"
     bind:change="onKewordChange"
     bind:search="bindSearch"
-    shape="round" use-action-slot>
-    <view slot="action" bindtap="bindSearch">搜索</view>
+    bind:cancel="onCancel"
+    shape="round" show-action>
   </van-search>
   <van-sticky>
     <van-tabs swipe-threshold="5" active="{{ type }}" bind:change="onTabChange">

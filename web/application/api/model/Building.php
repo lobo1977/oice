@@ -627,6 +627,9 @@ class Building extends Base
     } else {
       $data['city'] = self::$city;
       $data['user_id'] = $user_id;
+      if (empty($data['company_id'])) {
+        $data['company_id'] = $user->company_id;
+      }
       if (empty($data['floor_height'])) {
         unset($data['floor_height']);
       }

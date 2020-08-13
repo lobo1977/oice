@@ -7,7 +7,6 @@ Page({
   data: {
     isLoading: false,
     isPullDown: false,
-    goEdit: false,
     steps: [
       {
         text: '潜在'
@@ -109,7 +108,9 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    let that = this;
+    let that = this
+    app.globalData.refreshCustomerView = false
+
     if (options.id) {
       that.data.info.id = options.id
     }
@@ -135,9 +136,9 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    if (this.data.goEdit) {
+    if (app.globalData.refreshCustomerView) {
       this.getView()
-      this.data.goEdit = false
+      app.globalData.refreshCustomerView = false
     }
   },
 
@@ -162,7 +163,6 @@ Page({
       this.getView()
     }
     wx.stopPullDownRefresh()
-    this.data.isPullDown = false
   },
 
   /**
@@ -259,14 +259,12 @@ Page({
   },
 
   bindAddLinkman: function() {
-    this.data.goEdit = true
     wx.navigateTo({
       url: '../../linkman/edit/edit?type=customer&oid=' + this.data.info.id
     })
   },
 
   bindAddLog: function(event) {
-    this.data.goEdit = true
     wx.navigateTo({
       url: '../log/log?oid=' + this.data.info.id
     })
@@ -274,51 +272,67 @@ Page({
 
   bindUpload: function(event) {
     let that = this
+    let count = 0
+    let error = 0
     wx.chooseMedia({
       maxDuration: 20,
       camera: 'back',
       success(res) {
         wx.showLoading()
-        let count = 0
-        res.tempFiles.forEach(element => {
-          wx.uploadFile({
-            header: {
-              'Content-Type': 'multipart/form-data',
-              'User-Token': app.globalData.appUserInfo && app.globalData.appUserInfo.token ? 
-                app.globalData.appUserInfo.token : ''
-            },
-            url: app.globalData.serverUrl + '/api/customer/uploadAttach',
-            filePath: element.tempFilePath,
-            name: 'attach[]',
-            formData: {
-              'id': that.data.info.id
-            },
-            success (res2) {
-              if (res2.success && res2.data) {
-                let json = JSON.parse(res2.data)
-                if (json.success) {
-                  var str = 'info.attach'
-                  that.setData({
-                    [str]: json.data
-                  })
-                  that.setPrevImages(json.data)
+        try {
+          res.tempFiles.forEach(element => {
+            wx.uploadFile({
+              header: {
+                'Content-Type': 'multipart/form-data',
+                'User-Token': app.globalData.appUserInfo && app.globalData.appUserInfo.token ? 
+                  app.globalData.appUserInfo.token : ''
+              },
+              url: app.globalData.serverUrl + '/api/customer/uploadAttach',
+              filePath: element.tempFilePath,
+              name: 'attach[]',
+              formData: {
+                'id': that.data.info.id
+              },
+              success (res2) {
+                if (res2.data) {
+                  let json = JSON.parse(res2.data)
+                  if (json.success) {
+                    that.setData({
+                      ['info.attach']: json.data
+                    })
+                    that.setPrevImages(json.data)
+                  } else {
+                    error++
+                  }
+                } else {
+                  error++
                 }
-              } else {
-                Dialog.alert({
-                  title: '发生错误',
-                  message: res2.message ? res2.message : '系统异常'
-                }).then(() => {
-                })
+              },
+              complete() {
+                count++
+                if (count >= res.tempFiles.length) {
+                  wx.hideLoading()
+                  if (error > 0) {
+                    Dialog.alert({
+                      title: '发生错误',
+                      message: error + '个文件上传失败'
+                    })
+                  }
+                }
+              }, 
+              fail(e) {
+                error++
+                console.log(e.errMsg)
               }
-            },
-            complete() {
-              count++
-              if (count >= res.tempFiles.length) {
-                wx.hideLoading()
-              }
-            }
+            })
           })
-        });
+        } catch(e) {
+          Dialog.alert({
+            title: '发生错误',
+            message: e.message
+          }).then(() => {
+          })
+        }
       }
     })
   },
@@ -383,9 +397,8 @@ Page({
       }, (res) => {
         if (res.success) {
           that.data.info.attach.splice(that.data.attachIndex, 1)
-          var str = 'info.attach'
           that.setData({
-            [str]: that.data.info.attach
+            ['info.attach']: that.data.info.attach
           })
         } else {
           wx.showToast({
@@ -401,7 +414,6 @@ Page({
   },
 
   bindEdit: function(event) {
-    this.data.goEdit = true
     wx.navigateTo({
       url: '../edit/edit?id=' + this.data.info.id
     })
@@ -435,9 +447,7 @@ Page({
   },
 
   onKewordChange: function(event) {
-    this.setData({
-      keyword: event.detail
-    })
+    this.data.keyword = event.detail
   },
 
   bindSearch: function() {
@@ -461,8 +471,8 @@ Page({
   },
 
   bindAddFilter: function() {
+    this.data.filterPage = 1
     this.setData({
-      filterPage: 1,
       filterList: [],
       filterResult: [],
       showFilter: true
@@ -542,15 +552,11 @@ Page({
 
   setPrevImages: function(files) {
     if (files.length) {
-      let prevList = this.data.previewImages
       for (let i = 0; i < files.length; i++) {
         if (files[i].is_image) {
-          prevList.push(app.globalData.serverUrl + '/' + files[i].src)
+          this.data.previewImages.push(app.globalData.serverUrl + '/' + files[i].src)
         }
       }
-      this.setData({
-        previewImages: prevList
-      })
     }
   },
 
@@ -584,13 +590,13 @@ Page({
 
   // 获取数据
   getView: function() {
-    let that = this;
-    that.setData({
-      isLoading: true
-    })
-    
+    let that = this
+    that.data.isLoading = true
+
     if (that.data.isPullDown == false) {
       wx.showLoading()
+    } else {
+      that.data.isPullDown = false
     }
     
     let url = 'customer/detail?id=' + that.data.info.id
@@ -600,14 +606,12 @@ Page({
     
     app.get(url, (res) => {
       if (res.success && res.data) {
-        that.setData({
-          info: res.data
-        })
-
         let arrSteps = that.data.steps
-        let step = that.data.info.status
+        let step = res.data.status
         let stepIcon = "checked"
         let stepColor = "#07c160"
+        let logs = []
+
         arrSteps[4].text = '成交'
         if (step > 5) {
           step = 0
@@ -617,26 +621,25 @@ Page({
           stepIcon = "clear"
           stepColor = "#ff0000"
         }
+
+        if (res.data.log && res.data.log.length) {
+          for (let i in res.data.log) {
+            logs.push({
+              text: res.data.log[i].title,
+              desc: res.data.log[i].summary.replace(/<br\/>/g, '\n')
+                + '\n' + res.data.log[i].user + ' ' + res.data.log[i].time_span
+            })
+          }
+        }
+
         that.setData({
+          info: res.data,
           steps: arrSteps,
           activeStep: step,
           activeIcon: stepIcon,
-          activeColor: stepColor
+          activeColor: stepColor,
+          logs: logs
         })
-
-        if (that.data.info.log && that.data.info.log.length) {
-          let logs = []
-          for (let i in that.data.info.log) {
-            logs.push({
-              text: that.data.info.log[i].title,
-              desc: that.data.info.log[i].summary.replace(/<br\/>/g, '\n')
-                + '\n' + that.data.info.log[i].user + ' ' + that.data.info.log[i].time_span
-            })
-          }
-          that.setData({
-            logs
-          })
-        }
 
         that.setPrevImages(res.data.attach)
       } else {
@@ -648,9 +651,7 @@ Page({
         })
       }
     }, () => {
-      that.setData({
-        isLoading: false
-      })
+      that.data.isLoading = false
       wx.hideLoading()
     })
   },
@@ -724,20 +725,15 @@ Page({
     })
     app.get('my/favorite?page=' + that.data.filterPage + '&page_size=' + that.data.filterPageSize, (res) => {
       if (res.success) {
-        if (!res.data || res.data.length < that.data.filterPageSize) {
-          that.setData({
-            isFilterEnd: true
-          })
-        } else {
-          that.setData({
-            isFilterEnd: false
-          })
-        }
-
         if (res.data && res.data.length) {
           let list = that.data.filterList.concat(res.data)
           that.setData({
-            filterList: list
+            filterList: list,
+            isFilterEnd: res.data.length < that.data.filterPageSize
+          })
+        } else {
+          that.setData({
+            isFilterEnd: true
           })
         }
       }

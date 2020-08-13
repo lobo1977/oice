@@ -83,18 +83,18 @@ Page({
   onPullDownRefresh: function() {
     // 触发下拉刷新时执行
     if (this.data.isLoading == false) {
-      this.data.isPullDown = true
+      this.setData({
+        isPullDown: true
+      })
       this.data.pageIndex = 1
       this.getList()
-    } else {
-      this.data.isPullDown = false
     }
     wx.stopPullDownRefresh()
   },
   onReachBottom: function() {
     if (this.data.isEnd == false) {
       this.data.pageIndex++
-      this.getList();
+      this.getList()
     }
   },
   onShareAppMessage: function () {
@@ -102,15 +102,21 @@ Page({
   },
   
   onKewordChange(e) {
-    this.setData({
-      keyword: e.detail
-    });
+    this.data.keyword = e.detail
   },
 
   // 搜索项目
   onSearch: function(event) {
     this.data.pageIndex = 1
-    this.getList();
+    this.getList()
+  },
+
+  onCancel: function() {
+    this.setData({
+      keyword: ''
+    })
+    this.data.pageIndex = 1
+    this.getList()
   },
 
   onClickDropNav({ detail = {} }) {
@@ -153,12 +159,12 @@ Page({
   filterAcreageChange(event) {
     this.data.acreage = event.detail
     this.data.pageIndex = 1
-    this.getList();
+    this.getList()
   },
 
   bindAdd: function() {
     wx.navigateTo({
-      url: '../edit/edit?id=0',
+      url: '../edit/edit',
     })
   },
     

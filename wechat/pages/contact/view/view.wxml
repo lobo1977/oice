@@ -38,7 +38,7 @@
       <van-button square type="primary" icon="wechat" block bindtap="bindCopyWeixin" data-data="{{info}}">加微信</van-button>
     </van-col>
     <van-col span="12">
-      <van-button square type="danger" icon="phone-o" block bindtap="bindPhoneCall" data-data="{{info}}">拨打电话</van-button>
+      <van-button square type="info" icon="phone-o" block bindtap="bindPhoneCall" data-data="{{info}}">拨打电话</van-button>
     </van-col>
   </van-row>
 </view>

@@ -47,7 +47,8 @@ Page({
     room_error: '',
     is_mobile_error: false,
     mobile_error: '',
-    images: []
+    images: [],
+    previewList: []
   },
 
   /**
@@ -56,9 +57,19 @@ Page({
   onLoad: function (options) {
     let that = this
     if (options.id) {
+      wx.setNavigationBarTitle({
+        title: '修改单元信息'
+      })
       that.setData({
         id: options.id
       })
+    } else {
+      wx.setNavigationBarTitle({
+        title: '添加单元'
+      })
+    }
+    if (options.bid) {
+      that.data.building_id = options.bid
     }
     if (app.globalData.appUserInfo) {
       that.getData()
@@ -126,30 +137,23 @@ Page({
     let url = 'unit/edit?id=' + that.data.id
     app.get(url, (res) => {
       if (res.success && res.data) {
-        for (let item in that.data.info) {
+        let info = that.data.info
+        for (let item in info) {
           if (res.data[item] !== undefined && res.data[item] !== null) {
-            that.setData({
-              ['info.' + item]: res.data[item]
-            })
+            info[item] = res.data[item]
           }
         }
         if (res.data.end_date) {
+          info.end_date = app.formatTime(Date.parse(res.data.end_date.replace(/-/g, '/')), 'yyyy-MM-dd')
           that.setData({
-            ['info.end_date']: app.formatTime(Date.parse(res.data.end_date.replace(/-/g, '/')), 'yyyy-MM-dd'),
             numberEndDate: Date.parse(res.data.end_date.replace(/-/g, '/'))
-          })
-        } else {
-          that.setData({
-            ['info.end_date']: ''
           })
         }
 
         if (res.data.face) {
           that.face.forEach((element, idx) => {
             if (res.data.face.indexOf(element.name) >= 0) {
-              that.setData({
-                ['face[' + idx + '].type']: 'success'
-              })
+              element.type = 'success'
             }
           })
         }
@@ -157,43 +161,50 @@ Page({
         if (res.data.decoration) {
           that.decoration.forEach((element, idx) => {
             if (res.data.decoration.indexOf(element.name) >= 0) {
-              that.setData({
-                ['decoration[' + idx + '].type']: 'success'
-              })
+              element.type = 'success'
             }
           })
         }
 
+        let imageList = []
         if (res.data.images) {
-          let imageList = []
           res.data.images.forEach(element => {
             imageList.push({
+              id: element.id,
               url: app.globalData.serverUrl + '/' + element.msrc,
-              path: app.globalData.serverUrl + '/' + element.src,
               name: element.title,
-              deletable: true
+              deletable: element.default != 1
             })
-          })
-          that.setData({
-            images: imageList
+            that.data.previewList.push({
+              url: app.globalData.serverUrl + '/' + element.src,
+              type: 'image'
+            })
           })
         }
 
         if (res.data.videos) {
-          let imageList = that.data.images
           res.data.videos.forEach(element => {
             imageList.push({
+              id: element.id,
               url: app.globalData.serverUrl + '/' + element.msrc,
-              path: app.globalData.serverUrl + '/' + element.src,
               name: element.title,
               isImage: false,
               deletable: true
             })
-          })
-          that.setData({
-            images: imageList
+            that.data.previewList.push({
+              url: app.globalData.serverUrl + '/' + element.src,
+              type: 'video',
+              poster: app.globalData.serverUrl + '/' + element.msrc
+            })
           })
         }
+        
+        that.setData({
+          info: info,
+          face: that.data.face,
+          decoration: that.data.decoration,
+          images: imageList
+        })
       } else {
         Dialog.alert({
           title: '发生错误',
@@ -427,13 +438,14 @@ Page({
 
     app.post('unit/edit?id=' + that.data.id, that.data.info, (res) => {
       if (res.success) {
-        app.globalData.refreshBuilding = true
+        app.globalData.refreshBuildingView = true
         if (that.data.id == 0) {
           let id = res.data
           wx.redirectTo({
             url: '../view/view?id=' + id
           })
         } else {
+          app.globalData.refreshUnitView = true
           wx.navigateBack()
         }
       } else {
@@ -456,6 +468,132 @@ Page({
       }
     }, () => {
       wx.hideLoading()
+    })
+  },
+
+  previewImages: function(event) {
+    if (this.data.previewList.length) {
+      wx.previewMedia({
+        sources: this.data.previewList,
+        current: event.detail.index
+      })
+    }
+  },
+
+  upload: function(event) {
+    let that = this
+    let count = 0
+    let error = 0
+    const files = event.detail.file
+    wx.showLoading()
+    try {
+      files.forEach(file => {
+        wx.uploadFile({
+          header: {
+            'Content-Type': 'multipart/form-data',
+            'User-Token': app.globalData.appUserInfo && app.globalData.appUserInfo.token ? 
+              app.globalData.appUserInfo.token : ''
+          },
+          url: app.globalData.serverUrl + '/api/building/uploadUnitImage',
+          filePath: file.tempFilePath,
+          name: 'images[]',
+          formData: {
+            'id': that.data.id
+          },
+          success(res) {
+            if (res.data) {
+              let json = JSON.parse(res.data)
+              if (json.success) {
+                if (json.data && json.data.length) {
+                  let imageList = []
+                  that.data.previewList = []
+                  json.data.forEach(element => {
+                    imageList.push({
+                      id: element.id,
+                      url: app.globalData.serverUrl + '/' + element.msrc,
+                      name: element.title,
+                      isImage: element.is_image,
+                      deletable: element.default != 1
+                    })
+                    that.data.previewList.push({
+                      url: app.globalData.serverUrl + '/' + element.src,
+                      type: element.is_image ? 'image' : 'video',
+                      poster: app.globalData.serverUrl + '/' + element.msrc
+                    })
+                  })
+                  that.setData({
+                    images: imageList
+                  })
+                }
+              } else {
+                error++
+                console.log(json.message)
+              }
+            } else {
+              error++
+            }
+          },
+          complete() {
+            count++
+            if (count >= files.length) {
+              app.globalData.refreshUnitView = true
+              wx.hideLoading()
+              if (error > 0) {
+                Dialog.alert({
+                  title: '发生错误',
+                  message: error + '个文件上传失败'
+                })
+              }
+            }
+          },
+          fail(e) {
+            error++
+            console.log(e.errMsg)
+          }
+        })
+      })
+    } catch(e) {
+      wx.hideLoading()
+      Dialog.alert({
+        title: '发生错误',
+        message: e.message
+      })
+    }
+  },
+
+  removeImage: function(event) {
+    let that = this
+    let idx = event.detail.index
+    let file = that.data.images[idx]
+
+    Dialog.confirm({
+      title: '删除确认',
+      message: '确定要删除这个图片/视频吗？',
+    })
+    .then(() => {
+      wx.showLoading()
+      app.post('building/removeImage', {
+        image_id: file.id
+      }, (res) => {
+        if (res.success) {
+          app.globalData.refreshUnitView = true
+          that.data.images.splice(idx, 1)
+          that.data.previewList.splice(idx, 1)
+          that.setData({
+            images: that.data.images
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: res.message ? res.message : '操作失败，系统异常',
+            duration: 2000
+          })
+        }
+      }, () => {
+        wx.hideLoading()
+      })
+    })
+    .catch(() => {
     })
   }
 })

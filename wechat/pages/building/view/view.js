@@ -7,6 +7,7 @@ Page({
   data: {
     isLoading: false,
     isPullDown: false,
+    isVideoPlay: false,
     info: {
       id: 0,
       building_name: '',    // 名称
@@ -46,13 +47,13 @@ Page({
       unit: [],
       confirm: []
     },
-    previewImages: [],
-    showUnits: [],
-    goEdit: false
+    previewImages: []
   },
   
   onLoad(options) {
-    let that = this;
+    let that = this
+    app.globalData.refreshBuildingView = false
+    
     if (options.id) {
       that.data.info.id = options.id
     }
@@ -69,9 +70,9 @@ Page({
   },
 
   onShow: function () {
-    if (this.data.goEdit) {
+    if (app.globalData.refreshBuildingView) {
       this.getView()
-      this.data.goEdit = false
+      app.globalData.refreshBuildingView = false
     }
   },
   
@@ -82,7 +83,6 @@ Page({
       this.getView()
     }
     wx.stopPullDownRefresh()
-    this.data.isPullDown = false
   },
   
   // 转发事件
@@ -92,18 +92,30 @@ Page({
       title: data.building_name,
       path: '/pages/building/view/view?id=' + data.id + '&key=' + data.key
     }
-    if (this.data.previewImages.length) {
-      shareData.imageUrl = this.data.previewImages[0]
+    if (this.data.info.images.length) {
+      shareData.imageUrl = app.globalData.serverUrl + '/' + this.data.info.images[0].msrc
     }
     return shareData
+  },
+
+  onVideoPlay() {
+    this.setData({
+      isVideoPlay: true
+    })
+  },
+
+  onVideoStop() {
+    this.setData({
+      isVideoPlay: false
+    })
   },
   
   // 预览图片
   bindViewImage(event) {
-    let url = app.globalData.serverUrl + '/' + event.currentTarget.dataset.data.src
-    wx.previewImage({
-      current: url,
-      urls: this.data.previewImages
+    let idx = event.currentTarget.dataset.data
+    wx.previewMedia({
+      sources: this.data.previewImages,
+      current: idx
     })
   },
   
@@ -145,21 +157,18 @@ Page({
   },
 
   bindEdit: function(event) {
-    this.data.goEdit = true
     wx.navigateTo({
       url: '../edit/edit?id=' + this.data.info.id
     })
   },
 
   bindAddUnit: function() {
-    this.data.goEdit = true
     wx.navigateTo({
       url: '../../unit/edit/edit?bid=' + this.data.info.id
     })
   },
 
   bindAddLinkman: function() {
-    this.data.goEdit = true
     wx.navigateTo({
       url: '../../linkman/edit/edit?type=building&oid=' + this.data.info.id
     })
@@ -167,15 +176,15 @@ Page({
   
   // 获取数据
   getView: function() {
-    let that = this;
-    that.setData({
-      isLoading: true
-    })
+    let that = this
+    that.data.isLoading = true
     
     if (that.data.isPullDown == false) {
       wx.showLoading({
         title: '加载中',
       })
+    } else {
+      that.data.isPullDown = false
     }
     
     let url = 'building/detail?id=' + that.data.info.id
@@ -185,30 +194,32 @@ Page({
     
     app.get(url, (res) => {
       if (res.data) {
-        that.setData({
-          info: res.data
-        })
-        let prevList = that.data.previewImages
-        if (res.data.images.length) {
-          for (let i = 0; i < res.data.images.length; i++) {
-            prevList.push(app.globalData.serverUrl + '/' + res.data.images[i].src)
-          }
-          that.setData({
-            previewImages: prevList
-          })
-        }
-        if (res.data.unit.length) {
-          that.setData({
-            showUnits: res.data.unit.filter(function (unit) {
-              return unit.status === 1
+        let prevList = []
+        if (res.data.videos.length) {
+          res.data.videos.forEach(element => {
+            prevList.push({
+              url: app.globalData.serverUrl + '/' + element.src,
+              type: 'video',
+              poster: app.globalData.serverUrl + '/' + element.msrc
             })
           })
         }
+        if (res.data.images.length) {
+          res.data.images.forEach(element => {
+            prevList.push({
+              url: app.globalData.serverUrl + '/' + element.src,
+              type: 'image',
+              poster: app.globalData.serverUrl + '/' + element.msrc
+            })
+          })
+        }
+        that.setData({
+          info: res.data,
+          previewImages: prevList
+        })
       }
     }, () => {
-      that.setData({
-        isLoading: false
-      })
+      that.data.isLoading = false
       wx.hideLoading()
     })
   }

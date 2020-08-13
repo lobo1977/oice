@@ -75,7 +75,10 @@
   </view>
 
   <view wx:if="{{id > 0}}" hidden="{{activeTab != 2}}" style="padding:10px;">
-    <van-uploader file-list="{{ images }}" accept="media" max-count="10" bind:after-read="upload" />
+    <van-uploader file-list="{{ images }}" accept="media" max-count="10" 
+    preview-full-image="{{ false }}" bind:click-preview="previewImages"
+    bind:delete="removeImage"
+    bind:after-read="upload" multiple />
   </view>
 
   <van-dialog id="van-dialog" />

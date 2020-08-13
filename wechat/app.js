@@ -264,7 +264,11 @@ App({
       }
     ],
     refreshBuilding: false,
-    refreshCustomer: false
+    refreshCustomer: false,
+    refreshBuildingView: false,
+    refreshUnitView: false,
+    refreshLinkView: false,
+    refreshCustomerView: false
   },
   
   // 登录
@@ -307,7 +311,7 @@ App({
   		},
   		fail (err) {
   			wx.showToast({
-          title: '发生错误，请稍后再试。',
+          title: '发生错误，请稍后再试',
           icon: 'none',
           duration: 2000
         })

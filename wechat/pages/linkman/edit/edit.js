@@ -35,19 +35,20 @@ Page({
   onLoad: function (options) {
     let that = this
     if (options.id) {
-      that.setData({
-        id: options.id
+      that.data.id = options.id
+      wx.setNavigationBarTitle({
+        title: '修改联系人信息'
+      })
+    } else {
+      wx.setNavigationBarTitle({
+        title: '添加联系人'
       })
     }
     if (options.type) {
-      that.setData({
-        ['info.type']: options.type
-      })
+      that.data.info.type = options.type
     }
     if (options.oid) {
-      that.setData({
-        ['info.owner_id']: options.oid
-      })
+      that.data.info.owner_id = options.oid
     }
     if (app.globalData.appUserInfo) {
       that.getData()
@@ -62,7 +63,6 @@ Page({
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: function () {
-
   },
 
   /**
@@ -75,35 +75,30 @@ Page({
    * 生命周期函数--监听页面隐藏
    */
   onHide: function () {
-
   },
 
   /**
    * 生命周期函数--监听页面卸载
    */
   onUnload: function () {
-
   },
 
   /**
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function () {
-
   },
 
   /**
    * 页面上拉触底事件的处理函数
    */
   onReachBottom: function () {
-
   },
 
   /**
    * 用户点击右上角分享
    */
   onShareAppMessage: function () {
-
   },
 
   // 获取数据
@@ -115,13 +110,15 @@ Page({
     let url = 'linkman/edit?id=' + that.data.id
     app.get(url, (res) => {
       if (res.success && res.data) {
-        for (let item in that.data.info) {
+        let info = that.data.info
+        for (let item in info) {
           if (res.data[item] !== undefined && res.data[item] !== null) {
-            that.setData({
-              ['info.' + item]: res.data[item]
-            })
+            info[item] = res.data[item]
           }
         }
+        that.setData({
+          info: info
+        })
       } else {
         Dialog.alert({
           title: '发生错误',
@@ -287,6 +284,15 @@ Page({
 
     app.post('linkman/edit?id=' + that.data.id, that.data.info, (res) => {
       if (res.success) {
+        if (that.data.info.type == 'building') {
+          app.globalData.refreshBuildingView = true
+        }
+        if (that.data.info.type == 'unit') {
+          app.globalData.refreshUnitView = true
+        }
+        if (that.data.info.type == 'customer') {
+          app.globalData.refreshCustomerView = true
+        }
         wx.navigateBack()
       } else if (res.message) {
         wx.showToast({

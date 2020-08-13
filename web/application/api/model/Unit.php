@@ -439,6 +439,9 @@ class Unit extends Base
       return $id;
     } else {
       $data['user_id'] = $user_id;
+      if (empty($data['company_id'])) {
+        $data['company_id'] = $user->company_id;
+      }
 
       $linkman = null;
 

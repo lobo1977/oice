@@ -61,8 +61,15 @@ Page({
   onLoad: function (options) {
     let that = this
     if (options.id) {
+      wx.setNavigationBarTitle({
+        title: '修改客户信息'
+      })
       that.setData({
         id: options.id
+      })
+    } else {
+      wx.setNavigationBarTitle({
+        title: '添加客户'
       })
     }
     if (app.globalData.appUserInfo) {
@@ -131,33 +138,53 @@ Page({
     let url = 'customer/edit?id=' + that.data.id
     app.get(url, (res) => {
       if (res.success && res.data) {
-        for (let item in that.data.info) {
+        let info = that.data.info
+        for (let item in info) {
           if (res.data[item] !== undefined && res.data[item] !== null) {
-            that.setData({
-              ['info.' + item]: res.data[item]
-            })
+            info[item] = res.data[item]
           }
         }
         if (res.data.settle_date) {
+          info.settle_date = app.formatTime(Date.parse(res.data.settle_date.replace(/-/g, '/')), 'yyyy-MM-dd')
           that.setData({
-            ['info.settle_date']: app.formatTime(Date.parse(res.data.settle_date.replace(/-/g, '/')), 'yyyy-MM-dd'),
             numberSettleDate: Date.parse(res.data.settle_date.replace(/-/g, '/'))
-          })
-        } else {
-          that.setData({
-            ['info.settle_date']: ''
           })
         }
         if (res.data.end_date) {
+          info.end_date = app.formatTime(Date.parse(res.data.end_date.replace(/-/g, '/')), 'yyyy-MM-dd')
           that.setData({
-            ['info.end_date']: app.formatTime(Date.parse(res.data.end_date.replace(/-/g, '/')), 'yyyy-MM-dd'),
             numberEndDate: Date.parse(res.data.end_date.replace(/-/g, '/'))
           })
-        } else {
-          that.setData({
-            ['info.end_date']: ''
-          })
         }
+
+        let arrArea = []
+        let arrDistrict = []
+        let arrDemand = []
+        app.globalData.area.forEach(element => {
+          if (element.id != 'all') {
+            arrArea.push(element.text)
+            if (element.children && element.children.length) {
+              let dataDistrict = info.district ? info.district : ''
+              element.children.forEach(d => {
+                if (d.id != '') {
+                  arrDistrict.push( { text: d.text, type: dataDistrict.indexOf(d.text) >= 0 ? 'success' : 'default' })
+                }
+              })
+            }
+          }
+        })
+        app.globalData.buildingType.forEach(element => {
+          if (element.text != '类别') {
+            arrDemand.push(element.text)
+          }
+        })
+
+        that.setData({
+          info: info,
+          area: arrArea,
+          demand: arrDemand,
+          district: arrDistrict
+        })
       } else {
         Dialog.alert({
           title: '发生错误',
@@ -167,32 +194,6 @@ Page({
         })
       }
     }, () => {
-      let arrArea = []
-      let arrDistrict = []
-      app.globalData.area.forEach(element => {
-        if (element.id != 'all') {
-          arrArea.push(element.text)
-          if (element.children && element.children.length) {
-            let dataDistrict = that.data.info.district ? that.data.info.district : ''
-            element.children.forEach(d => {
-              if (d.id != '') {
-                arrDistrict.push( { text: d.text, type: dataDistrict.indexOf(d.text) >= 0 ? 'success' : 'default' })
-              }
-            })
-          }
-        }
-      })
-      let arrDemand = []
-      app.globalData.buildingType.forEach(element => {
-        if (element.text != '类别') {
-          arrDemand.push(element.text)
-        }
-      })
-      that.setData({
-        area: arrArea,
-        demand: arrDemand,
-        district: arrDistrict
-      })
       wx.hideLoading()
     })
   },
@@ -438,6 +439,7 @@ Page({
                   url: '../view/view?id=' + id
                 })
               } else {
+                app.globalData.refreshCustomerView = true
                 wx.navigateBack()
               }
             })

@@ -49,7 +49,6 @@ Page({
       this.getView()
     }
     wx.stopPullDownRefresh()
-    this.data.isPullDown = false
   },
   
   // 转发事件
@@ -90,15 +89,15 @@ Page({
   
   // 获取数据
   getView: function() {
-    let that = this;
-    that.setData({
-      isLoading: true
-    })
+    let that = this
+    that.data.isLoading = true
     
     if (that.data.isPullDown == false) {
       wx.showLoading({
         title: '加载中',
       })
+    } else {
+      that.data.isPullDown = false
     }
     
     let url = 'user/detail?id=' + that.data.info.id
@@ -113,9 +112,7 @@ Page({
         })
       }
     }, () => {
-      that.setData({
-        isLoading: false
-      })
+      that.data.isLoading = false
       wx.hideLoading()
     })
   }

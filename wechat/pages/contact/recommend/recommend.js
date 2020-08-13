@@ -82,19 +82,18 @@ Page({
   
   // 获取数据
   getView: function() {
-    let that = this;
-    that.setData({
-      isLoading: true
-    })
+    let that = this
+    that.data.isLoading = true
     
     if (that.data.isPullDown == false) {
       wx.showLoading({
         title: '加载中',
       })
+    } else {
+      that.data.isPullDown = false
     }
     
     let url = 'customer/show?id=' + that.data.id
-
     app.get(url, (res) => {
       if (res.data) {
         that.setData({
@@ -106,9 +105,7 @@ Page({
         })
       }
     }, () => {
-      that.setData({
-        isLoading: false
-      })
+      that.data.isLoading = false
       wx.hideLoading()
     })
   }

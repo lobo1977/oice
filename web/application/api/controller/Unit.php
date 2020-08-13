@@ -132,7 +132,7 @@ class Unit extends Base
   /**
    * 删除单元
    */
-  public function remove($id, $bid) {
+  public function remove($id, $bid = 0) {
     $result = modelUnit::remove($this->user, $id);
     if ($result == 1) {
       if ($bid) {

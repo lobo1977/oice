@@ -5,6 +5,7 @@ const app = getApp()
 
 Page({
   data: {
+    activeTab: 1,
     id: 0,
     area: [],
     area_index: 0,
@@ -69,7 +70,7 @@ Page({
     is_name_empty: false,
     name_error: '',
     images: [],
-    videos: []
+    previewList: []
   },
 
   /**
@@ -78,8 +79,15 @@ Page({
   onLoad: function (options) {
     let that = this
     if (options.id) {
+      wx.setNavigationBarTitle({
+        title: '修改项目信息'
+      })
       that.setData({
         id: options.id
+      })
+    } else {
+      wx.setNavigationBarTitle({
+        title: '添加项目'
       })
     }
     if (app.globalData.appUserInfo) {
@@ -95,7 +103,6 @@ Page({
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: function () {
-
   },
 
   /**
@@ -108,35 +115,36 @@ Page({
    * 生命周期函数--监听页面隐藏
    */
   onHide: function () {
-
   },
 
   /**
    * 生命周期函数--监听页面卸载
    */
   onUnload: function () {
-
   },
 
   /**
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function () {
-
   },
 
   /**
    * 页面上拉触底事件的处理函数
    */
   onReachBottom: function () {
-
   },
 
   /**
    * 用户点击右上角分享
    */
   onShareAppMessage: function () {
+  },
 
+  bindTabChange: function(event) {
+    this.setData({
+      activeTab: event.detail.index + 1
+    })
   },
 
   // 获取数据
@@ -148,40 +156,59 @@ Page({
     let url = 'building/edit?id=' + that.data.id
     app.get(url, (res) => {
       if (res.success && res.data) {
-        for (let item in that.data.info) {
+        let info = that.data.info
+        for (let item in info) {
           if (res.data[item] !== undefined && res.data[item] !== null) {
-            that.setData({
-              ['info.' + item]: res.data[item]
-            })
+            info[item] = res.data[item]
           }
         }
         if (res.data.user_id === 0 || res.data.user_id === app.globalData.appUserInfo.id) {
-          that.setData({
-            ['info.send_sms']: 1
-          })
+          info.send_sms = 1
         }
         if (res.data.completion_date) {
+          info.completion_date = app.formatTime(Date.parse(res.data.completion_date.replace(/-/g, '/')), 'yyyy-MM-dd')
           that.setData({
-            ['info.completion_date']: app.formatTime(Date.parse(res.data.completion_date.replace(/-/g, '/')), 'yyyy-MM-dd'),
             numberCompletionDate: Date.parse(res.data.completion_date.replace(/-/g, '/'))
           })
-        } else {
-          that.setData({
-            ['info.completion_date']: ''
-          })
         }
-        
+
+        let imageList = []
         if (res.data.images) {
-          that.setData({
-            images: res.data.images
+          res.data.images.forEach(element => {
+            imageList.push({
+              id: element.id,
+              url: app.globalData.serverUrl + '/' + element.msrc,
+              name: element.title,
+              deletable: element.default != 1
+            })
+            that.data.previewList.push({
+              url: app.globalData.serverUrl + '/' + element.src,
+              type: 'image'
+            })
+          })
+        }
+
+        if (res.data.videos) {
+          res.data.videos.forEach(element => {
+            imageList.push({
+              id: element.id,
+              url: app.globalData.serverUrl + '/' + element.msrc,
+              name: element.title,
+              isImage: false,
+              deletable: true
+            })
+            that.data.previewList.push({
+              url: app.globalData.serverUrl + '/' + element.src,
+              type: 'video',
+              poster: app.globalData.serverUrl + '/' + element.msrc
+            })
           })
         }
         
-        if (res.data.videos) {
-          that.setData({
-            videos: res.data.videos
-          })
-        }
+        that.setData({
+          info: info,
+          images: imageList
+        })
       } else {
         Dialog.alert({
           title: '发生错误',
@@ -502,6 +529,7 @@ Page({
               url: '../view/view?id=' + id
             })
           } else {
+            app.globalData.refreshBuildingView = true
             wx.navigateBack()
           }
         } else {
@@ -526,5 +554,131 @@ Page({
         wx.hideLoading()
       })
     }
+  },
+
+  previewImages: function(event) {
+    if (this.data.previewList.length) {
+      wx.previewMedia({
+        sources: this.data.previewList,
+        current: event.detail.index
+      })
+    }
+  },
+
+  upload: function(event) {
+    let that = this
+    let count = 0
+    let error = 0
+    const files = event.detail.file
+    wx.showLoading()
+    try {
+      files.forEach(file => {
+        wx.uploadFile({
+          header: {
+            'Content-Type': 'multipart/form-data',
+            'User-Token': app.globalData.appUserInfo && app.globalData.appUserInfo.token ? 
+              app.globalData.appUserInfo.token : ''
+          },
+          url: app.globalData.serverUrl + '/api/building/uploadImage',
+          filePath: file.tempFilePath,
+          name: 'images[]',
+          formData: {
+            'id': that.data.id
+          },
+          success(res) {
+            if (res.data) {
+              let json = JSON.parse(res.data)
+              if (json.success) {
+                if (json.data && json.data.length) {
+                  let imageList = []
+                  that.data.previewList = []
+                  json.data.forEach(element => {
+                    imageList.push({
+                      id: element.id,
+                      url: app.globalData.serverUrl + '/' + element.msrc,
+                      name: element.title,
+                      isImage: element.is_image,
+                      deletable: element.default != 1
+                    })
+                    that.data.previewList.push({
+                      url: app.globalData.serverUrl + '/' + element.src,
+                      type: element.is_image ? 'image' : 'video',
+                      poster: app.globalData.serverUrl + '/' + element.msrc
+                    })
+                  })
+                  that.setData({
+                    images: imageList
+                  })
+                }
+              } else {
+                error++
+                console.log(json.message)
+              }
+            } else {
+              error++
+            }
+          },
+          complete() {
+            count++
+            if (count >= files.length) {
+              app.globalData.refreshBuildingView = true
+              wx.hideLoading()
+              if (error > 0) {
+                Dialog.alert({
+                  title: '发生错误',
+                  message: error + '个文件上传失败'
+                })
+              }
+            }
+          },
+          fail(e) {
+            error++
+            console.log(e.errMsg)
+          }
+        })
+      })
+    } catch(e) {
+      wx.hideLoading()
+      Dialog.alert({
+        title: '发生错误',
+        message: e.message
+      })
+    }
+  },
+
+  removeImage: function(event) {
+    let that = this
+    let idx = event.detail.index
+    let file = that.data.images[idx]
+
+    Dialog.confirm({
+      title: '删除确认',
+      message: '确定要删除这个图片/视频吗？',
+    })
+    .then(() => {
+      wx.showLoading()
+      app.post('building/removeImage', {
+        image_id: file.id
+      }, (res) => {
+        if (res.success) {
+          app.globalData.refreshBuildingView = true
+          that.data.images.splice(idx, 1)
+          that.data.previewList.splice(idx, 1)
+          that.setData({
+            images: that.data.images
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: res.message ? res.message : '操作失败，系统异常',
+            duration: 2000
+          })
+        }
+      }, () => {
+        wx.hideLoading()
+      })
+    })
+    .catch(() => {
+    });
   }
 })

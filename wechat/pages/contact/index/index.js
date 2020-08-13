@@ -42,11 +42,9 @@ Page({
   onPullDownRefresh: function () {
     // 触发下拉刷新时执行
     if (this.data.isLoading == false) {
-      this.isPullDown = true
+      this.data.isPullDown = true
       this.data.pageIndex = 1
       this.getList()
-    } else {
-      this.isPullDown = false
     }
     wx.stopPullDownRefresh()
   },
@@ -74,9 +72,7 @@ Page({
   // 获取列表
   getList: function () {
     let that = this
-    that.setData({
-      isLoading: true
-    })
+    that.data.isLoading = true
     if (that.data.pageIndex <= 1) {
       that.setData({
         list: []
@@ -97,10 +93,8 @@ Page({
       }
     }, () => {
       wx.hideLoading()
-      that.setData({
-        isPullDown: false,
-        isLoading: false
-      })
+      that.data.isLoading = false
+      that.data.isPullDown = false
     })
   }
 })

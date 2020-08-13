@@ -16,27 +16,34 @@ Page({
   },
 
   onKewordChange(e) {
-    this.setData({
-      keyword: e.detail
-    })
+    this.data.keyword = e.detail
   },
 
   // 搜索客户
   bindSearch: function(event) {
+    this.data.pageIndex = 1
     this.setData({
-      pageIndex: 1,
-      type: '',
-    });
-    this.getList();
+      type: ''
+    })
+    this.getList()
+  },
+
+  onCancel: function() {
+    this.setData({
+      keyword: '',
+      type: ''
+    })
+    this.data.pageIndex = 1
+    this.getList()
   },
 
   onTabChange(event) {
+    this.data.pageIndex = 1
+    this.data.keyword = ''
     this.setData({
-      pageIndex: 1,
-      type: event.detail.name,
-      keyword: ''
-    });
-    this.getList();
+      type: event.detail.name
+    })
+    this.getList()
   },
 
   getList: function() {
@@ -95,7 +102,6 @@ Page({
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: function () {
-
   },
 
   /**
@@ -112,24 +118,22 @@ Page({
    * 生命周期函数--监听页面隐藏
    */
   onHide: function () {
-
   },
 
   /**
    * 生命周期函数--监听页面卸载
    */
   onUnload: function () {
-
   },
 
   onPullDownRefresh: function() {
     // 触发下拉刷新时执行
     if (this.data.isLoading == false) {
-      this.data.isPullDown = true
+      this.setData({
+        isPullDown: true
+      })
       this.data.pageIndex = 1
       this.getList()
-    } else {
-      this.data.isPullDown = false
     }
     wx.stopPullDownRefresh()
   },
@@ -145,12 +149,11 @@ Page({
    * 用户点击右上角分享
    */
   onShareAppMessage: function () {
-
   },
 
   bindAdd: function() {
     wx.navigateTo({
-      url: '../edit/edit?id=0',
+      url: '../edit/edit',
     })
   }
 })

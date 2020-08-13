@@ -7,9 +7,9 @@ Page({
   data: {
     isLoading: false,
     isPullDown: false,
-    goEdit: false,
     info: {
       id: 0,
+      type: '',
       title: '',         // 名称
       department: '',    // 部门
       job: '',           // 职务
@@ -29,7 +29,9 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    let that = this;
+    let that = this
+    app.globalData.refreshLinkmanView = false
+
     if (options.id) {
       that.data.info.id = options.id
     }
@@ -53,9 +55,9 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    if (this.data.goEdit) {
+    if (app.globalData.refreshLinkmanView) {
       this.getView()
-      this.data.goEdit = false
+      app.globalData.refreshLinkmanView = false
     }
   },
 
@@ -63,14 +65,12 @@ Page({
    * 生命周期函数--监听页面隐藏
    */
   onHide: function () {
-
   },
 
   /**
    * 生命周期函数--监听页面卸载
    */
   onUnload: function () {
-
   },
 
   /**
@@ -82,7 +82,6 @@ Page({
       this.getView()
     }
     wx.stopPullDownRefresh()
-    this.data.isPullDown = false
   },
 
   /**
@@ -123,7 +122,6 @@ Page({
   },
 
   bindEdit: function() {
-    this.data.goEdit = true
     wx.navigateTo({
       url: '../edit/edit?id=' + this.data.info.id
     })
@@ -143,15 +141,15 @@ Page({
 
   // 获取数据
   getView: function() {
-    let that = this;
-    that.setData({
-      isLoading: true
-    })
-    
+    let that = this
+    that.data.isLoading = true
+
     if (that.data.isPullDown == false) {
       wx.showLoading({
         title: '加载中',
       })
+    } else {
+      that.data.isPullDown = false
     }
     
     let url = 'linkman/detail?id=' + that.data.info.id
@@ -169,9 +167,7 @@ Page({
         })
       }
     }, () => {
-      that.setData({
-        isLoading: false
-      })
+      that.data.isLoading = true
       wx.hideLoading()
     })
   },
@@ -185,6 +181,15 @@ Page({
       id: that.data.info.id
     }, (res) => {
       if (res.success) {
+        if (that.data.info.type == 'building') {
+          app.globalData.refreshBuildingView = true
+        }
+        if (that.data.info.type == 'unit') {
+          app.globalData.refreshUnitView = true
+        }
+        if (that.data.info.type == 'customer') {
+          app.globalData.refreshCustomerView = true
+        }
         wx.navigateBack()
       } else {
         Dialog.alert({
