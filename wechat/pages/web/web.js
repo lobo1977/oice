@@ -56,9 +56,11 @@ Page({
   onReachBottom: function () {
   },
 
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function () {
+  // 转发事件
+  onShareAppMessage(object) {
+    let shareData = {
+      path: '/pages/web/web?url=' + this.data.url
+    }
+    return shareData
   }
 })

@@ -7,10 +7,7 @@ Page({
   data: {
     activeTab: 1,
     id: 0,
-    area: [],
-    area_index: 0,
-    district: [],
-    district_index: 0,
+    areaData: [],
     showArea: false,
     type:[],
     showType: false,
@@ -156,6 +153,13 @@ Page({
     let url = 'building/edit?id=' + that.data.id
     app.get(url, (res) => {
       if (res.success && res.data) {
+        let arrType = []
+        app.globalData.buildingType.forEach(element => {
+          if (element.text != '类别') {
+            arrType.push(element.text)
+          }
+        })
+
         let info = that.data.info
         for (let item in info) {
           if (res.data[item] !== undefined && res.data[item] !== null) {
@@ -204,10 +208,37 @@ Page({
             })
           })
         }
-        
+
+        let arrArea = [], arrDistrict = [], area
+        let idx = 0, idx2 = 0, areaIdx = 0, districtIdx = 0
+        app.globalData.area.forEach(element => {
+          if (element.id != 'all') {
+            arrArea.push(element.text)
+            if (res.data.area == element.text) {
+              area = element
+              areaIdx = idx
+            }
+            idx++
+          }
+        })
+
+        if (area && area.children && area.children.length) {
+          area.children.forEach(d => {
+            if (d.id != '') {
+              arrDistrict.push(d.text)
+              if (res.data.district == d.text) {
+                districtIdx = idx2
+              }
+              idx2++
+            }
+          })
+        }
+
         that.setData({
+          type: arrType,
           info: info,
-          images: imageList
+          images: imageList,
+          areaData: [{values: arrArea, defaultIndex: areaIdx}, {values: arrDistrict, defaultIndex: districtIdx}]
         })
       } else {
         Dialog.alert({
@@ -218,72 +249,30 @@ Page({
         })
       }
     }, () => {
-      let arrArea = []
-      let arrDistrict = []
-      let dataArea = that.data.info.area ? that.data.info.area : ''
-      let dataDistrict = that.data.info.district ? that.data.info.district : ''
-      let idx = 0;
-      let idx2 = 0;
-      app.globalData.area.forEach(element => {
-        if (element.id != 'all') {
-          arrArea.push(element.text)
-          if (element.children && element.children.length && (dataArea == element.text || (idx == 0 && dataArea == ''))) {
-            that.setData({
-              area_index: idx
-            })
-            element.children.forEach(d => {
-              idx2 = 0
-              if (d.id != '') {
-                arrDistrict.push(d.text)
-                if (dataDistrict == d.text) {
-                  that.setData({
-                    district_index: idx2
-                  })
-                }
-                idx2++
-              }
-            })
-          }
-          idx++;
-        }
-      })
-      let arrType = []
-      app.globalData.buildingType.forEach(element => {
-        if (element.text != '类别') {
-          arrType.push(element.text)
-        }
-      })
-      that.setData({
-        area: arrArea,
-        type: arrType,
-        district: arrDistrict
-      })
       wx.hideLoading()
     })
   },
 
   onNameInput: function(event) {
-    this.setData({
-      ['info.building_name']: event.detail
-    })
+    this.data.info.building_name = event.detail
+    if (this.data.info.building_name && this.data.is_name_empty) {
+      that.setData({
+        is_name_empty: false,
+        name_error: ''
+      })
+    }
   },
 
   // onTelInput: function(event) {
-  //   this.setData({
-  //     ['info.tel']: event.detail
-  //   })
+  //   this.data.info.tel = event.detail
   // },
 
   // onLinkmanInput: function(event) {
-  //   this.setData({
-  //     ['info.linkman']: event.detail
-  //   })
+  //   this.data.info.linkman = event.detail
   // },
 
   onAddressInput: function(event) {
-    this.setData({
-      ['info.address']: event.detail
-    })
+    this.data.info.address = event.detail
   },
 
   bindSelectArea: function() {
@@ -360,13 +349,20 @@ Page({
   bindselectLatLng: function(event) {
     let that = this
     let info = that.data.info
-    let lat = null
-    let lng = null
     if (info.latitude !== null && info.latitude !== 0 && info.longitude !== null && info.longitude !== 0) {
       let latLng = app.convertBD09ToGCJ02(info.latitude, info.longitude)
-      lat = latLng.lat
-      lng = latLng.lng
+      that.chooseLocation(latLng.lat, latLng.lng)
+    } else {
+      wx.getLocation({
+        type: 'gjc02',
+        success (res) {
+          that.chooseLocation(res.latitude, res.longitude)
+        }
+      })
     }
+  },
+
+  chooseLocation: function(lat, lng) {
     wx.chooseLocation({
       latitude: lat,
       longitude: lng,
@@ -401,45 +397,31 @@ Page({
   },
 
   onAcreageInput: function(event) {
-    this.setData({
-      ['info.acreage']: event.detail
-    })
+    this.data.info.acreage = event.detail
   },
 
   onPriceInput: function(event) {
-    this.setData({
-      ['info.price']: event.detail
-    })
+    this.data.info.price = event.detail
   },
 
   onFloorHeightInput: function(event) {
-    this.setData({
-      ['info.floor_height']: event.detail
-    })
+    this.data.info.floor_height = event.detail
   },
 
   onBearingInput: function(event) {
-    this.setData({
-      ['info.bearing']: event.detail
-    })
+    this.data.info.bearing = event.detail
   },
 
   onDeveloperInput: function(event) {
-    this.setData({
-      ['info.developer']: event.detail
-    })
+    this.data.info.developer = event.detail
   },
 
   onManagerInput: function(event) {
-    this.setData({
-      ['info.manager']: event.detail
-    })
+    this.data.info.manager = event.detail
   },
 
   onFeeInput: function(event) {
-    this.setData({
-      ['info.fee']: event.detail
-    })
+    this.data.info.fee = event.detail
   },
 
   bindSelectCompletionDate: function() {
@@ -462,45 +444,31 @@ Page({
   },
 
   onRemInput: function(event) {
-    this.setData({
-      ['info.rem']: event.detail
-    })
+    this.data.info.rem = event.detail
   },
 
   onEquipmentInput: function(event) {
-    this.setData({
-      ['info.equipment']: event.detail
-    })
+    this.data.info.equipment = event.detail
   },
 
   onTrafficInput: function(event) {
-    this.setData({
-      ['info.traffic']: event.detail
-    })
+    this.data.info.traffic = event.detail
   },
 
   onFacilityInput: function(event) {
-    this.setData({
-      ['info.facility']: event.detail
-    })
+    this.data.info.facility = event.detail
   },
 
   onEnvironmentInput: function(event) {
-    this.setData({
-      ['info.environment']: event.detail
-    })
+    this.data.info.environment = event.detail
   },
 
   onShareChange: function(event) {
-    this.setData({
-      ['info.share']: event.detail ? 1 : 0
-    })
+    this.data.info.share = event.detail ? 1 : 0
   },
 
   onSmsChange: function(event) {
-    this.setData({
-      ['info.send_sms']: event.detail ? 1 : 0
-    })
+    this.data.info.send_sms = event.detail ? 1 : 0
   },
 
   bindSave: function() {
@@ -510,7 +478,7 @@ Page({
         is_name_empty: true,
         name_error: '请输入项目名称'
       })
-    } else {
+    } else if (that.data.is_name_empty) {
       that.setData({
         is_name_empty: false,
         name_error: ''

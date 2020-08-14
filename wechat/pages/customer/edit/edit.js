@@ -85,7 +85,6 @@ Page({
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: function () {
-
   },
 
   /**
@@ -98,35 +97,30 @@ Page({
    * 生命周期函数--监听页面隐藏
    */
   onHide: function () {
-
   },
 
   /**
    * 生命周期函数--监听页面卸载
    */
   onUnload: function () {
-
   },
 
   /**
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function () {
-
   },
 
   /**
    * 页面上拉触底事件的处理函数
    */
   onReachBottom: function () {
-
   },
 
   /**
    * 用户点击右上角分享
    */
   onShareAppMessage: function () {
-
   },
 
   // 获取数据
@@ -199,27 +193,25 @@ Page({
   },
 
   onNameInput: function(event) {
-    this.setData({
-      ['info.customer_name']: event.detail
-    })
+    this.data.info.customer_name = event.detail
+    if (this.data.info.customer_name && this.data.is_name_empty) {
+      that.setData({
+        is_name_empty: false,
+        name_error: ''
+      })
+    }
   },
 
   onTelInput: function(event) {
-    this.setData({
-      ['info.tel']: event.detail
-    })
+    this.data.info.tel = event.detail
   },
 
   onLinkmanInput: function(event) {
-    this.setData({
-      ['info.linkman']: event.detail
-    })
+    this.data.info.linkman = event.detail
   },
 
   onAddressInput: function(event) {
-    this.setData({
-      ['info.address']: event.detail
-    })
+    this.data.info.address = event.detail
   },
 
   bindSelectArea: function() {
@@ -310,27 +302,19 @@ Page({
   },
 
   onMinAcreageInput: function(event) {
-    this.setData({
-      ['info.min_acreage']: event.detail
-    })
+    this.data.info.min_acreage = event.detail
   },
 
   onMaxAcreageInput: function(event) {
-    this.setData({
-      ['info.max_acreage']: event.detail
-    })
+    this.data.info.max_acreage = event.detail
   },
 
   onBudgeInput: function(event) {
-    this.setData({
-      ['info.budge']: event.detail
-    })
+    this.data.info.budge = event.detail
   },
 
   onCurrentAreaInput: function(event) {
-    this.setData({
-      ['info.current_area']: event.detail
-    })
+    this.data.info.current_area = event.detail
   },
 
   bindSelectSettleDate: function() {
@@ -372,21 +356,15 @@ Page({
   },
 
   onRemindChange: function(event) {
-    this.setData({
-      ['info.remind']: event.detail
-    })
+    this.data.info.remind = event.detail
   },
 
   onRemInput: function(event) {
-    this.setData({
-      ['info.rem']: event.detail
-    })
+    this.data.info.rem = event.detail
   },
 
   onShareChange: function(event) {
-    this.setData({
-      ['info.share']: event.detail ? 1 : 0
-    })
+    this.data.info.share = event.detail ? 1 : 0
   },
 
   bindSelectStatus: function() {
@@ -415,83 +393,84 @@ Page({
         is_name_empty: true,
         name_error: '请输入客户名称'
       })
-    } else {
+      return
+    } else if (that.data.is_name_empty) {
       that.setData({
         is_name_empty: false,
         name_error: ''
       })
+    }
 
-      wx.showLoading({
-        title: '保存中',
-      })
+    wx.showLoading({
+      title: '保存中',
+    })
 
-      app.post('customer/edit?id=' + that.data.id, that.data.info, (res) => {
-        if (res.success) {
-          app.globalData.refreshCustomer = true
-          if (res.message) {
-            Dialog.alert({
-              title: '保存成功',
-              message: res.message
-            }).then(() => {
-              if (that.data.id == 0) {
-                let id = res.data
-                wx.redirectTo({
-                  url: '../view/view?id=' + id
-                })
-              } else {
-                app.globalData.refreshCustomerView = true
-                wx.navigateBack()
-              }
-            })
-          } else if (that.data.id == 0) {
-            let id = res.data
-            wx.redirectTo({
-              url: '../view/view?id=' + id
-            })
-          } else {
-            wx.navigateBack()
-          }
-        } else if (res.data) {
-          if (res.data.token) {
-            that.data.info.__token__ = res.data.token
-          }
-          if (res.data.confirm && res.data.clash) {
-            Dialog.confirm({
-              title: '撞单提醒',
-              message: res.message
-            }).then(() => {
-              that.data.info.clash = res.data.clash
-              that.bindSave()
-            })
-          } else {
-            Dialog.alert({
-              title: res.data.clash ? '撞单提醒' : '发生错误',
-              message: res.message
-            }).then(() => {
-              if (res.data.clash) {
-                let id = res.data.clash
-                wx.redirectTo({
-                  url: '../view/view?id=' + id
-                })
-              }
-            })
-          }
-        } else if (res.message) {
-          wx.showToast({
-            icon: 'none',
-            title: res.message,
-            duration: 2000
+    app.post('customer/edit?id=' + that.data.id, that.data.info, (res) => {
+      if (res.success) {
+        app.globalData.refreshCustomer = true
+        if (res.message) {
+          Dialog.alert({
+            title: '保存成功',
+            message: res.message
+          }).then(() => {
+            if (that.data.id == 0) {
+              let id = res.data
+              wx.redirectTo({
+                url: '../view/view?id=' + id
+              })
+            } else {
+              app.globalData.refreshCustomerView = true
+              wx.navigateBack()
+            }
+          })
+        } else if (that.data.id == 0) {
+          let id = res.data
+          wx.redirectTo({
+            url: '../view/view?id=' + id
           })
         } else {
-          wx.showToast({
-            icon: 'none',
-            title: '操作失败，系统异常',
-            duration: 2000
+          wx.navigateBack()
+        }
+      } else if (res.data) {
+        if (res.data.token) {
+          that.data.info.__token__ = res.data.token
+        }
+        if (res.data.confirm && res.data.clash) {
+          Dialog.confirm({
+            title: '撞单提醒',
+            message: res.message
+          }).then(() => {
+            that.data.info.clash = res.data.clash
+            that.bindSave()
+          })
+        } else {
+          Dialog.alert({
+            title: res.data.clash ? '撞单提醒' : '发生错误',
+            message: res.message
+          }).then(() => {
+            if (res.data.clash) {
+              let id = res.data.clash
+              wx.redirectTo({
+                url: '../view/view?id=' + id
+              })
+            }
           })
         }
-      }, () => {
-        wx.hideLoading()
-      })
-    }
-  }
+      } else if (res.message) {
+        wx.showToast({
+          icon: 'none',
+          title: res.message,
+          duration: 2000
+        })
+      } else {
+        wx.showToast({
+          icon: 'none',
+          title: '操作失败，系统异常',
+          duration: 2000
+        })
+      }
+    }, () => {
+      wx.hideLoading()
+    })
+}
 })

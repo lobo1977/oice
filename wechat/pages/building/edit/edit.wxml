@@ -57,7 +57,7 @@
     </van-cell-group>
 
     <van-popup show="{{ showArea }}" position="bottom" bind:close="onAreaPickerClose">
-      <van-picker columns="{{ [{values: area, defaultIndex: area_index}, {values: district, defaultIndex: district_index}] }}" bind:confirm="onAreaSelected" bind:cancel="onAreaPickerClose" bind:change="onAreaPickerChange" show-toolbar />
+      <van-picker columns="{{ areaData }}" bind:confirm="onAreaSelected" bind:cancel="onAreaPickerClose" bind:change="onAreaPickerChange" show-toolbar />
     </van-popup>
 
     <van-popup show="{{ showType }}" position="bottom" bind:close="onTypePickerClose">
