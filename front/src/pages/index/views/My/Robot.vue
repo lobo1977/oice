@@ -3,7 +3,7 @@
     <div style="text-align:center;">
       <divider>请使用微信扫码登录</divider>
       <div v-show="qrCode.length > 0">
-        <qrcode :value="qrCode" type="img" style="margin:10px 0"></qrcode>
+        <img :src="qrCode" style="margin:10px 0;width:160px;height:160px;" />
         <p style="margin-top:10px;font-size:0.8em;color:#999999;">
           以上二维码不支持长按识别及从本机相册识别，请截图发送到其他手机或电脑，然后用微信扫一扫功能。
           <br />您需要先关注公众微信号“云普商办”，扫码后两分钟公众号回复：“签到成功”，机器人方可正常显示。
