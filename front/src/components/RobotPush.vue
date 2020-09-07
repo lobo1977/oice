@@ -127,7 +127,7 @@ export default {
       cycle: true,
       cycle_hour: 3,
       start_hour: 8,
-      end_hour: 22,
+      end_hour: 24,
       leftOptions: {
         showBack: false
       },
@@ -273,9 +273,9 @@ export default {
       vm.keyword = ''
       vm.checkList = []
       vm.cycle = true
-      vm.cycle_hour = 2
+      vm.cycle_hour = 3
       vm.start_hour = 8
-      vm.end_hour = 20
+      vm.end_hour = 24
       vm.$get('/api/robot/contact?id=' + this.robotID, (res) => {
         if (res.success) {
           if (res.data && res.data.length) {
