@@ -251,7 +251,7 @@ class User extends Base
       ->leftJoin('oauth o', "a.id = o.user_id and o.platform = 'wechat'")
       ->where('a.id', $id)
       ->where('a.status', 0)
-      ->field('a.id,a.title,a.avatar,a.mobile,a.email,a.qq,a.weixin,
+      ->field('a.id,a.type,a.title,a.avatar,a.mobile,a.email,a.qq,a.weixin,
         b.company_id,b.superior_id,u.title as superior,
         c.title as company,c.full_name,c.logo,c.user_id as company_admin,o.openid')
       ->find();

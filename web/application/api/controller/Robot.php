@@ -15,8 +15,12 @@ class Robot extends Base
    * 微信登录二维码
    */
   public function qrcode() {
-    $ret = Python::ppython("oice::run");
-    return $this->succeed($ret);
+    if ($this->user->type < 10) {
+      $ret = Python::ppython("oice::run");
+      return $this->succeed($ret);
+    } else {
+      return $this->fail('对不起，您是受限用户，不能使用机器人。');
+    }
   }
     
   /**

@@ -42,7 +42,7 @@
       <cell v-if="user.id" title="通讯录" :link="{name: 'Contact'}">
         <x-icon slot="icon" type="android-contacts" class="cell-icon"></x-icon>
       </cell>
-      <cell v-if="user.id" title="微信机器人" :link="{name:'Robot'}">
+      <cell v-if="user.id && user.type < 10" title="微信机器人" :link="{name:'Robot'}">
         <x-icon slot="icon" type="wechat" class="cell-icon"></x-icon>
       </cell>
       <cell v-if="user.id" title="修改密码" :link="{name:'Password'}">
@@ -67,7 +67,7 @@ export default {
     return {
       user: {
         // id: 0,
-        // type: 0,
+        type: 0,
         title: '',
         avatar: '',
         company_id: 0,
