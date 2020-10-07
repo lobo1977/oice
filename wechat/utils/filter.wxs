@@ -30,12 +30,12 @@ var formatNumber = function(n) {
 var host = 'https://m.o-ice.com'
 
 var imageUrl = function(url) {
-  if (url.indexOf('http') == 0) {
+  if (url && url.indexOf('http') == 0) {
     return url
-  } else if (url.indexOf('/') == 0) {
+  } else if (url && url.indexOf('/') == 0) {
     return host + url
   } else {
-    return host + '/' + url
+    return host + '/' + (url || '')
   }
 }
 

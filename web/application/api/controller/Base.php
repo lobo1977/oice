@@ -1,6 +1,7 @@
 <?php
 namespace app\api\controller;
 
+use think\facade\Log as sysLog;
 use think\facade\Cache;
 use think\facade\Validate;
 use think\Controller;
@@ -73,6 +74,9 @@ class Base extends Controller
    * 表单令牌
    */
   protected function formToken() {
+    if (!$this->user_token) {
+      $this->getUser();
+    }
     $form_token = $this->request->token('__token__', 'sha1');
     Cache::set($this->user_token, $form_token, 600);
     return $form_token;

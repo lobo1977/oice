@@ -478,50 +478,51 @@ Page({
         is_name_empty: true,
         name_error: '请输入项目名称'
       })
+      return
     } else if (that.data.is_name_empty) {
       that.setData({
         is_name_empty: false,
         name_error: ''
       })
-
-      wx.showLoading({
-        title: '保存中',
-      })
-
-      app.post('building/edit?id=' + that.data.id, that.data.info, (res) => {
-        if (res.success) {
-          app.globalData.refreshBuilding = true
-          if (that.data.id == 0) {
-            let id = res.data
-            wx.redirectTo({
-              url: '../view/view?id=' + id
-            })
-          } else {
-            app.globalData.refreshBuildingView = true
-            wx.navigateBack()
-          }
-        } else {
-          if (res.data && res.data.token) {
-            that.data.info.__token__ = res.data.token
-          }
-          if (res.message) {
-            wx.showToast({
-              icon: 'none',
-              title: res.message,
-              duration: 2000
-            })
-          } else {
-            wx.showToast({
-              icon: 'none',
-              title: '操作失败，系统异常',
-              duration: 2000
-            })
-          }
-        }
-      }, () => {
-        wx.hideLoading()
-      })
     }
+
+    wx.showLoading({
+      title: '保存中',
+    })
+
+    app.post('building/edit?id=' + that.data.id, that.data.info, (res) => {
+      if (res.success) {
+        app.globalData.refreshBuilding = true
+        if (that.data.id == 0) {
+          let id = res.data
+          wx.redirectTo({
+            url: '../view/view?id=' + id
+          })
+        } else {
+          app.globalData.refreshBuildingView = true
+          wx.navigateBack()
+        }
+      } else {
+        if (res.data && res.data.token) {
+          that.data.info.__token__ = res.data.token
+        }
+        if (res.message) {
+          wx.showToast({
+            icon: 'none',
+            title: res.message,
+            duration: 2000
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: '操作失败，系统异常',
+            duration: 2000
+          })
+        }
+      }
+    }, () => {
+      wx.hideLoading()
+    })
   },
 
   previewImages: function(event) {

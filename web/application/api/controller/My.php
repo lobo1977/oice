@@ -91,11 +91,10 @@ class My extends Base
       return $this->succeed($data);
     } else {
       $validate = Validate::make([
-        'title'  => 'require|token',
+        //'title'  => 'require',
         'email' => 'email|unique:user,email,' . $this->user_id
       ],[
-        'title.require' => '必须填写姓名。',
-        'title.token' => '无效请求，请勿重复提交。',
+        //'title.require' => '必须填写姓名。',
         'email.email' => '电子邮箱无效。',
         'email.unique' => '电子邮箱已存在，请使用其他邮箱。'
       ]);
@@ -103,7 +102,9 @@ class My extends Base
       $data = input('post.');
       $avatar = request()->file('avatar');
       
-      if (!$validate->check($data)) {
+      if (!$this->checkFormToken($data)) {
+        return $this->fail('无效请求，请勿重复提交表单');
+      } else if (!$validate->check($data)) {
         $form_token = $this->formToken();
         return $this->fail($validate->getError(), $form_token);
       } else {

@@ -402,7 +402,7 @@ class User extends Base
         unset($data['avatar']);
       }
 
-      if ($data['title'] != $oldData->title) {
+      if (isset($data['title']) && $data['title'] != $oldData->title) {
         if ($oldData->title) {
           $summary = $summary . '姓名：' . $oldData->title . ' -> ' . $data['title'] . '\n';
         } else {
@@ -410,7 +410,7 @@ class User extends Base
         }
       }
 
-      if ($data['email'] != $oldData->email) {
+      if (isset($data['email']) && $data['email'] != $oldData->email) {
         if ($oldData->email) {
           $summary = $summary . '电子邮箱：' . $oldData->email . ' -> ' . $data['email'] . '\n';
         } else {
@@ -418,7 +418,7 @@ class User extends Base
         }
       }
 
-      if ($data['weixin'] != $oldData->weixin) {
+      if (isset($data['weixin']) && $data['weixin'] != $oldData->weixin) {
         if ($oldData->weixin) {
           $summary = $summary . '微信：' . $oldData->weixin . ' -> ' . $data['weixin'] . '\n';
         } else {
@@ -426,7 +426,7 @@ class User extends Base
         }
       }
 
-      if ($data['qq'] != $oldData->qq) {
+      if (isset($data['qq']) && $data['qq'] != $oldData->qq) {
         if ($oldData->qq) {
           $summary = $summary . 'QQ：' . $oldData->qq . ' -> ' . $data['qq'] . '\n';
         } else {

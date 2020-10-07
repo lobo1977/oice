@@ -310,6 +310,7 @@ App({
   			}
   		},
   		fail (err) {
+        console.log(err)
   			wx.showToast({
           title: '发生错误，请稍后再试',
           icon: 'none',

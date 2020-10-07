@@ -1,1 +1,5 @@
 /* pages/my/index/index.wxss */
+
+.my-grid {
+  margin:6px 0 8px 0;
+}
