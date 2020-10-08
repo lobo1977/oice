@@ -43,7 +43,7 @@ export default {
         mobile: '',   // 手机号码
         email: '',    // 电子邮箱
         weixin: '',   // 微信
-        qq: ''       // QQ
+        qq: ''        // QQ
       },
       avatarSrc: null
     }

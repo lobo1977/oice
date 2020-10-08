@@ -1,0 +1,28 @@
+<page-meta background-text-style="dark">
+</page-meta>
+<wxs src="../../../utils/filter.wxs" module="filter" />
+
+<view class="page-view">
+  <van-cell-group>
+    <van-cell title="头像" center>
+      <van-uploader bind:after-read="upload">
+        <image mode="aspectFill" 
+          src="{{filter.imageUrl(avatar)}}" class="cell-image"></image>
+      </van-uploader>
+    </van-cell>   
+    <van-field title-width="80px" label="姓名" value="{{ info.title }}" required placeholder="{{ title_error }}" error="{{is_title_empty}}" maxlength="30" bind:input="onTitleInput" input-align="right" />
+    <van-cell title="手机" link-type="navigateTo" is-link
+      url="../mobile/mobile" value="{{ mobile }}" ></van-cell>
+    <van-field title-width="80px" label="电子邮箱" value="{{ info.email }}" type="email" error="{{ is_email_error }}" maxlength="30" bind:input="onEmailInput" input-align="right" error_message="{{email_error}}" />
+    <van-field title-width="80px" label="微信" value="{{ info.weixin }}" maxlength="30" bind:input="onWeixinInput" input-align="right" />
+    <van-field title-width="80px" label="QQ" value="{{ info.qq }}" maxlength="30" bind:input="onQQInput" input-align="right" />
+  </van-cell-group>
+
+  <van-row gutter="0" custom-class="button-bar">
+    <van-col span="24">
+      <van-button square type="primary" icon="sign" block bindtap="bindSave">保存</van-button>
+    </van-col>
+  </van-row>
+
+  <van-dialog id="van-dialog" />
+</view>

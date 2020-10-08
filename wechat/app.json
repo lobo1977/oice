@@ -39,7 +39,9 @@
     "van-divider": "@vant/weapp/divider",
     "van-nav-bar": "@vant/weapp/nav-bar",
     "van-notice-bar": "@vant/weapp/notice-bar",
-    "van-uploader": "@vant/weapp/uploader"
+    "van-uploader": "@vant/weapp/uploader",
+    "van-grid": "@vant/weapp/grid",
+    "van-grid-item": "@vant/weapp/grid-item"
   },
   "tabBar": {
     "list": [
@@ -54,6 +56,12 @@
         "pagePath": "pages/customer/index/index",
         "iconPath": "icon/contact_a.png",
         "selectedIconPath": "icon/contact_b.png"
+      },
+      {
+        "text": "我的",
+        "pagePath": "pages/my/index/index",
+        "iconPath": "icon/my_a.png",
+        "selectedIconPath": "icon/my_b.png"
       }
     ]
   },
@@ -71,6 +79,8 @@
     "pages/contact/view/view",
     "pages/linkman/edit/edit",
     "pages/my/index/index",
-    "pages/web/web"
+    "pages/web/web",
+    "pages/my/info/info",
+    "pages/my/mobile/mobile"
   ]
 }
