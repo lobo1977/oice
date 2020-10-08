@@ -41,7 +41,9 @@
     "van-notice-bar": "@vant/weapp/notice-bar",
     "van-uploader": "@vant/weapp/uploader",
     "van-grid": "@vant/weapp/grid",
-    "van-grid-item": "@vant/weapp/grid-item"
+    "van-grid-item": "@vant/weapp/grid-item",
+    "van-radio": "@vant/weapp/radio",
+    "van-radio-group": "@vant/weapp/radio-group"
   },
   "tabBar": {
     "list": [
@@ -81,6 +83,10 @@
     "pages/my/index/index",
     "pages/web/web",
     "pages/my/info/info",
-    "pages/my/mobile/mobile"
+    "pages/my/mobile/mobile",
+    "pages/my/favorite/favorite",
+    "pages/my/building/building",
+    "pages/my/customer/customer",
+    "pages/company/index/index"
   ]
 }

@@ -1,0 +1,12 @@
+<!--pages/company/index/index.wxml-->
+<page-meta background-text-style="dark">
+</page-meta>
+<view>
+  <van-radio-group value="{{ me.company_id }}" bind:change="onChange">
+    <van-cell-group title="切换企业">
+      <van-cell wx:for="{{my}}" wx:key="id" title="{{item.title}}" clickable bind:click="onClick">
+        <van-radio slot="right-icon" name="{{item.id}}" />
+      </van-cell>
+    </van-cell-group>
+  </van-radio-group>
+</view>

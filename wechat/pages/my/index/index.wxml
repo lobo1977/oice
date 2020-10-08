@@ -18,15 +18,16 @@
   </van-cell-group>
 
   <van-grid column-num="3" clickable custom-class="my-grid">
-    <van-grid-item icon="star-o" text="收藏" link-type="navigateTo" url="" />
-    <van-grid-item icon="hotel-o" text="项目" link-type="navigateTo" url="" />
-    <van-grid-item icon="todo-list-o" text="到期客户" link-type="navigateTo" url="" />
+    <van-grid-item icon="star-o" text="收藏" link-type="navigateTo" url="../favorite/favorite" />
+    <van-grid-item icon="hotel-o" text="项目" link-type="navigateTo" url="../building/building" />
+    <van-grid-item icon="todo-list-o" text="到期客户" link-type="navigateTo" url="../customer/customer" />
   </van-grid>
 
   <van-cell-group>
-    <van-cell title="我的企业" icon="home-o" link-type="navigateTo" url="" is-link/>
-    <van-cell title="我的名片" icon="idcard" link-type="navigateTo" url="" is-link/>
-    <van-cell title="通讯录" icon="friends-o" link-type="navigateTo" url="" is-link/>
+    <van-cell title="我的企业" icon="home-o" link-type="navigateTo" url="../../company/index/index" is-link value="{{me.company}}"/>
+    <van-cell wx:if="{{me.superior_id > 0}}" title="我的上级" icon="manager-o" link-type="navigateTo" url="../../contact/view/view?id={{me.superior_id}}" is-link value="{{me.superior}}"/>
+    <van-cell title="我的名片" icon="idcard" link-type="navigateTo" url="../../contact/view/view?id={{ me.id }}" is-link/>
+    <van-cell title="通讯录" icon="friends-o" link-type="navigateTo" url="../../contact/index/index" is-link/>
   </van-cell-group>
 </view>
 

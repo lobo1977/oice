@@ -5,6 +5,7 @@ const app = getApp()
 
 Page({
   data: {
+    isMe: false,
     isLoading: false,
     isPullDown: false,
     info: {
@@ -108,7 +109,8 @@ Page({
     app.get(url, (res) => {
       if (res.data) {
         that.setData({
-          info: res.data
+          info: res.data,
+          isMe: app.globalData.appUserInfo.id == that.data.info.id
         })
       }
     }, () => {
