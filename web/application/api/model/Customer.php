@@ -133,12 +133,12 @@ class Customer extends Base
     }
     
     $list = self::alias('a')
-      ->leftJoin('user_company b', 'a.user_id = b.user_id and a.company_id = b.company_id and b.status = 1')
+      ->leftJoin('user_company b', 'a.user_id = b.user_id AND a.company_id = b.company_id AND b.status = 1')
       ->leftJoin('user u', 'a.user_id = u.id')
-      ->leftJoin('share s', "s.type = 'customer' and a.id = s.object_id and s.user_id = " . $user_id)
-      ->where('(a.user_id = ' . $user_id . ' and a.company_id = ' . $company_id . ')
-         OR ((a.share = 1 or b.superior_id = ' . $user_id . ') and a.company_id > 0 and a.company_id = ' . $company_id . ')
-         OR s.object_id is not null');
+      ->leftJoin('share s', "s.type = 'customer' AND a.id = s.object_id AND s.user_id = " . $user_id)
+      ->where('(a.user_id = ' . $user_id . '
+         OR (a.share = 1 OR b.superior_id = ' . $user_id . ')
+         OR s.object_id IS NOT NULL) AND a.company_id > 0 AND a.company_id = ' . $company_id);
 
     if (isset($filter['keyword']) && $filter['keyword'] != '') {
       $list->where('a.customer_name', 'like', '%' . $filter['keyword'] . '%');
