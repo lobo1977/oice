@@ -143,5 +143,57 @@ Page({
         isLoading: false
       })
     })
+  },
+
+  setActiveCompany(id) {
+    if (this.data.me.company_id == id) {
+      return
+    }
+
+    wx.showLoading({
+      title: '切换中'
+    })
+
+    app.post('company/setActive', {
+      id: id
+    }, (res) => {
+      if (res.success) {
+        this.setData({
+          ['me.company_id']: id,
+        })
+        app.globalData.appUserInfo.company_id = id
+      } else {
+        if (res.message) {
+          wx.showToast({
+            icon: 'none',
+            title: res.message,
+            duration: 2000
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: '操作失败，系统异常',
+            duration: 2000
+          })
+        }
+      }
+    }, () => {
+      wx.hideLoading()
+    })
+  },
+
+  newCompany: function() {
+    wx.navigateTo({
+      url: '../edit/edit',
+    })
+  },
+
+  changeCompany: function(event) {
+    this.setActiveCompany(event.detail)
+  },
+
+  onCompanyClick: function(event) {
+    const { name } = event.currentTarget.dataset
+    this.setActiveCompany(name)
   }
 })

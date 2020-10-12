@@ -43,7 +43,9 @@
     "van-grid": "@vant/weapp/grid",
     "van-grid-item": "@vant/weapp/grid-item",
     "van-radio": "@vant/weapp/radio",
-    "van-radio-group": "@vant/weapp/radio-group"
+    "van-radio-group": "@vant/weapp/radio-group",
+    "van-collapse": "@vant/weapp/collapse",
+    "van-collapse-item": "@vant/weapp/collapse-item"
   },
   "tabBar": {
     "list": [
@@ -87,6 +89,8 @@
     "pages/my/favorite/favorite",
     "pages/my/building/building",
     "pages/my/customer/customer",
-    "pages/company/index/index"
+    "pages/company/index/index",
+    "pages/company/view/view",
+    "pages/company/edit/edit"
   ]
 }

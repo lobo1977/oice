@@ -1,0 +1,22 @@
+/* pages/company/view/view.wxss */
+
+.page-view {
+  padding-top:10px;
+}
+
+.banner {
+  margin:0 0 10px 0;
+  height:130px;
+  border-radius:2px;
+  text-align: center;
+  background-color: #fff;
+}
+
+.banner image {
+  margin: 10px;
+  height: 60px;
+}
+
+.banner .title {
+  font-weight: bold;
+}
