@@ -18,14 +18,14 @@
   </van-cell-group>
 
   <van-cell-group title="待审核成员" wx:if="{{info.allowPass && waitUser.length}}">
-    <van-swipe-cell wx:for="{{waitUser}}" wx:for-index="idx" wx:key="id" right-width="{{ 120 }}">
-      <van-cell title="{{item.title}}" label="{{item.mobile}}" center>
+    <van-swipe-cell wx:for="{{waitUser}}" wx:key="id" right-width="{{ 120 }}">
+      <van-cell title="{{item.title}}" label="{{item.mobile}}" center link-type="navigateTo" url="../../contact/view/view?id={{item.id}}">
         <image slot="icon" mode="aspectFill" 
           src="{{filter.imageUrl(item.avatar)}}" class="cell-image"></image>
       </van-cell>
       <view slot="right" style="height:100%">
-        <van-button type="primary" data-index="{{ idx }}" custom-style="height:100%" bind:click="pass">通过</van-button>
-        <van-button type="danger" data-index="{{ idx }}" custom-style="height:100%" bind:click="reject">驳回</van-button>
+        <van-button type="primary" data-id="{{ item.id }}" custom-style="height:100%" bind:click="pass">通过</van-button>
+        <van-button type="danger" data-id="{{ item.id }}" custom-style="height:100%" bind:click="reject">驳回</van-button>
       </view>
     </van-swipe-cell>
   </van-cell-group>
@@ -56,4 +56,11 @@
       <van-button square type="default" icon="delete" block bind:click="onRemove" disabled="{{ !info.allowDelete }}"></van-button>
     </van-col>
   </van-row>
+
+  <van-dialog id="van-dialog" />
+
+  <van-dialog id="dlgInvite" use-slot title="邀请新人加入" show="{{ showInvite }}" show-cancel-button asyncClose
+    bind:confirm="invite" bind:cancel="closeInvite">
+    <input class="dialog-input" auto-focus placeholder="请输入对方手机号码" bindinput="inviteMobileInput" value="{{inviteMobile}}" />
+  </van-dialog>
 </view>

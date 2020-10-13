@@ -272,7 +272,7 @@ App({
   },
   
   // 登录
-  login () {
+  login() {
     wx.login({
       success: res => {
         let app = this
@@ -291,6 +291,18 @@ App({
           console.log('登录失败！' + res.errMsg)
         }
       }
+    })
+  },
+
+  /**
+   * 更新用户信息
+   */
+  updateUserInfo() {
+    this.get('getUserInfo', (res) => {
+      if (res.data) {
+        app.globalData.appUserInfo = res.data
+      }
+    }, () => {
     })
   },
   

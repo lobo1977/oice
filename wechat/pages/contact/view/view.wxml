@@ -9,9 +9,13 @@
         <text class="title">{{info.title}}</text>
         <text class="company" wx:if="{{info.full_name}}">{{'\n' + info.full_name}}</text>
       </view>
-      <image
+      <image wx:if="{{info.logo}}"
         mode="aspectFit"
         src="{{filter.imageUrl(info.logo)}}"
+      />
+      <image wx:if="{{!info.logo}}"
+        mode="aspectFit"
+        src="{{filter.imageUrl(info.avatar)}}"
       />
     </view>
     <view class="contact">

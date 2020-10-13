@@ -1,4 +1,6 @@
 // pages/company/view/view.js
+import Dialog from '../../../miniprogram_npm/@vant/weapp/dialog/dialog';
+
 const app = getApp()
 
 Page({
@@ -9,6 +11,8 @@ Page({
   data: {
     isLoading: false,
     isPullDown: false,
+    showInvite: false,
+    inviteMobile: '',
     info: {
       id: 0,
       title: '',
@@ -113,6 +117,62 @@ Page({
     return shareData
   },
 
+  onInvite: function() {
+    this.setData({
+      showInvite: true,
+      inviteMobile: ''
+    })
+  },
+
+  closeInvite: function() {
+    this.setData({
+      showInvite: false,
+      inviteMobile: ''
+    })
+  },
+
+  inviteMobileInput: function(event) {
+    this.data.inviteMobile = event.detail.value
+  },
+
+  invite: function() {
+    let that = this
+    let dlg = this.selectComponent('#dlgInvite')
+    if (that.data.inviteMobile == '') {
+      dlg.stopLoading()
+      return
+    } else if (!app.isMobile(that.data.inviteMobile)) {
+      dlg.stopLoading()
+      wx.showToast({
+        title: '请输入有效的手机号码',
+        icon: 'none',
+        duration: 1500
+      })
+      return
+    } else {
+      app.post('company/invite', {
+        id: that.data.info.id,
+        mobile: that.data.inviteMobile
+      }, (res) => {
+        if (res.success) {
+          Dialog.alert({
+            title: '提示',
+            message: '您向手机号 ' + that.data.inviteMobile + ' 的用户发出邀请，请等待对方确认。'
+          })
+        } else {
+          Dialog.alert({
+            title: '发生错误',
+            message: res.message ? res.message : '系统异常'
+          })
+        }
+      }, () => {
+        that.setData({
+          showInvite: false
+        })
+      })
+    }
+  },
+
   onRemove: function() {
     Dialog.confirm({
       title: '删除确认',
@@ -122,7 +182,7 @@ Page({
       this.remove()
     })
     .catch(() => {
-    });
+    })
   },
 
   getInfo: function() {
@@ -151,6 +211,106 @@ Page({
       }
     }, () => {
       that.data.isLoading = false
+      wx.hideLoading()
+    })
+  },
+
+  addin: function() {
+    let that = this
+    wx.showLoading()
+    app.post('company/addin', {
+      id: that.data.info.id
+    }, (res) => {
+      if (res.success) {
+        app.updateUserInfo()
+        if (res.data == 1) {
+          Dialog.alert({
+            title: '恭喜',
+            message: '您已加入' + that.data.info.title
+          }).then(() => {
+            wx.navigateBack()
+          })
+        } else {
+          Dialog.alert({
+            title: '提示',
+            message: '您已申请加入' + that.data.info.title + '，请等待企业管理员审核。'
+          }).then(() => {
+            wx.navigateBack()
+          })
+        }
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        })
+      }
+    }, () => {
+      wx.hideLoading()
+    })
+  },
+
+  quit:function() {
+    let that = this
+    Dialog.confirm({
+      title: '退出确认',
+      message: '您确定要退出' + that.data.info.title + '吗？',
+    })
+    .then(() => {
+      wx.showLoading()
+      app.post('company/quit', {
+        id: that.data.info.id
+      }, (res) => {
+        if (res.success) {
+          if (res.data) {
+            app.globalData.appUserInfo = res.data
+          }
+          app.updateUserInfo()
+          Dialog.alert({
+            title: '提示',
+            message: '您已退出' + that.data.info.title
+          }).then(() => {
+            wx.navigateBack()
+          })
+        } else {
+          Dialog.alert({
+            title: '发生错误',
+            message: res.message ? res.message : '系统异常'
+          })
+        }
+      }, () => {
+        wx.hideLoading()
+      })
+    })
+    .catch(() => {
+    })
+  },
+
+  pass: function(event) {
+    const user_id = event.currentTarget.dataset.id
+    this.audit(user_id, 'company/passAddin')
+  },
+
+  reject: function(event) {
+    const user_id = event.currentTarget.dataset.id
+    this.audit(user_id, 'company/rejectAddin')
+  },
+
+  audit: function(user_id, url) {
+    let that = this
+    wx.showLoading()
+    app.post(url, {
+      id: that.data.info.id,
+      user_id: user_id
+    }, (res) => {
+      if (res.success) {
+        that.getInfo()
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        })
+      }
+    }, () => {
       wx.hideLoading()
     })
   },
