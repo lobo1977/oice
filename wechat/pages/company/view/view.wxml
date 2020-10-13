@@ -13,23 +13,39 @@
   <van-cell-group>
     <van-cell title-width="80px" title="企业全称" icon="home-o" value="{{info.full_name}}" />
     <van-cell title-width="80px" title="地址" icon="location-o" value="{{info.address}}" />
-    <van-cell title-width="80px" title="成员" icon="friends-o" value="{{info.addin}}" link-type="navigateTo" 
-      url="../member/member?id={{info.id}}" is-link />
+    <van-cell title-width="80px" title="成员" icon="friends-o" value="{{info.addin}}" link-type="navigateTo" url="../member/member?id={{info.id}}" is-link />
     <view class="cell-text-area" wx:if="{{info.rem}}">{{info.rem}}</view>
   </van-cell-group>
 
-  <view wx:if="{{info.allowPass && waitUser.length}}">
-    <view>待审核成员</view>
-    <van-collapse accordion>
-      <van-collapse-item wx:for="{{waitUser}}" wx:key="id" 
-        title="{{item.title}}" name="{{item.id}}" icon="{{filter.imageUrl(item.avatar)}}">
-        <van-button type="primary" size="small">通过</van-button>
-        <van-button type="danger" size="small">驳回</van-button>
-      </van-collapse-item>
-    </van-collapse>
-  </view>
+  <van-cell-group title="待审核成员" wx:if="{{info.allowPass && waitUser.length}}">
+    <van-swipe-cell wx:for="{{waitUser}}" wx:for-index="idx" wx:key="id" right-width="{{ 120 }}">
+      <van-cell title="{{item.title}}" label="{{item.mobile}}" center>
+        <image slot="icon" mode="aspectFill" 
+          src="{{filter.imageUrl(item.avatar)}}" class="cell-image"></image>
+      </van-cell>
+      <view slot="right" style="height:100%">
+        <van-button type="primary" data-index="{{ idx }}" custom-style="height:100%" bind:click="pass">通过</van-button>
+        <van-button type="danger" data-index="{{ idx }}" custom-style="height:100%" bind:click="reject">驳回</van-button>
+      </view>
+    </van-swipe-cell>
+  </van-cell-group>
 
-  <van-row  wx:if="{{info.allowInvite || info.allowEdit || info.allowDelete}}" gutter="0" custom-class="button-bar">
+  <van-row wx:if="{{!info.allowInvite}}" gutter="0" custom-class="button-bar">
+    <van-col span="24">
+      <van-button wx:if="{{info.isAddin === false}}" square type="primary" icon="certificate" block bind:click="addin" disabled="{{info.join_way == 2 && !info.isInvtie}}">
+        <text wx:if="{{info.join_way == 0 && !info.isInvtie}}">立即加入</text>
+        <text wx:if="{{info.join_way == 1 && !info.isInvtie}}">申请加入</text>
+        <text wx:if="{{info.join_way == 2 && !info.isInvtie}}">需通过邀请加入</text>
+        <text wx:if="{{info.isInvtie}}">接受邀请</text>
+      </van-button>
+      <van-button square type="danger" icon="close" block bind:click="quit">
+        <text wx:if="{{info.isAddin === 1}}">退出</text>
+        <text wx:if="{{info.isAddin === 0}}">放弃申请</text>
+      </van-button>
+    </van-col>
+  </van-row>
+
+  <van-row wx:if="{{info.allowInvite || info.allowEdit || info.allowDelete}}" gutter="0" custom-class="button-bar">
     <van-col span="10">
       <van-button square type="danger" icon="friends-o" block bind:click="onInvite" disabled="{{!info.allowInvite}}">邀请同事</van-button>
     </van-col>
