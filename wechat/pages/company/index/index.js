@@ -9,7 +9,10 @@ Page({
   data: {
     isLoading: false,
     isPullDown: false,
+    keyword: '',
+    showSearch: false,
     me: null,
+    searchResult: [],
     my: [],
     waites: [],
     inviteMe: [],
@@ -53,7 +56,9 @@ Page({
    * 生命周期函数--监听页面隐藏
    */
   onHide: function () {
-
+    this.setData({
+      showSearch: false
+    })
   },
 
   /**
@@ -89,6 +94,47 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+
+  onKewordChange(event) {
+    this.data.keyword = event.detail
+  },
+
+  onSearch: function(event) {
+    let that = this
+    if (that.data.keyword == '') {
+      return
+    }
+    that.setData({
+      showSearch: true
+    })
+    app.post('company/search', {
+      keyword: that.data.keyword
+    }, (res) => {
+      if (res.success && res.data) {
+        that.setData({
+          searchResult: res.data
+        })
+      } else {
+        that.setData({
+          searchResult: []
+        })
+      }
+    }, () => {
+    })
+  },
+
+  onCancelSearch: function() {
+    this.setData({
+      keyword: '',
+      showSearch: false
+    })
+  },
+
+  onCloseSearch: function() {
+    this.setData({
+      showSearch: false
+    })
   },
 
   getList: function() {

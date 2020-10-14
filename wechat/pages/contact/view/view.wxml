@@ -27,6 +27,10 @@
       </view>
     </view>
   </view>
+
+  <view style="margin:15px;">
+    <van-button wx:if="{{info.canSetSuperior}}" square type="primary" icon="manager-o" block bindtap="setSuperior">指定为我的上级</van-button>
+  </view>
   
   <van-cell-group title="他的推荐资料" wx:if="{{info.recommend && info.recommend.length}}">
     <van-cell wx:for="{{info.recommend}}" wx:key="id" data-data="{{item}}" 
@@ -45,4 +49,6 @@
       <van-button square type="info" icon="phone-o" block bindtap="bindPhoneCall" data-data="{{info}}">拨打电话</van-button>
     </van-col>
   </van-row>
+
+  <van-dialog id="van-dialog" />
 </view>

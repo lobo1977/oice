@@ -1,4 +1,5 @@
 // pages/contact/view/view.js
+import Dialog from '../../../miniprogram_npm/@vant/weapp/dialog/dialog';
 
 //获取应用实例
 const app = getApp()
@@ -11,7 +12,6 @@ Page({
     info: {
       id: 0,
       avatar: '',
-      avatarView: '',
       title: '',       // 姓名
       mobile: '',      // 手机号码
       email: '',       // 电子邮箱
@@ -22,7 +22,9 @@ Page({
       full_name: '',   // 企业全称
       logo: '',        // 企业logo
       in_contact: false,
-      recommend: []
+      recommend: [],
+      isSuperior: false,
+      canSetSuperior: false
     }
   },
   
@@ -115,6 +117,32 @@ Page({
       }
     }, () => {
       that.data.isLoading = false
+      wx.hideLoading()
+    })
+  },
+
+  setSuperior: function() {
+    let that = this
+    wx.showLoading()
+    app.post('company/setSuperior', {
+      user_id: that.data.info.id
+    }, (res) => {
+      if (res.success) {
+        app.updateUserInfo()
+        that.setData({
+          ['info.isSuperior']: true,
+          ['info.canSetSuperior']: false
+        })
+        Dialog.alert({
+          message: '您已将 ' + that.data.info.title + ' 指定为你的上级，您的客户资料及工作日报将对其可见。'
+        })
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        })
+      }
+    }, () => {
       wx.hideLoading()
     })
   }

@@ -1,0 +1,33 @@
+<!--pages/company/member/member.wxml-->
+<page-meta background-text-style="dark">
+</page-meta>
+<wxs src="../../../utils/filter.wxs" module="filter" />
+
+<view>
+  <van-cell-group>
+    <van-swipe-cell wx:for="{{list}}" wx:key="id" right-width="{{ 120 }}" disabled="{{!me.isAdmin || item.isAdmin}}">
+      <van-cell title="{{item.title}}" center value="{{ me.id === item.id ? '我' : '' }}"
+        use-label-slot custom-class="cell-contact"
+        link-type="navigateTo" url="../../contact/view/view?id={{item.id}}">
+        <image slot="icon" mode="aspectFill" 
+          src="{{filter.imageUrl(item.avatar)}}" class="cell-image"></image>
+        <view slot="label">
+          <van-tag type="success" wx:if="{{item.isAdmin}}" custom-class="cell-tag">管理员</van-tag>
+          <text wx:if="{{item.mobile}}">{{item.mobile}}</text>
+        </view>
+      </van-cell>
+      <view wx:if="{{me.isAdmin && !item.isAdmin}}" slot="right" style="height:100%">
+        <van-button type="primary" data-user="{{ item }}" custom-style="height:100%"  bind:click="turn">转交</van-button>
+        <van-button type="danger" data-user="{{ item}}" custom-style="height:100%"  bind:click="remove">移除</van-button>
+      </view>
+    </van-swipe-cell>
+  </van-cell-group>
+
+  <van-divider contentPosition="center" customStyle="margin-left:50px;margin-right:50px;">
+    <text wx:if="{{ list.length > 0 && isEnd && isLoading === false }}">没有更多了</text>
+    <text wx:if="{{ list.length == 0 && isLoading === false }}">暂无成员</text>
+    <van-loading wx:if="{{ isLoading && isPullDown === false }}" type="spinner" size="20px">加载中...</van-loading>
+  </van-divider>
+
+  <van-dialog id="van-dialog" />
+</view>

@@ -1,11 +1,15 @@
-//index.js
-import Dialog from '../../../miniprogram_npm/@vant/weapp/dialog/dialog'
+// pages/company/member/member.js
+import Dialog from '../../../miniprogram_npm/@vant/weapp/dialog/dialog';
 
-//获取应用实例
 const app = getApp()
 
 Page({
+
+  /**
+   * 页面的初始数据
+   */
   data: {
+    id: 0,
     pageIndex: 1,
     pageSize: 10,
     isLoading: false,
@@ -15,11 +19,14 @@ Page({
     list: []
   },
 
+  /**
+   * 生命周期函数--监听页面加载
+   */
   onLoad: function (options) {
     let that = this
-    wx.showLoading({
-      title: '加载中',
-    })
+    if (options.id) {
+      that.data.id = options.id
+    }
     if (app.globalData.appUserInfo) {
       that.setData({
         me: app.globalData.appUserInfo
@@ -35,21 +42,37 @@ Page({
     }
   },
 
-  onShow: function () {
-  },
-
+  /**
+   * 生命周期函数--监听页面初次渲染完成
+   */
   onReady: function () {
-    // 页面首次渲染完毕时执行
+
   },
 
+  /**
+   * 生命周期函数--监听页面显示
+   */
+  onShow: function () {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面隐藏
+   */
   onHide: function () {
-    // 页面从前台变为后台时执行
+
   },
 
+  /**
+   * 生命周期函数--监听页面卸载
+   */
   onUnload: function () {
-    // 页面销毁时执行
+
   },
 
+  /**
+   * 页面相关事件处理函数--监听用户下拉动作
+   */
   onPullDownRefresh: function () {
     // 触发下拉刷新时执行
     if (this.data.isLoading == false) {
@@ -62,33 +85,41 @@ Page({
     wx.stopPullDownRefresh()
   },
 
+  /**
+   * 页面上拉触底事件的处理函数
+   */
   onReachBottom: function () {
     if (this.data.isEnd == false) {
       this.data.pageIndex++
-      this.getList();
+      this.getList()
     }
   },
 
+  /**
+   * 用户点击右上角分享
+   */
   onShareAppMessage: function () {
-    let shareData = {
-      title: '【商办云】联系人',
-      path: '/pages/contact/index/index'
-    }
-    return shareData
+
   },
 
-  // 获取列表
-  getList: function () {
+  getList: function() {
     let that = this
-    that.data.isLoading = true
+
+    if (that.data.isLoading) return
+
+    that.setData({
+      isLoading: true
+    })
+
     if (that.data.pageIndex <= 1) {
       that.setData({
         list: []
       })
     }
-    app.post('my/contact', {
+
+    app.post('user/companyMember', { 
+      id: that.data.id,
       page: that.data.pageIndex,
-      only_my: 1
     }, (res) => {
       if (!res.data || res.data.length < that.data.pageSize) {
         that.setData({
@@ -106,7 +137,6 @@ Page({
         })
       }
     }, () => {
-      wx.hideLoading()
       that.setData({
         isPullDown: false,
         isLoading: false
@@ -114,17 +144,54 @@ Page({
     })
   },
 
-  remove: function(event) {
-    let that = this
+  turn: function(event) {
     const user = event.currentTarget.dataset.user
     Dialog.confirm({
-      title: '移除确认',
-      message: '确定要确定要移除联系人 ' + user.title + ' 吗？',
+      title: '转交确认',
+      message: '确定要将管理权限转交给 ' + user.title + ' 吗？',
     })
     .then(() => {
       wx.showLoading()
-      app.post('my/removeContact', {
-        contact_id: user.id
+      app.post('company/turn', {
+        id: that.data.id,
+        user_id: user.id
+      }, (res) => {
+        if (res.success) {
+          that.getList()
+          if (res.data) {
+            app.globalData.appUserInfo = res.data
+            that.setData({
+              me: app.globalData.appUserInfo
+            })
+          }
+          Dialog.alert({
+            message: '转交成功'
+          })
+        } else {
+          Dialog.alert({
+            title: '发生错误',
+            message: res.message ? res.message : '系统异常'
+          })
+        }
+      }, () => {
+        wx.hideLoading()
+      })
+    })
+    .catch(() => {
+    })
+  },
+
+  remove: function(event) {
+    const user = event.currentTarget.dataset.user
+    Dialog.confirm({
+      title: '移除确认',
+      message: '确定要确定要移除成员 ' + user.title + ' 吗？',
+    })
+    .then(() => {
+      wx.showLoading()
+      app.post('company/rejectAddin', {
+        id: that.data.id,
+        user_id: user.id
       }, (res) => {
         if (res.success) {
           that.getList()

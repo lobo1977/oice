@@ -38,7 +38,7 @@
         <text wx:if="{{info.join_way == 2 && !info.isInvtie}}">需通过邀请加入</text>
         <text wx:if="{{info.isInvtie}}">接受邀请</text>
       </van-button>
-      <van-button square type="danger" icon="close" block bind:click="quit">
+      <van-button wx:if="{{info.isAddin === 0 || info.isAddin === 1}}" square type="danger" icon="close" block bind:click="quit">
         <text wx:if="{{info.isAddin === 1}}">退出</text>
         <text wx:if="{{info.isAddin === 0}}">放弃申请</text>
       </van-button>

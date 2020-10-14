@@ -89,6 +89,8 @@
     "pages/my/customer/customer",
     "pages/company/index/index",
     "pages/company/view/view",
-    "pages/company/edit/edit"
+    "pages/company/edit/edit",
+    "pages/company/member/member",
+    "pages/company/memberView/memberView"
   ]
 }

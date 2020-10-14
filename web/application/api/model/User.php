@@ -45,15 +45,17 @@ class User extends Base
    * 获取通讯录（含同事）
    */
   public static function contact($user, $page) {
+    $company = db('user_company')->where('user_id', $user->id)->column('company_id');
+
     $list = self::alias('a')
-      ->leftJoin('user_company b', 'a.id = b.user_id and b.status = 1 and b.active = 1')
+      ->leftJoin('user_company b', 'a.id = b.user_id and b.status = 1')
       ->leftJoin('company co', 'b.company_id = co.id')
-      ->field('a.id,a.title,a.avatar,a.mobile,co.full_name,b.create_time')
-      ->where('b.company_id', $user->company_id)
+      ->field('a.id,a.title,a.avatar,a.mobile,b.company_id,co.full_name')
+      ->where('b.company_id', 'IN', $company)
       ->whereOr('a.id', 'IN', function ($query) use($user) {
         $query->table('tbl_user_contact')->where('user_id', $user->id)->field('contact_id');
       })
-      ->order(['b.create_time' => 'desc']);
+      ->order(['b.active' => 'desc', 'b.company_id' => 'desc']);
 
     if ($page > 0) {
       $list->page($page, 10);
@@ -61,15 +63,19 @@ class User extends Base
 
     $list = $list->select();
 
+    $ids = [];
+    $data = [];
+
     foreach($list as &$member) {
-      if ($member->create_time) {
-        $member->is_colleague = true;
-      } else {
-        $member->is_colleague = false;
+      if (!in_array($member->id, $ids)) {
+        $member->is_colleague = in_array($member->company_id, $company);
+        self::formatData($member);
+        $ids[] = $member->id;
+        $data[] = $member;
       }
-      self::formatData($member);
     }
-    return $list;
+    
+    return $data;
   }
 
   /**

@@ -298,7 +298,8 @@ App({
    * 更新用户信息
    */
   updateUserInfo() {
-    this.get('getUserInfo', (res) => {
+    let app = this
+    app.get('getUserInfo', (res) => {
       if (res.data) {
         app.globalData.appUserInfo = res.data
       }
@@ -307,34 +308,35 @@ App({
   },
   
   request(url, method, data, cb, finish) {
-      wx.request({
-  		url: API_URL + url,
-  		method: method,
-  		data: data,
-  		header: {
+    let app = this
+    wx.request({
+      url: API_URL + url,
+      method: method,
+      data: data,
+      header: {
         'Content-Type': 'application/x-www-form-urlencoded',
-  			'User-Token': this.globalData.appUserInfo && this.globalData.appUserInfo.token ? 
-  				this.globalData.appUserInfo.token : ''
-  		},
-  		success (res) {
-  			if (cb) {
-  				cb(res.data)
-  			}
-  		},
-  		fail (err) {
+        'User-Token': app.globalData.appUserInfo && app.globalData.appUserInfo.token ? 
+        app.globalData.appUserInfo.token : ''
+      },
+      success (res) {
+        if (cb) {
+          cb(res.data)
+        }
+      },
+      fail (err) {
         console.log(err)
-  			wx.showToast({
+        wx.showToast({
           title: '发生错误，请稍后再试',
           icon: 'none',
           duration: 2000
         })
-  		},
-  		complete () {
+      },
+      complete () {
         if (finish) {
           finish()
         }
-  		}
-  	})
+      }
+    })
   },
   
   post(url, data, cb, finish) {

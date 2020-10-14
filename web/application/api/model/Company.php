@@ -88,7 +88,7 @@ class Company extends Base
       $list = $list->where('title|full_name', 'like', '%' . $keyword . '%');
     }
 
-    $list = $list ->field('id,title,logo,area,address,create_time')
+    $list = $list ->field('id,title,full_name,logo,area,address,create_time')
       ->page($page, 10)
       ->order('id', 'asc')
       ->select();
