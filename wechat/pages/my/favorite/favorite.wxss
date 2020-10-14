@@ -1,1 +1,5 @@
 /* pages/my/favorite/favorite.wxss */
+
+.van-nav-bar__right {
+  display: block !important;
+}

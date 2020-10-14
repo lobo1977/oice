@@ -90,7 +90,6 @@
     "pages/company/index/index",
     "pages/company/view/view",
     "pages/company/edit/edit",
-    "pages/company/member/member",
-    "pages/company/memberView/memberView"
+    "pages/company/member/member"
   ]
 }

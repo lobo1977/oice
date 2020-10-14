@@ -1,21 +1,24 @@
 <!--pages/my/favorite/favorite.wxml-->
 <page-meta background-text-style="dark">
 </page-meta>
-<wxs src='../../../utils/filter.wxs' module='filter' />
+<wxs src="../../../utils/filter.wxs" module="filter" />
 <view>
- <van-cell-group>
-    <van-cell wx:for="{{list}}" wx:key="id"
-      title="{{item.title}}" use-label-slot
-      link-type="navigateTo"
-      url="{{ item.unit_id > 0 ? '../../unit/view/view?id=' + item.unit_id : '../../building/view/view?id=' + item.building_id }}"
-      custom-class="cell-contact">
-      <view slot="label">
-        <text wx:if="{{item.desc}}">{{item.desc}}</text>
-      </view>
-      <image slot="icon" mode="aspectFill" 
-        src="{{filter.imageUrl(item.src)}}" class="cell-image"></image>
-    </van-cell>
-  </van-cell-group>
+  <van-nav-bar left-text="" right-text="选择" bind:click-left="" bind:click-right="toggleCeckBox" fixed placeholder safe-area-inset-top="{{false}}" />
+  <van-checkbox-group value="{{ checked }}" bind:change="checkChange">
+    <van-cell-group>
+      <van-cell wx:for="{{list}}" wx:key="id" wx:for-index="idx" data-index="{{idx}}"
+        title="{{item.title}}" use-label-slot title-width="250px" clickable center
+        bind:click="selectItem"
+        custom-class="cell-contact">
+        <view slot="label">
+          <text wx:if="{{item.desc}}">{{item.desc}}</text>
+        </view>
+        <image slot="icon" mode="aspectFill" 
+          src="{{filter.imageUrl(item.src)}}" class="cell-image"></image>
+        <van-checkbox wx:if="{{showCheckbox}}" class="checkboxes-{{ idx }}" checked-color="#07c160" catch:tap="noop" name="{{ idx }}" />
+      </van-cell>
+    </van-cell-group>
+  </van-checkbox-group>
 
   <van-divider contentPosition="center" customStyle="margin-left:50px;margin-right:50px;">
     <text wx:if="{{ list.length > 0 && isEnd && isLoading === false }}">没有更多了</text>

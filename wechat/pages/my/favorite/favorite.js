@@ -7,12 +7,14 @@ Page({
    * 页面的初始数据
    */
   data: {
+    showCheckbox: false,
     pageIndex: 1,
     pageSize: 10,
     isLoading: false,
     isPullDown: false,
     isEnd: false,
-    list: []
+    list: [],
+    checked: []
   },
 
   /**
@@ -85,6 +87,37 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+
+  toggleCeckBox: function() {
+    this.setData({
+      showCheckbox: !this.data.showCheckbox
+    })
+  },
+
+  checkChange: function(event) {
+    this.setData({
+      checked: event.detail
+    })
+  },
+
+  selectItem: function(event) {
+    const { index } = event.currentTarget.dataset
+    if (this.data.showCheckbox) {
+      const checkbox = this.selectComponent(`.checkboxes-${index}`)
+      checkbox.toggle()
+    } else {
+      const item = this.data.list[index]
+      if (item.unit_id) {
+        wx.navigateTo({
+          url: '../../unit/view/view?id=' + item.unit_id,
+        })
+      } else {
+        wx.navigateTo({
+          url: '../../building/view/view?id=' + item.building_id,
+        })
+      }
+    }
   },
 
   // 获取列表
