@@ -1,20 +1,23 @@
 // pages/my/favorite/favorite.js
+import Dialog from '../../../miniprogram_npm/@vant/weapp/dialog/dialog';
+
 const app = getApp()
 
 Page({
-
   /**
    * 页面的初始数据
    */
   data: {
     showCheckbox: false,
+    checkAll: false,
     pageIndex: 1,
     pageSize: 10,
     isLoading: false,
     isPullDown: false,
     isEnd: false,
     list: [],
-    checked: []
+    checked: [],
+    myCustomer: []
   },
 
   /**
@@ -23,9 +26,11 @@ Page({
   onLoad: function (options) {
     if (app.globalData.appUserInfo) {
       this.getList()
+      this.getMyCustomer()
     } else {
       app.userLoginCallback = () => {
         this.getList()
+        this.getMyCustomer()
       }
     }
   },
@@ -89,7 +94,7 @@ Page({
 
   },
 
-  toggleCeckBox: function() {
+  toggleCheckbox: function() {
     this.setData({
       showCheckbox: !this.data.showCheckbox
     })
@@ -101,7 +106,26 @@ Page({
     })
   },
 
-  selectItem: function(event) {
+  toggleCheckAll: function(event) {
+    this.setData({
+      checkAll: event.detail,
+    })
+    if (!this.data.checkAll) {
+      this.setData({
+        checked: [],
+      })
+    } else {
+      let arr = []
+      for (let i = 0; i < this.data.list.length; i++) {
+        arr.push(i.toString())
+      }
+      this.setData({
+        checked: arr,
+      })
+    }
+  },
+
+  clickItem: function(event) {
     const { index } = event.currentTarget.dataset
     if (this.data.showCheckbox) {
       const checkbox = this.selectComponent(`.checkboxes-${index}`)
@@ -118,6 +142,20 @@ Page({
         })
       }
     }
+  },
+
+  noop() {},
+
+  getMyCustomer() {
+    let that = this
+    app.get('my/customer', (res) => {
+      if (res.data) {
+        that.setData({
+          myCustomer: res.data
+        })
+      }
+    }, () => {
+    })
   },
 
   // 获取列表
@@ -157,6 +195,42 @@ Page({
         isPullDown: false,
         isLoading: false
       })
+    })
+  },
+
+  getCheckList: function() {
+    let checkList = []
+    this.data.checked.forEach((item) => {
+      let obj = this.data.list[Number(item)]
+      checkList.push(obj.building_id + ',' + obj.unit_id)
+    })
+    return checkList
+  },
+
+  remove: function(event) {
+    let that = this
+    Dialog.confirm({
+      title: '移除确认',
+      message: '确定要确定要移除所选收藏吗？',
+    })
+    .then(() => {
+      wx.showLoading()
+      app.post('building/batchUnFavorite', {
+        ids: that.getCheckList()
+      }, (res) => {
+        if (res.success) {
+          that.getList()
+        } else {
+          Dialog.alert({
+            title: '发生错误',
+            message: res.message ? res.message : '系统异常'
+          })
+        }
+      }, () => {
+        wx.hideLoading()
+      })
+    })
+    .catch(() => {
     })
   }
 })

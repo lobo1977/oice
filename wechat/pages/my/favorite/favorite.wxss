@@ -1,5 +1,7 @@
 /* pages/my/favorite/favorite.wxss */
-
-.van-nav-bar__right {
-  display: block !important;
+.check-all .van-col--6 {
+  padding-top: 7px;
+}
+.value-class {
+  flex: none !important;
 }

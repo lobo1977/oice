@@ -3,19 +3,32 @@
 </page-meta>
 <wxs src="../../../utils/filter.wxs" module="filter" />
 <view>
-  <van-nav-bar left-text="" right-text="选择" bind:click-left="" bind:click-right="toggleCeckBox" fixed placeholder safe-area-inset-top="{{false}}" />
+  <van-sticky>
+    <view style="background-color:#fff;height:36px;">
+      <van-row>
+        <van-col span="18">
+          <van-button type="primary" size="small" color="transparent" bind:click="toggleCheckbox" custom-style="color:#1989fa;">选择</van-button>
+        </van-col>
+        <van-col span="6" class="check-all">
+          <van-checkbox wx:if="{{showCheckbox}}" checked-color="#07c160" value="{{checkAll}}" bind:change="toggleCheckAll">
+            全选
+          </van-checkbox>
+        </van-col>
+      </van-row>
+    </view>
+  </van-sticky>
   <van-checkbox-group value="{{ checked }}" bind:change="checkChange">
     <van-cell-group>
       <van-cell wx:for="{{list}}" wx:key="id" wx:for-index="idx" data-index="{{idx}}"
-        title="{{item.title}}" use-label-slot title-width="250px" clickable center
-        bind:click="selectItem"
-        custom-class="cell-contact">
+        title="{{item.title}}" use-label-slot clickable center
+        bind:click="clickItem"
+        custom-class="cell-contact" value-class="value-class">
         <view slot="label">
           <text wx:if="{{item.desc}}">{{item.desc}}</text>
         </view>
         <image slot="icon" mode="aspectFill" 
           src="{{filter.imageUrl(item.src)}}" class="cell-image"></image>
-        <van-checkbox wx:if="{{showCheckbox}}" class="checkboxes-{{ idx }}" checked-color="#07c160" catch:tap="noop" name="{{ idx }}" />
+        <van-checkbox wx:if="{{showCheckbox}}" class="checkboxes-{{ idx }}" checked-color="#07c160" name="{{ idx }}" catch:tap="noop" />
       </van-cell>
     </van-cell-group>
   </van-checkbox-group>
@@ -25,4 +38,15 @@
     <text wx:if="{{ list.length == 0 && isLoading === false }}">暂无内容</text>
     <van-loading wx:if="{{ isLoading && isPullDown === false }}" type="spinner" size="20px">加载中...</van-loading>
   </van-divider>
+
+  <van-row gutter="0" custom-class="button-bar">
+    <van-col span="16">
+      <van-button square type="primary" icon="completed" block bind:click="toFilter" disabled="{{checked.length == 0}}">加入筛选</van-button>
+    </van-col>
+    <van-col span="8">
+      <van-button square type="danger" icon="delete" block bind:click="remove" disabled="{{checked.length == 0}}">移除</van-button>
+    </van-col>
+  </van-row>
+
+  <van-dialog id="van-dialog" />
 </view>
