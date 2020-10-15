@@ -70,17 +70,18 @@ class Company extends Base
       }
     } else {
       $validate = Validate::make([
-        'title'  => 'require|token'
+        'title' => 'require'
       ],[
-        'title.require' => '必须填写企业名称。',
-        'title.token' => '无效请求，请勿重复提交。'
+        'title.require' => '必须填写企业名称。'
       ]);
 
       $data = input('post.');
       $logo = request()->file('logo');
       $stamp = request()->file('stamp');
       
-      if (!$validate->check($data)) {
+      if (!$this->checkFormToken($data)) {
+        return $this->fail('无效请求，请勿重复提交表单');
+      } else if (!$validate->check($data)) {
         $form_token = $this->formToken();
         return $this->fail($validate->getError(), $form_token);
       } else {

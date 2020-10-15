@@ -10,6 +10,7 @@ Page({
   data: {
     showCheckbox: false,
     checkAll: false,
+    showCustomerPicker: false,
     pageIndex: 1,
     pageSize: 10,
     isLoading: false,
@@ -17,7 +18,9 @@ Page({
     isEnd: false,
     list: [],
     checked: [],
-    myCustomer: []
+    myCustomer: [],
+    customerData: [],
+    customer_id: 0
   },
 
   /**
@@ -150,12 +153,33 @@ Page({
     let that = this
     app.get('my/customer', (res) => {
       if (res.data) {
+        that.data.myCustomer = res.data
+        let list = []
+        that.data.myCustomer.forEach((item) => {
+          list.push(item.customer_name)
+        })
         that.setData({
-          myCustomer: res.data
+          customerData: list
         })
       }
     }, () => {
     })
+  },
+
+  onCustomerPickerClose: function() {
+    this.setData({
+      showCustomerPicker: false
+    })
+  },
+
+  onCustomerSelected: function(event) {
+    this.setData({
+      showCustomerPicker: false,
+      customer_id: this.data.myCustomer[event.detail.index].id
+    })
+    if (this.data.customer_id > 0) {
+      this.addFilter()
+    }
   },
 
   // 获取列表
@@ -198,6 +222,28 @@ Page({
     })
   },
 
+  getBuildingList: function() {
+    let list = []
+    this.data.checked.forEach((item) => {
+      let obj = this.data.list[Number(item)]
+      if (obj.unit_id == 0) {
+        list.push(obj.building_id)
+      }
+    })
+    return list
+  },
+
+  getUnitList: function() {
+    let list = []
+    this.data.checked.forEach((item) => {
+      let obj = this.data.list[Number(item)]
+      if (obj.unit_id > 0) {
+        list.push(obj.unit_id)
+      }
+    })
+    return list
+  },
+
   getCheckList: function() {
     let checkList = []
     this.data.checked.forEach((item) => {
@@ -205,6 +251,67 @@ Page({
       checkList.push(obj.building_id + ',' + obj.unit_id)
     })
     return checkList
+  },
+
+  toFilter: function() {
+    let that = this
+    if (that.data.customer_id == 0) {
+      if (that.data.myCustomer.length > 1) {
+        that.setData({
+          showCustomerPicker: true
+        })
+        return
+      } else if (that.data.myCustomer.length == 1) {
+        that.data.customer_id = that.data.myCustomer[0].id
+      } else {
+        Dialog.alert({
+          message: '您需要添加客户才可以添加筛选'
+        }).then(() => {
+          wx.navigateTo({
+            url: '../../customer/edit/edit',
+          })
+        })
+        return
+      }
+    }
+    
+    if (that.data.checked.length == 0) {
+      wx.showToast({
+        icon: 'none',
+        title: '请选择要加入筛选的项目',
+        duration: 2000
+      })
+      return
+    }
+
+    that.addFilter()
+  },
+
+  addFilter: function() {
+    let that = this
+    wx.showLoading()
+    app.post('customer/addFilter', {
+      cid: that.data.customer_id,
+      bids: that.getBuildingList(),
+      uids: that.getUnitList()
+    }, (res) => {
+      if (res.success) {
+        Dialog.alert({
+          message: '所选项目已加入客户筛选表'
+        }).then(() => {
+          wx.navigateTo({
+            url: '../../customer/view/view?id=' + that.data.customer_id,
+          })
+        })
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        })
+      }
+    }, () => {
+      wx.hideLoading()
+    })
   },
 
   remove: function(event) {
@@ -216,7 +323,7 @@ Page({
     .then(() => {
       wx.showLoading()
       app.post('building/batchUnFavorite', {
-        ids: that.getCheckList()
+        ids: JSON.stringify(that.getCheckList())
       }, (res) => {
         if (res.success) {
           that.getList()

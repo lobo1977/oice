@@ -17,6 +17,7 @@
       </van-row>
     </view>
   </van-sticky>
+
   <van-checkbox-group value="{{ checked }}" bind:change="checkChange">
     <van-cell-group>
       <van-cell wx:for="{{list}}" wx:key="id" wx:for-index="idx" data-index="{{idx}}"
@@ -38,6 +39,10 @@
     <text wx:if="{{ list.length == 0 && isLoading === false }}">暂无内容</text>
     <van-loading wx:if="{{ isLoading && isPullDown === false }}" type="spinner" size="20px">加载中...</van-loading>
   </van-divider>
+
+  <van-popup show="{{ showCustomerPicker }}" position="bottom" bind:close="onCustomerPickerClose">
+    <van-picker columns="{{ customerData }}" bind:confirm="onCustomerSelected" bind:cancel="onCustomerPickerClose" show-toolbar />
+  </van-popup>
 
   <van-row gutter="0" custom-class="button-bar">
     <van-col span="16">
