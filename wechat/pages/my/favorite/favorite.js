@@ -99,7 +99,8 @@ Page({
 
   toggleCheckbox: function() {
     this.setData({
-      showCheckbox: !this.data.showCheckbox
+      showCheckbox: !this.data.showCheckbox,
+      checked: []
     })
   },
 
@@ -245,10 +246,12 @@ Page({
   },
 
   getCheckList: function() {
-    let checkList = []
+    let checkList = {}
+    let i = 0
     this.data.checked.forEach((item) => {
       let obj = this.data.list[Number(item)]
-      checkList.push(obj.building_id + ',' + obj.unit_id)
+      checkList['ids[' + i + ']'] = obj.building_id + ',' + obj.unit_id
+      i++
     })
     return checkList
   },
@@ -296,6 +299,9 @@ Page({
       uids: that.getUnitList()
     }, (res) => {
       if (res.success) {
+        that.setData({
+          checked: []
+        })
         Dialog.alert({
           message: '所选项目已加入客户筛选表'
         }).then(() => {
@@ -322,10 +328,12 @@ Page({
     })
     .then(() => {
       wx.showLoading()
-      app.post('building/batchUnFavorite', {
-        ids: JSON.stringify(that.getCheckList())
-      }, (res) => {
+      app.post('building/batchUnFavorite',
+        that.getCheckList(), (res) => {
         if (res.success) {
+          that.setData({
+            checked: []
+          })
           that.getList()
         } else {
           Dialog.alert({

@@ -364,7 +364,9 @@ Page({
   },
 
   onShareChange: function(event) {
-    this.data.info.share = event.detail ? 1 : 0
+    this.setData({
+      ['info.share']: event.detail ? 1 : 0
+    })
   },
 
   bindSelectStatus: function() {

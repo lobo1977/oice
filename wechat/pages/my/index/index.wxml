@@ -12,7 +12,7 @@
       <view slot="label">
         <text wx:if="{{me.company}}">{{me.company}}</text>
       </view>
-      <image slot="icon" mode="aspectFill" 
+      <image slot="icon" mode="aspectFit" 
         src="{{filter.imageUrl(me.avatar)}}" class="cell-image"></image>
     </van-cell>
   </van-cell-group>

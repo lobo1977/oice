@@ -369,21 +369,15 @@ Page({
   },
 
   onRemInput: function(event) {
-    this.setData({
-      ['info.rem']: event.detail
-    })
+    this.data.info.rem = event.detail
   },
 
   onLinkmanInput: function(event) {
-    this.setData({
-      ['info.linkman']: event.detail
-    })
+    this.data.info.linkman = event.detail
   },
 
   onMobileInput: function(event) {
-    this.setData({
-      ['info.mobile']: event.detail
-    })
+    this.data.info.mobile = event.detail
     if (event.detail) {
       if (app.isMobile(event.detail)) {
         this.setData({

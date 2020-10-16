@@ -23,9 +23,15 @@
   align-items: flex-start;
 }
 
-.name-card image {
+.name-card .logo {
   margin-top: -20rpx;
   width:200rpx;
+  height:120rpx;
+}
+
+.name-card .avatar {
+  margin-top: -20rpx;
+  width:120rpx;
   height:120rpx;
 }
 

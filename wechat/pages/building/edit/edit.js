@@ -464,11 +464,15 @@ Page({
   },
 
   onShareChange: function(event) {
-    this.data.info.share = event.detail ? 1 : 0
+    this.setData({
+      ['info.share']: event.detail ? 1 : 0
+    })
   },
 
   onSmsChange: function(event) {
-    this.data.info.send_sms = event.detail ? 1 : 0
+    this.setData({
+      ['info.send_sms']: event.detail ? 1 : 0
+    })
   },
 
   bindSave: function() {

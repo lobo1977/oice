@@ -268,7 +268,8 @@ App({
     refreshBuildingView: false,
     refreshUnitView: false,
     refreshLinkView: false,
-    refreshCustomerView: false
+    refreshCustomerView: false,
+    refreshCompany: false
   },
   
   // 登录
@@ -288,7 +289,11 @@ App({
             }
           })
         } else {
-          console.log('登录失败！' + res.errMsg)
+          wx.showToast({
+            icon: 'none',
+            title: '登录失败！' + res.errMsg,
+            duration: 2000
+          })
         }
       }
     })

@@ -62,6 +62,11 @@ swiper {
   height:120rpx;
 }
 
+.cell-logo {
+  width:260rpx;
+  height:120rpx;
+}
+
 .cell-tag {
   margin-right:5px;
 }

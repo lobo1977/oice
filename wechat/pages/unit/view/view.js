@@ -203,6 +203,34 @@ Page({
     })
   },
 
+  // 收藏
+  favorite: function() {
+    let that = this
+    let url = that.data.info.isFavorite ? 'unit/unFavorite' : 'unit/favorite'
+    wx.showLoading()
+    app.post(url, {
+      id: that.data.info.id
+    }, (res) => {
+      if (res.success) {
+        wx.showToast({
+          icon: 'none',
+          title: that.data.info.isFavorite ? '已取消收藏' : '已加入收藏',
+          duration: 1000
+        })
+        that.setData({
+          ['info.isFavorite']: that.data.info.isFavorite ? false : true
+        })
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        })
+      }
+    }, () => {
+      wx.hideLoading()
+    })
+  },
+
   remove: function() {
     let that = this
     wx.showLoading({

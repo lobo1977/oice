@@ -43,7 +43,7 @@
         src="{{filter.imageUrl(item.src)}}" class="cell-image"></image>
     </van-cell>
     <van-cell wx:if="{{info.allowEdit}}" center custom-class="cell-view">
-      <view bindtap="bindAddUnit" style="display:flex;justify-content:flex-end;">
+      <view bindtap="bindAddUnit" style="display:flex;justify-content:flex-end;color:#1989fa;">
         <van-icon name="add-o" size="20px" custom-style="margin-right:5px" /><text>添加单元</text>
       </view>
     </van-cell>
@@ -60,7 +60,7 @@
       </view>
     </van-cell>
     <van-cell wx:if="{{info.allowEdit}}" center custom-class="cell-view">
-      <view bindtap="bindAddLinkman" style="display:flex;justify-content:flex-end;">
+      <view bindtap="bindAddLinkman" style="display:flex;justify-content:flex-end;color:#1989fa;">
         <van-icon name="add-o" size="20px" custom-style="margin-right:5px" /><text>添加联系人</text>
       </view>
     </van-cell>
@@ -97,12 +97,17 @@
     <view class="cell-text-area" wx:if="{{info.environment}}">周边环境：{{info.environment}}</view>
   </van-cell-group>
 
+  <van-dialog id="van-dialog" />
+
   <van-row gutter="0" custom-class="button-bar">
-    <van-col span="12">
-      <van-button square type="primary" icon="notes-o" block bind:click="bindViewNote">生成笔记</van-button>
+    <van-col span="8">
+      <van-button square type="primary" icon="{{ info.isFavorite ? 'star' : 'star-o'}}" block bind:click="favorite">收藏</van-button>
     </van-col>
-    <van-col span="12">
-      <van-button square type="info" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}">编辑</van-button>
+    <van-col span="8">
+      <van-button square type="info" icon="notes-o" block bind:click="bindViewNote">笔记</van-button>
+    </van-col>
+    <van-col span="8">
+      <van-button square type="danger" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}">编辑</van-button>
     </van-col>
   </van-row>
 </view>

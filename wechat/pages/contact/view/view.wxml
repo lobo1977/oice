@@ -10,11 +10,11 @@
         <text class="company" wx:if="{{info.full_name}}">{{'\n' + info.full_name}}</text>
       </view>
       <image wx:if="{{info.logo}}"
-        mode="aspectFit"
+        mode="aspectFit" class="logo"
         src="{{filter.imageUrl(info.logo)}}"
       />
       <image wx:if="{{!info.logo}}"
-        mode="aspectFit"
+        mode="aspectFit" class="avatar"
         src="{{filter.imageUrl(info.avatar)}}"
       />
     </view>

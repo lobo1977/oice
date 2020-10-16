@@ -66,7 +66,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+    this.setInfo()
   },
 
   /**
@@ -87,7 +87,8 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function () {
-
+    this.setInfo()
+    wx.stopPullDownRefresh()
   },
 
   /**
@@ -107,7 +108,7 @@ Page({
   onTitleInput: function(event) {
     this.data.info.title = event.detail
     if (this.data.info.title && this.data.is_title_empty) {
-      that.setData({
+      this.setData({
         is_title_empty: false,
         title_error: ''
       })
@@ -119,6 +120,7 @@ Page({
     if (event.detail) {
       if (app.isEmail(event.detail)) {
         this.setData({
+          is_email_error: false,
           email_error: ''
         })
       }
@@ -141,8 +143,9 @@ Page({
         title_error: '请填写姓名'
       })
       return
-    } else if (!app.isEmail(that.data.info.email)) {
+    } else if (that.data.info.email && !app.isEmail(that.data.info.email)) {
       that.setData({
+        is_email_error: true,
         email_error: '电子邮箱错误'
       })
       return
@@ -188,11 +191,10 @@ Page({
 
   upload: function(event) {
     let that = this
-    const files = event.detail.file
-    if (!files || files.length == 0) {
+    const file = event.detail.file
+    if (!file) {
       return
     }
-    const file = files[0]
     wx.showLoading()
     try {
       wx.uploadFile({
@@ -201,7 +203,7 @@ Page({
           'User-Token': app.globalData.appUserInfo && app.globalData.appUserInfo.token ? app.globalData.appUserInfo.token : ''
         },
         url: app.globalData.serverUrl + '/api/my/edit',
-        filePath: file.tempFilePath,
+        filePath: file.path,
         name: 'avatar',
         formData: {
           '__token__': that.data.info.__token__
@@ -220,10 +222,10 @@ Page({
               if (json.data) {
                 that.data.info.__token__ = json.data
               }
-              if (res.message) {
+              if (json.message) {
                 wx.showToast({
                   icon: 'none',
-                  title: res.message,
+                  title: json.message,
                   duration: 2000
                 })
               } else {

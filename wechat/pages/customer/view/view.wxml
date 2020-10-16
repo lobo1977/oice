@@ -52,7 +52,7 @@
           </view>
         </van-cell>
         <van-cell wx:if="{{info.allowFollow}}" center custom-class="cell-view">
-          <view bindtap="bindAddLinkman" style="display:flex;justify-content:flex-end;">
+          <view bindtap="bindAddLinkman" style="display:flex;justify-content:flex-end;color:#1989fa;">
             <van-icon name="add-o" size="20px" custom-style="margin-right:5px" /><text>添加联系人</text>
           </view>
         </van-cell>
@@ -66,7 +66,7 @@
             src="{{filter.imageUrl(info.avatar)}}" class="cell-image"></image>
         </van-cell>
         <van-cell wx:if="{{info.allowTurn}}" center custom-class="cell-view" custom-class="cell-view">
-          <view bindtap="bindTurn" style="display:flex;justify-content:flex-end;">
+          <view bindtap="bindTurn" style="display:flex;justify-content:flex-end;color:#1989fa;">
             <van-icon name="share" size="20px" custom-style="margin-right:5px" /><text>转交</text>
           </view>
         </van-cell>
