@@ -8,8 +8,8 @@
       <van-cell wx:if="{{me.id != item.id}}" label="{{item.full_name}}"  title-width="160px" center
         custom-class="cell-contact" link-type="navigateTo" url="../view/view?id={{item.id}}" value="{{ item.is_colleague ? '同事' : '联系人' }}">
         <view slot="title">
-          <text style="margin-right:5px">{{item.title}}</text>
-          <van-tag wx:if="{{item.id == me.superior_id}}" type="warning">上级</van-tag>
+          <text>{{item.title}}</text>
+          <van-tag wx:if="{{item.id == me.superior_id}}" type="warning" custom-class="cell-tag">上级</van-tag>
         </view>
         <image slot="icon" mode="aspectFill" 
           src="{{filter.imageUrl(item.avatar)}}" class="cell-image"></image>

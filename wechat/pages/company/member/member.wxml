@@ -6,14 +6,15 @@
 <view>
   <van-cell-group>
     <van-swipe-cell wx:for="{{list}}" wx:key="id" right-width="{{ 120 }}" disabled="{{!me.isAdmin || item.isAdmin}}">
-      <van-cell title="{{item.title}}" center value="{{ me.id === item.id ? '我' : '' }}"
-        use-label-slot custom-class="cell-contact"
+      <van-cell center value="{{ me.id === item.id ? '我' : '' }}"
+        custom-class="cell-contact" label="{{item.mobile}}"
         link-type="navigateTo" url="../../contact/view/view?id={{item.id}}">
         <image slot="icon" mode="aspectFill" 
           src="{{filter.imageUrl(item.avatar)}}" class="cell-image"></image>
-        <view slot="label">
+        <view slot="title">
+          <text>{{item.title}}</text>
           <van-tag type="success" wx:if="{{item.isAdmin}}" custom-class="cell-tag">管理员</van-tag>
-          <text wx:if="{{item.mobile}}">{{item.mobile}}</text>
+          <van-tag wx:if="{{item.id == me.superior_id}}" type="warning" custom-class="cell-tag">上级</van-tag>
         </view>
       </van-cell>
       <view wx:if="{{me.isAdmin && !item.isAdmin}}" slot="right" style="height:100%">
