@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "wechat"
+		},
+		{
+			"path": "wxBot"
 		}
 	],
 	"settings": {}

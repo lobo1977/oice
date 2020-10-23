@@ -1,0 +1,54 @@
+# @author:lobo
+# chkconfig:35 85 15
+# description:Weixin robot service
+#!bin/bash
+
+lock="php_python.py"
+
+start(){
+        ls_date=`date +%Y%m%d`
+        echo -e "Weixin robot service start....\c"
+        su root -c "stdbuf -oL /bin/python /data/wxBot/php_python.py >> /data/wxBot/log/${ls_date}.txt &"
+        echo "ok."
+}
+
+stop(){
+        ls_date=`date +%Y%m%d`
+	echo -e "Weixin robot service stop....\c"
+	pkill -f $lock
+	su root -c "stdbuf -oL /bin/python /data/wxBot/clear_bot.py >> /data/wxBot/log/${ls_date}.txt"
+        su root -c "stdbuf -oL /bin/python /data/wxBot/clear_oice_bot.py >> /data/wxBot/log/${ls_date}.txt"
+	echo "ok."
+}
+
+status(){
+	ps -fe|grep $lock |grep -v grep
+	if [ $? -ne 0 ];then
+		echo "$0 service stopped"
+	else
+        echo "$0 service running" 
+    fi
+}
+
+restart(){
+        stop
+        start
+}
+
+case "$1" in
+"start")
+        start
+        ;;
+"stop")
+        stop
+        ;;
+"status")
+        status
+        ;;
+"restart")
+        restart
+        ;;
+*)
+        echo "$0 start|stop|status|restart"
+        ;;
+esac
