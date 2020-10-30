@@ -8,19 +8,8 @@ App({
     // logs.unshift(Date.now())
     // wx.setStorageSync('logs', logs)
     
-    // 获取用户信息
-    wx.getUserInfo({
-      success: res => {
-        this.globalData.userInfo = res.userInfo
-        this.login()
-        if (this.userInfoReadyCallback) {
-          this.userInfoReadyCallback(res)
-        }
-      },
-      fail: () => {
-        this.login()
-      }
-    })
+    // 用户登录
+    this.login()
     
     // wx.getSetting({
     //   success: res => {
