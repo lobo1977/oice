@@ -1,4 +1,4 @@
-var formatTime = function(date) {
+var formatDateTime = function(date) {
   var date = getDate(date)
   var year = date.getFullYear()
   var month = date.getMonth() + 1
@@ -20,6 +20,12 @@ var formatDate = function(date) {
   var day = time.getDate()
 
   return year + '年' + month + '月' + day + '日'
+}
+
+var formatTime = function(date) {
+  var hour = date.getHours()
+  var minute = date.getMinutes()
+  return [hour, minute].map(formatNumber).join(':')
 }
 
 var formatNumber = function(n) {

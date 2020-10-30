@@ -17,8 +17,11 @@
 		</van-cell>
 		<van-cell title="QQ" wx:if="{{info.qq}}" custom-class="cell-view" title-width="160rpx" value="{{info.qq}}" value-class="text-left"></van-cell>
 		<van-cell title="状态" custom-class="cell-view" title-width="160rpx" value="{{info.status == 0 ? '在职' : '离职'}}" value-class="text-left"></van-cell>
-		<view class="cell-text-area" wx:if="{{info.rem}}">{{info.rem}}</view>
 	</van-cell-group>
+
+	<van-cell-group title="备注" wx:if="{{info.rem}}">
+    <van-cell title="{{info.rem}}" />
+  </van-cell-group>
 
 	<van-dialog id="van-dialog" />
 

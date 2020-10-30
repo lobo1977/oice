@@ -18,7 +18,7 @@
     </view>
   </van-sticky>
 
-  <van-checkbox-group value="{{ checked }}" bind:change="checkChange">
+  <van-checkbox-group wx:if="{{list.length}}" value="{{ checked }}" bind:change="checkChange">
     <van-cell-group>
       <van-cell wx:for="{{list}}" wx:key="id" wx:for-index="idx" data-index="{{idx}}"
         title="{{item.title}}" use-label-slot clickable center
@@ -35,8 +35,7 @@
   </van-checkbox-group>
 
   <van-divider contentPosition="center" customStyle="margin-left:50px;margin-right:50px;">
-    <text wx:if="{{ list.length > 0 && isEnd && isLoading === false }}">没有更多了</text>
-    <text wx:if="{{ list.length == 0 && isLoading === false }}">暂无内容</text>
+    <text wx:if="{{ (list.length == 0 || isEnd) && isLoading === false }}">{{ list.length == 0 ? '暂无内容' : '没有更多了' }}</text>
     <van-loading wx:if="{{ isLoading && isPullDown === false }}" type="spinner" size="20px">加载中...</van-loading>
   </van-divider>
 

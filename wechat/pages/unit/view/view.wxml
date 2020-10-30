@@ -1,7 +1,7 @@
 <!--view.wxml-->
 <page-meta background-text-style="dark">
 </page-meta>
-<wxs src='../../../utils/filter.wxs' module='filter' />
+<wxs src="../../../utils/filter.wxs" module="filter" />
 <view class="page-view">
   <swiper wx:if="{{previewImages && previewImages.length}}" indicator-dots="{{false}}" autoplay="{{isVideoPlay == false}}">
     <swiper-item wx:for="{{previewImages}}" wx:key="id" wx:for-index="idx" data-data="{{idx}}" bindtap="bindViewImage">
@@ -30,8 +30,12 @@
       title-width="160rpx" value="{{info.statusText}}" value-class="text-left"></van-cell>
     <van-cell title="到期日" wx:if="{{info.end_date_text}}" custom-class="cell-view"
       title-width="160rpx" value="{{info.end_date_text}}" value-class="text-left"></van-cell>
-    <view class="cell-text-area" wx:if="{{info.rem}}">{{info.rem}}</view>
   </van-cell-group>
+
+  <van-cell-group title="备注" wx:if="{{info.rem}}">
+    <van-cell title="{{info.rem}}" />
+  </van-cell-group>
+
   <van-cell-group title="联系人" wx:if="{{info.allowEdit || (info.linkman && info.linkman.length)}}">
     <van-cell wx:for="{{info.linkman}}" wx:key="id" data-data="{{item}}"
       title="{{item.title}}" center custom-class="cell-view"

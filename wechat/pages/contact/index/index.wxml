@@ -1,9 +1,9 @@
 <!--pages/contact/index/index.wxml-->
 <page-meta background-text-style="dark">
 </page-meta>
-<wxs src='../../../utils/filter.wxs' module='filter' />
+<wxs src="../../../utils/filter.wxs" module="filter" />
 <view>
-  <van-cell-group>
+  <van-cell-group wx:if="{{list.length}}">
     <van-swipe-cell wx:for="{{list}}" wx:key="id" right-width="{{ 60 }}" disabled="{{ item.is_colleague}}">
       <van-cell wx:if="{{me.id != item.id}}" label="{{item.full_name}}"  title-width="160px" center
         custom-class="cell-contact" link-type="navigateTo" url="../view/view?id={{item.id}}" value="{{ item.is_colleague ? '同事' : '联系人' }}">
@@ -21,8 +21,7 @@
   </van-cell-group>
 
   <van-divider contentPosition="center" customStyle="margin-left:50px;margin-right:50px;">
-    <text wx:if="{{ list.length > 0 && isEnd && isLoading === false }}">没有更多了</text>
-    <text wx:if="{{ list.length == 0 && isLoading === false }}">暂无成员</text>
+    <text wx:if="{{ (list.length == 0 || isEnd) && isLoading === false }}">{{ list.length == 0 ? '暂无内容' : '没有更多了' }}</text>
     <van-loading wx:if="{{ isLoading && isPullDown === false }}" type="spinner" size="20px">加载中...</van-loading>
   </van-divider>
 

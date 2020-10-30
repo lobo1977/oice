@@ -49,9 +49,9 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    if (app.refreshCompany) {
+    if (app.globalData.refreshCompany) {
       this.getList()
-      app.refreshCompany = false
+      app.globalData.refreshCompany = false
     }
   },
 

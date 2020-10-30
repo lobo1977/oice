@@ -2,6 +2,7 @@
 namespace app\api\model;
 
 use think\model\concern\SoftDelete;
+use app\common\Utils;
 use app\api\model\Base;
 use app\api\model\Company;
 use app\api\model\User;
@@ -123,6 +124,7 @@ class DailyReview extends Base
 
     foreach($list as $item) {
       $item->levelText = self::$level[$item->level];
+      $item->time_span = Utils::timeSpan($item->create_time);
       User::formatData($item);
     }
 

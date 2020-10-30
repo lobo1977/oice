@@ -269,7 +269,8 @@ App({
     refreshUnitView: false,
     refreshLinkView: false,
     refreshCustomerView: false,
-    refreshCompany: false
+    refreshCompany: false,
+    refreshDaily: false
   },
   
   // 登录

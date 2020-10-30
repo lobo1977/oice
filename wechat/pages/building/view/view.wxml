@@ -1,7 +1,7 @@
 <!--view.wxml-->
 <page-meta background-text-style="dark">
 </page-meta>
-<wxs src='../../../utils/filter.wxs' module='filter' />
+<wxs src="../../../utils/filter.wxs" module="filter" />
 
 <view class="page-view">
   <van-notice-bar wx:if="{{info.id > 0 && info.user_id == 0}}"
@@ -90,11 +90,26 @@
       title-width="160rpx" value="{{info.electricity_fee}}" value-class="text-left"></van-cell>
     <van-cell title="停车位" wx:if="{{info.car_seat}}" custom-class="cell-view"
       title-width="160rpx" value="{{info.car_seat}}" value-class="text-left"></van-cell>
-    <view class="cell-text-area" wx:if="{{info.rem}}">{{info.rem}}</view>
-    <view class="cell-text-area" wx:if="{{info.traffic}}">交通状况：{{info.traffic}}</view>
-    <view class="cell-text-area" wx:if="{{info.equipment}}">楼宇设备：{{info.equipment}}</view>
-    <view class="cell-text-area" wx:if="{{info.facility}}">配套设施：{{info.facility}}</view>
-    <view class="cell-text-area" wx:if="{{info.environment}}">周边环境：{{info.environment}}</view>
+  </van-cell-group>
+
+  <van-cell-group title="项目说明" wx:if="{{info.rem}}">
+    <van-cell title="{{info.rem}}" />
+  </van-cell-group>
+
+  <van-cell-group title="交通状况" wx:if="{{info.traffic}}">
+    <van-cell title="{{info.traffic}}" />
+  </van-cell-group>
+
+  <van-cell-group title="楼宇设备" wx:if="{{info.equipment}}">
+    <van-cell title="{{info.equipment}}" />
+  </van-cell-group>
+
+  <van-cell-group title="配套设施" wx:if="{{info.facility}}">
+    <van-cell title="{{info.facility}}" />
+  </van-cell-group>
+
+  <van-cell-group title="周边环境" wx:if="{{info.environment}}">
+    <van-cell title="{{info.environment}}" />
   </van-cell-group>
 
   <van-dialog id="van-dialog" />

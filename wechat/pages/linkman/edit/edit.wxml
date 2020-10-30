@@ -1,5 +1,4 @@
 <!--pages/customer/edit/edit.wxml-->
-<wxs src='../../../utils/filter.wxs' module='filter' />
 <view class="page-view">
   <van-cell-group>
     <van-field title-width="80px" label="姓名" value="{{ info.title }}" required placeholder="{{ title_error }}" error="{{is_title_empty}}" maxlength="10" bind:input="onTitleInput" />

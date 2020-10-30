@@ -2,7 +2,7 @@
 <page-meta background-text-style="dark">
 </page-meta>
 <view>
-  <van-cell-group>
+  <van-cell-group wx:if="{{list.length}}">
     <van-cell wx:for="{{list}}" wx:key="id"
       title="{{item.title}}" label="{{item.desc}}" center
       link-type="navigateTo"
@@ -11,8 +11,7 @@
   </van-cell-group>
   
   <van-divider contentPosition="center" customStyle="margin-left:50px;margin-right:50px;">
-    <text wx:if="{{ list.length > 0 && isEnd && isLoading === false }}">没有更多了</text>
-    <text wx:if="{{ list.length == 0 && isLoading === false }}">暂无内容</text>
+    <text wx:if="{{ (list.length == 0 || isEnd) && isLoading === false }}">{{ list.length == 0 ? '暂无内容' : '没有更多了' }}</text>
     <van-loading wx:if="{{ isLoading && isPullDown === false }}" type="spinner" size="20px">加载中...</van-loading>
   </van-divider>
 </view>

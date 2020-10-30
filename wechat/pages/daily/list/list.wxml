@@ -1,0 +1,72 @@
+<!--pages/daily/list/list.wxml-->
+<page-meta background-text-style="dark">
+</page-meta>
+<wxs src="../../../utils/filter.wxs" module="filter" />
+
+<view>
+  <van-sticky>
+    <van-row>
+      <van-col span="4">
+        <van-button type="default" block hairline icon="arrow-left" bind:click="goPrev" disabled="{{ date < minDate + 24*60*60*1000 }}">
+        </van-button>
+      </van-col>
+      <van-col span="16">
+        <van-button type="default" block hairline bind:click="openCalendar">{{date_text}}</van-button>
+      </van-col>
+       <van-col span="4">
+        <van-button type="default" block hairline icon="arrow" bind:click="goNext" disabled="{{ date > maxDate - 24*60*60*1000 }}">
+        </van-button>
+      </van-col>
+    </van-row>
+    <van-tabs active="{{ type }}" bind:change="onTabChange">
+      <van-tab title="工作日报" name="list"></van-tab>
+      <van-tab title="批阅" name="review"></van-tab>
+    </van-tabs>
+  </van-sticky>
+
+  <view hidden="{{type != 'list'}}">
+    <van-cell-group wx:if="{{list.length}}">
+      <van-cell wx:for="{{list}}" wx:key="id" center
+        title="{{item.title}}" label="{{item.summary}}" value="{{item.time_span}}"
+        link-type="navigateTo" is-link
+        url="../view/view?id={{item.id}}">
+      </van-cell>
+    </van-cell-group>
+
+    <van-divider contentPosition="center" customStyle="margin-left:50px;margin-right:50px;">
+      <text wx:if="{{ (list.length == 0 || isEnd) && isLoading === false }}">{{ list.length == 0 ? '暂无内容' : '没有更多了' }}</text>
+      <van-loading wx:if="{{ isLoading && isPullDown === false }}" type="spinner" size="20px">加载中...</van-loading>
+    </van-divider>
+  </view>
+
+  <view hidden="{{type != 'review'}}">
+    <van-cell-group wx:if="{{review.length}}">
+      <van-cell wx:for="{{review}}" wx:key="id" center
+        label="{{item.content}}" value="{{item.time_span}}"
+        link-type="navigateTo" is-link
+        url="../reviewView/reviewView?id={{item.id}}">
+        <image slot="icon" mode="aspectFill" 
+        src="{{filter.imageUrl(item.avatar)}}" class="cell-image"></image>
+        <view slot="title">
+          {{item.user}}
+          <van-tag type="{{item.level == 0 ? 'danger' : (item.level == 1 ? 'primary' : 'success')}}">{{item.levelText}}</van-tag>
+        </view>
+      </van-cell>
+    </van-cell-group>
+
+    <van-divider wx:if="{{ isReviewLoading || review.length == 0 }}" contentPosition="center" customStyle="margin-left:50px;margin-right:50px;">
+      <text wx:if="{{ review.length == 0 && isReviewLoading === false }}">暂无内容</text>
+      <van-loading wx:if="{{ isReviewLoading }}" type="spinner" size="20px">加载中...</van-loading>
+    </van-divider>
+  </view>
+
+  <van-row wx:if="{{me.id > 0 && me.id == user.superior_id}}" gutter="0" custom-class="button-bar">
+    <van-col span="24">
+      <van-button square type="primary" icon="completed" block bindtap="review" disabled="{{list.length == 0}}">批阅</van-button>
+    </van-col>
+  </van-row>
+
+  <van-icon wx:if="{{me.id == id}}" name="add" color="#07c160" size="40" custom-style="position:fixed;bottom:30px;right:15px;" bindtap="add" />
+
+  <van-calendar show="{{ showCalendar }}" bind:close="onCalendarClose" bind:confirm="onCalendarConfirm" default-date="{{date}}" min-date="{{ minDate }}" max-date="{{ maxDate }}" />
+</view>

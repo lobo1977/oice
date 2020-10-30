@@ -1,16 +1,16 @@
-<!--pages/my/building/building.wxml-->
+<!--pages/daily/index/index.wxml-->
 <page-meta background-text-style="dark">
 </page-meta>
 <wxs src="../../../utils/filter.wxs" module="filter" />
 <view>
- <van-cell-group wx:if="{{list.length}}">
+  <van-cell-group>
     <van-cell wx:for="{{list}}" wx:key="id"
-      title="{{item.title}}" label="{{item.desc}}"
-      link-type="navigateTo"
-      url="../../building/view/view?id={{item.id }}"
+      title="{{item.title}}" label="今日 {{item.daily_count}} 项日报"
+      link-type="navigateTo" is-link
+      url="../list/list?id={{item.id}}&date={{date}}"
       custom-class="cell-contact">
       <image slot="icon" mode="aspectFill" 
-        src="{{filter.imageUrl(item.src)}}" class="cell-image"></image>
+        src="{{filter.imageUrl(item.avatar)}}" class="cell-image"></image>
     </van-cell>
   </van-cell-group>
 
@@ -18,5 +18,6 @@
     <text wx:if="{{ (list.length == 0 || isEnd) && isLoading === false }}">{{ list.length == 0 ? '暂无内容' : '没有更多了' }}</text>
     <van-loading wx:if="{{ isLoading && isPullDown === false }}" type="spinner" size="20px">加载中...</van-loading>
   </van-divider>
-</view>
 
+  <van-icon name="add" color="#07c160" size="40" custom-style="position:fixed;bottom:30px;right:15px;" bindtap="bindAdd" />
+</view>

@@ -17,10 +17,11 @@
     </van-cell>
   </van-cell-group>
 
-  <van-grid column-num="3" clickable custom-class="my-grid">
+  <van-grid column-num="4" clickable custom-class="my-grid">
     <van-grid-item icon="star-o" text="收藏" link-type="navigateTo" url="../favorite/favorite" />
     <van-grid-item icon="hotel-o" text="项目" link-type="navigateTo" url="../building/building" />
     <van-grid-item icon="todo-list-o" text="到期客户" link-type="navigateTo" url="../customer/customer" />
+    <van-grid-item icon="notes-o" text="工作日报" link-type="navigateTo" url="../../daily/index/index" />
   </van-grid>
 
   <van-cell-group>
