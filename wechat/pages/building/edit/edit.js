@@ -67,7 +67,11 @@ Page({
     is_name_empty: false,
     name_error: '',
     images: [],
-    previewList: []
+    previewList: [],
+    imageMenu: [{name: '设为封面'}],
+    showImageMenu: false,
+    current_image: null,
+    uploadAccept: 'media'
   },
 
   /**
@@ -75,6 +79,11 @@ Page({
    */
   onLoad: function (options) {
     let that = this
+    if (app.globalData.isWindows) {
+      that.setData({
+        uploadAccept: 'image'
+      })
+    }
     if (options.id) {
       wx.setNavigationBarTitle({
         title: '修改项目信息'
@@ -183,6 +192,7 @@ Page({
               id: element.id,
               url: app.globalData.serverUrl + '/' + element.msrc,
               name: element.title,
+              isImage: true,
               deletable: element.default != 1
             })
             that.data.previewList.push({
@@ -529,7 +539,54 @@ Page({
     })
   },
 
+  onImageMenuClose: function() {
+    this.setData({
+      showImageMenu: false
+    })
+  },
+
+  onImageMenuSelect: function(event) {
+    let that = this
+    that.setData({
+      showImageMenu: false
+    })
+    if (that.data.current_image) {
+      wx.showLoading()
+      app.post('building/setDefaultImage', {
+        image_id: that.data.current_image.id
+      }, (res) => {
+        if (res.success) {
+          that.data.images.forEach(img => {
+            if (img.id == that.data.current_image.id) {
+              img.deletable = false
+            } else {
+              img.deletable = true
+            }
+          })
+          that.setData({
+            images: that.data.images
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: res.message ? res.message : '操作失败，系统异常',
+            duration: 2000
+          })
+        }
+      }, () => {
+        wx.hideLoading()
+      })
+    }
+  },
+
   previewImages: function(event) {
+    this.data.current_image = this.data.images[event.detail.index]
+    if (this.data.current_image.isImage && this.data.current_image.deletable) {
+      this.setData({
+        showImageMenu: true
+      })
+      return
+    }
     if (this.data.previewList.length) {
       wx.previewMedia({
         sources: this.data.previewList,
@@ -585,7 +642,6 @@ Page({
                 }
               } else {
                 error++
-                console.log(json.message)
               }
             } else {
               error++

@@ -274,6 +274,9 @@ Page({
     let that = this
     let count = 0
     let error = 0
+
+    app.checkSystem('/app/customer/view/' + that.data.info.id + '?tab=2')
+
     wx.chooseMessageFile({
       count: 5,
       success(res) {
