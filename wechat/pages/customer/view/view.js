@@ -224,7 +224,7 @@ Page({
       return
     }
     let attach = this.data.info.attach[event.currentTarget.dataset.data]
-    let url = app.globalData.serverUrl + '/' + attach.src
+    let url = app.globalData.serverUrl + '/' + attach.url
     if (attach.is_image) {
       wx.previewImage({
         current: url,

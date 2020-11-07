@@ -84,6 +84,7 @@ Page({
         uploadAccept: 'image'
       })
     }
+ 
     if (options.id) {
       wx.setNavigationBarTitle({
         title: '修改项目信息'
@@ -600,6 +601,9 @@ Page({
     let count = 0
     let error = 0
     const files = event.detail.file
+    if (files.length == 0) {
+      return
+    }
     wx.showLoading()
     try {
       files.forEach(file => {
@@ -610,7 +614,7 @@ Page({
               app.globalData.appUserInfo.token : ''
           },
           url: app.globalData.serverUrl + '/api/building/uploadImage',
-          filePath: file.tempFilePath,
+          filePath: that.data.uploadAccept == 'media' ? file.tempFilePath : file.path,
           name: 'images[]',
           formData: {
             'id': that.data.id

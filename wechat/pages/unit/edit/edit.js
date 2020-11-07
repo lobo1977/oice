@@ -545,7 +545,7 @@ Page({
               app.globalData.appUserInfo.token : ''
           },
           url: app.globalData.serverUrl + '/api/building/uploadUnitImage',
-          filePath: file.tempFilePath,
+          filePath: that.data.uploadAccept == 'media' ? file.tempFilePath : file.path,
           name: 'images[]',
           formData: {
             'id': that.data.id

@@ -12,7 +12,7 @@ App({
 
     wx.getSystemInfo({
       success (res) {
-        app.globalData.isWindows = /windows/.test(res.system.toLowerCase())
+        app.globalData.isWindows = /win/.test(res.system.toLowerCase())
       }
     })
     
