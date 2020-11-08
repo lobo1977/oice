@@ -49,8 +49,12 @@ Page({
     mobile_error: '',
     images: [],
     previewList: [],
-    imageMenu: [{name: '设为封面'}],
+    imageMenu: [
+      {name: '设为封面', value: 'setDefault', disabled: true}, 
+      {name: '删除', value: 'delete', disabled: true}
+    ],
     showImageMenu: false,
+    current_image_index: 0,
     current_image: null,
     uploadAccept: 'media'
   },
@@ -182,6 +186,7 @@ Page({
               id: element.id,
               url: app.globalData.serverUrl + '/' + element.msrc,
               name: element.title,
+              isImage: true,
               deletable: element.default != 1
             })
             that.data.previewList.push({
@@ -486,48 +491,55 @@ Page({
       showImageMenu: false
     })
     if (that.data.current_image) {
-      wx.showLoading()
-      app.post('building/setDefaultImage', {
-        image_id: that.data.current_image.id
-      }, (res) => {
-        if (res.success) {
-          that.data.images.forEach(img => {
-            if (img.id == that.data.current_image.id) {
-              img.deletable = false
-            } else {
-              img.deletable = true
-            }
-          })
-          that.setData({
-            images: that.data.images
-          })
-        } else {
-          wx.showToast({
-            icon: 'none',
-            title: res.message ? res.message : '操作失败，系统异常',
-            duration: 2000
-          })
-        }
-      }, () => {
-        wx.hideLoading()
-      })
+      if (event.detail.value == 'setDefault') {
+        wx.showLoading()
+        app.post('building/setDefaultImage', {
+          image_id: that.data.current_image.id
+        }, (res) => {
+          if (res.success) {
+            that.data.images.forEach(img => {
+              if (img.id == that.data.current_image.id) {
+                img.deletable = false
+              } else {
+                img.deletable = true
+              }
+            })
+            that.setData({
+              images: that.data.images
+            })
+          } else {
+            wx.showToast({
+              icon: 'none',
+              title: res.message ? res.message : '操作失败，系统异常',
+              duration: 2000
+            })
+          }
+        }, () => {
+          wx.hideLoading()
+        })
+      } else if (event.detail.value == 'delete') {
+        that.removeImage()
+      }
     }
   },
 
   previewImages: function(event) {
+    this.data.current_image_index = event.detail.index
     this.data.current_image = this.data.images[event.detail.index]
-    if (this.data.current_image.isImage && this.data.current_image.deletable) {
-      this.setData({
-        showImageMenu: true
-      })
-      return
-    }
-    if (this.data.previewList.length) {
-      wx.previewMedia({
-        sources: this.data.previewList,
-        current: event.detail.index
-      })
-    }
+    let imageAction = this.data.imageMenu
+    imageAction[0].disabled = !this.data.current_image.isImage || !this.data.current_image.deletable
+    imageAction[1].disabled = !this.data.current_image.deletable
+    this.setData({
+      imageMenu: imageAction,
+      showImageMenu: true
+    })
+    return
+    // if (this.data.previewList.length) {
+    //   wx.previewMedia({
+    //     sources: this.data.previewList,
+    //     current: event.detail.index
+    //   })
+    // }
   },
 
   upload: function(event) {
@@ -535,15 +547,18 @@ Page({
     let count = 0
     let error = 0
     const files = event.detail.file
+    let header = {
+      'User-Token': app.globalData.appUserInfo && app.globalData.appUserInfo.token ? 
+        app.globalData.appUserInfo.token : ''
+    }
+    if (!app.globalData.isWindows) {
+      header['Content-Type'] =  'multipart/form-data'
+    }
     wx.showLoading()
     try {
       files.forEach(file => {
         wx.uploadFile({
-          header: {
-            'Content-Type': 'multipart/form-data',
-            'User-Token': app.globalData.appUserInfo && app.globalData.appUserInfo.token ? 
-              app.globalData.appUserInfo.token : ''
-          },
+          header: header,
           url: app.globalData.serverUrl + '/api/building/uploadUnitImage',
           filePath: that.data.uploadAccept == 'media' ? file.tempFilePath : file.path,
           name: 'images[]',
@@ -613,7 +628,7 @@ Page({
 
   removeImage: function(event) {
     let that = this
-    let idx = event.detail.index
+    let idx = that.data.current_image_index
     let file = that.data.images[idx]
 
     Dialog.confirm({

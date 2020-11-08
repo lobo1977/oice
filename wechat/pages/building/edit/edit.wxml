@@ -100,7 +100,7 @@
   <view wx:if="{{id > 0}}" hidden="{{activeTab != 2}}" style="padding:10px;">
     <van-uploader file-list="{{ images }}" accept="{{uploadAccept}}" max-count="10" 
     preview-full-image="{{ false }}" bind:click-preview="previewImages"
-    bind:delete="removeImage"
+    bind:delete="removeImage" deletable="{{false}}"
     bind:after-read="upload"
     multiple />
 

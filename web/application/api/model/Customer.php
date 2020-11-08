@@ -164,7 +164,7 @@ class Customer extends Base
       if ($filter['clash']) {
         $list->where('a.clash', '>', 0);
       } else {
-        $list->where('a.clash', ['exp', 'IS NULL'], ['=', 0], 'or');
+        $list->where('(a.clash IS NULL OR a.clash = 0)');
       }
     }
 
@@ -312,8 +312,8 @@ class Customer extends Base
       //->leftJoin('linkman b',"b.type = 'customer' AND b.owner_id = a.id")
       ->where('a.id', '<>', $id)
       ->where('a.company_id', $company_id)
-      ->where('a.clash', ['exp', 'IS NULL'], ['=', 0], 'or')
-      ->where('a.parallel', ['exp', 'IS NULL'], ['=', 0], 'or')
+      ->where('(a.clash IS NULL OR a.clash = 0)')
+      ->where('(a.parallel IS NULL OR a.parallel = 0)')
       ->where(function ($query) use($keyword, $tel) {
           $query->where('a.customer_name', 'like', '%' . $keyword . '%');
           if ($tel) {
