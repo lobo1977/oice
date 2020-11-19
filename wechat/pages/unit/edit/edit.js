@@ -80,9 +80,9 @@ Page({
       wx.setNavigationBarTitle({
         title: '添加单元'
       })
-    }
-    if (options.bid) {
-      that.data.building_id = options.bid
+      if (options.bid) {
+        that.data.info.building_id = options.bid
+      }
     }
     if (app.globalData.appUserInfo) {
       that.getData()
