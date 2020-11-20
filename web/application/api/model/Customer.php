@@ -85,15 +85,15 @@ class Customer extends Base
         ($customer->user_id == $user->id || $user->isAdmin);
     } else if ($operate == 'edit') {
       return (($user->isAdmin && $customer->company_id == $user->company_id) || 
-        $customer->user_id == $user->id || $customer->share_level > 0) && 
-        (!$customer->clash || $customer->parallel);
+        $customer->user_id == $user->id || $customer->share_level > 0); 
+        //&& (!$customer->clash || $customer->parallel);
     } else if ($operate == 'follow') {    // 跟进
       return (
         ($user->isAdmin && $customer->company_id == $user->company_id) || 
         $customer->share_level !== null || $customer->user_id == $user->id || 
         ($customer->share && $customer->company_id > 0 && $customer->company_id == $user->company_id) || 
         ($user->id == $superior_id && $customer->company_id > 0 && $customer->company_id == $user->company_id)
-      ) && (!$customer->clash || $customer->parallel);
+      ); //&& (!$customer->clash || $customer->parallel);
     } else if ($operate == 'confirm') {   // 确认
       return $customer->user_id == $user->id &&
         $customer->company_id > 0 && $customer->company_id == $user->company_id && 
@@ -312,14 +312,14 @@ class Customer extends Base
       //->leftJoin('linkman b',"b.type = 'customer' AND b.owner_id = a.id")
       ->where('a.id', '<>', $id)
       ->where('a.company_id', $company_id)
-      ->where('a.clash', ['exp', 'IS NULL'], ['=', 0], 'or')
-      ->where('a.parallel', ['exp', 'IS NULL'], ['=', 0], 'or')
+      ->where('(a.clash IS NULL OR a.clash = 0)')
+      ->where('(a.parallel IS NULL OR a.parallel = 0)')
       ->where(function ($query) use($keyword, $tel) {
+        if ($tel) {
+          $query->where("(a.tel = '" .$tel . "' OR a.customer_name like '%" . $keyword . "%')");
+        } else {
           $query->where('a.customer_name', 'like', '%' . $keyword . '%');
-          if ($tel) {
-            $query->whereOr('a.tel', '=', $tel);
-              //->whereOr('b.tel', '=', $tel);
-          } 
+        }
       })->field('a.id,a.customer_name,a.tel,a.status,a.user_id,u.title as user')
       ->find();
 
