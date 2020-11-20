@@ -43,12 +43,12 @@ Page({
       wx.setNavigationBarTitle({
         title: '添加联系人'
       })
-    }
-    if (options.type) {
-      that.data.info.type = options.type
-    }
-    if (options.oid) {
-      that.data.info.owner_id = options.oid
+      if (options.type) {
+        that.data.info.type = options.type
+      }
+      if (options.oid) {
+        that.data.info.owner_id = options.oid
+      }
     }
     if (app.globalData.appUserInfo) {
       that.getData()

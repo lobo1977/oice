@@ -226,7 +226,8 @@ class User extends Base
 
     $list = self::alias('a')
       ->join('user_company b', 'a.id = b.user_id and b.status = 1 and b.company_id = ' . $company_id)
-      ->leftJoin('log c', "a.id = c.user_id AND c.company_id = b.company_id AND " . 
+      ->leftJoin('log c', "a.id = c.user_id AND c.company_id = b.company_id AND c.delete_time IS NULL " . 
+        "AND c.title <> '登录' AND c.title <> '退出' AND " . 
         "c.start_time between '" . $date . "' AND '" . date("Y-m-d", strtotime($date . ' +1 day')) . "'")
       ->where('b.superior_id = ' . $user_id . ' OR a.id = ' . $user_id);
 

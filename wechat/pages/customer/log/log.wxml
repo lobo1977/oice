@@ -1,8 +1,8 @@
 <!--pages/customer/Log/log.wxml-->
-<wxs src='../../../utils/filter.wxs' module='filter' />
+<wxs src="../../../utils/filter.wxs" module="filter" />
 <view class="page-view">
   <van-cell-group>
-    <van-field title-width="50px" label="时间" value="{{ filter.formatTime(start_time) }}" required right-icon="calender-o" readonly clickable bindtap="bindSelectTime" />
+    <van-field title-width="50px" label="时间" value="{{ filter.formatDateTime(start_time) }}" required right-icon="calender-o" readonly clickable bindtap="bindSelectTime" />
     <van-field title-width="50px" label="摘要" value="{{ title }}" required placeholder="{{ title_error }}" error="{{is_title_empty}}" maxlength="10" bind:input="onTitleInput" />
     <van-field title-width="50px" label="详情" value="{{ summary }}" type="textarea" maxlength="200" bind:input="onSummaryInput" />
   </van-cell-group>

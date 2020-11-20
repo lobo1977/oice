@@ -14,7 +14,10 @@
     <van-cell title-width="80px" title="企业全称" icon="home-o" value="{{info.full_name}}" />
     <van-cell title-width="80px" title="地址" icon="location-o" value="{{info.address}}" />
     <van-cell title-width="80px" title="成员" icon="friends-o" value="{{info.addin}}" link-type="navigateTo" url="../member/member?id={{info.id}}" is-link />
-    <view class="cell-text-area" wx:if="{{info.rem}}">{{info.rem}}</view>
+  </van-cell-group>
+
+  <van-cell-group title="企业简介" wx:if="{{info.rem}}">
+    <van-cell title="{{info.rem}}" />
   </van-cell-group>
 
   <van-cell-group title="待审核成员" wx:if="{{info.allowPass && waitUser.length}}">

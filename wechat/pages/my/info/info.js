@@ -189,6 +189,13 @@ Page({
 
   upload: function(event) {
     let that = this
+    let header = {
+      'User-Token': app.globalData.appUserInfo && app.globalData.appUserInfo.token ? 
+        app.globalData.appUserInfo.token : ''
+    }
+    if (!app.globalData.isWindows) {
+      header['Content-Type'] =  'multipart/form-data'
+    }
     const file = event.detail.file
     if (!file) {
       return
@@ -196,10 +203,7 @@ Page({
     wx.showLoading()
     try {
       wx.uploadFile({
-        header: {
-          'Content-Type': 'multipart/form-data',
-          'User-Token': app.globalData.appUserInfo && app.globalData.appUserInfo.token ? app.globalData.appUserInfo.token : ''
-        },
+        header: header,
         url: app.globalData.serverUrl + '/api/my/edit',
         filePath: file.path,
         name: 'avatar',

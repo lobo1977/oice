@@ -1,0 +1,39 @@
+<!--pages/daily/edit/edit.wxml-->
+<view class="page-view">
+  <van-cell-group>
+    <van-field title-width="80px" label="开始时间" value="{{ info.start_time }}" right-icon="underway-o" readonly clickable bindtap="selectStartTime" required />
+    <van-field title-width="80px" label="结束时间" value="{{ end_time }}" right-icon="underway-o" readonly clickable bindtap="selectEndTime" />
+    <van-field title-width="80px" label="摘要" value="{{ info.title }}" required placeholder="{{ title_error }}" error="{{is_title_empty}}" maxlength="10" bind:input="onTitleInput" />
+  </van-cell-group>
+  <van-cell-group title="详情">
+    <van-field value="{{ info.summary }}" type="textarea" maxlength="500" autosize bind:input="onSummaryInput" />
+  </van-cell-group>
+
+  <van-popup show="{{ showStartTime }}" position="bottom" bind:close="onStartTimeClose" z-index="1000">
+    <van-datetime-picker
+      type="datetime"
+      value="{{ start_time }}"
+      bind:confirm="onStartTimeConfirm"
+      bind:cancel="onStartTimeCancel"
+    />
+  </van-popup>
+
+  <van-popup show="{{ showEndTime }}" position="bottom" bind:close="onEndTimeClose" z-index="1000">
+    <van-datetime-picker
+      type="time"
+      min-hour="8"
+      max-hour="22"
+      value="{{ end_time }}"
+      bind:confirm="onEndTimeConfirm"
+      bind:cancel="onEndTimeCancel"
+    />
+  </van-popup>
+
+  <van-row gutter="0" custom-class="button-bar">
+    <van-col span="24">
+      <van-button square type="primary" icon="sign" block bindtap="save">保存</van-button>
+    </van-col>
+  </van-row>
+
+  <van-dialog id="van-dialog" />
+</view>

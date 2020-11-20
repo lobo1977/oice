@@ -1,0 +1,26 @@
+<!--pages/daily/review/review.wxml-->
+<view class="page-view">
+  <van-cell-group>
+    <van-field title-width="80px" label="工作评定" value="{{ level_text }}" is-link readonly clickable bindtap="selectLevel" required />
+  </van-cell-group>
+  <van-cell-group>
+    <van-field value="{{ info.content }}" type="textarea" maxlength="500" autosize bind:input="onContentInput" required placeholder="请输入批阅意见" error="{{is_content_empty}}" />
+  </van-cell-group>
+
+  <van-action-sheet
+    show="{{ showLevel }}"
+    actions="{{ level }}"
+    bind:close="onLevelClose"
+    bind:select="onLevelSelect"
+    z-index="1000"
+  />
+
+  <van-row gutter="0" custom-class="button-bar">
+    <van-col span="24">
+      <van-button square type="primary" icon="sign" block bindtap="save">保存</van-button>
+    </van-col>
+  </van-row>
+
+  <van-dialog id="van-dialog" />
+</view>
+

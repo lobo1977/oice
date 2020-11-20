@@ -1,7 +1,7 @@
 <!--pages/contact/view/view.wxml-->
 <page-meta background-text-style="dark">
 </page-meta>
-<wxs src='../../../utils/filter.wxs' module='filter' />
+<wxs src="../../../utils/filter.wxs" module="filter" />
 <view class="page-content">
   <view class="name-card">
     <view class="row">

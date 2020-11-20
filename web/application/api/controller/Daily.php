@@ -58,17 +58,18 @@ class Daily extends Base
       $data = input('post.');
 
       $validate = Validate::make([
-        'title'  => 'require|token',
+        'title'  => 'require',
         'start_time' => 'date',
         'end_time' => 'date'
       ],[
         'title.require' => '必须填写摘要。',
-        'title.token' => '无效请求，请勿重复提交。',
         'start_time.date' => '开始时间无效。',
         'end_time.date' => '结束时间无效。'
       ]);
 
-      if (!$validate->check($data)) {
+      if (!$this->checkFormToken($data)) {
+        return $this->fail('无效请求，请勿重复提交表单');
+      } else if (!$validate->check($data)) {
         $form_token = $this->formToken();
         return $this->fail($validate->getError(), $form_token);
       } else {
@@ -126,15 +127,16 @@ class Daily extends Base
       $data = input('post.');
 
       $validate = Validate::make([
-        'content'  => 'require|token',
+        'content'  => 'require',
         'review_date' => 'date'
       ],[
-        'content.require' => '必须填写批阅内容。',
-        'content.token' => '无效请求，请勿重复提交。',
+        'content.require' => '必须填写批阅意见。',
         'review_date.date' => '批阅日期无效。'
       ]);
 
-      if (!$validate->check($data)) {
+      if (!$this->checkFormToken($data)) {
+        return $this->fail('无效请求，请勿重复提交表单');
+      } else if (!$validate->check($data)) {
         $form_token = $this->formToken();
         return $this->fail($validate->getError(), $form_token);
       } else {

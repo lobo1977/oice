@@ -37,10 +37,11 @@ class Log extends Base
         }
         return Customer::allow($user, $customer, 'view');
       } else {
-        $superior_id = Company::getSuperior($log->company_id, $log->user_id);
         return $log->user_id == $user->id || 
-          ($log->company_id == $user->company_id && $user->id == $superior_id);
+          ($log->company_id == $user->company_id && $user->id == $log->superior_id);
       }
+    } else if ($operate == 'review') {
+      return $log->company_id == $user->company_id && $user->id == $log->superior_id;
     } else {
       return $log->getAttr('type') > 0 && $log->user_id == $user->id;
     }
@@ -72,12 +73,13 @@ class Log extends Base
     if ($operate == 'view') {
       $log = self::alias('a')
         ->leftJoin('user b','b.id = a.user_id')
+        ->leftJoin('user_company uc', 'a.user_id = uc.user_id and a.company_id = uc.company_id and uc.status = 1')
         ->leftJoin("company c", "a.table = 'company' and a.owner_id = c.id")
         ->leftJoin("customer d", "a.table = 'customer' and a.owner_id = d.id")
         ->leftJoin("building e", "a.table = 'building' and a.owner_id = e.id")
         ->leftJoin("unit f", "a.table = 'unit' and a.owner_id = f.id")
         ->where('a.id', $id)
-        ->field('a.*,b.title as username,b.avatar,b.mobile,' .
+        ->field('a.*,b.title as username,b.avatar,b.mobile,uc.superior_id,' .
           'c.title as company_name,d.customer_name,e.building_name,f.building_no,f.floor,f.room')
         ->find();
     } else {
@@ -108,6 +110,7 @@ class Log extends Base
       $log->summary = str_replace('\n', '<br/>', $log->summary);
       $log->allowEdit = self::allow($user, $log, 'edit');
       $log->allowDelete = self::allow($user, $log, 'delete');
+      $log->allowReview = self::allow($user, $log, 'review');
     }
     return $log;
   }
@@ -161,9 +164,10 @@ class Log extends Base
   public static function getList($user, $table, $owner_id) {
     $list = self::alias('a')
       ->leftJoin('user b ','a.user_id = b.id')
+      ->leftJoin('user_company c', 'a.user_id = c.user_id and a.company_id = c.company_id and c.status = 1')
       ->where('a.table', $table)
       ->where('a.owner_id', $owner_id)
-      ->field('a.id,a.type,a.level,a.title,a.summary,a.start_time,a.end_time,a.company_id,a.user_id,b.title as user,b.mobile,b.avatar')
+      ->field('a.id,a.type,a.level,a.title,a.summary,a.start_time,a.end_time,a.company_id,c.superior_id,a.user_id,b.title as user,b.mobile,b.avatar')
       ->order('a.start_time', 'desc')->order('a.id', 'desc')
       ->select();
 
@@ -210,9 +214,9 @@ class Log extends Base
       ->leftJoin("customer d", "a.table = 'customer' and a.owner_id = d.id")
       ->leftJoin("building e", "a.table = 'building' and a.owner_id = e.id")
       ->leftJoin("company g", "a.table = 'company' and a.owner_id = g.id")
-      ->where("a.user_id = " . $user_id .
+      ->where("(a.user_id = " . $user_id .
         " OR (a.company_id > 0 AND a.company_id = " . $company_id . 
-        " AND c.superior_id = " . $user_id . ")");
+        " AND c.superior_id = " . $user_id . ")) AND a.title <> '登录' AND a.title <> '退出'");
 
     if (isset($filter['id']) && $filter['id']) {
       $list->where('a.user_id', $filter['id']);
@@ -228,7 +232,7 @@ class Log extends Base
     }
 
     $result = $list->field('a.id,a.type,a.level,a.title,a.summary,' .
-      'a.start_time,a.end_time,a.company_id,a.user_id,b.title as user,b.mobile,b.avatar,' .
+      'a.start_time,a.end_time,a.company_id,a.user_id,c.superior_id,b.title as user,b.mobile,b.avatar,' .
       'd.customer_name,e.building_name,g.title as company_name')
       ->page($filter['page'], $filter['page_size'])  
       ->order('a.start_time', 'desc')->order('a.id', 'desc')
@@ -244,6 +248,7 @@ class Log extends Base
       } else {
         $log->summary = str_replace('\n', ' ', $log->summary);
       }
+      $log->time_span = Utils::timeSpan($log->start_time);
       // $log->allowEdit = self::allow($user, $log, 'edit');
       // $log->allowDelete = self::allow($user, $log, 'delete');
     }

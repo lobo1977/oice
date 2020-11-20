@@ -1,7 +1,7 @@
 <!--pages/contact/recommend.wxml-->
 <page-meta background-text-style="dark">
 </page-meta>
-<wxs src='../../../utils/filter.wxs' module='filter' />
+<wxs src="../../../utils/filter.wxs" module="filter" />
 <view class="page-content">
   <view style="margin:0 15rpx 20rpx 15rpx">
     <view class="page-title">

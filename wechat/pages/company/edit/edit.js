@@ -226,12 +226,16 @@ Page({
 
   uploadSave() {
     let that = this
+    let header = {
+      'User-Token': app.globalData.appUserInfo && app.globalData.appUserInfo.token ? 
+        app.globalData.appUserInfo.token : ''
+    }
+    if (!app.globalData.isWindows) {
+      header['Content-Type'] =  'multipart/form-data'
+    }
     try {
       wx.uploadFile({
-        header: {
-          'Content-Type': 'multipart/form-data',
-          'User-Token': app.globalData.appUserInfo && app.globalData.appUserInfo.token ? app.globalData.appUserInfo.token : ''
-        },
+        header: header,
         url: app.globalData.serverUrl + '/api/company/edit?id=' + that.data.id,
         filePath: that.data.logo_file.path,
         name: 'logo',

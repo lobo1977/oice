@@ -49,13 +49,6 @@ swiper {
   background-color: transparent !important;
 }
 
-.cell-text-area {
-  padding: 10rpx 30rpx;
-  font-size: 1em;
-  line-height: 1.8em;
-  color: #999;
-}
-
 .cell-image {
   margin-right:20rpx;
   width:120rpx;

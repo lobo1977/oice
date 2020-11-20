@@ -7,20 +7,17 @@ App({
     // var logs = wx.getStorageSync('logs') || []
     // logs.unshift(Date.now())
     // wx.setStorageSync('logs', logs)
-    
-    // 获取用户信息
-    wx.getUserInfo({
-      success: res => {
-        this.globalData.userInfo = res.userInfo
-        this.login()
-        if (this.userInfoReadyCallback) {
-          this.userInfoReadyCallback(res)
-        }
-      },
-      fail: () => {
-        this.login()
+
+    let app = this
+
+    wx.getSystemInfo({
+      success (res) {
+        app.globalData.isWindows = /win/.test(res.system.toLowerCase())
       }
     })
+    
+    // 用户登录
+    app.login()
     
     // wx.getSetting({
     //   success: res => {
@@ -32,6 +29,7 @@ App({
   },
   
   globalData: {
+    isWindows: false,
     userInfo: null,
     appUserInfo: null,
     serverUrl: 'https://m.o-ice.com',
@@ -269,7 +267,8 @@ App({
     refreshUnitView: false,
     refreshLinkView: false,
     refreshCustomerView: false,
-    refreshCompany: false
+    refreshCompany: false,
+    refreshDaily: false,
   },
   
   // 登录
@@ -310,6 +309,27 @@ App({
       }
     }, () => {
     })
+  },
+
+  checkSystem(path) {
+    let app = this
+    if (!path) {
+      path = ''
+    }
+    if (app.globalData.isWindows) {
+      wx.showToast({
+        title: '电脑端小程序暂不支持此功能，将为您跳转至网页版',
+        icon: 'none',
+        duration: 2000,
+        success() {
+          setTimeout(function() {
+            wx.navigateTo({
+              url: '/pages/web/web?url=' + app.globalData.serverUrl + path
+            })
+          }, 2000)
+        }
+      })
+    }
   },
   
   request(url, method, data, cb, finish) {

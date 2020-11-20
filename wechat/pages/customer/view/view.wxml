@@ -1,7 +1,7 @@
 <!--pages/customer/view/view.wxml-->
 <page-meta background-text-style="dark">
 </page-meta>
-<wxs src='../../../utils/filter.wxs' module='filter' />
+<wxs src="../../../utils/filter.wxs" module="filter" />
 <view class="page-view">
   <van-cell-group>
     <van-cell title="{{info.customer_name}}" title-class="cell-title" custom-class="cell-view"></van-cell>
@@ -36,7 +36,10 @@
           title-width="160rpx" value="{{info.current_area}} 平米" value-class="text-left"></van-cell>
         <van-cell title="到期日" wx:if="{{info.end_date}}" custom-class="cell-view"
           title-width="160rpx" value="{{info.end_date}}" value-class="text-left"></van-cell>
-        <view class="cell-text-area" wx:if="{{info.rem}}">{{info.rem}}</view>
+      </van-cell-group>
+
+      <van-cell-group title="备注" wx:if="{{info.rem}}">
+        <van-cell title="{{info.rem}}" />
       </van-cell-group>
 
       <van-cell-group title="联系人" wx:if="{{(info.linkman && info.linkman.length) || info.allowFollow}}">
@@ -193,9 +196,7 @@
         </van-cell-group>
       </van-checkbox-group>
       <van-divider contentPosition="center" customStyle="margin-left:50px;margin-right:50px;">
-        <text wx:if="{{ filterList.length > 0 && isFilterEnd && !isFilterLoading }}">没有更多了</text>
-        <text wx:if="{{ filterList.length == 0 && isFilterEnd && !isFilterLoading }}">暂无可选项目</text>
-        <text wx:if="{{ !isFilterEnd && !isFilterLoading }}" bindtap="getMoreFilter">加载更多</text>
+        <text wx:if="{{ isFilterLoading == false }}" bindtap="getMoreFilter">{{ filterList.length == 0 ? '暂无可选项目' : (isFilterEnd ? '没有更多了' : '加载更多') }}</text>
         <van-loading wx:if="{{ isFilterLoading }}" type="spinner" size="20px">加载中...</van-loading>
       </van-divider>
     </scroll-view>

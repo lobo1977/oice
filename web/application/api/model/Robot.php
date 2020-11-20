@@ -103,7 +103,7 @@ class Robot extends Base
     }
 
     $content .= '
-推广支持 -【' . config('app_name') . '】';
+推广支持 - 公众号【' . config('app_name') . '】- 开发商发布项目销控平台';
 
     $list = self::alias('r')
       ->join('robot_contact c', 'r.uid = c.uid')

@@ -164,7 +164,7 @@ class Customer extends Base
       if ($filter['clash']) {
         $list->where('a.clash', '>', 0);
       } else {
-        $list->where('a.clash', ['exp', 'IS NULL'], ['=', 0], 'or');
+        $list->where('(a.clash IS NULL OR a.clash = 0)');
       }
     }
 

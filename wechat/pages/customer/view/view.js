@@ -224,7 +224,7 @@ Page({
       return
     }
     let attach = this.data.info.attach[event.currentTarget.dataset.data]
-    let url = app.globalData.serverUrl + '/' + attach.src
+    let url = app.globalData.serverUrl + '/' + attach.url
     if (attach.is_image) {
       wx.previewImage({
         current: url,
@@ -274,9 +274,11 @@ Page({
     let that = this
     let count = 0
     let error = 0
-    wx.chooseMedia({
-      maxDuration: 20,
-      camera: 'back',
+
+    app.checkSystem('/app/customer/view/' + that.data.info.id + '?tab=2')
+
+    wx.chooseMessageFile({
+      count: 5,
       success(res) {
         wx.showLoading()
         try {
@@ -288,7 +290,7 @@ Page({
                   app.globalData.appUserInfo.token : ''
               },
               url: app.globalData.serverUrl + '/api/customer/uploadAttach',
-              filePath: element.tempFilePath,
+              filePath: element.path,
               name: 'attach[]',
               formData: {
                 'id': that.data.info.id

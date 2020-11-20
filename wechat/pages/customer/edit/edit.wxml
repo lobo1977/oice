@@ -1,5 +1,5 @@
 <!--pages/customer/edit/edit.wxml-->
-<wxs src='../../../utils/filter.wxs' module='filter' />
+<wxs src="../../../utils/filter.wxs" module="filter" />
 <view class="page-view">
   <van-cell-group>
     <van-field title-width="80px" label="客户名称" value="{{ info.customer_name }}" required placeholder="{{ name_error }}" error="{{is_name_empty}}" maxlength="30" bind:input="onNameInput" />
