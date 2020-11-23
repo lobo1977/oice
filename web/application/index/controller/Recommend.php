@@ -122,7 +122,10 @@ class Recommend extends Controller
     }
 
     ob_clean();
-    $pdf->Output($title . '.pdf', 'D');
+    $res = new \think\Response;
+    $res->contentType('application/pdf');
+    $pdf->Output(urlencode($title . '.pdf'), 'D');
+    return $res;
   }
 
   private function pdfA($pdf, $data) {

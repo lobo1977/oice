@@ -5,6 +5,7 @@ const app = getApp()
 
 Page({
   data: {
+    activeTab: 0,
     isLoading: false,
     isPullDown: false,
     steps: [
@@ -67,13 +68,7 @@ Page({
       recommend: [],          // 推荐资料
       confirm: [],            // 确认书
       clashCustomer: null,
-      shareList: [],
-      allowEdit: false,
-      allowTurn: false,
-      allowFollow: false,
-      allowConfirm: false,
-      allowClash: false,
-      allowDelete: false
+      shareList: []
     },
     tapStartTime: 0,
     tapEndTime: 0,
@@ -101,7 +96,18 @@ Page({
     filterPageSize: 10,
     isFilterEnd: false,
     filterList: [],
-    filterResult: []
+    filterResult: [],
+    showFilterCheckbox: false,
+    filterCheckAll: false,
+    filterChecked: [],
+    showRecommendType: false,
+    recommendType: [ 
+      {name: '手机版', value: 0}, 
+      {name: '打印版', value: 1}, 
+      {name: '打印版（中英对照）', value: 2}, 
+      {name: '打印版（横版）', value: 3}, 
+      {name: '对比表', value: 4}
+    ],
   },
 
   /**
@@ -183,6 +189,12 @@ Page({
     return shareData
   },
 
+  onTabChange: function(event) {
+    this.setData({
+      activeTab: event.detail.index
+    })
+  },
+
   bindTouchStart: function(e) {
     this.tapStartTime = e.timeStamp;
   },
@@ -231,15 +243,21 @@ Page({
         urls: this.data.previewImages
       })
     } else {
+      wx.showLoading({title: '加载中'})
       wx.downloadFile({
         url: url,
         success: function (res) {
-          const filePath = res.tempFilePath
-          wx.openDocument({
-            filePath: filePath,
-            success: function (res) {
-            }
-          })
+          if (res.statusCode === 200) {
+            wx.openDocument({
+              showMenu: true,
+              filePath: res.tempFilePath,
+              success: function (res) {
+              }
+            })
+          }
+        },
+        complete: function() {
+          wx.hideLoading()
         }
       })
     }
@@ -280,7 +298,7 @@ Page({
     wx.chooseMessageFile({
       count: 5,
       success(res) {
-        wx.showLoading()
+        wx.showLoading({title: '上传中'})
         try {
           res.tempFiles.forEach(element => {
             wx.uploadFile({
@@ -430,7 +448,7 @@ Page({
       this.remove()
     })
     .catch(() => {
-    });
+    })
   },
 
   bindTurn: function() {
@@ -564,7 +582,7 @@ Page({
 
   noop: function() {},
 
-  bindRemoveFilter: function(event) {
+  removeFilter : function(event) {
     let that = this
     const idx = event.currentTarget.dataset.index
     const filter = that.data.info.filter[idx]
@@ -596,7 +614,7 @@ Page({
     that.data.isLoading = true
 
     if (that.data.isPullDown == false) {
-      wx.showLoading()
+      wx.showLoading({title: '加载中'})
     } else {
       that.data.isPullDown = false
     }
@@ -746,6 +764,38 @@ Page({
     })
   },
 
+  toggleFilterCheckbox: function() {
+    this.setData({
+      showFilterCheckbox: !this.data.showFilterCheckbox,
+      filterChecked: []
+    })
+  },
+
+  filterCheckChange: function(event) {
+    this.setData({
+      filterChecked: event.detail
+    })
+  },
+
+  toggleFilterCheckAll: function(event) {
+    this.setData({
+      filterCheckAll: event.detail,
+    })
+    if (!this.data.filterCheckAll) {
+      this.setData({
+        filterChecked: [],
+      })
+    } else {
+      let arr = []
+      for (let i = 0; i < this.data.info.filter.length; i++) {
+        arr.push(i.toString())
+      }
+      this.setData({
+        filterChecked: arr,
+      })
+    }
+  },
+
   unShare: function(user_id, idx) {
     let that = this
     wx.showLoading()
@@ -794,6 +844,123 @@ Page({
       }
     }, () => {
       wx.hideLoading()
+    })
+  },
+
+  toRecommend: function() {
+    // this.setData({
+    //   showRecommendType: true
+    // })
+    this.onRecommendTypeSelect()
+  },
+
+  onRecommendTypeClose: function() {
+    this.setData({
+      showRecommendType: false
+    })
+  },
+
+  getRecommendData: function(mode) {
+    let data = {}
+    let i = 0
+    data['cid'] = this.data.info.id
+    data['mode'] = mode
+    this.data.filterChecked.forEach((item) => {
+      let obj = this.data.info.filter[Number(item)]
+      data['ids[' + i + ']'] = obj.building_id + ',' + obj.unit_id
+      i++
+    })
+    return data
+  },
+
+  onRecommendTypeSelect: function(event) {
+    let that = this
+    let mode = 0
+    if (event) {
+      mode = event.detail.value
+    }
+    wx.showLoading()
+    app.post('customer/recommend', 
+      that.getRecommendData(mode), (res) => {
+      if (res.success) {
+        Dialog.alert({
+          message: '已成功生成推荐资料'
+        }).then(() => {
+          that.setData({
+            activeTab: 4,
+            filterCheckAll: false,
+            filterChecked: [],
+            ['info.recommend']: res.data
+          })
+        })
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        })
+      }
+    }, () => {
+      wx.hideLoading()
+    })
+  },
+
+  viewRecommend: function(event) {
+    let item = event.currentTarget.dataset.data
+    //if (item.mode == 0) {
+      wx.navigateTo({
+        url: '../../contact/recommend/recommend?id=' + item.token
+      })
+    // } else {
+    //   wx.showLoading({title: '加载中'})
+    //   wx.downloadFile({
+    //     url: app.globalData.serverUrl + '/index/print/' + item.token + '/' + item.mode,
+    //     success: function (res) {
+    //       if (res.statusCode === 200) {
+    //         wx.openDocument({
+    //           showMenu: true,
+    //           fileType: 'pdf',
+    //           filePath: res.tempFilePath,
+    //           success: function (res) {
+    //           }
+    //         })
+    //       }
+    //     },
+    //     complete: function() {
+    //       wx.hideLoading()
+    //     }
+    //   })
+    //}
+  },
+
+  removeRecommend : function(event) {
+    let that = this
+    Dialog.confirm({
+      title: '删除资料',
+      message: '删除后，已分享给客户的资料将无法查看，确定要删除吗？',
+    })
+    .then(() => {
+      wx.showLoading()
+      const idx = event.currentTarget.dataset.index
+      const item = that.data.info.recommend[idx]
+      app.post('customer/removeRecommend', {
+        id: item.id
+      }, (res) => {
+        if (res.success) {
+          that.data.info.recommend.splice(idx, 1)
+          that.setData({
+            ['info.recommend']: that.data.info.recommend
+          })
+        } else {
+          Dialog.alert({
+            title: '发生错误',
+            message: res.message ? res.message : '系统异常'
+          })
+        }
+      }, () => {
+        wx.hideLoading()
+      })
+    })
+    .catch(() => {
     })
   }
 })

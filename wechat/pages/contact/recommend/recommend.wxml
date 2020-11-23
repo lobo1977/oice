@@ -25,18 +25,34 @@
     </van-cell>
   </van-cell-group>
 
+  <van-cell-group title="推荐人">
+    <van-cell title="{{manager.title}}" label="{{company.full_name}}" title-width="370rpx"
+      center custom-class="cell-building">
+      <image slot="icon" mode="aspectFill" wx:if="{{manager.avatar}}"
+        src="{{filter.imageUrl(manager.avatar)}}" class="cell-image"></image>
+      <van-icon name="phone" size="25px" wx:if="{{manager.mobile}}"
+        data-data="{{manager}}" bindtap="bindPhoneCall"
+        color="blue" custom-style="margin-right:40rpx" />
+      <van-icon name="chat" size="25px" wx:if="{{manager.weixin || manager.mobile}}" 
+        data-data="{{manager}}" bindtap="bindCopyWeixin" color="green" />
+    </van-cell>
+  </van-cell-group>
+
   <view class="button-bar">
-    <van-cell-group>
-      <van-cell title="{{manager.title}}" label="{{company.full_name}}" title-width="370rpx"
-        center custom-class="cell-building">
-        <image slot="icon" mode="aspectFill" wx:if="{{manager.avatar}}"
-          src="{{filter.imageUrl(manager.avatar)}}" class="cell-image"></image>
-        <van-icon name="phone" size="25px" wx:if="{{manager.mobile}}"
-          data-data="{{manager}}" bindtap="bindPhoneCall"
-          color="blue" custom-style="margin-right:40rpx" />
-        <van-icon name="chat" size="25px" wx:if="{{manager.weixin || manager.mobile}}" 
-          data-data="{{manager}}" bindtap="bindCopyWeixin" color="green" />
-      </van-cell>
-    </van-cell-group>
+    <van-row gutter="0" custom-class="button-bar">
+      <van-col span="24">
+        <van-button square type="primary" icon="newspaper-o" block bind:click="download">下载PDF</van-button>
+      </van-col>
+    </van-row>
   </view>
+
+  <van-action-sheet
+    show="{{ showPDFType }}"
+    actions="{{ pdfType }}"
+    bind:close="onPDFTypeClose"
+    bind:select="onPDFTypeSelect"
+    description="请选择资料版式"
+  />
+
+  <van-dialog id="van-dialog" />
 </view>

@@ -2,13 +2,24 @@
 <page-meta background-text-style="dark">
 </page-meta>
 <wxs src="../../../utils/filter.wxs" module="filter" />
+<wxs module="script">
+  var modeType = function(type, mode) {
+    for (var i = 0; i < type.length; ++i) {
+      if (type[i].value == mode) {
+        return type[i].name
+      }
+    }
+    return ''
+  }
+  module.exports.modeType = modeType
+</wxs>
 <view class="page-view">
   <van-cell-group>
     <van-cell title="{{info.customer_name}}" title-class="cell-title" custom-class="cell-view"></van-cell>
   </van-cell-group>
   <van-steps steps="{{ steps }}" active="{{ activeStep }}" active-color="{{ activeColor }}" active-icon="{{ activeIcon }}" />
-  <van-tabs swipe-threshold="5" sticky>
-    <van-tab title="基本信息">
+  <van-tabs swipe-threshold="5" sticky active="{{ activeTab }}" bind:change="onTabChange">
+    <van-tab title="信息">
       <van-cell-group>
         <van-cell title="直线电话" wx:if="{{info.tel}}"
           custom-class="cell-view" title-width="160rpx" 
@@ -110,7 +121,7 @@
         </van-col>
       </van-row>
     </van-tab>
-    <van-tab title="跟进纪要">
+    <van-tab title="跟进">
       <van-steps steps="{{ logs }}" active="{{ 0 }}" direction="vertical" />
       <van-row gutter="0" custom-class="button-bar">
         <van-col span="24">
@@ -135,25 +146,58 @@
         </van-col>
       </van-row>
     </van-tab>
-    <van-tab title="项目筛选">
-      <van-cell-group>
+    <van-tab title="筛选">
+      <view style="background-color:#fff;height:36px;">
+        <van-row>
+          <van-col span="18">
+            <van-button type="primary" size="small" color="transparent" bind:click="toggleFilterCheckbox" custom-style="color:#1989fa;">选择</van-button>
+          </van-col>
+          <van-col span="6" class="check-all">
+            <van-checkbox wx:if="{{showFilterCheckbox}}" checked-color="#07c160" value="{{filterCheckAll}}" bind:change="toggleFilterCheckAll">
+              全选
+            </van-checkbox>
+          </van-col>
+        </van-row>
+      </view>
+
+      <van-checkbox-group wx:if="{{info.filter.length}}" value="{{ filterChecked }}" bind:change="filterCheckChange">
         <van-swipe-cell wx:for="{{info.filter}}" wx:for-index="idx" wx:key="id" right-width="{{ 60 }}" disabled="{{!info.allowFollow}}">
           <van-cell data-data="{{ item }}" 
-            title="{{item.title}}" label="{{item.desc}}" center
+            title="{{item.title}}" label="{{item.desc}}" center value-class="value-class"
             bind:click="bindViewBuilding" custom-class="cell-contact">
             <image slot="icon" mode="aspectFill" 
               src="{{filter.imageUrl(item.src)}}" class="cell-image"></image>
+            <van-checkbox wx:if="{{showFilterCheckbox}}" class="checkboxes-{{ idx }}" checked-color="#07c160" name="{{ idx }}" catch:tap="noop" />
           </van-cell>
           <view slot="right" style="height:100%">
-            <van-button square type="danger" data-index="{{ idx }}" custom-style="height:100%" bindtap="bindRemoveFilter">删除</van-button>
+            <van-button square type="danger" data-index="{{ idx }}" custom-style="height:100%" bindtap="removeFilter">删除</van-button>
+          </view>
+        </van-swipe-cell>
+      </van-checkbox-group>
+      <van-row gutter="0" custom-class="button-bar">
+        <van-col span="12">
+          <van-button square type="primary" icon="filter-o" block bind:click="bindAddFilter" disabled="{{ !info.allowFollow }}">添加筛选</van-button>
+        </van-col>
+        <van-col span="12">
+          <van-button square type="danger" icon="newspaper-o" block bind:click="toRecommend" disabled="{{ !info.allowFollow || filterChecked.length == 0 }}">生成推荐资料</van-button>
+        </van-col>
+      </van-row>
+    </van-tab>
+    <van-tab title="推荐">
+      <van-cell-group>
+        <van-swipe-cell wx:for="{{info.recommend}}" wx:for-index="idx" wx:key="id" right-width="{{ 60 }}" disabled="{{!info.allowFollow}}">
+          <van-cell data-data="{{ item }}" title-width="200px"
+            title="{{item.building + '(' + item.building_count + '个项目)'}}" label="{{item.create_time}}"
+            is-link center
+            bind:click="viewRecommend">
+            <image slot="icon" mode="aspectFill" 
+              src="{{filter.imageUrl(item.image)}}" class="cell-image"></image>
+          </van-cell>
+          <view slot="right" style="height:100%">
+            <van-button square type="danger" data-index="{{ idx }}" custom-style="height:100%" bindtap="removeRecommend">删除</van-button>
           </view>
         </van-swipe-cell>
       </van-cell-group>
-      <van-row gutter="0" custom-class="button-bar">
-        <van-col span="24">
-          <van-button square type="primary" icon="filter-o" block bind:click="bindAddFilter" disabled="{{ !info.allowFollow }}">添加筛选</van-button>
-        </van-col>
-      </van-row>
     </van-tab>
   </van-tabs>
 
@@ -214,6 +258,14 @@
     actions="{{ attachActions }}"
     bind:close="onAttachActionsClose"
     bind:select="onAttachActionsSelect"
+  />
+
+  <van-action-sheet
+    show="{{ showRecommendType }}"
+    actions="{{ recommendType }}"
+    bind:close="onRecommendTypeClose"
+    bind:select="onRecommendTypeSelect"
+    description="请选择资料版式"
   />
 
   <van-dialog id="van-dialog" z-index="200" />

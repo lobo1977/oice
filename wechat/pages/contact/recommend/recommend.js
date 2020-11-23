@@ -1,4 +1,6 @@
 // pages/contact/recommend.js
+import Dialog from '../../../miniprogram_npm/@vant/weapp/dialog/dialog';
+
 //获取应用实例
 const app = getApp()
 
@@ -6,7 +8,7 @@ Page({
   data: {
     isLoading: false,
     isPullDown: false,
-    id: 0,
+    id: '',
     customer: {
       title: '',
       customer_name: ''
@@ -19,7 +21,14 @@ Page({
       mobile: ''
     },
     date: '',
-    list: []
+    list: [],
+    showPDFType: false,
+    pdfType: [ 
+      {name: '标准版', value: 1}, 
+      {name: '中英对照', value: 2}, 
+      {name: '横版', value: 3}, 
+      {name: '对比表', value: 4}
+    ],
   },
   
   onLoad(options) {
@@ -95,7 +104,7 @@ Page({
     
     let url = 'customer/show?id=' + that.data.id
     app.get(url, (res) => {
-      if (res.data) {
+      if (res.success) {
         that.setData({
           customer: res.data.customer,
           company: res.data.company,
@@ -103,10 +112,53 @@ Page({
           date: res.data.date,
           list: res.data.list
         })
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        }).then(() => {
+          wx.navigateBack()
+        })
       }
     }, () => {
       that.data.isLoading = false
       wx.hideLoading()
+    })
+  },
+
+  download: function() {
+    this.setData({
+      showPDFType: true
+    })
+  },
+
+  onPDFTypeClose: function() {
+    this.setData({
+      showPDFType: false
+    })
+  },
+
+  onPDFTypeSelect: function(event) {
+    this.setData({
+      showPDFType: false
+    })
+    wx.showLoading({title: '加载中'})
+    wx.downloadFile({
+      url: app.globalData.serverUrl + '/index/print/' + this.data.id + '/' + event.detail.value,
+      success: function (res) {
+        if (res.statusCode === 200) {
+          wx.openDocument({
+            showMenu: true,
+            fileType: 'pdf',
+            filePath: res.tempFilePath,
+            success: function (res) {
+            }
+          })
+        }
+      },
+      complete: function() {
+        wx.hideLoading()
+      }
     })
   }
 })

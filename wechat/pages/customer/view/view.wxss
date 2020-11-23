@@ -1,1 +1,10 @@
 /* pages/customer/view/view.wxss */
+.check-all {
+  font-size:0.8em;
+}
+.check-all .van-col--6 {
+  padding-top: 9px;
+}
+.value-class {
+  flex: none !important;
+}
