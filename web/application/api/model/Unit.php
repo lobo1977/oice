@@ -60,6 +60,10 @@ class Unit extends Base
    */
   public static function formatInfo($unit) {
     if ($unit != null) {
+      if ($unit->create_time) {
+        $unit->create_time_text = date('Y年n月j日 h:i', strtotime($unit->create_time));
+      }
+
       if (!empty($unit->building_no)) {
         if (!empty($unit->title)) {
           $unit->title = $unit->title . $unit->building_no . ' ';
@@ -83,6 +87,9 @@ class Unit extends Base
         if ($unit->status != 1) {
           $unit->title = $unit->title . '(' . $unit->statusText . ')';
         }
+      }
+      if (isset($unit->share) && $unit->share == 0) {
+        $unit->title = $unit->title . '[私有]';
       }
 
       if (empty($unit->file)) {
@@ -200,10 +207,12 @@ class Unit extends Base
     $unit = self::alias('a')
       ->join('building b', 'a.building_id = b.id')
       ->leftJoin('share s', "s.type = 'unit' and a.id = s.object_id and s.user_id = " . $user_id)
+      ->leftJoin('user u', 'a.user_id = u.id')
       ->where('a.id', $id)
-      ->field('a.id,building_id,b.building_name,a.building_no,a.floor,a.room,a.face,' .
-        'a.acreage,a.rent_sell,a.rent_price,a.sell_price,a.decoration,a.status,' . 
-        'a.end_date,a.rem,a.share,a.user_id,a.company_id,s.level as share_level')
+      ->field('a.id,building_id,b.building_name,a.building_no,a.floor,a.room,a.face,
+        a.acreage,a.rent_sell,a.rent_price,a.sell_price,a.decoration,a.status,
+        a.end_date,a.rem,a.share,a.user_id,a.company_id,a.create_time,u.title as user,u.avatar,
+        s.level as share_level')
       ->find();
 
     if ($unit == null) {
@@ -211,6 +220,16 @@ class Unit extends Base
     } else if ($operate != 'notes' && !self::allow($user, $unit, $operate)) {
       self::exception('您没有权限' . ($operate == 'view' ? '查看' : '修改') . '此单元。');
     } else {
+
+      if (isset($unit->avatar) && $unit->avatar) {
+        $find = strpos($unit->avatar, 'http');
+        if ($find === false || $find > 0) {
+          $unit->avatar = '/upload/user/images/60/' . $unit->avatar;
+        }
+      } else {
+        $unit->avatar = '/static/img/avatar.png';
+      }
+
       $images = [];
       $videos = [];
       
@@ -246,6 +265,14 @@ class Unit extends Base
         }
       }
     }
+
+    if (empty($user) || (!$user->isAdmin && $unit->company_id != $user->company_id)) {
+      unset($unit['user']);
+      unset($unit['avatar']);
+      unset($unit['create_time']);
+      unset($unit['create_time_text']);
+    }
+
     return $unit;
   }
 
@@ -260,6 +287,12 @@ class Unit extends Base
     $user_id = 0;
     if ($user) {
       $user_id = $user->id;
+    }
+
+    $copy = 0;
+    if (isset($data['copy'])) {
+      $copy = $data['copy'];
+      unset($data['copy']);
     }
 
     if (isset($data['floor']) && ($data['floor'] == 'null' || empty($data['floor']))) {
@@ -489,6 +522,29 @@ class Unit extends Base
           $linkman['type'] = 'unit';
           $linkman['owner_id'] = $newData->id;
           Linkman::addUp($user, 0, $linkman);
+        }
+
+        if ($copy > 0) {
+          // 复制图片
+          $fileData = db('file')
+            ->where('type', 'unit')
+            ->where('parent_id', $copy)
+            ->where('delete_time', 'null')
+            ->field('type,' . $newData->id . ' as parent_id,title,file,size,default,sort,now() as create_time,' . $user_id . 'as user_id')
+            ->select();
+          if ($fileData) {
+            db('file')->insertAll($fileData);
+          }
+          // 复制联系人
+          $linkmanData = db('linkman')
+            ->where('type', 'unit')
+            ->where('parent_id', $copy)
+            ->where('delete_time', 'null')
+            ->field('type,' . $newData->id . ' as owner_id,title,department,job,mobile,tel,email,weixin,qq,rem,status,now() as create_time,' . $user_id . 'as user_id')
+            ->select();
+          if ($linkmanData) {
+            db('linkman')->insertAll($linkmanData);
+          }
         }
 
         return $newData->id;

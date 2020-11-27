@@ -8,8 +8,8 @@
           @touchstart.native="itemMouseDown" @touchend.native="itemMouseUp"
           @click.native="itemClick(item)">
           <div slot="right-menu">
-            <swipeout-button v-if="user.isAdmin && !item.isAdmin" @click.native.stop="turn(item)" type="primary">转交</swipeout-button>
-            <swipeout-button v-if="user.isAdmin && !item.isAdmin" @click.native.stop="remove(item)" type="warn">移除</swipeout-button>
+            <swipeout-button v-if="user.isCompanyAdmin && !item.isAdmin" @click.native.stop="turn(item)" type="primary">转交</swipeout-button>
+            <swipeout-button v-if="user.isCompanyAdmin && !item.isAdmin" @click.native.stop="remove(item)" type="warn">移除</swipeout-button>
           </div>
           <cell slot="content" :title="item.title">
             <img slot="icon" :src="item.avatar" class="cell-image">
@@ -41,7 +41,7 @@ export default {
   data () {
     return {
       user: {
-        isAdmin: false
+        isCompanyAdmin: false
       },
       id: 0,
       isLoading: false,
@@ -112,7 +112,7 @@ export default {
     },
     turn (user) {
       let vm = this
-      if (this.user && this.user.isAdmin) {
+      if (this.user && this.user.isCompanyAdmin) {
         this.$vux.confirm.show({
           title: '转交企业',
           content: '确定要将管理权限转交给 <strong>' + user.title + '</strong> 吗？',
@@ -149,7 +149,7 @@ export default {
     },
     remove (user) {
       let vm = this
-      if (this.user && this.user.isAdmin) {
+      if (this.user && this.user.isCompanyAdmin) {
         this.$vux.confirm.show({
           title: '移除成员',
           content: '确定要移除成员 <strong>' + user.title + '</strong> 吗？',

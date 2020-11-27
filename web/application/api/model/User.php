@@ -22,8 +22,15 @@ class User extends Base
   public static function formatData($user) {
     if ($user == null) return null;
     if (isset($user->company_admin)) {
-      $user->isAdmin = $user->id == $user->company_admin;
+      $user->isCompanyAdmin = $user->id == $user->company_admin;
       unset($user->company_admin);
+    } else {
+      $user->isCompanyAdmin = false;
+    }
+    if (isset($user['type'])) {
+      $user->isAdmin = $user['type'] == 1;
+      $user->isSystem = $user['type'] == 2;
+      $user->isLimited = $user['type'] == 10;
     }
     if (isset($user->avatar) && $user->avatar) {
       $find = strpos($user->avatar, 'http');

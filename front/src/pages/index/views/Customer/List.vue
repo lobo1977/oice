@@ -51,6 +51,9 @@ export default {
             this.isEnd = true
           }
           for (let item in newData) {
+            if (newData[item].clash > 0) {
+              newData[item].title = newData[item].title + '<span style="color:red">（撞单）</span>'
+            }
             this.list.push(newData[item])
           }
         } else {

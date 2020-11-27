@@ -27,6 +27,10 @@ Page({
       statusText: '',
       end_date_text: '', // 到日期
       rem: '',           // 备注
+      user_id: 0,
+      user: '',
+      avatar: '',
+      create_time_text: '',
       key: '',
       isFavorite: false,
       allowNew: false,
@@ -141,6 +145,12 @@ Page({
     })
   },
 
+  bindCopy: function(event) {
+    wx.navigateTo({
+      url: '../edit/edit?id=' + this.data.info.id + '&copy=1'
+    })
+  },
+
   bindDelete: function() {
     Dialog.confirm({
       title: '删除确认',
@@ -172,7 +182,7 @@ Page({
     }
     
     app.get(url, (res) => {
-      if (res.data) {
+      if (res.success && res.data) {
         let prevList = []
         if (res.data.videos.length) {
           res.data.videos.forEach(element => {
@@ -195,6 +205,13 @@ Page({
         that.setData({
           info: res.data,
           previewImages: prevList
+        })
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        }).then(() => {
+          wx.navigateBack()
         })
       }
     }, () => {

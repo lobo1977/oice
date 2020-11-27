@@ -95,7 +95,16 @@ class Log extends Base
       }
     }
     if ($operate == 'view') {
-      User::formatData($log);
+
+      if (isset($log->avatar) && $log->avatar) {
+        $find = strpos($log->avatar, 'http');
+        if ($find === false || $find > 0) {
+          $log->avatar = '/upload/user/images/60/' . $log->avatar;
+        }
+      } else {
+        $log->avatar = '/static/img/avatar.png';
+      }
+
       if ($log->building_no || $log->floor || $log->room) {
         $log->unit_name = $log->building_no;
         if ($log->floor > 0) {

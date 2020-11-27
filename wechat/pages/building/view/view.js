@@ -6,6 +6,7 @@ const app = getApp()
 
 Page({
   data: {
+    me: null,
     isLoading: false,
     isPullDown: false,
     isVideoPlay: false,
@@ -38,7 +39,12 @@ Page({
       traffic: '',          // 交通状况
       environment: '',      // 周边环境
       user_id: 0,
+      user: '',
+      avatar: '',
+      create_time_text: '',
       short_url: '',
+      share: 0,
+      status : 0,
       key: '',
       isFavorite: false,
       allowEdit: false,
@@ -48,7 +54,10 @@ Page({
       unit: [],
       confirm: []
     },
-    previewImages: []
+    previewImages: [],
+    showAudit: false,
+    auditSummary: '',
+    auditError: false
   },
   
   onLoad(options) {
@@ -62,9 +71,15 @@ Page({
       that.data.info.key = options.key
     }
     if (app.globalData.appUserInfo) {
+      this.setData({
+        me: app.globalData.appUserInfo
+      })
       that.getView()
     } else {
       app.userLoginCallback = () => {
+        this.setData({
+          me: app.globalData.appUserInfo
+        })
         that.getView()
       }
     }
@@ -163,6 +178,12 @@ Page({
     })
   },
 
+  bindCopy: function(event) {
+    wx.navigateTo({
+      url: '../edit/edit?id=' + this.data.info.id + '&copy=1'
+    })
+  },
+
   bindAddUnit: function() {
     wx.navigateTo({
       url: '../../unit/edit/edit?bid=' + this.data.info.id
@@ -174,12 +195,82 @@ Page({
       url: '../../linkman/edit/edit?type=building&oid=' + this.data.info.id
     })
   },
+
+  bindAudit: function() {
+    this.setData({
+      auditSummary: '',
+      auditError: false,
+      showAudit: true
+    })
+  },
+
+  auditSummaryChange: function(event) {
+    this.data.auditSummary = event.detail
+    if (event.detail.length > 0 && this.data.auditError) {
+      this.setData({
+        auditError: false
+      })
+    }
+  },
+
+  onAuditClose: function(event) {
+    if (event.detail == 'cancel') {
+      if (this.data.auditSummary.length == 0) {
+        this.setData({
+          showAudit: false
+        })
+        this.setData({
+          auditError: true,
+          showAudit: true
+        })
+      } else {
+        this.setData({
+          auditError: false
+        })
+        this.doAudit(2)
+      }
+    } else if (event.detail == 'confirm') {
+      this.data.auditSummary = ''
+      this.setData({
+        auditError: false
+      })
+      this.doAudit(1)
+    } else {
+      this.setData({
+        showAudit: false
+      })
+    }
+  },
+
+  doAudit: function(flag) {
+    let that = this
+    that.setData({
+      showAudit: false
+    })
+    wx.showLoading()
+    app.post('building/audit', {
+      id: that.data.info.id,
+      status: flag,
+      summary: that.data.auditSummary
+    }, (res) => {
+      if (res.success) {
+        app.globalData.refreshBuilding = true
+        wx.navigateBack()
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        })
+      }
+    }, () => {
+      wx.hideLoading()
+    })
+  },
   
   // 获取数据
   getView: function() {
     let that = this
     that.data.isLoading = true
-    
     if (that.data.isPullDown == false) {
       wx.showLoading({
         title: '加载中',
@@ -194,7 +285,7 @@ Page({
     }
     
     app.get(url, (res) => {
-      if (res.data) {
+      if (res.success && res.data) {
         let prevList = []
         if (res.data.videos.length) {
           res.data.videos.forEach(element => {
@@ -217,6 +308,13 @@ Page({
         that.setData({
           info: res.data,
           previewImages: prevList
+        })
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        }).then(() => {
+          wx.navigateBack()
         })
       }
     }, () => {

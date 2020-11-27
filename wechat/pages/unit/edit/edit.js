@@ -7,6 +7,7 @@ Page({
   data: {
     activeTab: 1,
     id: 0,
+    copy:0,
     face: [{name: '东', type: 'default'},{name: '西', type: 'default'},{name: '南', type: 'default'},{name: '北', type: 'default'}],
     showFace: false,
     rent_sell: [{name: '出租'}, {name: '出售'}, {name: '出租，出售'}],
@@ -23,6 +24,7 @@ Page({
     maxEndDate: Date.now() + 365 * 24 * 60 * 60 * 1000,
     info: {
       __token__: '',
+      copy: 0,
       building_id: 0,
       building_no: '',      // 楼栋
       floor: null,          // 楼层
@@ -74,7 +76,8 @@ Page({
         title: '修改单元信息'
       })
       that.setData({
-        id: options.id
+        id: options.id,
+        copy: options.copy ? options.copy : 0
       })
     } else {
       wx.setNavigationBarTitle({
@@ -147,7 +150,7 @@ Page({
     wx.showLoading({
       title: '加载中',
     })
-    let url = 'unit/edit?id=' + that.data.id
+    let url = 'unit/edit?id=' + that.data.id + '&copy=' + that.data.copy
     app.get(url, (res) => {
       if (res.success && res.data) {
         let info = that.data.info

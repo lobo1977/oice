@@ -36,6 +36,15 @@
     <van-cell title="{{info.rem}}" />
   </van-cell-group>
 
+  <van-cell-group title="录入人" wx:if="{{info.user}}">
+    <van-cell data-data="{{ info.user_id }}"
+      title="{{info.user}}" label="录入时间：{{info.create_time_text}}" center is-link
+      link-type="navigateTo" url="../../contact/view/view?id={{info.user_id}}" custom-class="cell-contact">
+      <image slot="icon" mode="aspectFill" 
+        src="{{filter.imageUrl(info.avatar)}}" class="cell-image"></image>
+    </van-cell>
+  </van-cell-group>
+
   <van-cell-group title="联系人" wx:if="{{info.allowEdit || (info.linkman && info.linkman.length)}}">
     <van-cell wx:for="{{info.linkman}}" wx:key="id" data-data="{{item}}"
       title="{{item.title}}" center custom-class="cell-view"
@@ -53,6 +62,10 @@
       </view>
     </van-cell>
   </van-cell-group>
+
+  <view wx:if="{{ info.allowEdit }}" style="padding:15px 0;text-align:center;">
+    <van-button plain round type="primary" bind:click="bindCopy">复制单元</van-button>
+  </view>
 
   <van-dialog id="van-dialog" />
 

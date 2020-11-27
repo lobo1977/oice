@@ -27,7 +27,7 @@
         "name": "待认领",
         "value": "empty"
     }, {
-        "name": "NEW",
-        "value": "NEW"
+        "name": "私有",
+        "value": "private"
     }
 ]

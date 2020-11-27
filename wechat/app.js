@@ -259,6 +259,9 @@ App({
       }, {
         text: "待认领",
         value: "empty"
+      }, {
+        text: "私有",
+        value: "private"
       }
     ],
     refreshBuilding: false,

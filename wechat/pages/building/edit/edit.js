@@ -7,6 +7,7 @@ Page({
   data: {
     activeTab: 1,
     id: 0,
+    copy: 0,
     areaData: [],
     showArea: false,
     type:[],
@@ -19,6 +20,7 @@ Page({
     numberCompletionDate: Date.now(),
     info: {
       __token__: '',
+      copy: 0,
       building_name: '',    // 名称
       type: '',             // 类别
       level: '',            // 等级
@@ -94,7 +96,8 @@ Page({
         title: '修改项目信息'
       })
       that.setData({
-        id: options.id
+        id: options.id,
+        copy: options.copy ? options.copy : 0
       })
     } else {
       wx.setNavigationBarTitle({
@@ -164,7 +167,7 @@ Page({
     wx.showLoading({
       title: '加载中',
     })
-    let url = 'building/edit?id=' + that.data.id
+    let url = 'building/edit?id=' + that.data.id + '&copy=' + that.data.copy
     app.get(url, (res) => {
       if (res.success && res.data) {
         let arrType = []

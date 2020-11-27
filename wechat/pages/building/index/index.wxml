@@ -34,6 +34,9 @@
       <view slot="title">
         {{item.building_name}}
         <van-tag type="success" wx:if="{{item.rent_sell}}" custom-class="cell-tag">{{item.rent_sell}}</van-tag>
+        <van-tag type="warning" wx:if="{{ item.user_id > 0 && item.share == 1 && item.status == 0}}" custom-class="cell-tag">待审核</van-tag>
+        <van-tag type="danger" wx:if="{{item.share == 1 && item.status == 2}}" custom-class="cell-tag">已驳回</van-tag>
+        <van-icon name="closed-eye" wx:if="{{ item.share == 0 && item.user_id > 0 }}" custom-style="position:relative;top:3px;margin-left:5px;" />
       </view>
       <image slot="icon" mode="aspectFill" 
         src="{{filter.imageUrl(item.src)}}" class="cell-image"></image>

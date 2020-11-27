@@ -14,6 +14,13 @@
   module.exports.modeType = modeType
 </wxs>
 <view class="page-view">
+  <van-notice-bar wx:if="{{info.id > 0 && info.clash > 0}}"
+    left-icon="warn-o"
+    mode="closeable"
+    speed="30"
+    text="该客户发生撞单，暂时不能跟进，请{{ info.allowClash ? '尽快' : '联系管理员' }}处理。"
+  />
+
   <van-cell-group>
     <van-cell title="{{info.customer_name}}" title-class="cell-title" custom-class="cell-view"></van-cell>
   </van-cell-group>
@@ -108,7 +115,8 @@
 
       <van-row gutter="0" custom-class="button-bar">
         <van-col span="{{info.isShare ? 12 : 10}}">
-          <van-button square type="primary" icon="notes-o" block bind:click="bindAddLog" disabled="{{ !info.allowFollow }}">跟进</van-button>
+          <van-button square type="primary" icon="notes-o" block bind:click="bindAddLog" wx:if="{{ info.clash == 0 || !info.allowClash }}" disabled="{{ !info.allowFollow }}">跟进</van-button>
+          <van-button square type="primary" icon="cluster-o" block bind:click="auditClash" wx:if="{{ info.clash > 0 && info.allowClash }}">撞单处理</van-button>
         </van-col>
         <van-col wx:if="{{!info.isShare}}" span="7">
           <van-button square type="info" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}">编辑</van-button>
@@ -266,6 +274,13 @@
     bind:close="onRecommendTypeClose"
     bind:select="onRecommendTypeSelect"
     description="请选择资料版式"
+  />
+
+  <van-action-sheet
+    show="{{ showClashMenu }}"
+    actions="{{ clashWay }}"
+    bind:close="onClashMenuClose"
+    bind:select="onClashMenuSelect"
   />
 
   <van-dialog id="van-dialog" z-index="200" />

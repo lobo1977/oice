@@ -131,7 +131,14 @@ class Confirm extends Base
           $confirm->developer = $confirm->building_company;
         }
         if ($operate == 'view') {
-          User::formatData($confirm);
+          if (isset($confirm->avatar) && $confirm->avatar) {
+            $find = strpos($confirm->avatar, 'http');
+            if ($find === false || $find > 0) {
+              $confirm->avatar = '/upload/user/images/60/' . $confirm->avatar;
+            }
+          } else {
+            $confirm->avatar = '/static/img/avatar.png';
+          }
           $confirm->allowEdit = self::allow($user, $confirm, 'edit');
           $confirm->allowDelete = self::allow($user, $confirm, 'delete');
         }

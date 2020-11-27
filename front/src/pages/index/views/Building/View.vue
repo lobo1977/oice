@@ -1,6 +1,6 @@
 <template>
   <div>
-    <topalert v-if="info.id > 0 && info.user_id == 0" type="info"
+    <topalert v-if="info.id > 0 && info.status == 3" type="info"
       message="该项目尚未被认领，您可以通过修改完善项目信息完成认领。"></topalert>
 
     <swiper v-if="info.videos.length || info.images.length" :auto="false" :loop="true" height="260px"
@@ -290,6 +290,16 @@ export default {
             for (let item in vm.info) {
               if (res.data[item] !== undefined && res.data[item] !== null) {
                 vm.info[item] = res.data[item]
+              } else if (Array.isArray(vm.info[item])) {
+                vm.info[item] = []
+              } else if (typeof vm.info[item] === 'string') {
+                vm.info[item] = ''
+              } else if (typeof vm.info[item] === 'number') {
+                vm.info[item] = 0
+              } else if (typeof vm.info[item] === 'boolean') {
+                vm.info[item] = false
+              } else {
+                vm.info[item] = null
               }
             }
             vm.info.building_type = res.data.type

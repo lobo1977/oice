@@ -5,6 +5,7 @@ const app = getApp()
 
 Page({
   data: {
+    me: null,
     pageIndex: 1,
     pageSize: 10,
     isLoading: false,
@@ -62,14 +63,24 @@ Page({
       filterType: app.globalData.buildingType
     })
     if (app.globalData.appUserInfo) {
+      this.setData({
+        me: app.globalData.appUserInfo
+      })
       this.getList()
     } else {
       app.userLoginCallback = () => {
+        this.setData({
+          me: app.globalData.appUserInfo
+        })
         this.getList()
       }
     }
   },
   onShow: function() {
+    if (app.globalData.refreshBuilding) {
+      this.getList()
+      app.globalData.refreshBuilding = false
+    }
   },
   onReady: function() {
     // 页面首次渲染完毕时执行

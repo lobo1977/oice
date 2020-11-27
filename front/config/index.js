@@ -20,15 +20,15 @@ module.exports = {
         ws: false
       },
       '/api' : {
-        target: 'http://m.o-ice.com',
+        target: 'https://m.o-ice.com',
         changeOrigin: true,
       },
       '/index' : {
-        target: 'http://m.o-ice.com',
+        target: 'https://m.o-ice.com',
         changeOrigin: true,
       },
       '/upload' : {
-        target: 'http://m.o-ice.com',
+        target: 'https://m.o-ice.com',
         changeOrigin: true,
       }
     },

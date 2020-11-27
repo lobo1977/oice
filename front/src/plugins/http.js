@@ -16,6 +16,7 @@ function ajax (url, method, data, contentType, cb) {
   }
 
   const $axios = axios.create({
+    withCredentials: false,
     headers: headers,
     transformRequest: function (data) {
       if (headers['Content-Type'].indexOf('x-www-form-urlencoded') > 0) {

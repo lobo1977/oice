@@ -56,7 +56,14 @@ class DailyReview extends Base
     }
 
     if ($operate == 'view') {
-      User::formatData($data);
+      if (isset($data->avatar) && $data->avatar) {
+        $find = strpos($data->avatar, 'http');
+        if ($find === false || $find > 0) {
+          $data->avatar = '/upload/user/images/60/' . $data->avatar;
+        }
+      } else {
+        $data->avatar = '/static/img/avatar.png';
+      }
       $data->levelText = self::$level[$data->level];
       $data->allowEdit = self::allow($user, $data, 'edit');
       $data->allowDelete = self::allow($user, $data, 'delete');
@@ -125,7 +132,14 @@ class DailyReview extends Base
     foreach($list as $item) {
       $item->levelText = self::$level[$item->level];
       $item->time_span = Utils::timeSpan($item->create_time);
-      User::formatData($item);
+      if (isset($item->avatar) && $item->avatar) {
+        $find = strpos($item->avatar, 'http');
+        if ($find === false || $find > 0) {
+          $item->avatar = '/upload/user/images/60/' . $item->avatar;
+        }
+      } else {
+        $item->avatar = '/static/img/avatar.png';
+      }
     }
 
     return $list;

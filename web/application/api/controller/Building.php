@@ -83,14 +83,19 @@ class Building extends Base
   /**
    * 添加/修改项目信息
    */
-  public function edit($id) {
+  public function edit($id = 0, $copy = 0) {
     if ($this->request->isGet()) {
       $form_token = $this->formToken();
       $companyList = Company::my($this->user);
       if ($id > 0) {
-        $data = modelBuilding::detail($this->user, $id, 'edit');
+        $data = modelBuilding::detail($this->user, $id, $copy == 0 ? 'edit' : 'view');
         $data->__token__ = $form_token;
         $data->companyList = $companyList;
+        if ($copy == 1) {
+          $data->id = 0;
+          $data->copy = $id;
+          $data->share = 0;
+        }
         return $this->succeed($data);
       } else {
         return $this->succeed([
@@ -256,6 +261,18 @@ class Building extends Base
       }
     }
     if ($result > 0) {
+      return $this->succeed();
+    } else {
+      return $this->fail();
+    }
+  }
+
+  /**
+   * 审核项目 
+  */
+  public function audit($id, $status = 1, $summary = '') {
+    $result = modelBuilding::audit($this->user, $id, $status, $summary);
+    if ($result == 1) {
       return $this->succeed();
     } else {
       return $this->fail();

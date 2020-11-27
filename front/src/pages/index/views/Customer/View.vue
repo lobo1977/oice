@@ -1,6 +1,7 @@
 <template>
   <div>
-    <topalert v-if="info.id > 0 && info.clash > 0" message="该客户已撞单，暂时不能跟进，请等候管理员处理。"></topalert>
+    <topalert v-if="info.id > 0 && info.clash > 0" 
+      :message="'该客户发生撞单，暂时不能跟进，请' + (info.allowClash ? '尽快' : '联系管理员') + '处理。'"></topalert>
 
     <tab :scroll-threshold="5">
       <tab-item @on-item-click="goTab(0)" :selected="tab === 0">基本信息</tab-item>
@@ -414,6 +415,16 @@ export default {
           for (let item in vm.info) {
             if (res.data[item] !== undefined && res.data[item] !== null) {
               vm.info[item] = res.data[item]
+            } else if (Array.isArray(vm.info[item])) {
+              vm.info[item] = []
+            } else if (typeof vm.info[item] === 'string') {
+              vm.info[item] = ''
+            } else if (typeof vm.info[item] === 'number') {
+              vm.info[item] = 0
+            } else if (typeof vm.info[item] === 'boolean') {
+              vm.info[item] = false
+            } else {
+              vm.info[item] = null
             }
           }
 
@@ -760,7 +771,11 @@ export default {
             text: '撞单处理完成。',
             width: '15em',
             onHide () {
-              vm.$router.push({name: 'Customer', query: {reload: 1}})
+              if (operate === 2) {
+                vm.$router.back()
+              } else {
+                vm.$router.push({name: 'Customer', query: {reload: 1}})
+              }
             }
           })
         } else {

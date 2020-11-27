@@ -30,9 +30,9 @@ class Customer extends Base
   protected static function formatList($list) {
     foreach($list as $key=>$customer) {
       $customer->title = '【' . self::$status[$customer->status] . '】' . $customer->customer_name;
-      if ($customer->clash) {
-        $customer->title = $customer->title . '<span style="color:red">（撞单）</span>';
-      }
+      //if ($customer->clash) {
+      //  $customer->title = $customer->title . '<span style="color:red">（撞单）</span>';
+      //}
       $customer->desc = (empty($customer->lease_buy) ? '' : $customer->lease_buy) . 
         (empty($customer->demand) ? '' : $customer->demand . ' ');
 
@@ -74,7 +74,7 @@ class Customer extends Base
     }
 
     if ($operate == 'view') {
-      return ($user->isAdmin && $customer->company_id == $user->company_id) || 
+      return ($user->isCompanyAdmin && $customer->company_id == $user->company_id) || 
         $customer->share_level !== null || $customer->user_id == $user->id || 
         ($customer->share && $customer->company_id > 0 && $customer->company_id == $user->company_id) || 
         ($user->id == $superior_id && $customer->company_id > 0 && $customer->company_id == $user->company_id);
@@ -82,29 +82,29 @@ class Customer extends Base
       return true;
     } else if ($operate == 'turn') {
       return $customer->company_id == $user->company_id &&
-        ($customer->user_id == $user->id || $user->isAdmin);
+        ($customer->user_id == $user->id || $user->isCompanyAdmin);
     } else if ($operate == 'edit') {
-      return (($user->isAdmin && $customer->company_id == $user->company_id) || 
+      return (($user->isCompanyAdmin && $customer->company_id == $user->company_id) || 
         $customer->user_id == $user->id || $customer->share_level > 0); 
         //&& (!$customer->clash || $customer->parallel);
     } else if ($operate == 'follow') {    // 跟进
       return (
-        ($user->isAdmin && $customer->company_id == $user->company_id) || 
+        ($user->isCompanyAdmin && $customer->company_id == $user->company_id) || 
         $customer->share_level !== null || $customer->user_id == $user->id || 
         ($customer->share && $customer->company_id > 0 && $customer->company_id == $user->company_id) || 
         ($user->id == $superior_id && $customer->company_id > 0 && $customer->company_id == $user->company_id)
-      ); //&& (!$customer->clash || $customer->parallel);
+      ) && (!$customer->clash || $customer->parallel);
     } else if ($operate == 'confirm') {   // 确认
       return $customer->user_id == $user->id &&
         $customer->company_id > 0 && $customer->company_id == $user->company_id && 
         (!$customer->clash || $customer->parallel);
     } else if ($operate == 'clash') {     // 撞单处理
-      return $user->isAdmin && $customer->clash &&
+      return $user->isCompanyAdmin && $customer->clash &&
         $customer->company_id == $user->company_id;
     } else if ($operate == 'delete') {    // 删除
       return ($customer->user_id == $user->id &&
         $customer->company_id > 0 && $customer->company_id == $user->company_id) ||
-        ($user->isAdmin && $customer->clash &&
+        ($user->isCompanyAdmin && $customer->clash &&
         $customer->company_id > 0 && $customer->company_id == $user->company_id) ||
         $customer->share_level > 1;
     } else {
@@ -271,7 +271,15 @@ class Customer extends Base
         $data->acreage = '';
       }
 
-      User::formatData($data);
+      if (isset($data->avatar) && $data->avatar) {
+        $find = strpos($data->avatar, 'http');
+        if ($find === false || $find > 0) {
+          $data->avatar = '/upload/user/images/60/' . $data->avatar;
+        }
+      } else {
+        $data->avatar = '/static/img/avatar.png';
+      }
+
       $data->key = md5('customer' . $data->id . config('wechat.app_secret'));
       $data->isShare = $data->share_level !== null;
       $data->allowEdit = self::allow($user, $data, 'edit');

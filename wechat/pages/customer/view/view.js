@@ -108,6 +108,23 @@ Page({
       {name: '打印版（横版）', value: 3}, 
       {name: '对比表', value: 4}
     ],
+    showClashMenu: false,
+    clashWay: [
+      {
+        name: '强行转交',
+        color: '#07c160',
+        value: 0
+      },
+      {
+        name: '并行处理',
+        value: 1
+      },
+      {
+        name: '驳回',
+        color: '#ee0a24',
+        value: 2
+      }
+    ]
   },
 
   /**
@@ -962,5 +979,70 @@ Page({
     })
     .catch(() => {
     })
+  },
+
+  auditClash: function() {
+    this.setData({
+      showClashMenu: true
+    })
+  },
+
+  onClashMenuClose: function() {
+    this.setData({
+      showClashMenu: false
+    })
+  },
+
+  clashPass: function(operate) {
+    let that = this
+    wx.showLoading()
+    app.post('customer/clashPass', {
+      id: that.info.data.id,
+      operate: operate
+    }, (res) => {
+      if (res.success) {
+        Dialog.alert({
+          message: '撞单处理完成'
+        }).then(() => {
+          if (operate === 2) {
+            app.globalData.refreshCustomer = true
+            wx.navigateBack()
+          } else {
+            that.getView()
+          }
+        })
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        })
+      }
+    }, () => {
+      wx.hideLoading()
+    })
+  },
+
+  onClashMenuSelect: function(event) {
+    let that = this
+    that.setData({
+      showClashMenu: false
+    })
+    if (event.detail.value === 2) {
+      Dialog.confirm({
+        title: '驳回确认',
+        message: '当前客户信息将被删除，确定要驳回处理吗？',
+      }).then(() => {
+        that.clashPass(event.detail.value)
+      })
+    } else if (event.detail.value === 0) {
+      Dialog.confirm({
+        title: '强行转交确认',
+        message: '被撞单客户将转交给当前用户，当前客户信息将被删除，确定要强行转交吗？',
+      }).then(() => {
+        that.clashPass(event.detail.value)
+      })
+    } else {
+      that.clashPass(event.detail.value)
+    }
   }
 })

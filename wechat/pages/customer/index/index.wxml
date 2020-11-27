@@ -19,9 +19,13 @@
   </van-sticky>
   <van-cell-group>
     <van-cell wx:for="{{list}}" wx:key="id"
-      title="{{item.title}}" label="{{item.desc}}" center
+      label="{{item.desc}}" center
       link-type="navigateTo"
       url="../view/view?id={{item.id}}">
+      <view slot="title">
+        {{item.title}}
+        <van-tag type="danger" wx:if="{{item.clash > 0}}">撞单</van-tag>
+      </view>
     </van-cell>
   </van-cell-group>
   

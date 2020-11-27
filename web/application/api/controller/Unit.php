@@ -49,14 +49,19 @@ class Unit extends Base
   /**
    * 添加/修改单元信息
    */
-  public function edit($id = 0) {
+  public function edit($id = 0, $copy = 0) {
     if ($this->request->isGet()) {
       $form_token = $this->formToken();
       $companyList = Company::my($this->user);
       if ($id > 0) {
-        $data = modelUnit::detail($this->user, $id, 'edit');
+        $data = modelUnit::detail($this->user, $id, $copy == 0 ? 'edit' : 'view');
         $data->__token__ = $form_token;
         $data->companyList = $companyList;
+        if ($copy == 1) {
+          $data->id = 0;
+          $data->copy = $id;
+          $data->share = 0;
+        }
         return $this->succeed($data);
       } else {
         return $this->succeed([
