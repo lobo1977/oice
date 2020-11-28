@@ -93,7 +93,7 @@ Page({
  
     if (options.id) {
       wx.setNavigationBarTitle({
-        title: '修改项目信息'
+        title: options.copy == 1 ? '添加项目' : '修改项目信息'
       })
       that.setData({
         id: options.id,
@@ -253,6 +253,7 @@ Page({
         }
 
         that.setData({
+          id: that.data.copy == 1 ? 0 : that.data.id,
           type: arrType,
           info: info,
           images: imageList,
