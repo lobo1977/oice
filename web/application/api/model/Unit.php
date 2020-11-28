@@ -530,7 +530,7 @@ class Unit extends Base
             ->where('type', 'unit')
             ->where('parent_id', $copy)
             ->where('delete_time', 'null')
-            ->field('type,' . $newData->id . ' as parent_id,title,file,size,default,sort,now() as create_time,' . $user_id . 'as user_id')
+            ->field('`type`,' . $newData->id . ' as parent_id,`title`,`file`,`size`,`default`,`sort`,now() as create_time,' . $user_id . ' as user_id')
             ->select();
           if ($fileData) {
             db('file')->insertAll($fileData);
@@ -538,9 +538,9 @@ class Unit extends Base
           // 复制联系人
           $linkmanData = db('linkman')
             ->where('type', 'unit')
-            ->where('parent_id', $copy)
+            ->where('owner_id', $copy)
             ->where('delete_time', 'null')
-            ->field('type,' . $newData->id . ' as owner_id,title,department,job,mobile,tel,email,weixin,qq,rem,status,now() as create_time,' . $user_id . 'as user_id')
+            ->field('`type`,' . $newData->id . ' as owner_id,`title`,`department`,`job`,`mobile`,`tel`,`email`,`weixin`,`qq`,`rem`,`status`,now() as create_time,' . $user_id . ' as user_id')
             ->select();
           if ($linkmanData) {
             db('linkman')->insertAll($linkmanData);
