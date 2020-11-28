@@ -319,7 +319,7 @@ class Building extends Base
     }
 
     if ($data->create_time) {
-      $data->create_time_text = date('Y年n月j日 h:i', strtotime($data->create_time));
+      $data->create_time_text = date('Y年n月j日 H:i', strtotime($data->create_time));
     }
 
     if ($operate != 'notes' && !self::allow($user, $data, $operate)) {

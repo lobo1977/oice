@@ -61,7 +61,7 @@ class Unit extends Base
   public static function formatInfo($unit) {
     if ($unit != null) {
       if ($unit->create_time) {
-        $unit->create_time_text = date('Y年n月j日 h:i', strtotime($unit->create_time));
+        $unit->create_time_text = date('Y年n月j日 H:i', strtotime($unit->create_time));
       }
 
       if (!empty($unit->building_no)) {
