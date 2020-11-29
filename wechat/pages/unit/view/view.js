@@ -35,6 +35,7 @@ Page({
       isFavorite: false,
       allowNew: false,
       allowEdit: false,
+      allowCopy: false,
       allowDelete: false,
       images: [],
       linkman: []

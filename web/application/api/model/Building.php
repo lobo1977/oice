@@ -79,9 +79,20 @@ class Building extends Base
           $building->user_id == $user->id || 
           ($building->company_id > 0 && $building->company_id == $user->company_id);
       }
+    } else if ($operate == 'copy') {
+      if ($user == null) {
+        return false;
+      }
+      return $building->share == 1 && $building->status == 1 && $building->user_id != $user->id && $building->company_id != $user->company_id;
     } else if ($operate == 'audit') {
+      if ($user == null) {
+        return false;
+      }
       return $user->isAdmin && $building->share == 1 && $building->status == 0;
     } else if ($operate == 'delete') {
+      if ($user == null) {
+        return false;
+      }
       return $user->isAdmin;
     } else {
       return false;
@@ -352,6 +363,7 @@ class Building extends Base
     if ($operate == 'view') {
       $data->isFavorite = false;
       $data->allowEdit = self::allow($user, $data, 'edit');
+      $data->allowCopy = self::allow($user, $data, 'copy');
       $data->allowAudit = self::allow($user, $data, 'audit');
       $data->allowDelete = self::allow($user, $data, 'delete');
       $data->unit = Unit::getByBuildingId($user, $id);

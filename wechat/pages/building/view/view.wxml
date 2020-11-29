@@ -155,10 +155,10 @@
     </van-col>
     <van-col span="{{info.allowDelete ? 7 : 8}}">
       <van-button wx:if="{{ info.allowAudit }}" square type="primary" icon="passed" block bind:click="bindAudit">审核</van-button>
-      <van-button wx:if="{{ info.share == 1 && info.status == 1 && info.company_id != me.company_id }}" square type="primary" icon="records" block bind:click="bindCopy">复制</van-button>
-      <van-button wx:if="{{ (info.user_id == 0 || info.user_id == me.id || info.company_id == me.company_id ) && !info.allowAudit }}" square type="primary" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}">编辑</van-button>
+      <van-button wx:if="{{ !info.allowAudit && info.allowCopy }}" square type="primary" icon="records" block bind:click="bindCopy">复制</van-button>
+      <van-button wx:if="{{ !info.allowAudit && !info.allowCopy }}" square type="primary" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}">编辑</van-button>
     </van-col>
-    <van-col span="3" wx:if="{{info.allowDelete}}">
+    <van-col span="3" wx:if="{{ info.allowDelete }}">
       <van-button square type="danger" icon="delete" block bind:click="bindDelete" disabled="{{ !info.allowDelete }}"></van-button>
     </van-col>
   </van-row>

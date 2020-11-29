@@ -44,6 +44,8 @@ class Unit extends Base
         $unit->share_level > 0 ||
         $unit->user_id == $user->id ||
         ($unit->company_id > 0 && $unit->company_id == $user->company_id));
+    } else if ($operate == 'copy') {
+      return $user != null && Building::allow($user, $building, 'edit');
     } else if ($operate == 'delete') {
       return $user != null && (
         Building::allow($user, $building, 'edit') ||
@@ -255,6 +257,7 @@ class Unit extends Base
         $unit->linkman = Linkman::getByOwnerId($user, 'unit', $id, true);
         $unit->allowNew = self::allow($user, $unit, 'new', $building);
         $unit->allowEdit = self::allow($user, $unit, 'edit', $building);
+        $unit->allowCopy = self::allow($user, $unit, 'copy', $building);
         $unit->allowDelete = self::allow($user, $unit, 'delete', $building);
         $unit->isFavorite = false;
         if ($user_id) {

@@ -48,6 +48,7 @@ Page({
       key: '',
       isFavorite: false,
       allowEdit: false,
+      allowCopy: false,
       allowAudit: false,
       allowDelete: false,
       images: [],
