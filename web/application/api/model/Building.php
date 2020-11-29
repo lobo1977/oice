@@ -79,8 +79,10 @@ class Building extends Base
           $building->user_id == $user->id || 
           ($building->company_id > 0 && $building->company_id == $user->company_id);
       }
+    } else if ($operate == 'audit') {
+      return $user->isAdmin && $building->share == 1 && $building->status == 0;
     } else if ($operate == 'delete') {
-      return false;
+      return $user->isAdmin;
     } else {
       return false;
     }
@@ -350,6 +352,7 @@ class Building extends Base
     if ($operate == 'view') {
       $data->isFavorite = false;
       $data->allowEdit = self::allow($user, $data, 'edit');
+      $data->allowAudit = self::allow($user, $data, 'audit');
       $data->allowDelete = self::allow($user, $data, 'delete');
       $data->unit = Unit::getByBuildingId($user, $id);
 
@@ -927,12 +930,11 @@ class Building extends Base
    * 审核项目
    */
   public static function audit($user, $id, $status = 1, $summary = '') {
-    if (!$user->isAdmin) {
-      self::exception('您没有权限审核项目。');
-    }
     $building = self::getById($user, $id);
     if ($building == null) {
       self::exception('项目不存在。');
+    } else if (!self::allow($user, $building, 'audit')) {
+      self::exception('您没有权限审核此项目。');
     }
     
     $result = $building->save([

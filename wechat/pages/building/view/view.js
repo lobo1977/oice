@@ -48,6 +48,7 @@ Page({
       key: '',
       isFavorite: false,
       allowEdit: false,
+      allowAudit: false,
       allowDelete: false,
       images: [],
       linkman: [],
@@ -340,6 +341,40 @@ Page({
         that.setData({
           ['info.isFavorite']: that.data.info.isFavorite ? false : true
         })
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        })
+      }
+    }, () => {
+      wx.hideLoading()
+    })
+  },
+
+  bindDelete: function() {
+    Dialog.confirm({
+      title: '删除确认',
+      message: '确定要删除这个项目吗？',
+    })
+    .then(() => {
+      this.remove()
+    })
+    .catch(() => {
+    });
+  },
+
+  remove: function() {
+    let that = this
+    wx.showLoading({
+      title: '删除中',
+    })
+    app.post('building/remove', {
+      id: that.data.info.id
+    }, (res) => {
+      if (res.success) {
+        app.globalData.refreshBuilding = true
+        wx.navigateBack()
       } else {
         Dialog.alert({
           title: '发生错误',
