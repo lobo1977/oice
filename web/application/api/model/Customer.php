@@ -288,7 +288,7 @@ class Customer extends Base
       $data->allowConfirm = self::allow($user, $data, 'confirm');
       $data->allowClash = self::allow($user, $data, 'clash');
       $data->allowDelete = self::allow($user, $data, 'delete');
-      $data->linkman = Linkman::getByOwnerId($user, 'customer', $id, true);
+      $data->linkman = Linkman::getByOwnerId($user, 'customer', $id, true, $data->allowEdit ? -1 : 0);
       $data->log = Log::getList($user, 'customer', $id);
       $data->filter = Filter::query($user, $id);
       $data->recommend = Recommend::query($user, $id);

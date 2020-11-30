@@ -374,7 +374,7 @@ class Building extends Base
       self::getShortUrl($data);
       
       if ($user) {
-        $data->linkman = Linkman::getByOwnerId($user, 'building', $id, true);
+        $data->linkman = Linkman::getByOwnerId($user, 'building', $id, true, $data->allowEdit ? -1 : 0);
         $data->confirm = Confirm::query($user, 0, $id);
         if (db('favorite')->where('user_id', $user->id)
           ->where('building_id', $id)->find()) {

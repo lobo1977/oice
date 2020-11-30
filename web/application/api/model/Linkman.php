@@ -36,15 +36,19 @@ class Linkman extends Base
   /**
    * 通过所有者ID获取联系人列表
    */
-  public static function getByOwnerId($user, $type, $id, $allow = false) {
+  public static function getByOwnerId($user, $type, $id, $allow = false, $status = -1) {
     if (!$allow && !self::allow($user, $type, $id, 'view')) {
       self::exception('您没有权限查看联系人。');
     }
     
     $list = self::where('type', $type)
-      ->where('owner_id', $id)
-      ->field('id,title,department,job,mobile,tel,email,weixin,qq,status')
-      ->order('id', 'asc')
+      ->where('owner_id', $id);
+
+    if ($status >= 0) {
+      $list->where('status', $status);
+    }
+    $list = $list->field('id,title,department,job,mobile,tel,email,weixin,qq,status')
+      ->order(['status' => 'asc', 'id' => 'asc'])
       ->select();
 
     foreach($list as $key=>$linkman) {

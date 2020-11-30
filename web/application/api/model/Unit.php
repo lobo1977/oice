@@ -254,7 +254,6 @@ class Unit extends Base
 
       if ($operate == 'view') {
         $building = Building::getById($user, $unit->building_id);
-        $unit->linkman = Linkman::getByOwnerId($user, 'unit', $id, true);
         $unit->allowNew = self::allow($user, $unit, 'new', $building);
         $unit->allowEdit = self::allow($user, $unit, 'edit', $building);
         $unit->allowCopy = self::allow($user, $unit, 'copy', $building);
@@ -266,6 +265,8 @@ class Unit extends Base
               $unit->isFavorite = true;
           }
         }
+
+        $unit->linkman = Linkman::getByOwnerId($user, 'unit', $id, true, $unit->allowEdit ? -1 : 0);
       }
     }
 
