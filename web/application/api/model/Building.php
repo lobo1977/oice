@@ -48,6 +48,9 @@ class Building extends Base
       $building->src = empty($building->file) ? '/static/img/error.png' : '/upload/building/images/300/' . $building->file;
       $building->fallbackSrc = '/static/img/error.png';
       $building->url = '/building/view/' . $building->id;
+      if (mb_strlen($building->address, 'utf-8') > 18) {
+        $building->address = mb_substr($building->address, 0, 17, 'utf-8') . '...';
+      }
     }
     return $list;
   }
