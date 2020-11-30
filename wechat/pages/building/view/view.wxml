@@ -121,6 +121,10 @@
     </van-cell>
   </van-cell-group>
 
+  <view wx:if="{{ info.allowCopy }}" style="padding:15px 0;text-align:center;">
+    <van-button plain round type="primary" bind:click="bindCopy">复制为私有</van-button>
+  </view>
+
   <van-dialog id="van-dialog" />
 
   <van-dialog id="audit-dialog"
@@ -155,8 +159,7 @@
     </van-col>
     <van-col span="{{info.allowDelete ? 7 : 8}}">
       <van-button wx:if="{{ info.allowAudit }}" square type="primary" icon="passed" block bind:click="bindAudit">审核</van-button>
-      <van-button wx:if="{{ !info.allowAudit && info.allowCopy }}" square type="primary" icon="records" block bind:click="bindCopy">复制</van-button>
-      <van-button wx:if="{{ !info.allowAudit && !info.allowCopy }}" square type="primary" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}">编辑</van-button>
+      <van-button wx:if="{{ !info.allowAudit }}" square type="primary" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}">编辑</van-button>
     </van-col>
     <van-col span="3" wx:if="{{ info.allowDelete }}">
       <van-button square type="danger" icon="delete" block bind:click="bindDelete" disabled="{{ !info.allowDelete }}"></van-button>

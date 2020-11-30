@@ -47,7 +47,7 @@
       <van-field value="{{ info.environment }}" type="textarea" maxlength="500" autosize bind:input="onEnvironmentInput" />
     </van-cell-group>
 
-    <van-cell-group>
+    <van-cell-group wx:if="{{ info.copy == 0 }}">
       <van-cell title="是否公开" label="公开后全网可见" title-width="200px">
         <van-switch checked="{{ info.share == 1 }}" bind:change="onShareChange" active-color="#07c160" />
       </van-cell>

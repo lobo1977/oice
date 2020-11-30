@@ -436,14 +436,14 @@ class Unit extends Base
         unset($data['user_id']);
       }
 
-      if ($oldData->user_id != $user_id) {
-        if (isset($data['share'])) {
-          unset($data['share']);
-        }
-        if (isset($data['company_id'])) {
-          unset($data['company_id']);
-        }
-      }
+      // if ($oldData->user_id != $user_id) {
+      //   if (isset($data['share'])) {
+      //     unset($data['share']);
+      //   }
+      //   if (isset($data['company_id'])) {
+      //     unset($data['company_id']);
+      //   }
+      // }
 
       if (isset($data['company_id']) && $data['company_id'] != $oldData->company_id) {
         $oldCompany = null;

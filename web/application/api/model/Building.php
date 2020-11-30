@@ -644,14 +644,16 @@ class Building extends Base
 
       if ($oldData->user_id == 0) {
         $data['user_id'] = $user_id;
-      } else if ($oldData->user_id != $user_id) {
-        if (isset($data['company_id'])) {
-          unset($data['company_id']);
-        }
-        if (isset($data['share'])) {
-          unset($data['share']);
-        }
-      }
+      } 
+      
+      // else if ($oldData->user_id != $user_id) {
+      //   if (isset($data['company_id'])) {
+      //     unset($data['company_id']);
+      //   }
+      //   if (isset($data['share'])) {
+      //     unset($data['share']);
+      //   }
+      // }
 
       if (isset($data['company_id']) && $data['company_id'] != $oldData->company_id) {
         $oldCompany = null;
@@ -676,7 +678,9 @@ class Building extends Base
           ' -> ' . self::$share[$data['share']] . '\n';
       }
 
-      if ($summary || $oldData->status == 3) {
+      if ($isAdmin && isset($data['share']) && $data['share'] == 1) {
+        $data['status'] = 1;
+      } else {
         $data['status'] = 0;
       }
 
@@ -706,6 +710,11 @@ class Building extends Base
       if (empty($data['floor_height'])) {
         unset($data['floor_height']);
       }
+      if ($isAdmin && isset($data['share']) && $data['share'] == 1) {
+        $data['status'] = 1;
+      } else {
+        $data['status'] = 0;
+      }
       $newData = new Building($data);
       $result = $newData->save();
 
@@ -729,21 +738,33 @@ class Building extends Base
             ->where('type', 'building')
             ->where('parent_id', $copy)
             ->where('delete_time', 'null')
-            ->field('`type`,' . $newData->id . ' as parent_id,`title`,`file`,`size`,`default`,`sort`,now() as create_time,' . $user_id . ' as user_id')
+            ->field('`type`,' . $newData->id . ' as parent_id,`title`,`file`,`size`,`default`,
+              `sort`,now() as create_time,' . $user_id . ' as user_id')
             ->select();
 
           if ($fileData) {
             db('file')->insertAll($fileData);
           }
           
-          // TODO:复制单元
+          // 复制单元
+          $unitData = db('unit')
+            ->where('building_id', $copy)
+            ->where('delete_time', 'null')
+            ->field('room,building_no,floor,face,acreage,rent_sell,rent_price,sell_price,decoration,`status`,end_date,`rem`,0 as `share`,' . 
+              $company_id . ' as `company_id`,' . $user_id . ' as user_id,now() as create_time')
+            ->select();
+
+          if ($unitData) {
+            db('unit')->insertAll($unitData);
+          }
 
           // 复制联系人
           $linkmanData = db('linkman')
             ->where('type', 'building')
             ->where('owner_id', $copy)
             ->where('delete_time', 'null')
-            ->field('`type`,' . $newData->id . ' as owner_id,`title`,`department`,`job`,`mobile`,tel,email,weixin,qq,rem,`status`,now() as create_time,' . $user_id . ' as user_id')
+            ->field('`type`,' . $newData->id . ' as owner_id,`title`,`department`,`job`,`mobile`,tel,email,
+              weixin,qq,rem,`status`,now() as create_time,' . $user_id . ' as user_id')
             ->select();
           if ($linkmanData) {
             db('linkman')->insertAll($linkmanData);
@@ -1073,6 +1094,7 @@ class Building extends Base
 
         $building['city'] = self::$city;
         $building['share'] = 0;
+        $building['status'] = 0;
         $building['user_id'] = $user_id;
         $building['company_id'] = $company_id;
 

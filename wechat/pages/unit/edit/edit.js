@@ -73,7 +73,7 @@ Page({
     }
     if (options.id) {
       wx.setNavigationBarTitle({
-        title: options.copy == 1 ? '添加单元' : '修改单元信息'
+        title: options.copy == 1 ? '复制单元' : '修改单元信息'
       })
       that.setData({
         id: options.id,
