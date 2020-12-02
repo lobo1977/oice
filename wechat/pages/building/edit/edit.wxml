@@ -3,6 +3,7 @@
 <view class="page-view">
   <van-tabs wx:if="{{id > 0}}" bind:change="bindTabChange">
     <van-tab title="基本信息"></van-tab>
+    <van-tab title="英文信息"></van-tab>
     <van-tab title="图片/视频"></van-tab>
   </van-tabs>
 
@@ -97,7 +98,46 @@
 
   </view>
 
-  <view wx:if="{{id > 0}}" hidden="{{activeTab != 2}}" style="padding:10px;">
+  <view wx:if="{{id > 0}}" hidden="{{activeTab != 2}}">
+    <van-cell-group>
+      <van-field title-width="80px" label="项目名称" value="{{ engInfo.name }}" required placeholder="{{ eng_name_error }}" error="{{ is_eng_name_empty }}" maxlength="30" bind:input="onEngNameInput" />
+    </van-cell-group>
+    <van-cell-group title="地理位置">
+      <van-field value="{{ engInfo.location }}" type="textarea" maxlength="500" autosize bind:input="onEngLocationInput" />
+    </van-cell-group>
+    <van-cell-group title="物业规模">
+      <van-field value="{{ engInfo.situation }}" type="textarea" maxlength="500" autosize bind:input="onEngSituationInput" />
+    </van-cell-group>
+    <van-cell-group title="开发商">
+      <van-field value="{{ engInfo.developer }}" type="textarea" maxlength="500" autosize bind:input="onEngDeveloperInput" />
+    </van-cell-group>
+    <van-cell-group title="物业管理">
+      <van-field value="{{ engInfo.manager }}" type="textarea" maxlength="500" autosize bind:input="onEngManagerInput" />
+    </van-cell-group>
+    <van-cell-group title="通讯设施">
+      <van-field value="{{ engInfo.network }}" type="textarea" maxlength="500" autosize bind:input="onEngNetworkInput" />
+    </van-cell-group>
+    <van-cell-group title="电梯">
+      <van-field value="{{ engInfo.elevator }}" type="textarea" maxlength="500" autosize bind:input="onEngElevatorInput" />
+    </van-cell-group>
+    <van-cell-group title="中央空调">
+      <van-field value="{{ engInfo.hvac }}" type="textarea" maxlength="500" autosize bind:input="onEngHvacInput" />
+    </van-cell-group>
+    <van-cell-group title="配套设施">
+      <van-field value="{{ engInfo.amenities }}" type="textarea" maxlength="500" autosize bind:input="onEngAmenitiesInput" />
+    </van-cell-group>
+    <van-cell-group title="入驻公司">
+      <van-field value="{{ engInfo.tenants }}" type="textarea" maxlength="500" autosize bind:input="onEngTenantsInput" />
+    </van-cell-group>
+
+    <van-row gutter="0" custom-class="button-bar">
+      <van-col span="24">
+        <van-button square type="primary" icon="sign" block bindtap="bindSaveEngInfo">保存</van-button>
+      </van-col>
+    </van-row>
+  </view>
+
+  <view wx:if="{{id > 0}}" hidden="{{activeTab != 3}}" style="padding:10px;">
     <van-uploader file-list="{{ images }}" accept="{{uploadAccept}}" max-count="10" 
     preview-full-image="{{ false }}" bind:click-preview="previewImages"
     bind:delete="removeImage" deletable="{{false}}"

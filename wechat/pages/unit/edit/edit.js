@@ -561,7 +561,7 @@ Page({
     wx.showLoading()
     try {
       files.forEach(file => {
-        wx.uploadFile({
+        setTimeout(() => wx.uploadFile({
           header: header,
           url: app.globalData.serverUrl + '/api/building/uploadUnitImage',
           filePath: that.data.uploadAccept == 'media' ? file.tempFilePath : file.path,
@@ -619,7 +619,7 @@ Page({
             error++
             console.log(e.errMsg)
           }
-        })
+        }), 300);
       })
     } catch(e) {
       wx.hideLoading()

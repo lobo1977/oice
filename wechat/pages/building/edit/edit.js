@@ -68,6 +68,8 @@ Page({
     },
     is_name_empty: false,
     name_error: '',
+    is_eng_name_empty: false,
+    eng_name_error: '',
     images: [],
     previewList: [],
     imageMenu: [
@@ -193,6 +195,16 @@ Page({
           })
         }
 
+        let engInfo = that.data.engInfo
+        for (let item in engInfo) {
+          if (res.data.engInfo && res.data.engInfo[item] !== undefined && res.data.engInfo[item] !== null) {
+            engInfo[item] = res.data.engInfo[item]
+          } else {
+            engInfo[item] = ''
+          }
+        }
+        engInfo.__token__ = res.data.__token__
+
         let imageList = []
         if (res.data.images) {
           res.data.images.forEach(element => {
@@ -256,6 +268,7 @@ Page({
           id: that.data.copy == 1 ? 0 : that.data.id,
           type: arrType,
           info: info,
+          engInfo: engInfo,
           images: imageList,
           areaData: [{values: arrArea, defaultIndex: areaIdx}, {values: arrDistrict, defaultIndex: districtIdx}]
         })
@@ -494,6 +507,52 @@ Page({
     })
   },
 
+  onEngNameInput: function(event) {
+    this.data.engInfo.name = event.detail
+    if (this.data.engInfo.name && this.data.is_eng_name_empty) {
+      that.setData({
+        is_eng_name_empty: false,
+        eng_name_error: ''
+      })
+    }
+  },
+
+  onEngLocationInput: function(event) {
+    this.data.engInfo.location = event.detail
+  },
+
+  onEngSituationInput: function(event) {
+    this.data.engInfo.situation = event.detail
+  },
+
+  onEngDeveloperInput: function(event) {
+    this.data.engInfo.developer = event.detail
+  },
+
+  onEngManagerInput: function(event) {
+    this.data.engInfo.manager = event.detail
+  },
+
+  onEngNetworkInput: function(event) {
+    this.data.engInfo.network = event.detail
+  },
+
+  onEngElevatorInput: function(event) {
+    this.data.engInfo.elevator = event.detail
+  },
+
+  onEngHvacInput: function(event) {
+    this.data.engInfo.hvac = event.detail
+  },
+
+  onEngAmenitiesInput: function(event) {
+    this.data.engInfo.amenities = event.detail
+  },
+
+  onEngTenantsInput: function(event) {
+    this.data.engInfo.tenants = event.detail
+  },
+
   bindSave: function() {
     let that = this
     if (!that.data.info.building_name) {
@@ -529,6 +588,57 @@ Page({
         if (res.data && res.data.token) {
           that.data.info.__token__ = res.data.token
         }
+        if (res.message) {
+          wx.showToast({
+            icon: 'none',
+            title: res.message,
+            duration: 2000
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: '操作失败，系统异常',
+            duration: 2000
+          })
+        }
+      }
+    }, () => {
+      wx.hideLoading()
+    })
+  },
+
+  bindSaveEngInfo: function() {
+    let that = this
+
+    if (!that.data.engInfo.name) {
+      that.setData({
+        is_eng_name_empty: true,
+        eng_name_error: '请输入项目名称'
+      })
+      return
+    } else if (that.data.is_eng_name_empty) {
+      that.setData({
+        is_eng_name_empty: false,
+        eng_name_error: ''
+      })
+    }
+
+    wx.showLoading({
+      title: '保存中',
+    })
+
+    app.post('building/saveEngInfo?id=' + that.data.id, that.data.engInfo, (res) => {
+      if (res.data) {
+        that.data.info.__token__ = res.data
+        that.data.engInfo.__token__ = res.data
+      }
+      if (res.success) {
+        wx.showToast({
+          icon: 'none',
+          title: '保存成功',
+          duration: 2000
+        })
+      } else {
         if (res.message) {
           wx.showToast({
             icon: 'none',
@@ -629,7 +739,7 @@ Page({
     }
     try {
       files.forEach(file => {
-        wx.uploadFile({
+        setTimeout(() => wx.uploadFile({
           header: header,
           url: app.globalData.serverUrl + '/api/building/uploadImage',
           filePath: that.data.uploadAccept == 'media' ? file.tempFilePath : file.path,
@@ -686,7 +796,7 @@ Page({
             error++
             console.log(e.errMsg)
           }
-        })
+        }), 300)
       })
     } catch(e) {
       wx.hideLoading()
