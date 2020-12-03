@@ -133,7 +133,7 @@ class Oauth extends Base
         $user->avatar = $oauth->avatar;
       }
       if ($user->save()) {
-        $user = self::getById($user->id);
+        $user = User::getById($user->id);
       } else {
         $user = null;
       }

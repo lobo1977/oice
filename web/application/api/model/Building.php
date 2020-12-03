@@ -399,9 +399,11 @@ class Building extends Base
   public static function addUp($user, $id, $data) {
     $data['pinyin'] = \my\Pinyin::convertInitalPinyin($data['building_name']);
     $user_id = 0;
+    $company_id = 0;
     $isAdmin = false;
     if ($user) {
       $user_id = $user->id;
+      $company_id = $user->company_id;
       $isAdmin = $user->isAdmin;
     }
 
