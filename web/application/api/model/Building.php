@@ -83,7 +83,7 @@ class Building extends Base
           ($building->company_id > 0 && $building->company_id == $user->company_id);
       }
     } else if ($operate == 'copy') {
-      if ($user == null) {
+      if ($user == null || $user->company_id == 0) {
         return false;
       }
       return $building->share == 1 && $building->status == 1 && $building->user_id != $user->id && $building->company_id != $user->company_id;
@@ -755,7 +755,7 @@ class Building extends Base
           $unitData = db('unit')
             ->where('building_id', $copy)
             ->where('delete_time', 'null')
-            ->field('room,building_no,floor,face,acreage,rent_sell,rent_price,sell_price,decoration,`status`,end_date,`rem`,0 as `share`,' . 
+            ->field($newData->id . ' as building_id,room,building_no,floor,face,acreage,rent_sell,rent_price,sell_price,decoration,`status`,end_date,`rem`,0 as `share`,' . 
               $company_id . ' as `company_id`,' . $user_id . ' as user_id,now() as create_time')
             ->select();
 
