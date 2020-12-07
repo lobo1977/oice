@@ -184,7 +184,7 @@ Page({
           title: '发生错误',
           message: res.message ? res.message : '系统异常'
         }).then(() => {
-          wx.navigateBack()
+          app.goBack()
         })
       }
     }, () => {
@@ -422,7 +422,7 @@ Page({
               })
             } else {
               app.globalData.refreshCustomerView = true
-              wx.navigateBack()
+              app.goBack()
             }
           })
         } else if (that.data.id == 0) {
@@ -431,7 +431,7 @@ Page({
             url: '../view/view?id=' + id
           })
         } else {
-          wx.navigateBack()
+          app.goBack()
         }
       } else if (res.data) {
         if (res.data.token) {

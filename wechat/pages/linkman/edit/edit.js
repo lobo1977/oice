@@ -124,7 +124,7 @@ Page({
           title: '发生错误',
           message: res.message ? res.message : '系统异常'
         }).then(() => {
-          wx.navigateBack()
+          app.goBack()
         })
       }
     }, () => {
@@ -293,7 +293,7 @@ Page({
         if (that.data.info.type == 'customer') {
           app.globalData.refreshCustomerView = true
         }
-        wx.navigateBack()
+        app.goBack()
       } else if (res.message) {
         wx.showToast({
           icon: 'none',

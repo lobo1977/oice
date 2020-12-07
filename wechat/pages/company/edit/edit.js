@@ -209,7 +209,7 @@ Page({
           title: '发生错误',
           message: res.message ? res.message : '系统异常'
         }).then(() => {
-          wx.navigateBack()
+          app.goBack()
         })
       }
     }, () => {
@@ -276,7 +276,7 @@ Page({
     if (res.success) {
       app.globalData.refreshCompany = true
       app.updateUserInfo()
-      wx.navigateBack()
+      app.goBack()
     } else {
       if (res.data) {
         that.data.info.__token__ = json.data

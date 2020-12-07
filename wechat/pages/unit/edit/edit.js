@@ -1,5 +1,6 @@
 // pages/building/edit/edit.js
 import Dialog from '../../../miniprogram_npm/@vant/weapp/dialog/dialog';
+import Toast from '../../../miniprogram_npm/@vant/weapp/toast/toast';
 
 const app = getApp()
 
@@ -228,7 +229,7 @@ Page({
           title: '发生错误',
           message: res.message ? res.message : '系统异常'
         }).then(() => {
-          wx.navigateBack()
+          app.goBack()
         })
       }
     }, () => {
@@ -453,12 +454,25 @@ Page({
         app.globalData.refreshBuildingView = true
         if (that.data.id == 0) {
           let id = res.data
-          wx.redirectTo({
-            url: '../view/view?id=' + id
-          })
+          if (that.data.info.copy) {
+            Toast({
+              type: 'success',
+              duration: 1000,
+              message: '复制成功',
+              onClose: () => {
+                wx.redirectTo({
+                  url: '../view/view?id=' + id
+                })
+              },
+            })
+          } else {
+            wx.redirectTo({
+              url: '../view/view?id=' + id
+            })
+          }
         } else {
           app.globalData.refreshUnitView = true
-          wx.navigateBack()
+          app.goBack()
         }
       } else {
         if (res.data && res.data.token) {

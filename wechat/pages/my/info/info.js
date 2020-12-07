@@ -163,7 +163,7 @@ Page({
         if (res.data) {
           app.globalData.appUserInfo = res.data
         }
-        wx.navigateBack()
+        app.goBack()
       } else {
         if (res.data) {
           that.data.info.__token__ = res.data

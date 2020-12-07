@@ -289,6 +289,17 @@ App({
     refreshCompany: false,
     refreshDaily: false,
   },
+
+  goBack() {
+    let pages = getCurrentPages()
+    if (pages.length > 1) {
+      wx.navigateBack()
+    } else {
+      wx.switchTab({
+        url: '/pages/building/index/index'
+      })
+    }
+  },
   
   // 登录
   login() {

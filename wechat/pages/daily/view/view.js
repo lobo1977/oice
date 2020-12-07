@@ -167,7 +167,7 @@ Page({
     }, (res) => {
       if (res.success) {
         app.globalData.refreshDaily = true
-        wx.navigateBack()
+        app.goBack()
       } else {
         Dialog.alert({
           title: '发生错误',

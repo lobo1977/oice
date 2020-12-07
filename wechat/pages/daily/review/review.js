@@ -147,7 +147,7 @@ Page({
           title: '发生错误',
           message: res.message ? res.message : '系统异常'
         }).then(() => {
-          wx.navigateBack()
+          app.goBack()
         })
       }
     }, () => {
@@ -175,7 +175,7 @@ Page({
     app.post('daily/editReview?id=' + that.data.id, that.data.info, (res) => {
       if (res.success) {
         app.globalData.refreshDaily = true
-        wx.navigateBack()
+        app.goBack()
       } else {
         if (res.data) {
           that.data.info.__token__ = json.data

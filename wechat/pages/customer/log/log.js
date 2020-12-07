@@ -168,7 +168,7 @@ Page({
       }, (res) => {
         if (res.success) {
           app.globalData.refreshCustomerView = true
-          wx.navigateBack()
+          app.goBack()
         } else if (res.message) {
           wx.showToast({
             icon: 'none',

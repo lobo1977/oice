@@ -684,7 +684,7 @@ Page({
           title: '发生错误',
           message: res.message ? res.message : '系统异常'
         }).then(() => {
-          wx.navigateBack()
+          app.goBack()
         })
       }
     }, () => {
@@ -731,7 +731,7 @@ Page({
           message: '转交成功',
         }).then(() => {
           app.globalData.refreshCustomer = true
-          wx.navigateBack()
+          app.goBack()
         })
       } else {
         Dialog.alert({
@@ -828,7 +828,7 @@ Page({
           })
         } else {
           app.globalData.refreshCustomer = true
-          wx.navigateBack()
+          app.goBack()
         }
       } else {
         wx.showToast({
@@ -852,7 +852,7 @@ Page({
     }, (res) => {
       if (res.success) {
         app.globalData.refreshCustomer = true
-        wx.navigateBack()
+        app.goBack()
       } else {
         Dialog.alert({
           title: '发生错误',
@@ -1006,7 +1006,7 @@ Page({
         }).then(() => {
           if (operate === 2) {
             app.globalData.refreshCustomer = true
-            wx.navigateBack()
+            app.goBack()
           } else {
             that.getView()
           }

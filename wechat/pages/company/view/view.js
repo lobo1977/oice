@@ -231,14 +231,14 @@ Page({
             title: '恭喜',
             message: '您已加入' + that.data.info.title
           }).then(() => {
-            wx.navigateBack()
+            app.goBack()
           })
         } else {
           Dialog.alert({
             title: '提示',
             message: '您已申请加入' + that.data.info.title + '，请等待企业管理员审核。'
           }).then(() => {
-            wx.navigateBack()
+            app.goBack()
           })
         }
       } else {
@@ -272,7 +272,7 @@ Page({
             title: '提示',
             message: '您已退出' + that.data.info.title
           }).then(() => {
-            wx.navigateBack()
+            app.goBack()
           })
         } else {
           Dialog.alert({
@@ -333,7 +333,7 @@ Page({
       id: that.data.info.id
     }, (res) => {
       if (res.success) {
-        wx.navigateBack()
+        app.goBack()
       } else {
         Dialog.alert({
           title: '发生错误',

@@ -257,7 +257,7 @@ Page({
     }, (res) => {
       if (res.success) {
         app.globalData.refreshBuilding = true
-        wx.navigateBack()
+        app.goBack()
       } else {
         Dialog.alert({
           title: '发生错误',
@@ -316,7 +316,7 @@ Page({
           title: '发生错误',
           message: res.message ? res.message : '系统异常'
         }).then(() => {
-          wx.navigateBack()
+          app.goBack()
         })
       }
     }, () => {
@@ -375,7 +375,7 @@ Page({
     }, (res) => {
       if (res.success) {
         app.globalData.refreshBuilding = true
-        wx.navigateBack()
+        app.goBack()
       } else {
         Dialog.alert({
           title: '发生错误',
