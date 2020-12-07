@@ -72,6 +72,10 @@ class Company extends Base
     } else if ($operate == 'edit' || $operate == 'invite' || $operate == 'pass') {
       return $company->user_id == $user->id;
     } else if ($operate == 'delete') {
+      if (isset($company->addin) && isset($company->isAddin) && 
+        ($company->addin == 0 || ($company->addin == 1 && $company->isAddin))) {
+        return $company->user_id == $user->id;
+      }
       return false;
     } else {
       return false;
@@ -174,10 +178,6 @@ class Company extends Base
     }
 
     if ($operate == 'view') {
-      $data->allowEdit = self::allow($user, $data, 'edit');
-      $data->allowInvite = self::allow($user, $data, 'invite');
-      $data->allowPass = self::allow($user, $data, 'pass');
-      $data->allowDelete = self::allow($user, $data, 'delete');
       $data->isAddin = false;
       $data->isInvtie = false;
       if ($user) {
@@ -197,6 +197,10 @@ class Company extends Base
         }
       }
       self::setAddinCount($data);
+      $data->allowEdit = self::allow($user, $data, 'edit');
+      $data->allowInvite = self::allow($user, $data, 'invite');
+      $data->allowPass = self::allow($user, $data, 'pass');
+      $data->allowDelete = self::allow($user, $data, 'delete');
     }    
     return $data;
   }
@@ -393,24 +397,27 @@ class Company extends Base
     $company = self::get($id);
     if ($company == null) {
       self::exception('企业不存在。');
-    }
-    if (!self::allow($user, $company, 'delete')) {
-      self::exception('您没有权限删除此企业。');
+    } else {
+      self::setAddinCount($company);
+      $company->isAddin = false;
+      $joinStatus = self::getJoinStatus($user, $id);
+      if ($joinStatus) {
+        $company->isAddin = $joinStatus['status'];
+      }
+      if (!self::allow($user, $company, 'delete')) {
+        self::exception('您没有权限删除此企业。');
+      }
     }
     
-    $joinStatus = self::getJoinStatus($user, $id);
-    
-    if ($joinStatus) {
-      self::exception('已加入的企业不能删除。');
-    }
-    $log = [
-      "table" => 'company',
-      "owner_id" => $company->id,
-      "title" => '删除企业',
-      "summary" => $company->title
-    ];
     $result = $company->delete();
     if ($result) {
+      db('user_company')->where('company_id', $id)->delete();
+      $log = [
+        "table" => 'company',
+        "owner_id" => $company->id,
+        "title" => '删除企业',
+        "summary" => $company->title
+      ];
       Log::add($user, $log);
     }
     return $result;
