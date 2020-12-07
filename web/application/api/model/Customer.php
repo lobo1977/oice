@@ -79,7 +79,7 @@ class Customer extends Base
         ($customer->share && $customer->company_id > 0 && $customer->company_id == $user->company_id) || 
         ($user->id == $superior_id && $customer->company_id > 0 && $customer->company_id == $user->company_id);
     } else if ($operate == 'new') {
-      return true;
+      return $user->company_id > 0;
     } else if ($operate == 'turn') {
       return $customer->company_id == $user->company_id &&
         ($customer->user_id == $user->id || $user->isCompanyAdmin);
