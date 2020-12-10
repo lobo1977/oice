@@ -75,12 +75,12 @@ class Building extends Base
     } else if ($operate == 'new') {
       return $user != null && $user->company_id > 0;
     } else if ($operate == 'edit') {
-      if ($user == null) {
+      if ($user == null || $user->company_id == 0) {
         return false;
       } else {
         return $building->user_id == 0 || $building->share_level > 0 ||
           $building->user_id == $user->id || 
-          ($building->company_id > 0 && $building->company_id == $user->company_id);
+          $building->company_id == $user->company_id;
       }
     } else if ($operate == 'copy') {
       if ($user == null || $user->company_id == 0) {
