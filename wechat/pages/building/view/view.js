@@ -164,7 +164,25 @@ Page({
   bindCopyWeixin(event) {
     let data = event.currentTarget.dataset.data
     wx.setClipboardData({
-      data: data.weixin || data.mobile
+      data: data.weixin || data.mobile,
+      success (res) {
+        wx.showToast({
+          title: '微信号复制成功',
+          duration: 1000
+        })
+      }
+    })
+  },
+
+  bindCopyUrl(event) {
+    wx.setClipboardData({
+      data: this.data.info.short_url,
+      success (res) {
+        wx.showToast({
+          title: '链接复制成功',
+          duration: 1000
+        })
+      }
     })
   },
 

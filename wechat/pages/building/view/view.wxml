@@ -34,6 +34,16 @@
       </view>
     </van-cell>
   </van-cell-group>
+
+  <van-row gutter="0">
+    <van-col span="{{info.allowCopy ? 12 : 24}}">
+      <van-button block color="#ffffff" bind:click="bindCopyUrl" custom-class="text-button">复制链接</van-button>
+    </van-col>
+    <van-col span="12" wx:if="{{ info.allowCopy }}">
+      <van-button block color="#ffffff" bind:click="bindCopy" custom-class="text-button">复制为私有</van-button>
+    </van-col>
+  </van-row>
+
   <van-cell-group title="单元销控" wx:if="{{info.allowEdit || (info.unit && info.unit.length)}}">
     <van-cell wx:for="{{info.unit}}" wx:key="id" wx:if="{{item.status === 1 || info.allowEdit}}"
       title="{{item.title}}" label="{{item.desc}}" is-link center
@@ -121,10 +131,6 @@
     </van-cell>
   </van-cell-group>
 
-  <view wx:if="{{ info.allowCopy }}" style="padding:15px 0;text-align:center;">
-    <van-button plain round type="primary" bind:click="bindCopy">复制为私有</van-button>
-  </view>
-
   <van-dialog id="van-dialog" />
 
   <van-dialog id="audit-dialog"
@@ -151,17 +157,21 @@
   </van-dialog>
 
   <van-row gutter="0" custom-class="button-bar">
-    <van-col span="{{info.allowDelete ? 7 : 8}}">
+    <van-col span="{{ !info.allowAudit && !info.allowEdit && !info.allowDelete ? 12 : (!info.allowAudit && !info.allowEdit ? 10 : 8) }}">
       <van-button square type="primary" icon="{{ info.isFavorite ? 'star' : 'star-o'}}" block bind:click="favorite">收藏</van-button>
     </van-col>
-    <van-col span="{{info.allowDelete ? 7 : 8}}">
+    <van-col span="{{ !info.allowAudit && !info.allowEdit && !info.allowDelete ? 12 : (!info.allowAudit && !info.allowEdit ? 10 : 8) }}">
       <van-button square type="info" icon="notes-o" block bind:click="bindViewNote">笔记</van-button>
     </van-col>
-    <van-col span="{{info.allowDelete ? 7 : 8}}">
-      <van-button wx:if="{{ info.allowAudit }}" square type="primary" icon="passed" block bind:click="bindAudit">审核</van-button>
-      <van-button wx:if="{{ !info.allowAudit }}" square type="primary" icon="edit" block bind:click="bindEdit" disabled="{{ !info.allowEdit }}">编辑</van-button>
+    <van-col wx:if="{{ info.allowAudit || info.allowEdit }}" span="{{ info.allowDelete ? 4 : 8}}">
+      <van-button wx:if="{{ info.allowAudit }}" square type="primary" icon="passed" block bind:click="bindAudit">
+        <view wx:if="{{ !info.allowDelete }}">审核</view>
+      </van-button>
+      <van-button wx:if="{{ !info.allowAudit && info.allowEdit }}" square type="primary" icon="edit" block bind:click="bindEdit">
+        <view wx:if="{{ !info.allowDelete }}">编辑</view>
+      </van-button>
     </van-col>
-    <van-col span="3" wx:if="{{ info.allowDelete }}">
+    <van-col wx:if="{{ info.allowDelete }}" span="4">
       <van-button square type="danger" icon="delete" block bind:click="bindDelete" disabled="{{ !info.allowDelete }}"></van-button>
     </van-col>
   </van-row>
