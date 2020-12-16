@@ -23,5 +23,11 @@
     </van-field>
   </van-cell-group>
 
-  <van-button type="primary" block style="margin:30px 15px;" bind:click="bindSave">提交</van-button>
+  <van-row gutter="0" custom-class="button-bar">
+    <van-col span="24">
+        <van-button type="primary" icon="sign" block square bind:click="bindSave">提交</van-button>
+    </van-col>
+  </van-row>
+
+  <van-dialog id="van-dialog" />
 </view>
