@@ -13,6 +13,7 @@
   "usingComponents": {
     "van-button": "@vant/weapp/button",
     "van-loading": "@vant/weapp/loading",
+    "van-image": "@vant/weapp/image",
     "van-row": "@vant/weapp/row",
     "van-col": "@vant/weapp/col",
     "van-icon": "@vant/weapp/icon",
@@ -97,6 +98,7 @@
     "pages/daily/view/view",
     "pages/daily/edit/edit",
     "pages/daily/review/review",
-    "pages/daily/reviewView/reviewView"
+    "pages/daily/reviewView/reviewView",
+    "pages/my/contact/contact"
   ]
 }

@@ -29,6 +29,7 @@
     <van-cell wx:if="{{me.superior_id > 0}}" title="我的上级" icon="manager-o" link-type="navigateTo" url="../../contact/view/view?id={{me.superior_id}}" is-link value="{{me.superior}}"/>
     <van-cell title="我的名片" icon="idcard" link-type="navigateTo" url="../../contact/view/view?id={{ me.id }}" is-link/>
     <van-cell title="通讯录" icon="friends-o" link-type="navigateTo" url="../../contact/index/index" is-link/>
+    <van-cell title="联系我们" icon="chat-o" link-type="navigateTo" url="../contact/contact" is-link/>
   </van-cell-group>
 </view>
 
