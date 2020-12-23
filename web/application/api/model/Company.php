@@ -185,7 +185,7 @@ class Company extends Base
         if ($joinStatus) {
           $data->isAddin = $joinStatus['status'];
         }
-        if ($data->allowPass) {
+        if ($data->user_id == $user->id) {
           $data->waitUser = User::companyMember($user, $id);
         }
         if (db('invite')
