@@ -65,7 +65,7 @@ class Building extends Base
     if ($operate == 'share') {
       return true;
     } else if ($operate == 'view') {
-      return ($building->share && ($building->status == 1 || $user->isAdmin)) || 
+      return ($building->share && ($building->status == 1 || ($user != null && $user->isAdmin))) || 
         $building->user_id == 0 ||
         (
           $user != null && ($building->share_level !== null || 
