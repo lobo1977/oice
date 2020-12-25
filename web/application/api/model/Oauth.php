@@ -86,20 +86,32 @@ class Oauth extends Base
    * 微信小程序用户登录
    */
   public static function miniLogin($token) {
-    if (!$token || !isset($token['unionid'])) {
-      return false;
+    if (!$token || !isset($token['openid'])) {
+      self::exception('缺少 token 或 openid');
     }
 
     $user = null;
     $isReg = false;
     $platform = 'wechat';
-    $oauth = self::where('platform', $platform)
-      ->where('unionid', $token['unionid'])->find();
+    $oauth = self::where('platform', $platform);
+    if (isset($token['unionid'])) {
+      $oauth->where('unionid', $token['unionid']);
+    } else {
+      $oauth->where('openid', $token['openid']);
+    }
+    $oauth = $oauth->find();
    
     if ($oauth == null) {
       $oauth = new Oauth();
+      $oauth->user_id = 0;
       $oauth->platform = $platform;
-      $oauth->unionid = $token['unionid'];
+      if (isset($token['unionid'])) {
+        $oauth->unionid = $token['unionid'];
+      } else {
+        $oauth->openid = $token['openid'];
+      }
+      $oauth->nickname = '';
+      $oauth->avatar = '';
     }
 
     if (isset($token['nickname'])) {
@@ -109,10 +121,9 @@ class Oauth extends Base
       $oauth->avatar = $token['avatar'];
     }
     $oauth->session_key = $token['session_key'];
-    $result = $oauth->save();
-
-    if (isset($oauth['user_id']) && $oauth['user_id'] > 0) {
-      $user = User::getById($oauth['user_id']);
+    
+    if ($oauth->user_id > 0) {
+      $user = User::getById($oauth->user_id);
       if ($user) {
         if ($oauth->nickname && empty($user->title)) {
           $user->title = $oauth->nickname;
@@ -133,14 +144,17 @@ class Oauth extends Base
         $user->avatar = $oauth->avatar;
       }
       if ($user->save()) {
+        $oauth->user_id = $user->id;
         $user = User::getById($user->id);
       } else {
         $user = null;
       }
     }
 
+    $result = $oauth->save();
+
     if ($user) {
-      return User::loginSuccess($user, $token['unionid'], $isReg);
+      return User::loginSuccess($user, isset($token['unionid']) ? $token['unionid'] : $token['openid'], $isReg);
     } else {
       return false;
     }

@@ -221,6 +221,7 @@ class Wechat extends Base
   public function miniLogin($code = '', $nickname = '', $avater = '') {
     if (!empty($code)) {
       $data = $this->wechat->getUserSession($code);
+      log::info('miniLogin data:' . print_r($data, true));
       if ($data) {
         if ($nickname) {
           $data['nickname'] = $nickname;
@@ -229,11 +230,17 @@ class Wechat extends Base
           $data['avater'] = $avater;
         }
         $user = Oauth::miniLogin($data);
+        log::info('miniLogin user:' . print_r($user, true));
         if ($user) {
           return $this->succeed($user);
+        } else {
+          return $this->exception('登录失败');
         }
+      } else {
+        return $this->exception($this->wechat->getMessage());
       }
+    } else {
+      return null;
     }
-    return $this->fail($this->wechat->getMessage());
   }
 }

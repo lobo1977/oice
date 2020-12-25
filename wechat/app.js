@@ -308,19 +308,33 @@ App({
         let app = this
         if (res.code) {
           app.post('wechat/miniLogin', { 
-              code: res.code, 
-              nickname: (app.globalData.userInfo ? app.globalData.userInfo.nickName : ''),
-              avatar: (app.globalData.userInfo ? app.globalData.userInfo.avatarUrl : ''),
-            }, (res2) => {
-            app.globalData.appUserInfo = res2.data
-            if (app.userLoginCallback) {
-              app.userLoginCallback(res2)
+            code: res.code, 
+            nickname: (app.globalData.userInfo ? app.globalData.userInfo.nickName : ''),
+            avatar: (app.globalData.userInfo ? app.globalData.userInfo.avatarUrl : ''),
+          }, (res2) => {
+            if (res2.success && res2.data) {
+              app.globalData.appUserInfo = res2.data
+              if (app.userLoginCallback) {
+                app.userLoginCallback(res2)
+              }
+            } else if (res2.message) {
+              wx.showToast({
+                icon: 'none',
+                title: res2.message,
+                duration: 2000
+              })
+            } else {
+              wx.showToast({
+                icon: 'none',
+                title: '登录失败，未知错误',
+                duration: 2000
+              })
             }
           })
         } else {
           wx.showToast({
             icon: 'none',
-            title: '登录失败！' + res.errMsg,
+            title: '登录失败，' + res.errMsg,
             duration: 2000
           })
         }

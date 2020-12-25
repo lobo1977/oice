@@ -145,6 +145,7 @@ Page({
   },
 
   turn: function(event) {
+    let that = this
     const user = event.currentTarget.dataset.user
     Dialog.confirm({
       title: '转交确认',
@@ -182,6 +183,7 @@ Page({
   },
 
   remove: function(event) {
+    let that = this
     const user = event.currentTarget.dataset.user
     Dialog.confirm({
       title: '移除确认',

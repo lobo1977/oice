@@ -62,7 +62,8 @@ class Base extends Controller
 
   protected function checkAuth() {
     if ($this->getUser() == null) {
-      abort(401, '访问的资源未授权，请登录。');
+      $this->exception('访问的资源未授权，请登录。');
+      //abort(401, '访问的资源未授权，请登录。');
     }
   }
 
