@@ -57,14 +57,19 @@ export default {
                 user.token = res.data.token
                 user.expire_time = res.data.expire_time
                 localStorage.user = JSON.stringify(user)
+              } else {
+                delete localStorage.user
+                return null
               }
             })
             if (expireTime < now) {
+              delete localStorage.user
               return null
             }
           }
           return user
         } catch (e) {
+          delete localStorage.user
           return null
         }
       } else {
