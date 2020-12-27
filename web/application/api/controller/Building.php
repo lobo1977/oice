@@ -153,10 +153,10 @@ class Building extends Base
   /**
    * 上传项目图片
    */
-  public function uploadImage($id) {
+  public function uploadImage($id, $is_default = 1) {
     $files = request()->file('images');
     if ($files) {
-      $result = File::upload($this->user, 'building', $id, $files);
+      $result = File::upload($this->user, 'building', $id, $is_default, $files);
       if ($result >= 1) {
         $images = File::getList($this->user, 'building', $id);
         return $this->succeed($images);
@@ -171,10 +171,10 @@ class Building extends Base
   /**
    * 上传单元图片
    */
-  public function uploadUnitImage($id) {
+  public function uploadUnitImage($id, $is_default = 1) {
     $files = request()->file('images');
     if ($files) {
-      $result = File::upload($this->user, 'unit', $id, $files);
+      $result = File::upload($this->user, 'unit', $id, $is_default, $files);
       if ($result >= 1) {
         $images = File::getList($this->user, 'unit', $id);
         return $this->succeed($images);

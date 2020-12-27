@@ -86,7 +86,7 @@ class File extends Base
   /**
    * 上传文件
    */
-  public static function upload($user, $type, $parent_id, $files) {
+  public static function upload($user, $type, $parent_id, $is_default, $files) {
     $operate = 'edit';
     if ($type == 'customer') {
       $operate = 'follow';
@@ -137,7 +137,7 @@ class File extends Base
         $data['title'] = substr($info->getInfo('name'), 0, 300);
         $data['file'] = $info->getFilename();
         $data['size'] = $info->getSize();
-        if ($count == 0 && Utils::isImageFile($info->getFilename())) {
+        if ($is_default == 1 && $count == 0 && Utils::isImageFile($info->getFilename())) {
           $data['default'] = 1;
           $count = 1;
         } else {

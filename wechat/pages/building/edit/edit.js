@@ -753,13 +753,14 @@ Page({
     }
     try {
       files.forEach(file => {
-        setTimeout(() => wx.uploadFile({
+        wx.uploadFile({
           header: header,
           url: app.globalData.serverUrl + '/api/building/uploadImage',
           filePath: that.data.uploadAccept == 'media' ? file.tempFilePath : file.path,
           name: 'images[]',
           formData: {
-            'id': that.data.id
+            'id': that.data.id,
+            'is_default': count == 0 ? 1 : 0
           },
           success(res) {
             if (res.data) {
@@ -810,7 +811,7 @@ Page({
             error++
             console.log(e.errMsg)
           }
-        }), 300)
+        })
       })
     } catch(e) {
       wx.hideLoading()
