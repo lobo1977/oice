@@ -40,7 +40,7 @@ class Recommend extends Controller
   /**
    * 打印版
    */
-  public function index($id, $mode = 1) {
+  public function index($id, $mode = 1, $file = '') {
     set_time_limit(0);
     
     $data = modelRecommend::detail(null, $id);
@@ -70,6 +70,10 @@ class Recommend extends Controller
     $this->assign('data', $data);
 
     $title = $data['customer']->customer_name . '_项目推荐';
+
+    if (empty($file)) {
+      $file = urlencode($title . '.pdf');
+    }
 
     $paf_page_ori = 'P';
 
@@ -123,8 +127,8 @@ class Recommend extends Controller
 
     ob_clean();
     $res = new \think\Response;
-    $res->contentType('application/pdf');
-    $pdf->Output(urlencode($title . '.pdf'), 'D');
+    $res->contentType('application/pdf;charset=UTF-8');
+    $pdf->Output($file, 'D');
     return $res;
   }
 

@@ -287,7 +287,7 @@ App({
     refreshLinkView: false,
     refreshCustomerView: false,
     refreshCompany: false,
-    refreshDaily: false,
+    refreshDaily: false
   },
 
   goBack() {

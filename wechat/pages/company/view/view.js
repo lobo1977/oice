@@ -225,6 +225,7 @@ Page({
       id: that.data.info.id
     }, (res) => {
       if (res.success) {
+        app.globalData.refreshCompany = true
         app.updateUserInfo()
         if (res.data == 1) {
           Dialog.alert({
@@ -264,6 +265,7 @@ Page({
         id: that.data.info.id
       }, (res) => {
         if (res.success) {
+          app.globalData.refreshCompany = true
           if (res.data) {
             app.globalData.appUserInfo = res.data
           }
@@ -333,6 +335,7 @@ Page({
       id: that.data.info.id
     }, (res) => {
       if (res.success) {
+        app.globalData.refreshCompany = true
         app.goBack()
       } else {
         Dialog.alert({
