@@ -168,7 +168,7 @@ Page({
         }
 
         if (res.data.face) {
-          that.face.forEach((element, idx) => {
+          that.data.face.forEach((element, idx) => {
             if (res.data.face.indexOf(element.name) >= 0) {
               element.type = 'success'
             }
@@ -176,7 +176,7 @@ Page({
         }
 
         if (res.data.decoration) {
-          that.decoration.forEach((element, idx) => {
+          that.data.decoration.forEach((element, idx) => {
             if (res.data.decoration.indexOf(element.name) >= 0) {
               element.type = 'success'
             }
