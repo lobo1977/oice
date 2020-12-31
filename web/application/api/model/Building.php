@@ -96,7 +96,9 @@ class Building extends Base
       if ($user == null) {
         return false;
       }
-      return $user->isAdmin || ($building->share == 0 && $building->user_id == $user->id);
+      return $user->isAdmin || 
+        ($building->share == 0 && $building->user_id == $user->id) || 
+        ($building->share == 0 && $user->isCompanyAdmin && $building->company_id != $user->company_id);
     } else {
       return false;
     }
