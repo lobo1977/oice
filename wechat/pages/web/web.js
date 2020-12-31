@@ -5,6 +5,7 @@ Page({
    * 页面的初始数据
    */
   data: {
+    title: '项目笔记',
     url: ''
   },
 
@@ -56,9 +57,16 @@ Page({
   onReachBottom: function () {
   },
 
+  bindmessage: function(e) { 
+    this.setData({
+      title: e.detail.data[0].title
+    })
+  },
+
   // 转发事件
   onShareAppMessage(object) {
     let shareData = {
+      title: this.data.title,
       path: '/pages/web/web?url=' + this.data.url
     }
     return shareData

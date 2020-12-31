@@ -7,7 +7,7 @@
         <meta name="application-name" content="{$Think.config.app_name}">
         <title>{$vo.building_name} {$vo.title}</title>
         {if !empty($wechat)}
-        <script src="http://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+        <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
         {/if}
         <style>
             body {
@@ -22,7 +22,6 @@
         </style>
     </head>
     <body>
-        <p>{$vo.building_name} {$vo.title}</p>
         <p>
             {if !empty($vo.face)}
                 【朝向】{$vo.face}<br/>
@@ -99,6 +98,8 @@
                     success: function () {
                     }
                 })
+
+                wx.miniProgram.postMessage({ data:{title: '{$vo.building_name} {$vo.title}', desc:''} });
             });
         </script>
         {/if}

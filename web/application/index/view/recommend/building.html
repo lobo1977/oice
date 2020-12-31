@@ -7,7 +7,7 @@
         <meta name="application-name" content="{$Think.config.app_name}">
         <title>{$vo.building_name}</title>
         {if !empty($wechat)}
-        <script src="http://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+        <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
         {/if}
         <style>
             body {
@@ -22,7 +22,6 @@
         </style>
     </head>
     <body>
-        <p>{$vo.building_name}</p>
         <p>
             {if !empty($vo.area) || !empty($vo.address)}
                 【位置】{if !empty($vo.area)}{$vo.area}{/if}{if !empty($vo.address)}{$vo.address}{/if}<br/>
@@ -135,6 +134,8 @@
                     success: function () {
                     }
                 })
+
+                wx.miniProgram.postMessage({ data:{title: '{$vo.building_name}', desc:''} });
             });
         </script>
         {/if}
