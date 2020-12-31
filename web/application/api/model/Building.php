@@ -96,7 +96,7 @@ class Building extends Base
       if ($user == null) {
         return false;
       }
-      return $user->isAdmin;
+      return $user->isAdmin || ($building->share == 0 && $building->user_id == $user->id);
     } else {
       return false;
     }
@@ -755,7 +755,7 @@ class Building extends Base
           $unitData = db('unit')
             ->where('building_id', $copy)
             ->where('delete_time', 'null')
-            ->field($newData->id . ' as building_id,room,building_no,floor,face,acreage,rent_sell,rent_price,sell_price,decoration,`status`,end_date,`rem`,0 as `share`,' . 
+            ->field($newData->id . ' as building_id,room,building_no,floor,face,acreage,rent_sell,rent_price,sell_price,decoration,`status`,end_date,`rem`,1 as `share`,' . 
               $company_id . ' as `company_id`,' . $user_id . ' as user_id,now() as create_time')
             ->select();
 
