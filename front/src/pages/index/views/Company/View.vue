@@ -176,7 +176,7 @@ export default {
 
           if (vm.$isWechat()) {
             let shareLink = window.location.href
-            let shareDesc = '云普商办入驻企业'
+            let shareDesc = '商办云入驻企业'
             let shareImage = null
             if (vm.info.logo) {
               shareImage = window.location.protocol + '//' +
