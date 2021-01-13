@@ -15,7 +15,7 @@
 
 return [
     // 应用名称
-    'app_name'               => '商办云',
+    'app_name'               => '商办云信息',
     // 应用地址
     'app_host'               => 'm.o-ice.com',
     // 应用调试模式

@@ -79,6 +79,13 @@ class Wechat extends Base
               'appid' => 'wxa797b3aba4faaa75',
               'pagepath' => 'pages/building/edit/edit',
               'url'=> $app_root . '/app/building/edit'
+            ),
+            array(
+              'name'=> urlencode("业务合作"),
+              'type'=> 'miniprogram',
+              'appid' => 'wxa797b3aba4faaa75',
+              'pagepath' => 'pages/my/contact/contact',
+              'url' => $app_root . '/app/my'
             )
             // array(
             //   'name'=> urlencode("商铺独楼"),
@@ -107,14 +114,16 @@ class Wechat extends Base
           'type'=> 'miniprogram',
           'appid' => 'wxa797b3aba4faaa75',
           'pagepath' => 'pages/customer/index/index',
-          'url'=> $app_root . '/app/customer'
+          'url'=> $app_root . '/app/customer',
+          'sub_button'=> array()
         ),
         array(
           'name'=> urlencode("我的"),
           'type'=> 'view',
           //'appid' => 'wxa797b3aba4faaa75',
           //'pagepath' => 'pages/my/index/index',
-          'url'=> $app_root . '/app/my'
+          'url'=> $app_root . '/app/my',
+          'sub_button'=> array()
         )
       )
     );

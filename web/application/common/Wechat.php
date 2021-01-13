@@ -378,8 +378,7 @@ class Wechat {
 完善我的资料：<a href="' . $app_root . '/app/my/info">点这里</a>
 登记我的企业：<a href="' . $app_root . '/app/company/edit">点这里</a>
 开发商发布项目：<a href="' . $app_root . '/app/building/edit">点这里</a>
-用微信群发项目帖：<a href="' . $app_root . '/app/my/robot">点这里</a>
-业务合作：13901109546 王先生';
+用微信群发项目帖：<a href="' . $app_root . '/app/my/robot">点这里</a>';
 				break;
 			//取消关注
 			case "unsubscribe":

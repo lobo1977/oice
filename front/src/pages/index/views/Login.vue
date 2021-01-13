@@ -3,7 +3,7 @@
 
     <div style="margin:30px 0 30px 0;text-align:center;">
       <img src="/static/img/logo_s.png" style="width:120px;height:62px;">
-      <h3 style="margin-top:10px;">商办云</h3>
+      <h3 style="margin-top:10px;">商办云信息</h3>
     </div>
 
     <group>

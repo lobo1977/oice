@@ -291,9 +291,9 @@ class oiceBot(WXBot):
     def handle_init(self):
         print '[INFO] Handle init'
         
-        # 获取商办云公众号ID,定时发送消息,保持接受公众号的消息推送
+        # 获取公众号ID,定时发送消息,保持接受公众号的消息推送
         if self.oice_id == '':
-            self.oice_id = self.get_public_id(u'商办云')
+            self.oice_id = self.get_public_id(u'商办云信息')
             
         try:
             #保存在线机器人信息
