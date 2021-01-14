@@ -64,7 +64,7 @@ Page({
       linkman: [],            // 联系人
       log: [],                // 跟进纪要
       attach: [],             // 附件
-      filter: [],             // 项目筛选表
+      filter: [],             // 拼盘
       recommend: [],          // 推荐资料
       confirm: [],            // 确认书
       clashCustomer: null,
@@ -539,7 +539,7 @@ Page({
     let that = this
     if (that.data.filterResult.length == 0) {
       wx.showToast({
-        title: '请选择要加入筛选的项目',
+        title: '请选择要加入拼盘的项目',
         icon: 'none',
         duration: 2000
       })

@@ -154,7 +154,7 @@
         </van-col>
       </van-row>
     </van-tab>
-    <van-tab title="筛选">
+    <van-tab title="拼盘">
       <view style="background-color:#fff;height:36px;">
         <van-row>
           <van-col span="18">
@@ -184,7 +184,7 @@
       </van-checkbox-group>
       <van-row gutter="0" custom-class="button-bar">
         <van-col span="12">
-          <van-button square type="primary" icon="filter-o" block bind:click="bindAddFilter" disabled="{{ !info.allowFollow }}">添加筛选</van-button>
+          <van-button square type="primary" icon="filter-o" block bind:click="bindAddFilter" disabled="{{ !info.allowFollow }}">添加拼盘</van-button>
         </van-col>
         <van-col span="12">
           <van-button square type="danger" icon="newspaper-o" block bind:click="toRecommend" disabled="{{ !info.allowFollow || filterChecked.length == 0 }}">生成推荐资料</van-button>
@@ -233,7 +233,7 @@
   </van-popup>
 
   <van-popup show="{{ showFilter }}" position="bottom" bind:close="onFilterClose" custom-style="height:100%;">
-    <van-nav-bar title="筛选项目" safe-area-inset-top="{{false}}" left-text="取消" right-text="确定" bind:click-left="onFilterClose"
+    <van-nav-bar title="拼盘" safe-area-inset-top="{{false}}" left-text="取消" right-text="确定" bind:click-left="onFilterClose"
       bind:click-right="onFilterConfirm" />
     <scroll-view scroll-y style="height:90%" bindscrolltolower="getMoreFilter">
       <van-checkbox-group value="{{ filterResult }}" bind:change="onFilterChange">

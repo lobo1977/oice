@@ -40,7 +40,16 @@ Page({
       images: [],
       linkman: []
     },
-    previewImages: []
+    previewImages: [],
+    showCustomerPicker: false,
+    myCustomer: [],
+    customerData: [],
+    customer_id: 0,
+    showMenu: false,
+    menu: [
+      {name: '修改', value: 'edit', disabled: true}, 
+      {name: '删除', value: 'delete', disabled: true}
+    ]
   },
   
   onLoad(options) {
@@ -55,9 +64,11 @@ Page({
     }
     if (app.globalData.appUserInfo) {
       that.getView()
+      that.getMyCustomer()
     } else {
       app.userLoginCallback = () => {
         that.getView()
+        that.getMyCustomer()
       }
     }
   },
@@ -163,6 +174,63 @@ Page({
     .catch(() => {
     });
   },
+
+  showMore: function() {
+    this.setData({
+      showMenu: true
+    })
+  },
+
+  onMenuClose: function() {
+    this.setData({
+      showMenu: false
+    })
+  },
+
+  onMenuSelect: function(event) {
+    let that = this
+    that.setData({
+      showMenu: false
+    })
+    if (event.detail.value == 'edit') {
+      that.bindEdit()
+    } else if (event.detail.value == 'delete') {
+      that.bindDelete()
+    }
+  },
+
+  onCustomerPickerClose: function() {
+    this.setData({
+      showCustomerPicker: false
+    })
+  },
+
+  onCustomerSelected: function(event) {
+    this.setData({
+      showCustomerPicker: false,
+      customer_id: this.data.myCustomer[event.detail.index].id
+    })
+    if (this.data.customer_id > 0) {
+      this.addFilter()
+    }
+  },
+
+  getMyCustomer() {
+    let that = this
+    app.get('my/customer', (res) => {
+      if (res.data) {
+        that.data.myCustomer = res.data
+        let list = []
+        that.data.myCustomer.forEach((item) => {
+          list.push(item.customer_name)
+        })
+        that.setData({
+          customerData: list
+        })
+      }
+    }, () => {
+    })
+  },
   
   // 获取数据
   getView: function() {
@@ -203,9 +271,15 @@ Page({
             })
           })
         }
+
+        let menuAction = that.data.menu
+        menuAction[0].disabled = !res.data.allowEdit
+        menuAction[1].disabled = !res.data.allowDelete
+
         that.setData({
           info: res.data,
-          previewImages: prevList
+          previewImages: prevList,
+          menu: menuAction
         })
       } else {
         Dialog.alert({
@@ -260,6 +334,57 @@ Page({
       if (res.success) {
         app.globalData.refreshBuildingView = true
         app.goBack()
+      } else {
+        Dialog.alert({
+          title: '发生错误',
+          message: res.message ? res.message : '系统异常'
+        })
+      }
+    }, () => {
+      wx.hideLoading()
+    })
+  },
+
+  toFilter: function() {
+    let that = this
+    if (that.data.customer_id == 0) {
+      if (that.data.myCustomer.length > 1) {
+        that.setData({
+          showCustomerPicker: true
+        })
+        return
+      } else if (that.data.myCustomer.length == 1) {
+        that.data.customer_id = that.data.myCustomer[0].id
+      } else {
+        Dialog.alert({
+          message: '您需要添加客户才可以添加拼盘'
+        }).then(() => {
+          wx.navigateTo({
+            url: '../../customer/edit/edit',
+          })
+        })
+        return
+      }
+    }
+    that.addFilter()
+  },
+
+  addFilter: function() {
+    let that = this
+    wx.showLoading()
+    app.post('customer/addFilter', {
+      cid: that.data.customer_id,
+      bids: that.data.info.building_id,
+      uids: that.data.info.id
+    }, (res) => {
+      if (res.success) {
+        Dialog.alert({
+          message: '所选单元已加入拼盘'
+        }).then(() => {
+          // wx.navigateTo({
+          //   url: '../../customer/view/view?id=' + that.data.customer_id,
+          // })
+        })
       } else {
         Dialog.alert({
           title: '发生错误',

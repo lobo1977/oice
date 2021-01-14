@@ -268,7 +268,7 @@ Page({
         that.data.customer_id = that.data.myCustomer[0].id
       } else {
         Dialog.alert({
-          message: '您需要添加客户才可以添加筛选'
+          message: '您需要添加客户才可以添加拼盘'
         }).then(() => {
           wx.navigateTo({
             url: '../../customer/edit/edit',
@@ -281,7 +281,7 @@ Page({
     if (that.data.checked.length == 0) {
       wx.showToast({
         icon: 'none',
-        title: '请选择要加入筛选的项目',
+        title: '请选择要加入拼盘的项目',
         duration: 2000
       })
       return
@@ -303,7 +303,7 @@ Page({
           checked: []
         })
         Dialog.alert({
-          message: '所选项目已加入客户筛选表'
+          message: '所选项目已加入拼盘'
         }).then(() => {
           wx.navigateTo({
             url: '../../customer/view/view?id=' + that.data.customer_id,
