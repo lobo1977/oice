@@ -182,7 +182,7 @@ class Building extends Base
         'a.id' => 'desc']);
     } else {
       $list->order([
-        'a.share' => 'asc',
+        'a.share' => 'desc',
         'a.status' => 'asc',
         'a.update_time' => 'desc', 
         'a.id' => 'desc']);
