@@ -176,8 +176,8 @@ class Building extends Base
 
     if ($isAdmin) {
       $list->order([
-        'a.status' => 'asc',
         'a.share' => 'desc',
+        'a.status' => 'asc',
         'a.update_time' => 'desc', 
         'a.id' => 'desc']);
     } else {
