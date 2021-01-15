@@ -57,7 +57,7 @@ class My extends Base
    * 我的项目
    */
   public function building($page = 1) {
-    $list = Building::search($this->user, ['my' => 1, 'page' => $page]);
+    $list = Building::search($this->user, ['my' => 2, 'page' => $page]);
     return $this->succeed($list);
   }
 

@@ -136,9 +136,14 @@ class Building extends Base
       ->leftJoin('share s', "s.type = 'building' and a.id = s.object_id and s.user_id = " . $user_id)
       ->where('a.city', self::$city);
 
-    if (isset($filter['my']) && $filter['my'] == 1) {
-      $list->where('(a.user_id > 0 AND (s.object_id is not null OR a.user_id = ' . $user_id . ' OR 
-        (a.company_id > 0 AND a.company_id = ' . $company_id . ')))');
+    if (isset($filter['my'])) {
+      if ($filter['my'] == 1) {
+        $list->where('(a.share = 0 AND ((a.user_id > 0 AND a.user_id = ' . $user_id . ') OR 
+          (a.company_id > 0 AND a.company_id = ' . $company_id . ')))');
+      } else {
+        $list->where('(a.user_id > 0 AND (s.object_id is not null OR a.user_id = ' . $user_id . ' OR 
+          (a.company_id > 0 AND a.company_id = ' . $company_id . ')))');
+      }
     } else if ($isAdmin) {
       $list->where('((a.share = 1 AND a.status <> 2) OR a.user_id = 0 OR s.object_id is not null OR a.user_id = ' . $user_id . ' OR 
         (a.company_id > 0 AND a.company_id = ' . $company_id . '))');
@@ -174,7 +179,13 @@ class Building extends Base
       a.rent_sell,a.price,b.file,a.user_id,a.share,a.status,s.level as share_level')
       ->page($filter['page'], $filter['page_size']);
 
-    if ($isAdmin) {
+    if (isset($filter['my']) && $filter['my'] >= 1) { 
+      $list->order([
+        'a.share' => 'asc',
+        'a.status' => 'asc',
+        'a.update_time' => 'desc', 
+        'a.id' => 'desc']);
+    } else if ($isAdmin) {
       $list->order([
         'a.share' => 'desc',
         'a.status' => 'asc',
