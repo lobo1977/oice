@@ -18,7 +18,6 @@ Page({
     isEnd: false,
     list: [],
     checked: [],
-    myCustomer: [],
     customerData: [],
     customer_id: 0
   },
@@ -29,11 +28,11 @@ Page({
   onLoad: function (options) {
     if (app.globalData.appUserInfo) {
       this.getList()
-      this.getMyCustomer()
+      this.getCustomer()
     } else {
       app.userLoginCallback = () => {
         this.getList()
-        this.getMyCustomer()
+        this.getCustomer()
       }
     }
   },
@@ -150,20 +149,14 @@ Page({
 
   noop() {},
 
-  getMyCustomer() {
+  getCustomer() {
     let that = this
-    app.get('my/customer', (res) => {
-      if (res.data) {
-        that.data.myCustomer = res.data
-        let list = []
-        that.data.myCustomer.forEach((item) => {
-          list.push(item.customer_name)
-        })
-        that.setData({
-          customerData: list
-        })
-      }
-    }, () => {
+    let list = []
+    app.globalData.myCustomer.forEach((item) => {
+      list.push(item.customer_name)
+    })
+    that.setData({
+      customerData: list
     })
   },
 
@@ -176,7 +169,7 @@ Page({
   onCustomerSelected: function(event) {
     this.setData({
       showCustomerPicker: false,
-      customer_id: this.data.myCustomer[event.detail.index].id
+      customer_id: app.globalData.myCustomer[event.detail.index].id
     })
     if (this.data.customer_id > 0) {
       this.addFilter()
@@ -259,13 +252,13 @@ Page({
   toFilter: function() {
     let that = this
     if (that.data.customer_id == 0) {
-      if (that.data.myCustomer.length > 1) {
+      if (app.globalData.myCustomer.length > 1) {
         that.setData({
           showCustomerPicker: true
         })
         return
-      } else if (that.data.myCustomer.length == 1) {
-        that.data.customer_id = that.data.myCustomer[0].id
+      } else if (app.globalData.myCustomer.length == 1) {
+        that.data.customer_id = app.globalData.myCustomer[0].id
       } else {
         Dialog.alert({
           message: '您需要添加客户才可以添加拼盘'

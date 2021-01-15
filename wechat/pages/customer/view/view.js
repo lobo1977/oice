@@ -727,10 +727,11 @@ Page({
       company_id: newUser.company_id
     }, (res) => {
       if (res.success) {
+        app.getMyCustomer()
+        app.globalData.refreshCustomer = true
         Dialog.alert({
           message: '转交成功',
         }).then(() => {
-          app.globalData.refreshCustomer = true
           app.goBack()
         })
       } else {
@@ -851,6 +852,7 @@ Page({
       id: that.data.info.id
     }, (res) => {
       if (res.success) {
+        app.getMyCustomer()
         app.globalData.refreshCustomer = true
         app.goBack()
       } else {
@@ -1005,6 +1007,7 @@ Page({
           message: '撞单处理完成'
         }).then(() => {
           if (operate === 2) {
+            app.getMyCustomer()
             app.globalData.refreshCustomer = true
             app.goBack()
           } else {

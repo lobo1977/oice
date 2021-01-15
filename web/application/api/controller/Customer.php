@@ -287,7 +287,7 @@ class Customer extends Base
   /**
    * 添加筛选
    */
-  public function addFilter($cid, $bids, $uids) {
+  public function addFilter($cid, $bids = '', $uids = '') {
     $result = 0;
     
     if ($bids) {

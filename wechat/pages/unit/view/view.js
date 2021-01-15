@@ -42,7 +42,6 @@ Page({
     },
     previewImages: [],
     showCustomerPicker: false,
-    myCustomer: [],
     customerData: [],
     customer_id: 0,
     showMenu: false,
@@ -64,11 +63,11 @@ Page({
     }
     if (app.globalData.appUserInfo) {
       that.getView()
-      that.getMyCustomer()
+      that.getCustomer()
     } else {
       app.userLoginCallback = () => {
         that.getView()
-        that.getMyCustomer()
+        that.getCustomer()
       }
     }
   },
@@ -208,27 +207,21 @@ Page({
   onCustomerSelected: function(event) {
     this.setData({
       showCustomerPicker: false,
-      customer_id: this.data.myCustomer[event.detail.index].id
+      customer_id: app.globalData.myCustomer[event.detail.index].id
     })
     if (this.data.customer_id > 0) {
       this.addFilter()
     }
   },
 
-  getMyCustomer() {
+  getCustomer() {
     let that = this
-    app.get('my/customer', (res) => {
-      if (res.data) {
-        that.data.myCustomer = res.data
-        let list = []
-        that.data.myCustomer.forEach((item) => {
-          list.push(item.customer_name)
-        })
-        that.setData({
-          customerData: list
-        })
-      }
-    }, () => {
+    let list = []
+    app.globalData.myCustomer.forEach((item) => {
+      list.push(item.customer_name)
+    })
+    that.setData({
+      customerData: list
     })
   },
   
@@ -348,13 +341,13 @@ Page({
   toFilter: function() {
     let that = this
     if (that.data.customer_id == 0) {
-      if (that.data.myCustomer.length > 1) {
+      if (app.globalData.myCustomer.length > 1) {
         that.setData({
           showCustomerPicker: true
         })
         return
-      } else if (that.data.myCustomer.length == 1) {
-        that.data.customer_id = that.data.myCustomer[0].id
+      } else if (app.globalData.myCustomer.length == 1) {
+        that.data.customer_id = app.globalData.myCustomer[0].id
       } else {
         Dialog.alert({
           message: '您需要添加客户才可以添加拼盘'
@@ -374,7 +367,6 @@ Page({
     wx.showLoading()
     app.post('customer/addFilter', {
       cid: that.data.customer_id,
-      bids: that.data.info.building_id,
       uids: that.data.info.id
     }, (res) => {
       if (res.success) {

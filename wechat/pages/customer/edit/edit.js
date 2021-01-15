@@ -415,13 +415,14 @@ Page({
             title: '保存成功',
             message: res.message
           }).then(() => {
+            app.getMyCustomer()
+            app.globalData.refreshCustomerView = true
             if (that.data.id == 0) {
               let id = res.data
               wx.redirectTo({
                 url: '../view/view?id=' + id
               })
             } else {
-              app.globalData.refreshCustomerView = true
               app.goBack()
             }
           })

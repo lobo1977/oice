@@ -32,6 +32,7 @@ App({
     isWindows: false,
     userInfo: null,
     appUserInfo: null,
+    myCustomer: [],
     serverUrl: 'https://m.o-ice.com',
     area: [
       {
@@ -314,6 +315,7 @@ App({
           }, (res2) => {
             if (res2.success && res2.data) {
               app.globalData.appUserInfo = res2.data
+              app.getMyCustomer()
               if (app.userLoginCallback) {
                 app.userLoginCallback(res2)
               }
@@ -350,6 +352,16 @@ App({
     app.get('getUserInfo', (res) => {
       if (res.data) {
         app.globalData.appUserInfo = res.data
+      }
+    }, () => {
+    })
+  },
+
+  getMyCustomer() {
+    let app = this
+    app.get('my/customer', (res) => {
+      if (res.data) {
+        app.globalData.myCustomer = res.data
       }
     }, () => {
     })
