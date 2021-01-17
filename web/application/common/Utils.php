@@ -158,9 +158,9 @@ class Utils
         if (!$fileName) {
             return false;
         }
-        $images = array('jpg','jpeg','png','gif','bmp');
+        $exts = array('jpg','jpeg','png','gif','bmp');
         $ext = strtolower(self::getFileExt($fileName));
-        return in_array($ext, $images);
+        return in_array($ext, $exts);
     }
 
     /**
@@ -170,9 +170,21 @@ class Utils
         if (!$fileName) {
             return false;
         }
-        $images = array('mp4');
+        $exts = array('mp4');
         $ext = strtolower(self::getFileExt($fileName));
-        return in_array($ext, $images);
+        return in_array($ext, $exts);
+    }
+
+    /**
+     * 判断是否为PDF文件
+     */
+    public static function isPdfFile($fileName = '') {
+        if (!$fileName) {
+            return false;
+        }
+        $exts = array('pdf');
+        $ext = strtolower(self::getFileExt($fileName));
+        return in_array($ext, $exts);
     }
 
     /**

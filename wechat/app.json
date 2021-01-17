@@ -100,5 +100,10 @@
     "pages/daily/review/review",
     "pages/daily/reviewView/reviewView",
     "pages/my/contact/contact"
-  ]
+  ],
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于设置项目的地理位置"
+    }
+  }
 }

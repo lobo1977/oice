@@ -73,6 +73,7 @@ Page({
     eng_name_error: '',
     images: [],
     previewList: [],
+    attach: null,
     imageMenu: [
       {name: '设为封面', value: 'setDefault', disabled: true}, 
       {name: '删除', value: 'delete', disabled: true}
@@ -269,6 +270,7 @@ Page({
           id: that.data.copy == 1 ? 0 : that.data.id,
           type: arrType,
           info: info,
+          attach: res.data.attach ? res.data.attach : null,
           engInfo: engInfo,
           images: imageList,
           areaData: [{values: arrArea, defaultIndex: areaIdx}, {values: arrDistrict, defaultIndex: districtIdx}]
@@ -733,6 +735,71 @@ Page({
     //     current: event.detail.index
     //   })
     // }
+  },
+
+  uploadAttach: function(event) {
+    let that = this
+    if (app.globalData.isWindows) {
+      return
+    }
+
+    wx.chooseMessageFile({
+      count: 1,
+      success(res) {
+        wx.showLoading({title: '上传中'})
+        try {
+          res.tempFiles.forEach(element => {
+            wx.uploadFile({
+              header: {
+                'Content-Type': 'multipart/form-data',
+                'User-Token': app.globalData.appUserInfo && app.globalData.appUserInfo.token ? 
+                  app.globalData.appUserInfo.token : ''
+              },
+              url: app.globalData.serverUrl + '/api/building/uploadAttach',
+              filePath: element.path,
+              name: 'attach[]',
+              formData: {
+                'id': that.data.id
+              },
+              success (res2) {
+                if (res2.data) {
+                  let json = JSON.parse(res2.data)
+                  if (json.success) {
+                    that.setData({
+                      attach: json.data
+                    })
+                  } else {
+                    Dialog.alert({
+                      title: '发生错误',
+                      message: json.message
+                    }).then(() => {
+                    })
+                  }
+                } else {
+                  Dialog.alert({
+                    title: '发生错误'
+                  }).then(() => {
+                  })
+                }
+              },
+              complete() {
+                wx.hideLoading()
+              }, 
+              fail(e) {
+                error++
+                console.log(e.errMsg)
+              }
+            })
+          })
+        } catch(e) {
+          Dialog.alert({
+            title: '发生错误',
+            message: e.message
+          }).then(() => {
+          })
+        }
+      }
+    })
   },
 
   upload: function(event) {

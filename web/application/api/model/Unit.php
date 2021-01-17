@@ -242,6 +242,8 @@ class Unit extends Base
             array_push($images, $file);
           } else if ($file->is_video) {
             array_push($videos, $file);
+          } else {
+            $data->attach = $file;
           }
         }
       }

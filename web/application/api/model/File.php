@@ -60,6 +60,10 @@ class File extends Base
           $file->src = '/upload/' . $type . '/images/original/' . $file->file;
           $file->msrc = '/upload/' . $type . '/images/300/' . Utils::replaceExt($file->file, 'jpg');
           $file->url = $file->src;
+        } else {
+          $file->src = '/static/img/attach.png';
+          $file->msrc = '/static/img/attach.png';
+          $file->url = '/upload/' . $type . '/attach/' . $file->file;
         }
       } else if ($type == 'customer') {
         $file->src = '/upload/' . $type . '/attach/' . $file->file;
@@ -110,25 +114,17 @@ class File extends Base
 
     foreach($files as $key => $file) {
       $info = false;
+      $uploadPath = '../public/upload/' . $type . '/images';
+      $info = $file->validate(['size'=>20971520, 'ext'=>'jpg,jpeg,png,gif,mp4'])
+        ->rule('uniqid')->move($uploadPath . '/original');
 
-      if ($type == 'building' || $type == 'unit') {
-        $uploadPath = '../public/upload/' . $type . '/images';
-        $info = $file->validate(['size'=>20971520, 'ext'=>'jpg,jpeg,png,gif,mp4'])
-          ->rule('uniqid')->move($uploadPath . '/original');
-
-        if ($info) {
-          if (Utils::isImageFile($info->getFilename())) {
-            self::thumbImage($info, [900,300], $uploadPath);
-          } else if (Utils::isVideoFile($info->getFilename())) {
-            Utils::getVideoCover($uploadPath . '/original/' . $info->getFilename(), 
-              $uploadPath . '/300/' . Utils::replaceExt($info->getFilename(), 'jpg'));
-          }
+      if ($info) {
+        if (Utils::isImageFile($info->getFilename())) {
+          self::thumbImage($info, [900,300], $uploadPath);
+        } else if (Utils::isVideoFile($info->getFilename())) {
+          Utils::getVideoCover($uploadPath . '/original/' . $info->getFilename(), 
+            $uploadPath . '/300/' . Utils::replaceExt($info->getFilename(), 'jpg'));
         }
-      } else {
-        $uploadPath = '../public/upload/' . $type . '/attach';
-        $info = $file->validate(['size'=>20971520,
-          'ext'=>'jpg,jpeg,png,gif,csv,txt,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar,mp4'])
-          ->rule('uniqid')->move($uploadPath);
       }
 
       if ($info) {
@@ -152,7 +148,60 @@ class File extends Base
           Log::add($user, [
             "table" => $type,
             "owner_id" => $parent_id,
-            "title" => '上传' . ($type == 'building' || $type == 'unit' ? '图片' : '附件'),
+            "title" => '上传' . (Utils::isImageFile($info->getFilename()) ? '图片' : '视频'),
+            "summary" => mb_strlen($newData->title) > 20 ? mb_substr($newData->title, 0, 20) . '...' : $newData->title 
+          ]);
+        }
+      } else {
+        self::exception($file->getError());
+      }
+    }
+
+    return $result;
+  }
+
+    /**
+   * 上传文件
+   */
+  public static function uploadAttach($user, $type, $parent_id, $files) {
+    $operate = 'edit';
+    if ($type == 'customer') {
+      $operate = 'follow';
+    }
+
+    if (!self::allow($user, $type, $parent_id, $operate)) {
+      self::exception('操作失败，您没有权限。');
+    }
+
+    $user_id = 0;
+    if ($user) {
+      $user_id = $user->id;
+    }
+
+    $result = 0;
+    foreach($files as $key => $file) {
+      $info = false;
+      $uploadPath = '../public/upload/' . $type . '/attach';
+      $info = $file->validate(['size'=>20971520,
+        'ext'=>'jpg,jpeg,png,gif,csv,txt,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar,mp4'])
+        ->rule('uniqid')->move($uploadPath);
+
+      if ($info) {
+        $data['type'] = $type;
+        $data['parent_id'] = $parent_id;
+        $data['title'] = substr($info->getInfo('name'), 0, 300);
+        $data['file'] = $info->getFilename();
+        $data['size'] = $info->getSize();
+        $data['user_id'] = $user_id;
+        
+        $newData = new File($data);
+        $result += $newData->save();
+
+        if ($result) {
+          Log::add($user, [
+            "table" => $type,
+            "owner_id" => $parent_id,
+            "title" => '上传附件',
             "summary" => mb_strlen($newData->title) > 20 ? mb_substr($newData->title, 0, 20) . '...' : $newData->title 
           ]);
         }

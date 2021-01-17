@@ -53,6 +53,7 @@ Page({
       allowDelete: false,
       images: [],
       linkman: [],
+      attach: null,
       unit: [],
       confirm: []
     },
@@ -485,5 +486,28 @@ Page({
     }, () => {
       wx.hideLoading()
     })
+  },
+
+  download: function() {
+    if (this.data.info.attach) {
+      let url = app.globalData.serverUrl + '/' + this.data.info.attach.url
+      wx.showLoading({title: '加载中'})
+      wx.downloadFile({
+        url: url,
+        success: function (res) {
+          if (res.statusCode === 200) {
+            wx.openDocument({
+              showMenu: true,
+              filePath: res.tempFilePath,
+              success: function (res) {
+              }
+            })
+          }
+        },
+        complete: function() {
+          wx.hideLoading()
+        }
+      })
+    }
   }
 })

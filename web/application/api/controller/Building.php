@@ -186,6 +186,29 @@ class Building extends Base
     }
   }
 
+    /**
+   * 上传项目图片
+   */
+  public function uploadAttach($id) {
+    $files = request()->file('attach');
+    if ($files) {
+      $result = File::uploadAttach($this->user, 'building', $id, $files);
+      if ($result >= 1) {
+        $images = File::getList($this->user, 'building', $id);
+        $arr = $images->toArray();
+        if (count($arr) > 0) {
+          return $this->succeed(array_pop($arr));
+        } else {
+          return $this->fail();
+        }
+      } else {
+        return $this->fail();
+      }
+    } else {
+      return $this->fail('请选择要上传的文件');
+    }
+  }
+
   /**
    * 设置默认图片
    */
