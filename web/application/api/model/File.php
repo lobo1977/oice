@@ -182,7 +182,7 @@ class File extends Base
     foreach($files as $key => $file) {
       $info = false;
       $uploadPath = '../public/upload/' . $type . '/attach';
-      $info = $file->validate(['size'=>20971520,
+      $info = $file->validate(['size'=>52428800,
         'ext'=>'jpg,jpeg,png,gif,csv,txt,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar,mp4'])
         ->rule('uniqid')->move($uploadPath);
 
