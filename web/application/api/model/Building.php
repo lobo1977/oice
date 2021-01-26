@@ -302,20 +302,36 @@ class Building extends Base
     }
 
     // 通过分享链接查看自动加入共享列表
-    if ($user_id > 0 && !empty($key) && $key == md5('building' . $id . config('wechat.app_secret'))) {
+    if ($user_id > 0 && !empty($key)) {
       $share = db('share')
         ->where('type', 'building')
         ->where('user_id', $user_id)
         ->where('object_id', $id)
         ->find();
-
       if (null == $share) {
-        db('share')->insert([
-          'type' => 'building',
-          'user_id' => $user_id,
-          'object_id' => $id,
-          'level' => 0
-        ]);
+        if ($key == md5('building' . $id . config('wechat.app_secret'))) {
+          db('share')->insert([
+            'type' => 'building',
+            'user_id' => $user_id,
+            'object_id' => $id,
+            'level' => 0
+          ]);
+        } else if ($key == md5('building_edit' . $id . config('wechat.app_secret'))) {
+          db('share')->insert([
+            'type' => 'building',
+            'user_id' => $user_id,
+            'object_id' => $id,
+            'level' => 1
+          ]);
+        }
+      } else if ($key == md5('building_edit' . $id . config('wechat.app_secret'))) {
+        db('share')
+          ->where('type', 'building')
+          ->where('user_id', $user_id)
+          ->where('object_id', $id)
+          ->update([
+            'level' => 1
+          ]);
       }
     }
 
@@ -1175,7 +1191,7 @@ class Building extends Base
       self::exception('您没有权限发送短信。');
     }
 
-    self::getShortUrl($building);
+    self::getShortUrl($building, true);
 
     $linkman = db('linkman')
       ->where('type', 'building')
@@ -1224,12 +1240,16 @@ class Building extends Base
   /**
    * 获取项目短网址
    */
-  private static function getShortUrl(&$building) {
+  private static function getShortUrl(&$building, $edit = false) {
     if (empty($building) || empty($building->id)) {
       return;
     }
+    $key = 'building';
+    if ($edit) {
+      $key = 'building_edit';
+    }
     if (empty($building->key)) {
-      $building->key = md5('building' . $building->id . config('wechat.app_secret'));
+      $building->key = md5($key . $building->id . config('wechat.app_secret'));
     }
     if (empty($building->short_url)) {
       $wechat = new Wechat();
