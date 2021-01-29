@@ -781,18 +781,6 @@ class Building extends Base
           if ($fileData) {
             db('file')->insertAll($fileData);
           }
-          
-          // 复制单元
-          $unitData = db('unit')
-            ->where('building_id', $copy)
-            ->where('delete_time', 'null')
-            ->field($newData->id . ' as building_id,room,building_no,floor,face,acreage,rent_sell,rent_price,sell_price,decoration,`status`,end_date,`rem`,1 as `share`,' . 
-              $company_id . ' as `company_id`,' . $user_id . ' as user_id,now() as create_time')
-            ->select();
-
-          if ($unitData) {
-            db('unit')->insertAll($unitData);
-          }
 
           // 复制联系人
           $linkmanData = db('linkman')
@@ -804,6 +792,45 @@ class Building extends Base
             ->select();
           if ($linkmanData) {
             db('linkman')->insertAll($linkmanData);
+          }
+          
+          // 复制单元
+          $unitData = db('unit')
+            ->where('building_id', $copy)
+            ->where('delete_time', 'null')
+            ->field('id,' . $newData->id . ' as building_id,room,building_no,floor,face,acreage,rent_sell,rent_price,sell_price,decoration,`status`,end_date,`rem`,1 as `share`,' . 
+              $company_id . ' as `company_id`,' . $user_id . ' as user_id,now() as create_time')
+            ->select();
+
+          if ($unitData) {
+            foreach($unitData as $key => $unit) {
+              $oldId = $unit['id'];
+              unset($unit['id']);
+              $newUnit = new Unit($unit);
+              $result = $newUnit->save();
+              if ($result) {
+                // 复制单元图片
+                $fileData = db('file')
+                  ->where('type', 'unit')
+                  ->where('parent_id', $oldId)
+                  ->where('delete_time', 'null')
+                  ->field('`type`,' . $newUnit->id . ' as parent_id,`title`,`file`,`size`,`default`,`sort`,now() as create_time,' . $user_id . ' as user_id')
+                  ->select();
+                if ($fileData) {
+                  db('file')->insertAll($fileData);
+                }
+                // 复制单元联系人
+                $linkmanData = db('linkman')
+                  ->where('type', 'unit')
+                  ->where('owner_id', $oldId)
+                  ->where('delete_time', 'null')
+                  ->field('`type`,' . $newUnit->id . ' as owner_id,`title`,`department`,`job`,`mobile`,`tel`,`email`,`weixin`,`qq`,`rem`,`status`,now() as create_time,' . $user_id . ' as user_id')
+                  ->select();
+                if ($linkmanData) {
+                  db('linkman')->insertAll($linkmanData);
+                }
+              }
+            }
           }
         }
 
