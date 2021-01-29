@@ -599,6 +599,46 @@ Page({
 
   noop: function() {},
 
+  batchRemmoveFilter: function(event) {
+    let that = this
+    let count = 0
+    wx.showLoading()
+    this.data.filterChecked.forEach((item) => {
+      count ++
+      let idx = Number(item)
+      let obj = that.data.info.filter[idx]
+      obj.deleted = true
+      app.post('customer/removeFilter', {
+        id: that.data.info.id,
+        building_id: obj.building_id,
+        unit_id: obj.unit_id
+      }, (res) => {
+        if (res.success) {
+        } else {
+          // Dialog.alert({
+          //   title: '发生错误',
+          //   message: res.message ? res.message : '系统异常'
+          // })
+        }
+      }, () => {
+        if (count >= that.data.filterChecked.length) {
+          that.data.info.filter.forEach((item, index, arr) => {
+            if (item.deleted) {
+              arr.splice(index, 1)
+            }
+          })
+          that.setData({
+            ['info.filter']: that.data.info.filter,
+            filterCheckAll: false,
+            filterChecked: [],
+            showFilterCheckbox: that.data.info.filter.length
+          })
+          wx.hideLoading()
+        }
+      })
+    })
+  },
+
   removeFilter : function(event) {
     let that = this
     const idx = event.currentTarget.dataset.index
