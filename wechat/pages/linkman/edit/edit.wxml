@@ -8,8 +8,8 @@
     error-message="{{ mobile_error }}" maxlength="11" bind:input="onMobileInput" />
     <van-field title-width="80px" label="直线电话" value="{{ info.tel }}" maxlength="20" bind:input="onTelInput" />
     <van-field title-width="80px" label="电子信箱" value="{{ info.email }}" maxlength="30" bind:input="onEmailInput" error="{{is_email_error}}" error-message="{{ email_error }}" />
-    <van-field title-width="80px" label="微信" value="{{ info.weixin }}" maxlength="30" bind:input="onEmailInput" />
-    <van-field title-width="80px" label="QQ" value="{{ info.qq }}" maxlength="30" bind:input="onEmailInput" />
+    <van-field title-width="80px" label="微信" value="{{ info.weixin }}" maxlength="30" bind:input="onWeixinInput" />
+    <van-field title-width="80px" label="QQ" value="{{ info.qq }}" maxlength="30" bind:input="onQQInput" />
     <van-cell title-width="80px" title="是否在职">
       <van-switch checked="{{ !info.status || info.status == 0 }}" bind:change="onStatusChange" active-color="#07c160" />
     </van-cell>
