@@ -158,7 +158,15 @@ class Building extends Base
     if ($files) {
       $result = File::upload($this->user, 'building', $id, $is_default, $files);
       if ($result >= 1) {
-        $images = File::getList($this->user, 'building', $id);
+        $images = [];
+        $files = File::getList($this->user, 'building', $id);
+        if ($files) {
+          foreach($files as $key => $file) {
+            if ($file->is_image || $file->is_video) {
+              array_push($images, $file);
+            }
+          }
+        }
         return $this->succeed($images);
       } else {
         return $this->fail();
@@ -176,7 +184,15 @@ class Building extends Base
     if ($files) {
       $result = File::upload($this->user, 'unit', $id, $is_default, $files);
       if ($result >= 1) {
-        $images = File::getList($this->user, 'unit', $id);
+        $images = [];
+        $files = File::getList($this->user, 'unit', $id);
+        if ($files) {
+          foreach($files as $key => $file) {
+            if ($file->is_image || $file->is_video) {
+              array_push($images, $file);
+            }
+          }
+        }
         return $this->succeed($images);
       } else {
         return $this->fail();
@@ -194,13 +210,16 @@ class Building extends Base
     if ($files) {
       $result = File::uploadAttach($this->user, 'building', $id, $files);
       if ($result >= 1) {
-        $images = File::getList($this->user, 'building', $id);
-        $arr = $images->toArray();
-        if (count($arr) > 0) {
-          return $this->succeed(array_pop($arr));
-        } else {
-          return $this->fail();
+        $attach = [];
+        $files = File::getList($this->user, 'building', $id);
+        if ($files) {
+          foreach($files as $key => $file) {
+            if (!$file->is_image && !$file->is_video) {
+              array_push($attach, $file);
+            }
+          }
         }
+        return $this->succeed($attach);
       } else {
         return $this->fail();
       }

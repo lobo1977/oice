@@ -377,6 +377,7 @@ class Building extends Base
 
     $images = [];
     $videos = [];
+    $attach = [];
     
     $files = File::getList($user, 'building', $id);
     if ($files) {
@@ -386,13 +387,14 @@ class Building extends Base
         } else if ($file->is_video) {
           array_push($videos, $file);
         } else {
-          $data->attach = $file;
+          array_push($attach, $file);
         }
       }
     }
 
     $data->images = $images;
     $data->videos = $videos;
+    $data->attach = $attach;
 
     if ($operate == 'view') {
       $data->isFavorite = false;

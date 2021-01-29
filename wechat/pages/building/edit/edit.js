@@ -73,7 +73,7 @@ Page({
     eng_name_error: '',
     images: [],
     previewList: [],
-    attach: null,
+    //attach: null,
     imageMenu: [
       {name: '设为封面', value: 'setDefault', disabled: true}, 
       {name: '删除', value: 'delete', disabled: true}
@@ -270,7 +270,7 @@ Page({
           id: that.data.copy == 1 ? 0 : that.data.id,
           type: arrType,
           info: info,
-          attach: res.data.attach ? res.data.attach : null,
+          //attach: res.data.attach ? res.data.attach : null,
           engInfo: engInfo,
           images: imageList,
           areaData: [{values: arrArea, defaultIndex: areaIdx}, {values: arrDistrict, defaultIndex: districtIdx}]

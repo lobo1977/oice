@@ -52,8 +52,8 @@ Page({
       allowAudit: false,
       allowDelete: false,
       images: [],
+      attach: [],
       linkman: [],
-      attach: null,
       unit: [],
       confirm: []
     },
@@ -63,7 +63,16 @@ Page({
     auditError: false,
     showCustomerPicker: false,
     customerData: [],
-    customer_id: 0
+    customer_id: 0,
+    tapStartTime: 0,
+    tapEndTime: 0,
+    showAttachActions: false,
+    attachIndex: 0,
+    attachActions: [
+      {
+        name: '删除',
+      }
+    ]
   },
   
   onLoad(options) {
@@ -488,26 +497,144 @@ Page({
     })
   },
 
-  download: function() {
-    if (this.data.info.attach) {
-      let url = app.globalData.serverUrl + '/' + this.data.info.attach.url
-      wx.showLoading({title: '加载中'})
-      wx.downloadFile({
-        url: url,
-        success: function (res) {
-          if (res.statusCode === 200) {
-            wx.openDocument({
-              showMenu: true,
-              filePath: res.tempFilePath,
-              success: function (res) {
-              }
-            })
-          }
-        },
-        complete: function() {
-          wx.hideLoading()
-        }
+  bindTouchStart: function(e) {
+    this.tapStartTime = e.timeStamp;
+  },
+
+  bindTouchEnd: function(e) {
+    this.tapEndTime = e.timeStamp;
+  },
+
+  bindAttachLongTap: function(event) {
+    let idx = event.currentTarget.dataset.data
+    if (this.data.info.allowEdit && app.globalData.appUserInfo.id == this.data.info.attach[idx].user_id) {
+      this.setData({
+        showAttachActions: true,
+        attachIndex: idx
       })
     }
+  },
+
+  onAttachActionsClose: function() {
+    this.setData({
+      showAttachActions: false
+    })
+  },
+
+  onAttachActionsSelect: function(event) {
+    let that = this
+    if (event.detail.name == '删除') {
+      wx.showLoading()
+      app.post('building/removeImage', {
+        image_id: that.data.info.attach[that.data.attachIndex].id,
+      }, (res) => {
+        if (res.success) {
+          that.data.info.attach.splice(that.data.attachIndex, 1)
+          that.setData({
+            ['info.attach']: that.data.info.attach
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: res.message ? res.message : '操作失败，系统异常',
+            duration: 2000
+          })
+        }
+      }, () => {
+        wx.hideLoading()
+      })
+    }
+  },
+
+  bindViewAttach: function (event) {
+    if (this.tapEndTime  - this.tapStartTime > 350) {
+      return
+    }
+    let attach = this.data.info.attach[event.currentTarget.dataset.data]
+    let url = app.globalData.serverUrl + '/' + attach.url
+    wx.showLoading({title: '加载中'})
+    wx.downloadFile({
+      url: url,
+      success: function (res) {
+        if (res.statusCode === 200) {
+          wx.openDocument({
+            showMenu: true,
+            filePath: res.tempFilePath,
+            success: function (res) {
+            }
+          })
+        }
+      },
+      complete: function() {
+        wx.hideLoading()
+      }
+    })
+  },
+
+  uploadAttach: function(event) {
+    let that = this
+    let count = 0
+    let error = 0
+
+    //app.checkSystem('/app/building/view/' + that.data.info.id)
+    wx.chooseMessageFile({
+      count: 5,
+      success(res) {
+        wx.showLoading({title: '上传中'})
+        try {
+          res.tempFiles.forEach(element => {
+            wx.uploadFile({
+              header: {
+                'Content-Type': 'multipart/form-data',
+                'User-Token': app.globalData.appUserInfo && app.globalData.appUserInfo.token ? 
+                  app.globalData.appUserInfo.token : ''
+              },
+              url: app.globalData.serverUrl + '/api/building/uploadAttach',
+              filePath: element.path,
+              name: 'attach[]',
+              formData: {
+                'id': that.data.info.id
+              },
+              success (res2) {
+                if (res2.data) {
+                  let json = JSON.parse(res2.data)
+                  if (json.success) {
+                    that.setData({
+                      ['info.attach']: json.data
+                    })
+                  } else {
+                    error++
+                  }
+                } else {
+                  error++
+                }
+              },
+              complete() {
+                count++
+                if (count >= res.tempFiles.length) {
+                  wx.hideLoading()
+                  if (error > 0) {
+                    Dialog.alert({
+                      title: '发生错误',
+                      message: error + '个文件上传失败'
+                    })
+                  }
+                }
+              }, 
+              fail(e) {
+                error++
+                console.log(e.errMsg)
+              }
+            })
+          })
+        } catch(e) {
+          Dialog.alert({
+            title: '发生错误',
+            message: e.message
+          }).then(() => {
+          })
+        }
+      }
+    })
   }
 })
