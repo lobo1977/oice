@@ -388,10 +388,18 @@ Page({
       let latLng = app.convertBD09ToGCJ02(info.latitude, info.longitude)
       that.chooseLocation(latLng.lat, latLng.lng)
     } else {
-      wx.getLocation({
-        type: 'gjc02',
+      wx.authorize({
+        scope: 'scope.userLocation',
         success (res) {
-          that.chooseLocation(res.latitude, res.longitude)
+          wx.getLocation({
+            type: 'gcj02',
+            success (res) {
+              that.chooseLocation(res.latitude, res.longitude)
+            },
+            fail (err) {
+              console.log(err)
+            }
+          })
         }
       })
     }
