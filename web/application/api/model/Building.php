@@ -1257,8 +1257,7 @@ class Building extends Base
       }
     }
 
-    $message = sprintf(config('sms.tmp_commission_confirm'), 
-      $summary, $acreage . '平方米', $building->short_url);
+    $message = sprintf(config('sms.tmp_commission_confirm'),  $summary);
 
     sysLog::info($mobileList . ':'. $message);
 
