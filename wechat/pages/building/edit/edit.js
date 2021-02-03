@@ -406,6 +406,7 @@ Page({
   },
 
   chooseLocation: function(lat, lng) {
+    let that = this
     wx.chooseLocation({
       latitude: lat,
       longitude: lng,
@@ -870,7 +871,6 @@ Page({
             }
           },
           complete() {
-            count++
             if (count >= files.length) {
               app.globalData.refreshBuildingView = true
               wx.hideLoading()
@@ -887,6 +887,7 @@ Page({
             console.log(e.errMsg)
           }
         })
+        count++
       })
     } catch(e) {
       wx.hideLoading()

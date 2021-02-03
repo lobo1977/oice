@@ -618,7 +618,6 @@ Page({
             }
           },
           complete() {
-            count++
             if (count >= files.length) {
               app.globalData.refreshUnitView = true
               wx.hideLoading()
@@ -635,6 +634,7 @@ Page({
             console.log(e.errMsg)
           }
         })
+        count++
       })
     } catch(e) {
       wx.hideLoading()
