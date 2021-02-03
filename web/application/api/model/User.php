@@ -362,7 +362,7 @@ class User extends Base
         }
         if ($user->save()) {
           $user = self::getById($user->id);
-          // 新用户自动关联已有项目
+          // 新用户自动关联项目
           self::bindUser($user);
           return self::loginSuccess($user, $mobile, true);
         } else {
@@ -499,7 +499,7 @@ class User extends Base
 
     $find = self::where('mobile', $mobile)->find();
     if ($find && $find->id != $user->id) {
-      self::exception('该手机号已被占用。');
+      self::exception('该手机号已存在。');
     }
 
     $oldData->mobile = $mobile;
@@ -508,6 +508,9 @@ class User extends Base
     }
     $result = $oldData->save();
     if ($result) {
+      $user->mobile = $mobile;
+      self::bindUser($user);
+
       Log::add($user, [
         "table" => "user",
         "owner_id" => $user->id,
@@ -715,4 +718,36 @@ class User extends Base
       }
     }
   }
+
+  /**
+   * 新用户自动创建关联企业
+   */
+  // private static function CreateCompany($user) {
+  //   if (empty($user->mobile)) {
+  //     return;
+  //   }
+
+  //   $linkman = db('linkman')
+  //     ->where('mobile', $user->mobile)
+  //     ->where('type', 'building')
+  //     ->where('status', 0)
+  //     ->where('delete_time', 'null')
+  //     ->field('type,owner_id')
+  //     ->select();
+
+  //   if (empty($linkman) || count($linkman) == 0) {
+  //     return;
+  //   }
+
+  //   foreach($linkman as $item) {
+  //     $building = db('building')
+  //       ->where('id', $item['owner_id'])
+  //       ->where('delete_time', 'null')
+  //       ->find();
+
+  //     if ($building) {
+
+  //     }
+  //   }
+  // }
 }
