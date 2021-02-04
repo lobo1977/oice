@@ -130,7 +130,7 @@
 
   <van-cell-group title="附件" wx:if="{{ (info.attach && info.attach.length) || info.allowEdit}}">
     <van-cell wx:for="{{info.attach}}" wx:for-index="idx" wx:key="id" data-data="{{ idx }}" 
-      title="{{item.title}}" label="{{item.username + ' 于 ' + item.upload_time + ' 上传 ' + (item.size || '')}}" center
+      title="{{item.title}}" label="{{item.username ? (item.username + ' 于 ' + item.upload_time + ' 上传 ') : '' + (item.size || '')}}" center
       bind:click="bindViewAttach" custom-class="cell-contact"
       bindtouchstart="bindTouchStart" bindtouchend="bindTouchEnd"
       bindlongtap="bindAttachLongTap">
@@ -181,6 +181,13 @@
   <van-popup show="{{ showCustomerPicker }}" position="bottom" bind:close="onCustomerPickerClose">
     <van-picker columns="{{ customerData }}" bind:confirm="onCustomerSelected" bind:cancel="onCustomerPickerClose" show-toolbar />
   </van-popup>
+
+  <van-action-sheet
+    show="{{ showAttachActions }}"
+    actions="{{ attachActions }}"
+    bind:close="onAttachActionsClose"
+    bind:select="onAttachActionsSelect"
+  />
 
   <van-row gutter="0" custom-class="button-bar">
     <van-col span="{{ !info.allowAudit && !info.allowEdit && !info.allowDelete ? 12 : (!info.allowAudit && !info.allowEdit ? 10 : 8) }}">

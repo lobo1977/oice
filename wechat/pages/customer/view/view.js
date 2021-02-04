@@ -328,7 +328,8 @@ Page({
               filePath: element.path,
               name: 'attach[]',
               formData: {
-                'id': that.data.info.id
+                'id': that.data.info.id,
+                'name': element.name
               },
               success (res2) {
                 if (res2.data) {

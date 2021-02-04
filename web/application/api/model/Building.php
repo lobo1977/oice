@@ -382,6 +382,9 @@ class Building extends Base
     $files = File::getList($user, 'building', $id);
     if ($files) {
       foreach($files as $key => $file) {
+        if (empty($user) || !$user->isAdmin) {
+          unset($file['username']);
+        }
         if ($file->is_image) {
           array_push($images, $file);
         } else if ($file->is_video) {

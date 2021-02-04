@@ -75,8 +75,8 @@ class File extends Base
           $file->msrc = '/static/img/attach.png';
         }
       }
-      if (mb_strlen($file->title) > 20) {
-        $file->title = mb_substr($file->title, 0, 20) . '...';
+      if (mb_strlen($file->title) > 26) {
+        $file->title = mb_substr($file->title, 0, 26) . '...';
       }
       if ($file->size) {
         $file->size = round(floatval($file->size) / 1048576, 2) . 'MB';
@@ -163,7 +163,7 @@ class File extends Base
     /**
    * 上传文件
    */
-  public static function uploadAttach($user, $type, $parent_id, $files) {
+  public static function uploadAttach($user, $type, $parent_id, $files, $name = '') {
     $operate = 'edit';
     if ($type == 'customer') {
       $operate = 'follow';
@@ -189,7 +189,7 @@ class File extends Base
       if ($info) {
         $data['type'] = $type;
         $data['parent_id'] = $parent_id;
-        $data['title'] = substr($info->getInfo('name'), 0, 300);
+        $data['title'] = empty($name) ? substr($info->getInfo('name'), 0, 300) : $name;
         $data['file'] = $info->getFilename();
         $data['size'] = $info->getSize();
         $data['user_id'] = $user_id;

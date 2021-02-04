@@ -205,10 +205,10 @@ class Building extends Base
     /**
    * 上传项目图片
    */
-  public function uploadAttach($id) {
+  public function uploadAttach($id, $name = '') {
     $files = request()->file('attach');
     if ($files) {
-      $result = File::uploadAttach($this->user, 'building', $id, $files);
+      $result = File::uploadAttach($this->user, 'building', $id, $files, $name);
       if ($result >= 1) {
         $attach = [];
         $files = File::getList($this->user, 'building', $id);

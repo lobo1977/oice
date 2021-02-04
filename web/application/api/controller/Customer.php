@@ -257,10 +257,10 @@ class Customer extends Base
   /**
    * 上传附件
    */
-  public function uploadAttach($id) {
+  public function uploadAttach($id, $name = '') {
     $files = request()->file('attach');
     if ($files) {
-      $result = File::uploadAttach($this->user, 'customer', $id, $files);
+      $result = File::uploadAttach($this->user, 'customer', $id, $files, $name);
       if ($result >= 1) {
         $attach = File::getList($this->user, 'customer', $id);
         return $this->succeed($attach);
