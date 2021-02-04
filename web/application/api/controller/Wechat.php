@@ -81,7 +81,7 @@ class Wechat extends Base
               'url'=> $app_root . '/app/building/edit'
             ),
             array(
-              'name'=> urlencode("业务合作"),
+              'name'=> urlencode("联系客服"),
               'type'=> 'miniprogram',
               'appid' => 'wxa797b3aba4faaa75',
               'pagepath' => 'pages/my/contact/contact',
@@ -133,6 +133,14 @@ class Wechat extends Base
     } else {
       return $this->fail($this->wechat->getMessage());
     }
+  }
+
+  /**
+   * 获取图片素材列表
+   */
+  public function image() {
+    $data = $this->wechat->getMaterial('image');
+    return $this->succeed($data);
   }
   
   /**

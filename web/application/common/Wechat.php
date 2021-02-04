@@ -370,15 +370,18 @@ class Wechat {
 	private function receiveEvent($object) {
 		$content = "";
 		$app_root = 'https://' . config('app_host');
+		$imageId = '';
 		
 		switch ($object->Event) {
 			//关注
 			case "subscribe":
+				$imageId = 'DtsusJONINVD_9nXOilQF6Zxc-5rbJZDLd8py2nHdLk';
 				$content = "欢迎进入" . config('app_name') . '
 完善我的资料：<a href="' . $app_root . '/app/my/info">点这里</a>
 登记我的企业：<a href="' . $app_root . '/app/company/edit">点这里</a>
 开发商发布项目：<a href="' . $app_root . '/app/building/edit">点这里</a>
-用微信群发项目帖：<a href="' . $app_root . '/app/my/robot">点这里</a>';
+用微信群发项目帖：<a href="' . $app_root . '/app/my/robot">点这里</a>
+转到商办云小程序：<a href="' . $app_root . '/app/building" data-miniprogram-appid="wxa797b3aba4faaa75" data-miniprogram-path="pages/building/index/index">点这里</a>';
 				break;
 			//取消关注
 			case "unsubscribe":
@@ -423,7 +426,7 @@ class Wechat {
 				break;
 		}
 		
-		return $this->returnMsg($object, $content);
+		return $this->returnMsg($object, $content, $imageId);
 	}
 	
 	/**
@@ -528,7 +531,7 @@ class Wechat {
 	 * @param unknown $content
 	 * @return unknown
 	 */
-	private function returnMsg($object, $content) {
+	private function returnMsg($object, $content, $imageId = '') {
 		if (is_array($content)) {
 			if (isset($content[0]['PicUrl'])) {
 				$result = $this->transmitNews($object, $content);
@@ -537,6 +540,9 @@ class Wechat {
 			}
 		} else {
 			$result = $this->transmitText($object, $content);
+			if ($imageId) {
+				$this->transmitImage($object, [ 'MediaId' => $imageId ]);
+			}
 		}
 		return $result;
 	}
@@ -828,6 +834,22 @@ class Wechat {
 		//3.将数组转成json格式
 		$postJson = json_encode($array);
 		//4.调用第三方接口
+		$res = $this->https_request($url, $postJson);
+		return $res;
+	}
+
+	/**
+	 * 获取多媒体素材列表
+	 */
+	function getMaterial($type = 'image') {
+		$access_token = $this->getAccessToken();
+		$url = 'https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token=' . $access_token;
+		$array = [
+			'type' => $type,
+			'offset' => 0,
+			'count' => 20
+		];
+		$postJson = json_encode($array);
 		$res = $this->https_request($url, $postJson);
 		return $res;
 	}
