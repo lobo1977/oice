@@ -735,7 +735,8 @@ class Building extends Base
         ]);
       }
 
-      if (isset($data['send_sms']) && $data['send_sms'] == 1) {
+      if (isset($data['share']) && $data['share'] == 1 && 
+        isset($data['send_sms']) && $data['send_sms'] == 1) {
         self::sendCommissionConfirm($user, $id);
       }
 
@@ -1221,6 +1222,8 @@ class Building extends Base
       return false;
     } else if (!self::allow($user, $building, 'edit')) {
       self::exception('您没有权限发送短信。');
+    } else if ($building['share'] == 0) {
+      return false;
     }
 
     self::getShortUrl($building, true);

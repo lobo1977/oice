@@ -57,7 +57,7 @@
         <van-switch checked="{{ info.share == 1 }}" bind:change="onShareChange" active-color="#07c160" />
       </van-cell>
       <van-cell wx:if="{{id > 0}}" title="短信通知" label="发送短信给项目联系人" title-width="200px">
-        <van-switch checked="{{ info.send_sms == 1 }}" bind:change="onSmsChange" active-color="#07c160" />
+        <van-switch checked="{{ info.send_sms == 1 && info.share == 1 }}" disabled="{{ info.share == 0 }}" bind:change="onSmsChange" active-color="#07c160" />
       </van-cell>
     </van-cell-group>
 
