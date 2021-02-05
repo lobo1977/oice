@@ -83,7 +83,7 @@ class Building extends Base
           $building->company_id == $user->company_id;
       }
     } else if ($operate == 'copy') {
-      if ($user == null || $user->company_id == 0) {
+      if ($user == null) {
         return false;
       }
       return $building->share == 1 && $building->status == 1 && $building->user_id != $user->id && $building->company_id != $user->company_id;
