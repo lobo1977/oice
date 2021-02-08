@@ -36,14 +36,14 @@
   </van-cell-group>
 
   <van-row gutter="0">
-    <van-col span="{{info.allowCopy ? 8 : 12}}">
+    <van-col span="{{info.allowCopy2 ? 8 : 12}}">
       <van-button block color="#ffffff" bind:click="favorite" custom-class="text-button" 
         icon="{{ info.isFavorite ? 'star' : 'star-o'}}">收藏</van-button>
     </van-col>
-    <van-col span="{{info.allowCopy ? 8 : 12}}">
+    <van-col span="{{info.allowCopy2 ? 8 : 12}}">
       <van-button block color="#ffffff" bind:click="bindCopyUrl" custom-class="text-button">复制链接</van-button>
     </van-col>
-    <van-col span="8" wx:if="{{info.allowCopy}}">
+    <van-col span="8" wx:if="{{info.allowCopy2}}">
       <van-button block color="#ffffff" bind:click="bindCopy" custom-class="text-button">复制私盘</van-button>
     </van-col>
   </van-row>

@@ -259,6 +259,7 @@ class Unit extends Base
         $unit->allowNew = self::allow($user, $unit, 'new', $building);
         $unit->allowEdit = self::allow($user, $unit, 'edit', $building);
         $unit->allowCopy = self::allow($user, $unit, 'copy', $building);
+        $unit->allowCopy2 = $user == null || $user->company_id == 0 || $unit->allowCopy;
         $unit->allowDelete = self::allow($user, $unit, 'delete', $building);
         $unit->isFavorite = false;
         if ($user_id) {

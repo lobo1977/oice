@@ -174,24 +174,7 @@ Page({
   },
 
   bindAdd: function() {
-    if (app.globalData.appUserInfo.company_id == 0) {
-      wx.showModal({
-        title: '提示',
-        content: '您还没有加入或者建立企业，点击确定立即创建企业。',
-        success (res) {
-          if (res.confirm) {
-            wx.navigateTo({
-              url: '../../company/index/index',
-            })
-          } else if (res.cancel) {
-          }
-        }
-      })
-    } else {
-      wx.navigateTo({
-        url: '../edit/edit',
-      })
-    }
+    app.checkUser('/pages/building/edit/edit')
   },
     
   // 获取列表

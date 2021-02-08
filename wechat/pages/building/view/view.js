@@ -49,6 +49,7 @@ Page({
       isFavorite: false,
       allowEdit: false,
       allowCopy: false,
+      allowCopy2: false,
       allowAudit: false,
       allowDelete: false,
       images: [],
@@ -214,9 +215,7 @@ Page({
   },
 
   bindCopy: function(event) {
-    wx.navigateTo({
-      url: '../edit/edit?id=' + this.data.info.id + '&copy=1'
-    })
+    app.checkUser('/pages/building/edit/edit?id=' + this.data.info.id + '&copy=1')
   },
 
   bindAddUnit: function() {

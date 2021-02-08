@@ -387,6 +387,48 @@ App({
       })
     }
   },
+
+  checkUser(returnUrl) {
+    let app = this
+    if (!app.globalData.appUserInfo.mobile) {
+      wx.showModal({
+        title: '提示',
+        content: '您还没有完善个人信息，请先完善个人信息，绑定手机号码。',
+        success (res) {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/my/info',
+            })
+          } else if (res.cancel) {
+          }
+        }
+      })
+    } else {
+      app.checkUserCompany(returnUrl)
+    }
+  },
+
+  checkUserCompany(returnUrl) {
+    let app = this
+    if (app.globalData.appUserInfo.company_id == 0) {
+      wx.showModal({
+        title: '提示',
+        content: '您还没有加入或者建立企业，点击确定立即创建企业。',
+        success (res) {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/company/index/index',
+            })
+          } else if (res.cancel) {
+          }
+        }
+      })
+    } else {
+      wx.navigateTo({
+        url: returnUrl,
+      })
+    }
+  },
   
   request(url, method, data, cb, finish) {
     let app = this

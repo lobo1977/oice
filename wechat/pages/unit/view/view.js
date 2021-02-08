@@ -36,6 +36,7 @@ Page({
       allowNew: false,
       allowEdit: false,
       allowCopy: false,
+      allowCopy2: false,
       allowDelete: false,
       images: [],
       linkman: []
@@ -157,9 +158,7 @@ Page({
   },
 
   bindCopy: function(event) {
-    wx.navigateTo({
-      url: '../edit/edit?id=' + this.data.info.id + '&copy=1'
-    })
+    app.checkUser('/pages/unit/edit/edit?id=' + this.data.info.id + '&copy=1')
   },
 
   bindDelete: function() {

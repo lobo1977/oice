@@ -403,6 +403,7 @@ class Building extends Base
       $data->isFavorite = false;
       $data->allowEdit = self::allow($user, $data, 'edit');
       $data->allowCopy = self::allow($user, $data, 'copy');
+      $data->allowCopy2 = $data->share == 1 && $data->status == 1 && ($user == null || $user->company_id == 0 || $data->allowCopy);
       $data->allowAudit = self::allow($user, $data, 'audit');
       $data->allowDelete = self::allow($user, $data, 'delete');
       $data->unit = Unit::getByBuildingId($user, $id);

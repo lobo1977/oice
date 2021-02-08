@@ -63,7 +63,7 @@
     </van-cell>
   </van-cell-group>
 
-  <view wx:if="{{ info.allowCopy }}" style="padding:15px 0;text-align:center;">
+  <view wx:if="{{ info.allowCopy2 }}" style="padding:15px 0;text-align:center;">
     <van-button plain round type="primary" bind:click="bindCopy">复制单元</van-button>
   </view>
 
