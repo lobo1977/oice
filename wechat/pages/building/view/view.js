@@ -73,13 +73,18 @@ Page({
       {
         name: '删除',
       }
-    ]
+    ],
+    uploadAccept: 'media'
   },
   
   onLoad(options) {
     let that = this
     app.globalData.refreshBuildingView = false
-    
+    if (app.globalData.isWindows) {
+      that.setData({
+        uploadAccept: 'image'
+      })
+    }
     if (options.id) {
       that.data.info.id = options.id
     }
@@ -636,5 +641,84 @@ Page({
         }
       }
     })
+  },
+
+  uploadImage: function(event) {
+    let that = this
+    let count = 0
+    let error = 0
+    const files = event.detail.file
+    if (files.length == 0) {
+      return
+    }
+    wx.showLoading()
+    let header = {
+      'User-Token': app.globalData.appUserInfo && app.globalData.appUserInfo.token ? 
+        app.globalData.appUserInfo.token : ''
+    }
+    if (!app.globalData.isWindows) {
+      header['Content-Type'] = 'multipart/form-data'
+    }
+    try {
+      files.forEach(file => {
+        wx.uploadFile({
+          header: header,
+          url: app.globalData.serverUrl + '/api/building/uploadImage',
+          filePath: that.data.uploadAccept == 'media' ? file.tempFilePath : file.path,
+          name: 'images[]',
+          formData: {
+            'id': that.data.info.id,
+            'is_default': count == 0 ? 1 : 0
+          },
+          success(res) {
+            if (res.data) {
+              let json = JSON.parse(res.data)
+              if (json.success) {
+                if (json.data && json.data.length) {
+                  let imageList = []
+                  json.data.forEach(element => {
+                    imageList.push({
+                      url: app.globalData.serverUrl + '/' + element.src,
+                      type: element.is_image ? 'image' : 'video',
+                      poster: app.globalData.serverUrl + '/' + element.msrc
+                    })
+                  })
+                  that.setData({
+                    previewImages: imageList
+                  })
+                }
+              } else {
+                error++
+              }
+            } else {
+              error++
+            }
+          },
+          complete() {
+            if (count >= files.length) {
+              //app.globalData.refreshBuildingView = true
+              wx.hideLoading()
+              if (error > 0) {
+                Dialog.alert({
+                  title: '发生错误',
+                  message: error + '个文件上传失败'
+                })
+              }
+            }
+          },
+          fail(e) {
+            error++
+            console.log(e.errMsg)
+          }
+        })
+        count++
+      })
+    } catch(e) {
+      wx.hideLoading()
+      Dialog.alert({
+        title: '发生错误',
+        message: e.message
+      })
+    }
   }
 })

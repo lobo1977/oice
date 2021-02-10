@@ -10,8 +10,14 @@
       <video wx:if="{{item.type == 'video'}}" src="{{item.url}}" poster="{{item.poster}}"
         muted bindplay="onVideoPlay" bindpause="onVideoStop" bindended="onVideoStop"
         style="width:100%;height:100%;background-color:#eeeeee;" controls="{{false}}"></video>
-    </swiper-item>idx
+    </swiper-item>
   </swiper>
+
+  <view wx:if="{{info.allowEdit && (!previewImages || previewImages.length == 0)}}"
+    style="margin-top:10px;text-align:center;">
+    <van-uploader file-list="{{[]}}" bind:after-read="uploadImage" accept="{{uploadAccept}}" upload-text="点击上传" multiple />
+  </view>
+  
   <van-cell-group>
     <van-cell title="{{info.building_name + ' ' +info.title}}" title-class="cell-title" custom-class="cell-view"></van-cell>
     <van-cell title="朝向" wx:if="{{info.face}}" custom-class="cell-view"

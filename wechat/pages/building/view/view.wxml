@@ -13,13 +13,19 @@
 
   <swiper wx:if="{{previewImages && previewImages.length}}" indicator-dots="{{false}}" autoplay="{{isVideoPlay == false}}">
     <swiper-item wx:for="{{previewImages}}" wx:key="id" wx:for-index="idx" data-data="{{idx}}" bindtap="bindViewImage">
-      <image wx:if="{{item.type == 'image'}}" style="width:100%; height:100%;background-color:#eeeeee;" 
+      <image wx:if="{{item.type == 'image'}}" style="width:100%;height:100%;background-color:#eeeeee;" 
         mode="aspectFill" src="{{item.poster}}"></image>
       <video wx:if="{{item.type == 'video'}}" src="{{item.url}}" poster="{{item.poster}}"
         muted bindplay="onVideoPlay" bindpause="onVideoStop" bindended="onVideoStop"
         style="width:100%;height:100%;background-color:#eeeeee;" controls="{{false}}"></video>
     </swiper-item>
   </swiper>
+
+  <view wx:if="{{info.allowEdit && (!previewImages || previewImages.length == 0)}}"
+    style="margin-top:10px;text-align:center;">
+    <van-uploader file-list="{{[]}}" bind:after-read="uploadImage" accept="{{uploadAccept}}" upload-text="点击上传" multiple />
+  </view>
+
   <van-cell-group>
     <van-cell title="{{info.building_name}}" use-label-slot 
       title-class="cell-title" label-class="cell-label" custom-class="cell-view"

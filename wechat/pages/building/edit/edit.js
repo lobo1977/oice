@@ -851,6 +851,7 @@ Page({
                       url: app.globalData.serverUrl + '/' + element.msrc,
                       name: element.title,
                       isImage: element.is_image,
+                      isVideo: element.is_video,
                       deletable: element.default != 1
                     })
                     that.data.previewList.push({

@@ -132,7 +132,7 @@ class Building extends Base
     }
   
     $list = self::alias('a')
-      ->leftJoin('file b',"b.parent_id = a.id AND b.type = 'building' AND b.default = 1")
+      ->leftJoin('file b',"b.parent_id = a.id AND b.type = 'building' AND b.default = 1 AND b.delete_time is null")
       ->leftJoin('share s', "s.type = 'building' and a.id = s.object_id and s.user_id = " . $user_id)
       ->where('a.city', self::$city);
 
@@ -448,6 +448,10 @@ class Building extends Base
     if (isset($data['copy'])) {
       $copy = $data['copy'];
       unset($data['copy']);
+    }
+
+    if (isset($data['district']) && $data['district'] == 'undefined') {
+      $data['district'] = '';
     }
 
     if (isset($data['completion_date']) && empty($data['completion_date'])) {
