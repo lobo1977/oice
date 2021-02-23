@@ -13,12 +13,13 @@
       <van-field title-width="80px" label="类型" value="{{ info.type }}" is-link readonly clickable bindtap="bindSelectType" />
       <van-field title-width="80px" label="等级" value="{{ info.level }}" is-link readonly clickable bindtap="bindSelectLevel" />
       <van-field title-width="80px" label="所在地" value="{{ info.area + info.district }}" is-link readonly clickable bindtap="bindSelectArea" />
-      <van-field title-width="80px" label="详细地址" value="{{ info.address }}" maxlength="100" bind:input="onAddressInput">
+      <van-field title-width="80px" label="详细地址" value="{{ info.address }}" maxlength="100" bind:input="onAddressInput" readonly bindtap="bindselectLatLng">
         <van-icon slot="right-icon" name="location-o" bindtap="bindselectLatLng" />
       </van-field>
       <van-field title-width="80px" label="竣工日期" value="{{ info.completion_date }}" right-icon="calender-o" readonly clickable bindtap="bindSelectCompletionDate" />
       <van-field title-width="80px" label="租售" value="{{ info.rent_sell }}" is-link readonly clickable bindtap="bindSelectRentSell" />
       <van-field title-width="80px" label="价格" value="{{ info.price }}" maxlength="30" bind:input="onPriceInput" />
+      <van-field title-width="80px" label="佣金比例" value="{{ info.commission }}" maxlength="30" bind:input="onCommissionInput" />
       <van-field title-width="80px" label="建筑面积" value="{{ info.acreage }}" type="number" maxlength="10" bind:input="onAcreageInput">
         <text slot="button">平方米</text>
       </van-field>

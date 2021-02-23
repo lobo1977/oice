@@ -49,6 +49,7 @@ Page({
       equipment: '',        // 楼宇设备
       traffic: '',          // 交通状况
       environment: '',      // 周边环境
+      commission: '',       // 佣金比例
       company_id: '',       // 所属企业
       user_id: 0,
       share: 1,             // 是否公开
@@ -446,6 +447,10 @@ Page({
 
   onPriceInput: function(event) {
     this.data.info.price = event.detail
+  },
+
+  onCommissionInput: function(event) {
+    this.data.info.commission = event.detail
   },
 
   onFloorHeightInput: function(event) {

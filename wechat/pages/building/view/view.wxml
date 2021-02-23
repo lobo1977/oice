@@ -94,6 +94,8 @@
       title-width="160rpx" value="{{info.rent_sell}}" value-class="text-left"></van-cell>
     <van-cell title="价格" wx:if="{{info.price}}" custom-class="cell-view"
       title-width="160rpx" value="{{info.price}}" value-class="text-left"></van-cell>
+    <van-cell title="佣金比例" wx:if="{{info.commission}}" custom-class="cell-view"
+      title-width="160rpx" value="{{info.commission}}" value-class="text-left"></van-cell>
     <van-cell title="楼层" wx:if="{{info.floor}}" custom-class="cell-view"
       title-width="160rpx" value="{{info.floor}}" value-class="text-left"></van-cell>
     <van-cell title="层面积" wx:if="{{info.floor_area}}" custom-class="cell-view"

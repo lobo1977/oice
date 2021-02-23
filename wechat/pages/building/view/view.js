@@ -38,6 +38,7 @@ Page({
       equipment: '',        // 楼宇设备
       traffic: '',          // 交通状况
       environment: '',      // 周边环境
+      commission: '',       // 佣金比例
       user_id: 0,
       user: '',
       avatar: '',

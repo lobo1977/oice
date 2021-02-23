@@ -340,7 +340,7 @@ class Building extends Base
       ->leftJoin('user u', 'a.user_id = u.id')
       ->field('a.id,a.building_name,a.type,a.level,a.area,a.district,a.address,a.subway,a.longitude,a.latitude,
         a.completion_date,a.rent_sell,a.price,a.acreage,a.floor,a.floor_area,a.floor_height,a.bearing,
-        a.developer,a.manager,a.fee,a.electricity_fee,a.car_seat,a.rem,a.facility,a.equipment,a.traffic,
+        a.developer,a.manager,a.fee,a.electricity_fee,a.car_seat,a.rem,a.commission,a.facility,a.equipment,a.traffic,
         a.environment,a.share,a.user_id,a.company_id,a.short_url,a.create_time,u.title as user,u.avatar,
         s.create_time as share_create_time,a.status,s.level as share_level')
       ->where('a.id', $id)
@@ -684,6 +684,14 @@ class Building extends Base
         }
       }
 
+      if ($data['commission'] != $oldData->commission) {
+        if ($oldData->commission) {
+          $summary = $summary . '佣金比例：' . $oldData->commission . ' -> ' . $data['commission'] . '\n';
+        } else {
+          $summary = $summary . '佣金比例：' . $data['commission'] . '\n';
+        }
+      }
+
       if (isset($data['user_id'])) {
         unset($data['user_id']);
       }
@@ -730,7 +738,7 @@ class Building extends Base
         $data['status'] = 0;
       }
 
-      $result =  $oldData->save($data);
+      $result = $oldData->save($data);
       if ($result && $summary) {
         Log::add($user, [
           "table" => "building",
