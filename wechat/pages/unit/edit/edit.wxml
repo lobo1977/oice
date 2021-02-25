@@ -14,14 +14,14 @@
         <text slot="button">层</text>
       </van-field>
       <van-field title-width="80px" label="朝向" value="{{ info.face }}" is-link readonly clickable bindtap="bindSelectFace" />
-      <van-field title-width="80px" label="面积" value="{{ info.acreage }}" type="number" maxlength="10" bind:input="onAcreageInput">
+      <van-field title-width="80px" label="面积" value="{{ info.acreage }}" type="digit" maxlength="10" bind:input="onAcreageInput">
         <text slot="button">平方米</text>
       </van-field>
       <van-field title-width="80px" label="租售" value="{{ info.rent_sell }}" is-link readonly clickable bindtap="bindSelectRentSell" />
-      <van-field title-width="80px" label="出租价格" value="{{ info.rent_price }}" type="number" maxlength="10" bind:input="onRentPriceInput">
+      <van-field title-width="80px" label="出租价格" value="{{ info.rent_price }}" type="digit" maxlength="10" bind:input="onRentPriceInput">
         <text slot="button">元/平方米/日</text>
       </van-field>
-      <van-field title-width="80px" label="出售价格" value="{{ info.sell_price }}" type="number" maxlength="10" bind:input="onSellPriceInput">
+      <van-field title-width="80px" label="出售价格" value="{{ info.sell_price }}" type="digit" maxlength="10" bind:input="onSellPriceInput">
         <text slot="button">元/平方米</text>
       </van-field>
       <van-field title-width="80px" label="装修状况" value="{{ info.decoration }}" is-link readonly clickable bindtap="bindSelectDecoration" />
