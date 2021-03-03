@@ -390,14 +390,14 @@ App({
 
   checkUser(returnUrl) {
     let app = this
-    if (!app.globalData.appUserInfo.mobile) {
+    if (!app.globalData.appUserInfo.title || !app.globalData.appUserInfo.mobile) {
       wx.showModal({
         title: '提示',
         content: '您还没有完善个人信息，请先完善个人信息，绑定手机号码。',
         success (res) {
           if (res.confirm) {
             wx.navigateTo({
-              url: '/pages/my/info',
+              url: '/pages/my/info/info',
             })
           } else if (res.cancel) {
           }
