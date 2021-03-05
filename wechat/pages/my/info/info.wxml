@@ -12,12 +12,21 @@
       </van-uploader>
     </van-cell>   
     <van-field title-width="80px" label="姓名" value="{{ info.title }}" required placeholder="{{ title_error }}" error="{{is_title_empty}}" maxlength="30" bind:input="onTitleInput" input-align="right" />
+    <van-field title-width="80px" label="行业属性" value="{{ role_name }}" is-link readonly clickable bindtap="bindSelectRole" input-align="right" />
     <van-cell title="手机" link-type="navigateTo" is-link
       url="../mobile/mobile" value="{{ mobile }}" ></van-cell>
     <van-field title-width="80px" label="电子邮箱" value="{{ info.email }}" type="email" error="{{ is_email_error }}" maxlength="30" bind:input="onEmailInput" input-align="right" error-message="{{email_error}}" />
     <van-field title-width="80px" label="微信" value="{{ info.weixin }}" maxlength="30" bind:input="onWeixinInput" input-align="right" />
     <van-field title-width="80px" label="QQ" value="{{ info.qq }}" maxlength="30" bind:input="onQQInput" input-align="right" />
   </van-cell-group>
+
+  <van-action-sheet
+    show="{{ showSelectRole }}"
+    actions="{{ role }}"
+    bind:close="onSelectRoleClose"
+    bind:select="onRoleSelect"
+    z-index="1000"
+  />
 
   <van-row gutter="0" custom-class="button-bar">
     <van-col span="24">

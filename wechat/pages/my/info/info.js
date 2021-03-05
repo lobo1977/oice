@@ -14,14 +14,18 @@ Page({
     info: {
       __token__: '',
       title: '',    // 昵称
+      role: 0,      // 行业属性
       email: '',    // 电子邮箱
       weixin: '',   // 微信
       qq: ''        // QQ
     },
+    role: [{name: '发展商', value : 1}, {name: '代理行', value: 2}, {name: '其他', value: 10}],
+    role_name: '',
     is_title_empty : false,
-    title_error: "",
+    title_error: '',
     is_email_error: false,
-    email_error: ""
+    email_error: '',
+    showSelectRole: false
   },
 
   setInfo: function() {
@@ -101,6 +105,26 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+
+  bindSelectRole: function() {
+    this.setData({
+      showSelectRole: true
+    })
+  },
+
+  onSelectRoleClose: function() {
+    this.setData({
+      showSelectRole: false
+    })
+  },
+
+  onRoleSelect: function(event) {
+    this.setData({
+      role_name: event.detail.name,
+      ['info.role']: event.detail.value,
+      showSelectRole: false
+    })
   },
 
   onTitleInput: function(event) {

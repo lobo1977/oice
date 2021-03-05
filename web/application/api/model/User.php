@@ -15,6 +15,7 @@ class User extends Base
   protected $pk = 'id';
   protected $deleteTime = 'delete_time';
   public static $status = ['正常','冻结'];
+  public static $role = ['','发展商','代理行','','','','','','','','其他'];
 
   /**
    * 格式化用户信息
@@ -265,7 +266,7 @@ class User extends Base
       ->leftJoin('oauth o', "a.id = o.user_id and o.platform = 'wechat'")
       ->where('a.id', $id)
       ->where('a.status', 0)
-      ->field('a.id,a.type,a.title,a.avatar,a.mobile,a.email,a.qq,a.weixin,
+      ->field('a.id,a.type,a.title,a.role,a.avatar,a.mobile,a.email,a.qq,a.weixin,
         b.company_id,b.superior_id,u.title as superior,
         c.title as company,c.full_name,c.logo,c.user_id as company_admin,o.openid')
       ->find();
@@ -421,6 +422,18 @@ class User extends Base
           $summary = $summary . '姓名：' . $oldData->title . ' -> ' . $data['title'] . '\n';
         } else {
           $summary = $summary . '姓名：' . $data['title'] . '\n';
+        }
+      }
+
+      if (isset($data['role']) && $data['role'] != 0 && $data['role'] != 1 && $data['role'] != 2) {
+        $data['role'] = 0;
+      }
+
+      if (isset($data['role']) && $data['role'] != $oldData->role) {
+        if ($oldData->role) {
+          $summary = $summary . '行业属性：' . self::$role[$oldData->role] . ' -> ' . self::$role[$data['role']] . '\n';
+        } else {
+          $summary = $summary . '行业属性：' . self::$role[$data['role']] . '\n';
         }
       }
 
