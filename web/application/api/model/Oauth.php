@@ -83,30 +83,22 @@ class Oauth extends Base
    * 微信小程序用户登录
    */
   public static function miniLogin($token) {
-    if (!$token || !isset($token['openid'])) {
-      self::exception('缺少 token 或 openid');
+    if (!$token || !isset($token['unionid'])) {
+      self::exception('缺少 token 或 unionid');
     }
 
     $user = null;
     $isReg = false;
     $platform = 'wechat';
-    $oauth = self::where('platform', $platform);
-    if (isset($token['unionid'])) {
-      $oauth->where('unionid', $token['unionid']);
-    } else {
-      $oauth->where('openid', $token['openid']);
-    }
-    $oauth = $oauth->find();
+    $oauth = self::where('platform', $platform)
+      ->where('unionid', $token['unionid'])
+      ->find();
    
     if ($oauth == null) {
       $oauth = new Oauth();
       $oauth->user_id = 0;
       $oauth->platform = $platform;
-      if (isset($token['unionid'])) {
-        $oauth->unionid = $token['unionid'];
-      } else {
-        $oauth->openid = $token['openid'];
-      }
+      $oauth->unionid = $token['unionid'];
       $oauth->nickname = '';
       $oauth->avatar = '';
     }
