@@ -1,4 +1,4 @@
-// pages/my/mobile/mobile.js
+// pages/my/switch/switch.js
 
 const app = getApp()
 
@@ -169,9 +169,9 @@ Page({
   },
 
   /**
-   * 提交绑定
+   * 登录
    */
-  bindSave: function(event) {
+  bindLogin: function(event) {
     let that = this
     if (!that.data.mobile) {
       that.setData({
@@ -193,10 +193,10 @@ Page({
     }
 
     wx.showLoading({
-      title: '提交中',
+      title: '登录中',
     })
 
-    app.post('my/mobile', {
+    app.post('wechat/switchUser', {
       mobile: that.data.mobile,
       verifyCode: that.data.code
     }, (res) => {

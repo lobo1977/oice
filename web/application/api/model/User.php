@@ -268,7 +268,7 @@ class User extends Base
       ->where('a.status', 0)
       ->field('a.id,a.type,a.title,a.role,a.avatar,a.mobile,a.email,a.qq,a.weixin,
         b.company_id,b.superior_id,u.title as superior,
-        c.title as company,c.full_name,c.logo,c.user_id as company_admin,o.openid')
+        c.title as company,c.full_name,c.logo,c.user_id as company_admin,o.openid,o.unionid')
       ->find();
     
     if ($data) {

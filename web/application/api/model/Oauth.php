@@ -54,7 +54,6 @@ class Oauth extends Base
     if ($oauth->save()) {
       session('oauth', $platform);
       session('unionid', $openUserInfo['unionid']);
-      session('oauth_openid', $token['openid']);
       if (isset($oauth['user_id']) && $oauth->user_id > 0) {
         $user = User::getById($oauth->user_id);
         if ($user != null) {
@@ -154,13 +153,13 @@ class Oauth extends Base
    */
   public static function mobile($mobile, $verify_code) {
     $platform = session('oauth');
-    $openid = session('oauth_openid');
-    if (empty($platform) || empty($openid)) {
+    $unionid = session('unionid');
+    if (empty($platform) || empty($unionid)) {
       return false;
     }
 
     $oauth = self::where('platform', $platform)
-      ->where('openid', $openid)->find();
+      ->where('unionid', $unionid)->find();
     
     if ($oauth == null) {
       return false;
@@ -177,7 +176,7 @@ class Oauth extends Base
     $oauth->user_id = $user->id;
     if ($oauth->save()) {
       session('oauth', null);
-      session('oauth_openid', null);
+      session('unionid', null);
     }
     if ($oauth->nickname && empty($user->title)) {
       $user->title = $oauth->nickname;
@@ -186,6 +185,22 @@ class Oauth extends Base
       $user->avatar = $oauth->avatar;
     }
     return $user;
+  }
+
+  /**
+   * 微信切换登录用户
+   */
+  public static function switchUser($unionid, $user_id) {
+    $oauth = self::where('platform', 'wechat')
+      ->where('unionid', $unionid)->find();
+
+    if ($oauth) {
+      $oauth->user_id = $user_id;
+      $oauth->save();
+      return true;
+    }
+
+    return false;
   }
 
   /**

@@ -99,7 +99,8 @@
     "pages/daily/edit/edit",
     "pages/daily/review/review",
     "pages/daily/reviewView/reviewView",
-    "pages/my/contact/contact"
+    "pages/my/contact/contact",
+    "pages/my/switch/switch"
   ],
   "permission": {
     "scope.userLocation": {

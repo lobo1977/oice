@@ -1,0 +1,33 @@
+<!--pages/my/switch/switch.wxml-->
+<view class="page-view">
+  <van-cell-group>
+    <van-field
+      value="{{ mobile }}"
+      label="手机号"
+      bind:input="onMobileInput"
+      error="{{ is_mobile_empty }}"
+      placeholder="{{ mobile_empty }}"
+      error-message="{{ mobile_error }}"
+    />
+    <van-field
+      value="{{ code }}"
+      label="短信验证码"
+      bind:input="onCodeInput"
+      error="{{ is_code_empty }}"
+      placeholder="{{ code_empty }}"
+      center
+      use-button-slot
+    >
+      <van-button slot="button" size="small" type="primary" wx:if="{{ waiting == false }}" bind:click="bindSendCode" disabled="{{send_code_disabled}}">发送验证码</van-button>
+      <van-button slot="button" size="small" type="primary" disabled wx:if="{{ waiting }}">{{ seconds }} 秒后重发</van-button>
+    </van-field>
+  </van-cell-group>
+
+  <van-row gutter="0" custom-class="button-bar">
+    <van-col span="24">
+        <van-button type="primary" icon="sign" block square bind:click="bindLogin">登录</van-button>
+    </van-col>
+  </van-row>
+
+  <van-dialog id="van-dialog" />
+</view>

@@ -4,12 +4,18 @@ namespace app\api\controller;
 use think\facade\Log;
 use app\common\Utils;
 use app\common\Wechat as WechatApi;
+use app\api\model\User;
 use app\api\model\Oauth;
 use app\api\controller\Base;
 
 class Wechat extends Base
 {
   protected $wechat;
+
+  protected $beforeActionList = [
+    'getUser',
+    'checkAuth' => ['only'=>'switchUser']
+  ];
 
   protected function initialize() {
     $this->wechat = new WechatApi();
@@ -259,5 +265,36 @@ class Wechat extends Base
     } else {
       return null;
     }
+  }
+
+  /**
+   * 切换用户
+   */
+  public function switchUser() {
+    if (input('?post.mobile')) {
+      $mobile = input('post.mobile');
+      $password = input('post.password');
+      $vcode = input('post.vcode','');
+      $verify_code = input('post.verifyCode');
+
+      $user = null;
+
+      if ($verify_code) {
+        $user = User::loginByVerifyCode($mobile, $verify_code);
+      } else {
+        $user = User::loginByPassword($mobile, $password, $vcode);
+      }
+
+      if ($user && $this->user && $this->user->unionid) {
+        $result = Oauth::switchUser($this->user->unionid, $user->id);
+        if ($result) {
+          $user->unionid = $this->user->unionid;
+          return $this->succeed($user);
+        }
+      }
+
+      return $this->fail();
+    }
+    return;
   }
 }
