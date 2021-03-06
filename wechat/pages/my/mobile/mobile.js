@@ -70,16 +70,17 @@ Page({
   },
 
   onMobileInput: function(event) {
-    this.data.mobile = event.detail
-    if (this.data.mobile) {
+    let that = this
+    that.data.mobile = event.detail
+    if (that.data.mobile) {
       if (app.isMobile(event.detail)) {
-        this.setData({
+        that.setData({
           is_mobile_empty: false,
           mobile_empty: '',
           mobile_error: ''
         })
       } else {
-        this.setData({
+        that.setData({
           is_mobile_empty: false,
           mobile_empty: ''
         })
@@ -88,6 +89,7 @@ Page({
   },
 
   onCodeInput: function(event) {
+    let that = this
     this.data.code = event.detail
     if (this.data.code) {
       that.setData({
