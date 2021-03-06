@@ -29,35 +29,32 @@ class Oauth extends Base
    */
   public static function login($token) {
     $platform = 'wechat';
-    $oauth = self::where('platform', $platform)
-      ->where('openid', $token['openid'])->find();
+    $wechat = new Wechat();
+    $openUserInfo = $wechat->getUserInfo($token['openid']);
+    if (!$openUserInfo || !isset($openUserInfo['unionid'])) {
+      self::exception('请先关注“商办云信息”微信公众号');
+    }
 
+    $oauth = self::where('platform', $platform)
+      ->where('unionid', $openUserInfo['unionid'])->find();
     if ($oauth == null) {
       $oauth = new Oauth();
       $oauth->platform = $platform;
+      $oauth->user_id = 0;
+      $oauth->unionid = $openUserInfo['unionid'];
       $oauth->openid = $token['openid'];
     }
-
-    $wechat = new Wechat();
-    $openUserInfo = $wechat->getUserInfo($token['openid']);
-
-    if ($openUserInfo) {
-      $oauth->nickname = Utils::emojiToChar($openUserInfo['nickname']);
-      $oauth->unionid = isset($openUserInfo['unionid']) ? $openUserInfo['unionid'] : '';
-      $oauth->avatar = $openUserInfo['headimgurl'];
-      $oauth->sex = $openUserInfo['sex'];
-    }
-
+    $oauth->nickname = Utils::emojiToChar($openUserInfo['nickname']);
+    $oauth->avatar = $openUserInfo['headimgurl'];
+    $oauth->sex = $openUserInfo['sex'];
     $oauth->token = $token['access_token'];
     $oauth->expired_time = $token['expires_in'];
     $oauth->refresh_token = $token['refresh_token'];
 
     if ($oauth->save()) {
       session('oauth', $platform);
+      session('unionid', $openUserInfo['unionid']);
       session('oauth_openid', $token['openid']);
-      if ($openUserInfo && isset($openUserInfo['unionid'])) {
-        session('unionid', $openUserInfo['unionid']);
-      }
       if (isset($oauth['user_id']) && $oauth->user_id > 0) {
         $user = User::getById($oauth->user_id);
         if ($user != null) {

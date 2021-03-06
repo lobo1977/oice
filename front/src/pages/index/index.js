@@ -185,6 +185,12 @@ router.beforeEach(function (to, from, next) {
           } else {
             next({name: 'BindMobile', query: res.data, replace: true})
           }
+        } else if (res.message) {
+          Vue.$vux.toast.show({
+            text: res.message,
+            width: '16em'
+          })
+          next({name: 'Login', replace: true})
         } else {
           next({name: 'Login', replace: true})
         }
