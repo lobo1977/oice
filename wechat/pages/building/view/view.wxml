@@ -47,7 +47,7 @@
         icon="{{ info.isFavorite ? 'star' : 'star-o'}}">收藏</van-button>
     </van-col>
     <van-col span="{{info.allowCopy2 ? 8 : 12}}">
-      <van-button block color="#ffffff" bind:click="bindCopyUrl" custom-class="text-button">复制链接</van-button>
+      <van-button block color="#ffffff" bind:click="bindPush" custom-class="text-button">群发贴</van-button>
     </van-col>
     <van-col span="8" wx:if="{{info.allowCopy2}}">
       <van-button block color="#ffffff" bind:click="bindCopy" custom-class="text-button">复制私盘</van-button>
@@ -182,6 +182,27 @@
         border="{{ false }}"
         bind:change="auditSummaryChange"
         error="{{ auditError }}"
+      />
+    </van-cell-group>
+  </van-dialog>
+
+  <van-dialog id="push-dialog"
+    use-slot
+    title="内容确认"
+    show="{{ showPush }}"
+    close-on-click-overlay
+    show-cancel-button
+    confirm-button-text="群发"
+    cancel-button-text="复制"
+    bind:confirm="sendPush"
+    bind:cancel="copyPushMessage">
+    <van-cell-group>
+      <van-field
+        value="{{ push_message }}"
+        type="textarea"
+        autosize
+        bind:input="onPushInput"
+        border="{{ false }}"
       />
     </van-cell-group>
   </van-dialog>

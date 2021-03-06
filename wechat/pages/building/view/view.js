@@ -75,7 +75,9 @@ Page({
         name: '删除',
       }
     ],
-    uploadAccept: 'media'
+    uploadAccept: 'media',
+    showPush: false,
+    push_message: ''
   },
   
   onLoad(options) {
@@ -222,6 +224,35 @@ Page({
 
   bindCopy: function(event) {
     app.checkUser('/pages/building/edit/edit?id=' + this.data.info.id + '&copy=1')
+  },
+
+  bindPush: function(event) {
+    this.setData({
+      showPush: true
+    })
+  },
+
+  onPushInput: function(event) {
+    this.data.push_message = event.detail
+  },
+
+  copyPushMessage: function(evnet) {
+    wx.setClipboardData({
+      data: this.data.push_message,
+      success (res) {
+        wx.showToast({
+          title: '复制成功',
+          duration: 1000
+        })
+      }
+    })
+  },
+
+  sendPush: function(evnet) {
+    Dialog.alert({
+      message: '请在“尚办云信息”微信公众号中打开此项目，然后点击群发按钮',
+    }).then(() => {
+    })
   },
 
   bindAddUnit: function() {
@@ -372,9 +403,25 @@ Page({
             })
           })
         }
+
+        let push_message = '【项目名称】' + res.data.building_name
+        push_message += '\n【地理位置】' + res.data.area + res.data.district + res.data.address
+        push_message += '\n【空置面积】'
+        push_message += '\n【交 通】' + res.data.traffic
+        push_message += '\n【报 价】' + res.data.price
+        push_message += '\n【物业费】' + res.data.fee
+        push_message += '\n【佣 金】'
+        push_message += '\n【交付标准】'
+        if (res.data.linkman && res.data.linkman.length) {
+          push_message += '\n【联系人】' + res.data.linkman[0].title
+          push_message += '\n【联系电话】' + res.data.linkman[0].mobile
+        }
+        push_message += '\n' + res.data.short_url
+
         that.setData({
           info: res.data,
-          previewImages: prevList
+          previewImages: prevList,
+          push_message: push_message
         })
       } else {
         Dialog.alert({
