@@ -390,7 +390,9 @@ App({
 
   checkUser(returnUrl) {
     let app = this
-    if (!app.globalData.appUserInfo.title || !app.globalData.appUserInfo.mobile) {
+    if (!app.globalData.appUserInfo.title || 
+      !app.globalData.appUserInfo.mobile || 
+      !app.globalData.appUserInfo.company) {
       wx.showModal({
         title: '提示',
         content: '您还没有完善个人信息，请先完善个人信息，绑定手机号码。',

@@ -91,10 +91,10 @@ class My extends Base
       return $this->succeed($data);
     } else {
       $validate = Validate::make([
-        //'title'  => 'require',
+        'title'  => 'require',
         'email' => 'email|unique:user,email,' . $this->user_id
       ],[
-        //'title.require' => '必须填写姓名。',
+        'title.require' => '必须填写姓名。',
         'email.email' => '电子邮箱无效。',
         'email.unique' => '电子邮箱已存在，请使用其他邮箱。'
       ]);

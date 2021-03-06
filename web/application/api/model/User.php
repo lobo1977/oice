@@ -425,7 +425,7 @@ class User extends Base
         }
       }
 
-      if (isset($data['role']) && $data['role'] != 0 && $data['role'] != 1 && $data['role'] != 2) {
+      if (isset($data['role']) && $data['role'] != 0 && $data['role'] != 1 && $data['role'] != 2 && $data['role'] != 10) {
         $data['role'] = 0;
       }
 
@@ -462,7 +462,28 @@ class User extends Base
       }
 
       $result = $oldData->save($data);
+
       if ($result) {
+        if (isset($data['company'])) {
+          $find = db('user_company')
+            ->alias('a')
+            ->join('Company c', "a.company_id = c.id and (c.title = '" . $data['company'] . "' OR c.full_name = '" . $data['company'] . "')")
+            ->where('a.user_id', $user->id)
+            ->find();
+
+          if (!$find) {
+            $company = new Company([
+              'city' => self::$city,
+              'user_id' => $user->id,
+              'title' => $data['company'],
+            ]);
+            $result = $company->save();
+            if ($result) {
+              Company::addin($user, $company->id);
+            }
+          }
+        }
+
         Log::add($user, [
           "table" => "user",
           "owner_id" => $user->id,

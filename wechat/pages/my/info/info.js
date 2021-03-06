@@ -13,8 +13,9 @@ Page({
     mobile: '',
     info: {
       __token__: '',
-      title: '',    // 昵称
+      title: '',    // 姓名
       role: 0,      // 行业属性
+      company: '',  // 企业   
       email: '',    // 电子邮箱
       weixin: '',   // 微信
       qq: ''        // QQ
@@ -23,16 +24,29 @@ Page({
     role_name: '',
     is_title_empty : false,
     title_error: '',
+    is_company_empty : false,
+    company_error: '',
     is_email_error: false,
     email_error: '',
     showSelectRole: false
   },
 
   setInfo: function() {
+    let role_name = ''
+    if (app.globalData.appUserInfo.role) {
+      this.data.role.forEach(element => {
+        if (element.value == app.globalData.appUserInfo.role) {
+          role_name = element.name
+        }
+      })
+    }
     this.setData({
       avatar: app.globalData.appUserInfo.avatar,
       mobile: app.globalData.appUserInfo.mobile,
+      role_name: role_name,
       ['info.title']: app.globalData.appUserInfo.title,
+      ['info.company']: app.globalData.appUserInfo.company,
+      ['info.role']: app.globalData.appUserInfo.role,
       ['info.email']: app.globalData.appUserInfo.email,
       ['info.weixin']: app.globalData.appUserInfo.weixin,
       ['info.qq']: app.globalData.appUserInfo.qq
@@ -63,7 +77,6 @@ Page({
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: function () {
-
   },
 
   /**
@@ -137,6 +150,16 @@ Page({
     }
   },
 
+  onCompanyInput: function(event) {
+    this.data.info.company = event.detail
+    if (this.data.info.company && this.data.is_company_empty) {
+      this.setData({
+        is_company_empty: false,
+        company_error: ''
+      })
+    }
+  },
+
   onEmailInput: function(event) {
     this.data.info.email = event.detail
     if (event.detail) {
@@ -164,18 +187,24 @@ Page({
         is_title_empty: true,
         title_error: '请填写姓名'
       })
-      return
-    } else if (that.data.info.email && !app.isEmail(that.data.info.email)) {
+    }
+
+    if (!that.data.info.company) { 
+      that.setData({
+        is_company_empty: true,
+        company_error: '请填写公司'
+      })
+    }
+    
+    if (that.data.info.email && !app.isEmail(that.data.info.email)) {
       that.setData({
         is_email_error: true,
         email_error: '电子邮箱错误'
       })
+    }
+
+    if (that.data.is_title_empty || that.data.is_company_empty || that.data.is_email_error) {
       return
-    } else if (that.data.is_title_empty) {
-      that.setData({
-        is_name_empty: false,
-        name_error: ''
-      })
     }
 
     wx.showLoading({

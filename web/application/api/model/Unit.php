@@ -32,6 +32,7 @@ class Unit extends Base
       return 
         $unit->share || 
         (
+          Building::allow($user, $building, 'view') ||
           $user != null && ($unit->user_id == $user->id ||
           $unit->share_level !== null ||
           ($unit->company_id > 0 && $unit->company_id == $user->company_id))
