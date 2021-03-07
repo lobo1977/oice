@@ -186,10 +186,10 @@
     </van-cell-group>
   </van-dialog>
 
-  <van-dialog id="push-dialog"
+  <van-dialog id="copy-dialog"
     use-slot
     title="内容确认"
-    show="{{ showPush }}"
+    show="{{ showCopy }}"
     close-on-click-overlay
     show-cancel-button
     confirm-button-text="群发"
@@ -205,6 +205,21 @@
         border="{{ false }}"
       />
     </van-cell-group>
+  </van-dialog>
+
+  <van-dialog id="push-dialog"
+    use-slot
+    show="{{ showPush }}"
+    close-on-click-overlay
+    confirm-button-text="关闭">
+    <view style="text-align:center;padding:1rem 1rem 0 1rem">
+      <view style="font-size:0.9rem">关注公众号，将复制内容发到公众号对话栏，点开链接，点击群发推广。</view>
+      <van-image
+        width="10rem"
+        height="10rem"
+        fit="contain" bind:click="previewCode" src="{{qrcode}}" />
+      <view style="font-size:0.9rem">请下载上图并识别（不支持长按识别）二维码关注“商办云信息”</view>
+    </view>
   </van-dialog>
 
   <van-popup show="{{ showCustomerPicker }}" position="bottom" bind:close="onCustomerPickerClose">

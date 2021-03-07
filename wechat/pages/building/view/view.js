@@ -7,6 +7,7 @@ const app = getApp()
 Page({
   data: {
     me: null,
+    qrcode: 'https://m.o-ice.com/static/img/qrcode.png',
     isLoading: false,
     isPullDown: false,
     isVideoPlay: false,
@@ -76,6 +77,7 @@ Page({
       }
     ],
     uploadAccept: 'media',
+    showCopy: false,
     showPush: false,
     push_message: ''
   },
@@ -228,7 +230,7 @@ Page({
 
   bindPush: function(event) {
     this.setData({
-      showPush: true
+      showCopy: true
     })
   },
 
@@ -249,9 +251,23 @@ Page({
   },
 
   sendPush: function(evnet) {
-    Dialog.alert({
-      message: '请在“尚办云信息”微信公众号中打开此项目，然后点击群发按钮',
-    }).then(() => {
+    wx.setClipboardData({
+      data: this.data.push_message,
+      success (res) {
+        wx.showToast({
+          title: '复制成功',
+          duration: 500
+        })
+      }
+    })
+    this.setData({
+      showPush: true
+    })
+  },
+
+  previewCode: function() {
+    wx.previewImage({
+      urls: [ this.data.qrcode ]
     })
   },
 
