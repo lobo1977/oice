@@ -100,6 +100,15 @@ class My extends Base
       ]);
 
       $data = input('post.');
+      if (isset($data['email']) && $data['email'] == 'null') {
+        unset($data['email']);
+      }
+      if (isset($data['weixin']) && $data['weixin'] == 'null') {
+        unset($data['weixin']);
+      }
+      if (isset($data['qq']) && $data['qq'] == 'null') {
+        unset($data['qq']);
+      }
       $avatar = request()->file('avatar');
       
       if (!$this->checkFormToken($data)) {

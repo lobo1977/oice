@@ -27,6 +27,8 @@ Page({
     is_company_empty : false,
     company_error: '',
     is_email_error: false,
+    role_error: '',
+    is_role_empty: false,
     email_error: '',
     showSelectRole: false
   },
@@ -44,12 +46,12 @@ Page({
       avatar: app.globalData.appUserInfo.avatar,
       mobile: app.globalData.appUserInfo.mobile,
       role_name: role_name,
-      ['info.title']: app.globalData.appUserInfo.title,
-      ['info.company']: app.globalData.appUserInfo.company,
+      ['info.title']: app.globalData.appUserInfo.title || '',
+      ['info.company']: app.globalData.appUserInfo.company || '',
       ['info.role']: app.globalData.appUserInfo.role,
-      ['info.email']: app.globalData.appUserInfo.email,
-      ['info.weixin']: app.globalData.appUserInfo.weixin,
-      ['info.qq']: app.globalData.appUserInfo.qq
+      ['info.email']: app.globalData.appUserInfo.email || '',
+      ['info.weixin']: app.globalData.appUserInfo.weixin || '',
+      ['info.qq']: app.globalData.appUserInfo.qq || ''
     })
 
     app.get('index/token', (res) => {
@@ -136,6 +138,8 @@ Page({
     this.setData({
       role_name: event.detail.name,
       ['info.role']: event.detail.value,
+      role_error: '',
+      is_role_empty: false,
       showSelectRole: false
     })
   },
@@ -195,6 +199,13 @@ Page({
         company_error: '请填写公司'
       })
     }
+
+    if (!that.data.info.role) { 
+      that.setData({
+        is_role_empty: true,
+        role_error: '请选择行业属性'
+      })
+    }
     
     if (that.data.info.email && !app.isEmail(that.data.info.email)) {
       that.setData({
@@ -203,7 +214,8 @@ Page({
       })
     }
 
-    if (that.data.is_title_empty || that.data.is_company_empty || that.data.is_email_error) {
+    if (that.data.is_title_empty || that.data.is_company_empty || 
+      that.data.is_role_empty || that.data.is_email_error) {
       return
     }
 
