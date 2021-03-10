@@ -381,7 +381,8 @@ class Wechat {
 登记我的企业：<a href="' . $app_root . '/app/company/edit">点这里</a>
 开发商发布项目：<a href="' . $app_root . '/app/building/edit">点这里</a>
 用微信群发项目帖：<a href="' . $app_root . '/app/my/robot">点这里</a>
-转到商办云小程序：<a href="' . $app_root . '/app/building" data-miniprogram-appid="wxa797b3aba4faaa75" data-miniprogram-path="pages/building/index/index">点这里</a>';
+转到商办云小程序：<a href="' . $app_root . '/app/building" data-miniprogram-appid="wxa797b3aba4faaa75" data-miniprogram-path="pages/building/index/index">点这里</a>
+特别注意:请完善个人信息和企业资料后再发布项目或其他操作。';
 				break;
 			//取消关注
 			case "unsubscribe":
