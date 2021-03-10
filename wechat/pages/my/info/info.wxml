@@ -12,7 +12,9 @@
       </van-uploader>
     </van-cell>   
     <van-field title-width="80px" label="姓名" value="{{ info.title }}" required placeholder="{{ title_error }}" error="{{is_title_empty}}" maxlength="30" bind:input="onTitleInput" input-align="right" />
-    <van-field title-width="80px" label="公司" required maxlength="30" readonly="{{!!info.company}}" value="{{info.company}}" bind:input="onCompanyInput" input-align="right" placeholder="{{ company_error }}" error="{{is_company_empty}}" />
+    <van-field wx:if="{{!info.company}}" title-width="80px" label="公司" required maxlength="30" bind:input="onCompanyInput" input-align="right" placeholder="{{ company_error }}" 
+    error="{{is_company_empty}}" />
+    <van-cell wx:if="{{!!info.company}}" title="公司" link-type="navigateTo" is-link url="../../company/index/index" value="{{ info.company }}" ></van-cell>
     <van-field title-width="80px" label="行业属性" required value="{{ role_name }}" is-link readonly clickable bindtap="bindSelectRole" input-align="right"placeholder="{{ role_error }}" error="{{is_role_empty}}" />
     <van-cell title="手机" link-type="navigateTo" is-link
       url="../mobile/mobile" value="{{ mobile }}" ></van-cell>
