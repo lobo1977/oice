@@ -209,7 +209,7 @@ Page({
     })
   },
 
-  onStatusChange: function() {
+  onStatusChange: function(event) {
     this.setData({
       ['info.status']: event.detail ? 0 : 1
     })
