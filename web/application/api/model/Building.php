@@ -420,7 +420,7 @@ class Building extends Base
       }
     }
 
-    if (empty($user) || (!$user->isAdmin && $data->company_id != $user->company_id)) {
+    if (empty($user) || $user->company_id == 0 || (!$user->isAdmin && $data->company_id != $user->company_id)) {
       unset($data['user']);
       unset($data['avatar']);
       unset($data['create_time']);
