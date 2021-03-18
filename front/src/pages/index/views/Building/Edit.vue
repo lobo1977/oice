@@ -307,6 +307,16 @@ export default {
     next(vm => {
       vm.user = vm.$store.state.oice.user || vm.user
 
+      if (!vm.user.title || !vm.user.mobile) {
+        vm.$vux.alert.show({
+          title: '完善个人信息',
+          content: '您需要先完善个人信息才能添加项目',
+          onHide () {
+            vm.$router.push({name: 'Info'})
+          }
+        })
+      }
+
       if (to.params.id) {
         vm.id = parseInt(to.params.id)
         if (isNaN(vm.id)) {
