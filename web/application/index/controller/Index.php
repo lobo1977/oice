@@ -6,6 +6,24 @@ use think\Controller;
 
 class Index extends Controller
 {
+  /**
+   * 短链接重定向
+   */
+  public function short($id = '') {
+    $url = config('app_host');
+    if ($id) {
+      $find = db('short_url')
+        ->where('id', $id)
+        ->where(function ($query) {
+          $query->whereOr([['end_time', 'null', ''], ['end_time', '>', date('Y-m-d H:i:s', time())]]);
+        })->find();
+      if ($find) {
+        $url = $find['url'];
+      }
+    }
+    $this->redirect($url, 302);
+  }
+
     public function import($file = 'buildings_rent.txt') {
         set_time_limit(0);
 

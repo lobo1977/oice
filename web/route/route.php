@@ -9,6 +9,11 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
+// 短链接路由
+Route::domain('t', function () {
+  Route::rule(':id', 'index/short')->pattern(['id' => '[a-zA-Z0-9]+']);
+})->bind('index');
+
 Route::rule('api/verify','api/index/verify');
 Route::rule('api/login','api/index/login');
 Route::rule('api/mobile','api/index/mobile');

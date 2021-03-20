@@ -15,6 +15,7 @@ use app\api\model\Company;
 use app\api\model\Linkman;
 use app\api\model\Unit;
 use app\api\model\Confirm;
+use app\api\model\ShortUrl;
 
 class Building extends Base
 {
@@ -1239,8 +1240,6 @@ class Building extends Base
       return false;
     }
 
-    self::getShortUrl($building, true);
-
     $linkman = db('linkman')
       ->where('type', 'building')
       ->where('owner_id', $building->id)
@@ -1287,21 +1286,17 @@ class Building extends Base
   /**
    * 获取项目短网址
    */
-  private static function getShortUrl(&$building, $edit = false) {
+  private static function getShortUrl(&$building) {
     if (empty($building) || empty($building->id)) {
       return;
     }
     $key = 'building';
-    if ($edit) {
-      $key = 'building_edit';
-    }
     if (empty($building->key)) {
       $building->key = md5($key . $building->id . config('wechat.app_secret'));
     }
     if (empty($building->short_url)) {
-      $wechat = new Wechat();
       $url = 'https://' . config('app_host') . '/app/building/view/' . $building->id . '/' . $building->key;
-      $building->short_url = $wechat->getShortUrl($url);
+      $building->short_url = ShortUrl::generate($url);
       $building->save();
     }
   }

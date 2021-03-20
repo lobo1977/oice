@@ -8,6 +8,7 @@ use app\api\model\Log;
 use app\api\model\Verify;
 use app\api\model\Oauth;
 use app\api\model\Company;
+use app\api\model\ShortUrl;
 
 class User extends Base
 {
@@ -612,8 +613,8 @@ class User extends Base
 		$weixinMsg = urlencode($message);
 		
 		if ($url) {
-			if (!strpos($url, "w.url.cn")) {
-				$url = $wechat->getShortUrl($url);
+			if (!strpos($url, "t.o-ice.com")) {
+				$url = ShortUrl::generate($url);
 			}
 			$weixinMsg = $weixinMsg . $url;
 		}
