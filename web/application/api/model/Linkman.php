@@ -100,18 +100,20 @@ class Linkman extends Base
       !self::allow($user, $linkman->getAttr('type'), $linkman->owner_id, $operate)) {
       self::exception('您没有权限' . ($operate == 'view' ? '查看' : '修改') . '此联系人。');
     }
+    
+    if (isset($linkman->avatar) && $linkman->avatar) {
+      $find = strpos($linkman->avatar, 'http');
+      if ($find === false || $find > 0) {
+        $linkman->avatar = '/upload/user/images/60/' . $linkman->avatar;
+      }
+    } else {
+      $linkman->avatar = '/static/img/avatar.png';
+    }
+
     if ($operate == 'view') {
       $linkman->allowEdit = $linkman->user_id == $user->id ||
         self::allow($user, $linkman->getAttr('type'), $linkman->owner_id, 'edit');
       $linkman->allowDelete = $linkman->allowEdit;
-      if (isset($linkman->avatar) && $linkman->avatar) {
-        $find = strpos($linkman->avatar, 'http');
-        if ($find === false || $find > 0) {
-          $linkman->avatar = '/upload/user/images/60/' . $linkman->avatar;
-        }
-      } else {
-        $linkman->avatar = '/static/img/avatar.png';
-      }
     }
     return $linkman;
   }
