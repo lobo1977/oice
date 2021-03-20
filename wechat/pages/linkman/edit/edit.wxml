@@ -1,6 +1,16 @@
-<!--pages/customer/edit/edit.wxml-->
+<page-meta background-text-style="dark">
+</page-meta>
+<wxs src="../../../utils/filter.wxs" module="filter" />
+
 <view class="page-view">
   <van-cell-group>
+    <van-cell title="头像" center>
+      <van-uploader bind:after-read="getAvatar">
+        <image mode="aspectFit" wx:if="{{info.avatar}}"
+          src="{{filter.imageUrl(info.avatar)}}" class="cell-image"></image>
+        <text wx:if="{{!info.avatar}}">点击上传</text>
+      </van-uploader>
+    </van-cell>
     <van-field title-width="80px" label="姓名" value="{{ info.title }}" required placeholder="{{ title_error }}" error="{{is_title_empty}}" maxlength="10" bind:input="onTitleInput" />
     <van-field title-width="80px" label="所在部门" value="{{ info.department }}" maxlength="20" bind:input="onDepartmentInput" />
     <van-field title-width="80px" label="职务" value="{{ info.job }}" maxlength="20" bind:input="onJobInput" />

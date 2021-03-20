@@ -1,8 +1,13 @@
 <!--pages/customer/view/view.wxml-->
 <page-meta background-text-style="dark"></page-meta>
+<wxs src="../../../utils/filter.wxs" module="filter" />
+
 <view class="page-view">
 	<van-cell-group>
-		<van-cell title="{{info.title}}" title-class="cell-title" custom-class="cell-view"></van-cell>
+		<van-cell title="{{info.title}}" title-class="cell-title" custom-class="cell-view" center>
+      <image mode="aspectFit" wx:if="{{info.avatar}}"
+        src="{{filter.imageUrl(info.avatar)}}" class="cell-image"></image>
+    </van-cell>
 		<van-cell title="手机号码" wx:if="{{info.mobile}}" custom-class="cell-view" title-width="160rpx" value="{{info.mobile}}" value-class="text-left">
 			<van-icon slot="right-icon" name="phone" size="20px" data-data="{{info.mobile}}" bindtap="bindPhoneCall" color="blue" custom-style="margin-right:10px" />
 		</van-cell>

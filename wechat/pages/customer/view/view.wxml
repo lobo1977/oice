@@ -62,8 +62,11 @@
 
       <van-cell-group title="联系人" wx:if="{{(info.linkman && info.linkman.length) || info.allowFollow}}">
         <van-cell wx:for="{{info.linkman}}" wx:key="id" data-data="{{item}}"
-          title="{{item.title}}" center label="{{item.desc}}" custom-class="cell-view"
+          title="{{item.title}}" label="{{item.department}}" 
+          center custom-class="cell-contact"
           link-type="navigateTo" url="../../linkman/view/view?id={{item.id}}">
+          <image slot="icon" mode="aspectFill" 
+            src="{{filter.imageUrl(item.avatar)}}" class="cell-image"></image>
           <view slot="right-icon">
             <van-icon name="phone" size="20px" wx:if="{{item.mobile || item.tel}}"
               data-data="{{item.mobile || item.tel}}" catchtap="bindPhoneCall"

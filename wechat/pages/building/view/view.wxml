@@ -71,8 +71,11 @@
 
   <van-cell-group title="项目通讯录" wx:if="{{info.allowEdit || (info.linkman && info.linkman.length)}}">
     <van-cell wx:for="{{info.linkman}}" wx:key="id" data-data="{{item}}"
-      title="{{item.title}}" center custom-class="cell-view"
+      title="{{item.title}}" label="{{item.department}}" 
+      center custom-class="cell-contact"
       link-type="navigateTo" url="../../linkman/view/view?id={{item.id}}">
+      <image slot="icon" mode="aspectFill" 
+        src="{{filter.imageUrl(item.avatar)}}" class="cell-image"></image>
       <view slot="right-icon">
         <van-icon name="phone" size="20px" wx:if="{{item.mobile || item.tel}}"
           data-data="{{item}}" catchtap="bindPhoneCall" color="blue" custom-style="margin-right:10px" />

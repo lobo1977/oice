@@ -11,6 +11,7 @@ Page({
       id: 0,
       type: '',
       title: '',         // 名称
+      avatar: '',        // 头像
       department: '',    // 部门
       job: '',           // 职务
       mobile: '',        // 手机号码

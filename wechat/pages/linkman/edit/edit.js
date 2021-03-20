@@ -6,11 +6,13 @@ const app = getApp()
 Page({
   data: {
     id: 0,
+    avatarFile: null,
     info: {
       __token__: '',
       type: '',          // 类别
       owner_id: 0,       // 客户ID
       title: '',         // 名称
+      avatar: '',        // 头像
       department: '',    // 部门
       job: '',           // 职务
       mobile: '',        // 手机号码
@@ -117,6 +119,7 @@ Page({
           }
         }
         that.setData({
+          avatarFile: null,
           info: info
         })
       } else {
@@ -221,6 +224,123 @@ Page({
     })
   },
 
+  getAvatar: function(event) {
+    let that = this
+    that.setData({
+      avatarFile: event.detail.file,
+      ['info.avatar']: event.detail.file.path
+    })
+  },
+
+  upload: function() {
+    let that = this
+    try {
+      let header = {
+        'User-Token': app.globalData.appUserInfo && app.globalData.appUserInfo.token ? 
+          app.globalData.appUserInfo.token : ''
+      }
+      if (!app.globalData.isWindows) {
+        header['Content-Type'] =  'multipart/form-data'
+      }
+
+      wx.uploadFile({
+        header: header,
+        url: app.globalData.serverUrl + '/api/linkman/edit?id=' + that.data.id,
+        filePath: that.data.avatarFile.path,
+        name: 'file',
+        formData: that.data.info,
+        success(res) {
+          if (res.data) {
+            let json = JSON.parse(res.data)
+            if (json.success) {
+              if (that.data.info.type == 'building') {
+                app.globalData.refreshBuildingView = true
+              }
+              if (that.data.info.type == 'unit') {
+                app.globalData.refreshUnitView = true
+              }
+              if (that.data.info.type == 'customer') {
+                app.globalData.refreshCustomerView = true
+              }
+              app.goBack()
+            } else {
+              if (json.data) {
+                that.data.info.__token__ = json.data
+              }
+              if (json.message) {
+                wx.showToast({
+                  icon: 'none',
+                  title: json.message,
+                  duration: 2000
+                })
+              } else {
+                wx.showToast({
+                  icon: 'none',
+                  title: '操作失败，系统异常',
+                  duration: 2000
+                })
+              }
+            }
+          } else {
+            wx.showToast({
+              icon: 'none',
+              title: '操作失败，系统异常',
+              duration: 2000
+            })
+          }
+        },
+        complete() {
+          wx.hideLoading()
+        },
+        fail(e) {
+          wx.showToast({
+            icon: 'none',
+            title: '操作失败，系统异常',
+            duration: 2000
+          })
+        }
+      })
+    } catch(e) {
+      wx.hideLoading()
+      Dialog.alert({
+        title: '发生错误',
+        message: e.message
+      })
+    }
+  },
+
+  save: function() {
+    let that = this
+    app.post('linkman/edit?id=' + that.data.id, that.data.info, (res) => {
+      if (res.success) {
+        if (that.data.info.type == 'building') {
+          app.globalData.refreshBuildingView = true
+        }
+        if (that.data.info.type == 'unit') {
+          app.globalData.refreshUnitView = true
+        }
+        if (that.data.info.type == 'customer') {
+          app.globalData.refreshCustomerView = true
+        }
+        app.goBack()
+      } else if (res.message) {
+        wx.showToast({
+          icon: 'none',
+          title: res.message,
+          duration: 2000
+        })
+      } else {
+        wx.showToast({
+          icon: 'none',
+          title: '操作失败，系统异常',
+          duration: 2000
+        })
+      }
+    }, () => {
+      wx.hideLoading()
+    })
+  },
+
   bindSave: function() {
     let that = this
     let error = 0
@@ -282,33 +402,10 @@ Page({
       title: '保存中',
     })
 
-    app.post('linkman/edit?id=' + that.data.id, that.data.info, (res) => {
-      if (res.success) {
-        if (that.data.info.type == 'building') {
-          app.globalData.refreshBuildingView = true
-        }
-        if (that.data.info.type == 'unit') {
-          app.globalData.refreshUnitView = true
-        }
-        if (that.data.info.type == 'customer') {
-          app.globalData.refreshCustomerView = true
-        }
-        app.goBack()
-      } else if (res.message) {
-        wx.showToast({
-          icon: 'none',
-          title: res.message,
-          duration: 2000
-        })
-      } else {
-        wx.showToast({
-          icon: 'none',
-          title: '操作失败，系统异常',
-          duration: 2000
-        })
-      }
-    }, () => {
-      wx.hideLoading()
-    })
+    if (that.data.avatarFile) {
+      that.upload()
+    } else {
+      that.save()
+    }
   }
 })
