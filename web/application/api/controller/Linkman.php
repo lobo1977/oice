@@ -49,6 +49,7 @@ class Linkman extends Base
       ]);
 
       $data = input('post.');
+      $avatar = request()->file('file');
 
       if (isset($data['mobile'])) {
         $data['mobile'] = str_replace(' ', '', $data['mobile']);
@@ -61,7 +62,7 @@ class Linkman extends Base
         return $this->fail($validate->getError(), $form_token);
       } else {
         unset($data['__token__']);
-        $result = modelLinkman::addUp($this->user, $id, $data);
+        $result = modelLinkman::addUp($this->user, $id, $data, $avatar);
         if ($result) {
           return $this->succeed($result);
         } else {

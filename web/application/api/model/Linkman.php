@@ -34,6 +34,22 @@ class Linkman extends Base
   }
 
   /**
+   * 上传头像
+   */
+  private static function uploadAvatar($avatar) {
+    $uploadPath = '../public/upload/user/images';
+    $info = $avatar->validate(['size'=>2097152,'ext'=>'jpg,jpeg,png,gif'])
+      ->rule('uniqid')->move($uploadPath . '/original');
+
+    if ($info) {
+      File::thumbImage($info, [60,200], $uploadPath);
+      return $info->getFilename();
+    } else {
+      self::exception($avatar->getError());
+    }
+  }
+
+  /**
    * 通过所有者ID获取联系人列表
    */
   public static function getByOwnerId($user, $type, $id, $allow = false, $status = -1) {
@@ -47,7 +63,7 @@ class Linkman extends Base
     if ($status >= 0) {
       $list->where('status', $status);
     }
-    $list = $list->field('id,title,department,job,mobile,tel,email,weixin,qq,status')
+    $list = $list->field('id,title,avatar,department,job,mobile,tel,email,weixin,qq,status')
       ->order(['status' => 'asc', 'id' => 'asc'])
       ->select();
 
@@ -55,6 +71,14 @@ class Linkman extends Base
       $linkman->desc = $linkman->department . $linkman->job . ' ' . $linkman->mobile . ' ' . $linkman->tel;
       if ($linkman->status == 1) {
         $linkman->title = $linkman->title . '(已离职)';
+      }
+      if (isset($linkman->avatar) && $linkman->avatar) {
+        $find = strpos($linkman->avatar, 'http');
+        if ($find === false || $find > 0) {
+          $linkman->avatar = '/upload/user/images/60/' . $linkman->avatar;
+        }
+      } else {
+        $linkman->avatar = '/static/img/avatar.png';
       }
     }
     return $list;
@@ -65,7 +89,7 @@ class Linkman extends Base
    */
   public static function detail($user, $id, $operate = 'view') {
     $linkman = self::where('id', $id)
-      ->field('id,type,owner_id,title,department,job,mobile,tel,' .
+      ->field('id,type,owner_id,title,avatar,department,job,mobile,tel,' .
         'email,weixin,qq,rem,status,user_id')
       ->find();
     
@@ -80,6 +104,14 @@ class Linkman extends Base
       $linkman->allowEdit = $linkman->user_id == $user->id ||
         self::allow($user, $linkman->getAttr('type'), $linkman->owner_id, 'edit');
       $linkman->allowDelete = $linkman->allowEdit;
+      if (isset($linkman->avatar) && $linkman->avatar) {
+        $find = strpos($linkman->avatar, 'http');
+        if ($find === false || $find > 0) {
+          $linkman->avatar = '/upload/user/images/60/' . $linkman->avatar;
+        }
+      } else {
+        $linkman->avatar = '/static/img/avatar.png';
+      }
     }
     return $linkman;
   }
@@ -87,7 +119,7 @@ class Linkman extends Base
   /**
    * 添加/修改联系人信息
    */
-  public static function addUp($user, $id, $data) {
+  public static function addUp($user, $id, $data, $avatar = null) {
     $user_id = 0;
     if ($user) {
       $user_id = $user->id;
@@ -103,6 +135,15 @@ class Linkman extends Base
       }
 
       $summary = $oldData->title . ' ';
+
+      if ($avatar) {
+        $path = self::uploadAvatar($avatar);
+        if ($path) {
+          $data['avatar'] = $path;
+        }
+      } else if (isset($data['avatar'])) {
+        unset($data['avatar']);
+      }
 
       if ($data['title'] != $oldData->title) {
         if ($oldData->title) {
@@ -207,6 +248,15 @@ class Linkman extends Base
         self::exception('您没有权限添加联系人。');
     } else {
       $data['user_id'] = $user_id;
+
+      if ($avatar) {
+        $path = self::uploadAvatar($avatar);
+        if ($path) {
+          $data['avatar'] = $path;
+        }
+      } else if (isset($data['avatar'])) {
+        unset($data['avatar']);
+      }
 
       $newData = new Linkman($data);
       $result = $newData->save();
