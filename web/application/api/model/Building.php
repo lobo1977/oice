@@ -1,4 +1,5 @@
 <?php
+
 namespace app\api\model;
 
 use think\facade\Log as sysLog;
@@ -23,13 +24,14 @@ class Building extends Base
   protected $pk = 'id';
   protected $deleteTime = 'delete_time';
 
-  public static $share = ['隐藏','公开'];
+  public static $share = ['隐藏', '公开'];
 
   /**
    * 格式化列表数据
    */
-  protected static function formatList($list) {
-    foreach($list as $key=>$building) {
+  protected static function formatList($list)
+  {
+    foreach ($list as $key => $building) {
       $building->title = $building->building_name;
       if ($building->status == 3) {
         $building->title .= '[待认领]';
@@ -59,20 +61,19 @@ class Building extends Base
   /**
    * 权限检查
    */
-  public static function allow($user, $building, $operate) {
+  public static function allow($user, $building, $operate)
+  {
     if ($building == null && $operate != 'new') {
       return false;
     }
     if ($operate == 'share') {
       return true;
     } else if ($operate == 'view') {
-      return ($building->share && ($building->status == 1 || ($user != null && $user->isAdmin))) || 
+      return ($building->share && ($building->status == 1 || ($user != null && $user->isAdmin))) ||
         $building->user_id == 0 ||
-        (
-          $user != null && ($building->share_level !== null || 
-          $building->user_id == $user->id ||
-          ($building->company_id > 0 && $building->company_id == $user->company_id))
-        );
+        ($user != null && ($building->share_level !== null ||
+            $building->user_id == $user->id ||
+            ($building->company_id > 0 && $building->company_id == $user->company_id)));
     } else if ($operate == 'new') {
       return $user != null && $user->company_id > 0;
     } else if ($operate == 'edit') {
@@ -80,7 +81,7 @@ class Building extends Base
         return false;
       } else {
         return $user->isAdmin || $building->user_id == 0 || $building->share_level > 0 ||
-          $building->user_id == $user->id || 
+          $building->user_id == $user->id ||
           $building->company_id == $user->company_id;
       }
     } else if ($operate == 'copy') {
@@ -97,18 +98,19 @@ class Building extends Base
       if ($user == null) {
         return false;
       }
-      return $user->isAdmin || 
-        ($building->share == 0 && $building->user_id == $user->id) || 
+      return $user->isAdmin ||
+        ($building->share == 0 && $building->user_id == $user->id) ||
         ($building->share == 0 && $user->isCompanyAdmin && $building->company_id != $user->company_id);
     } else {
       return false;
     }
   }
-  
+
   /**
    * 检索项目信息
    */
-  public static function search($user, $filter) {
+  public static function search($user, $filter)
+  {
     if (!isset($filter['page'])) {
       $filter['page'] = 1;
     }
@@ -131,9 +133,9 @@ class Building extends Base
       $filter['my'] = 1;
       unset($filter['type']);
     }
-  
+
     $list = self::alias('a')
-      ->leftJoin('file b',"b.parent_id = a.id AND b.type = 'building' AND b.default = 1 AND b.delete_time is null")
+      ->leftJoin('file b', "b.parent_id = a.id AND b.type = 'building' AND b.default = 1 AND b.delete_time is null")
       ->leftJoin('share s', "s.type = 'building' and a.id = s.object_id and s.user_id = " . $user_id)
       ->where('a.city', self::$city);
 
@@ -152,7 +154,7 @@ class Building extends Base
       $list->where('((a.share = 1 AND a.status = 1) OR a.user_id = 0 OR s.object_id is not null OR a.user_id = ' . $user_id . ' OR 
         (a.company_id > 0 AND a.company_id = ' . $company_id . '))');
     }
-    
+
     if (isset($filter['keyword']) && $filter['keyword'] != '') {
       $list->where("(a.pinyin like '" . $filter['keyword'] . "%' OR a.building_name like '%" . $filter['keyword'] . "%')");
     } else {
@@ -180,24 +182,27 @@ class Building extends Base
       a.rent_sell,a.price,b.file,a.user_id,a.share,a.status,s.level as share_level')
       ->page($filter['page'], $filter['page_size']);
 
-    if (isset($filter['my']) && $filter['my'] >= 1) { 
+    if (isset($filter['my']) && $filter['my'] >= 1) {
       $list->order([
         'a.share' => 'asc',
         'a.status' => 'asc',
-        'a.update_time' => 'desc', 
-        'a.id' => 'desc']);
+        'a.update_time' => 'desc',
+        'a.id' => 'desc'
+      ]);
     } else if ($isAdmin) {
       $list->order([
         'a.share' => 'desc',
         'a.status' => 'asc',
-        'a.update_time' => 'desc', 
-        'a.id' => 'desc']);
+        'a.update_time' => 'desc',
+        'a.id' => 'desc'
+      ]);
     } else {
       $list->order([
         'a.share' => 'desc',
         'a.status' => 'asc',
-        'a.update_time' => 'desc', 
-        'a.id' => 'desc']);
+        'a.update_time' => 'desc',
+        'a.id' => 'desc'
+      ]);
     }
 
     $result = $list->select();
@@ -208,7 +213,8 @@ class Building extends Base
   /**
    * 检索收藏的项目信息
    */
-  public static function myFavorite($user, $page = 1, $page_size = 10) {
+  public static function myFavorite($user, $page = 1, $page_size = 10)
+  {
     if ($user == null) {
       return null;
     }
@@ -224,11 +230,11 @@ class Building extends Base
       ->order('a.create_time', 'desc')
       ->select();
 
-    foreach($list as $key => $building) {
+    foreach ($list as $key => $building) {
       $building['title'] = $building['building_name'];
       if (!empty($building['building_no'])) {
         $building['title'] = $building['title'] . $building['building_no'];
-      } 
+      }
       if (!empty($building['floor'])) {
         if ($building['floor'] > 0) {
           $building['title'] = $building['title'] . $building['floor'] . '层';
@@ -276,7 +282,8 @@ class Building extends Base
   /**
    * 通过ID获取项目信息
    */
-  public static function getById($user, $id) {
+  public static function getById($user, $id)
+  {
     $user_id = 0;
 
     if ($user) {
@@ -295,7 +302,8 @@ class Building extends Base
   /**
    * 获取项目详细信息
    */
-  public static function detail($user, $id, $operate = 'view', $key = '') {
+  public static function detail($user, $id, $operate = 'view', $key = '')
+  {
     $user_id = 0;
 
     if ($user) {
@@ -379,10 +387,10 @@ class Building extends Base
     $images = [];
     $videos = [];
     $attach = [];
-    
+
     $files = File::getList($user, 'building', $id);
     if ($files) {
-      foreach($files as $key => $file) {
+      foreach ($files as $key => $file) {
         if (empty($user) || !$user->isAdmin) {
           unset($file['username']);
         }
@@ -410,13 +418,14 @@ class Building extends Base
       $data->unit = Unit::getByBuildingId($user, $id);
 
       self::getShortUrl($data);
-      
+
       if ($user) {
         $data->linkman = Linkman::getByOwnerId($user, 'building', $id, true, $data->allowEdit ? -1 : 0);
         $data->confirm = Confirm::query($user, 0, $id);
         if (db('favorite')->where('user_id', $user->id)
-          ->where('building_id', $id)->find()) {
-            $data->isFavorite = true;
+          ->where('building_id', $id)->find()
+        ) {
+          $data->isFavorite = true;
         }
       }
     }
@@ -434,7 +443,8 @@ class Building extends Base
   /**
    * 添加/修改项目信息
    */
-  public static function addUp($user, $id, $data) {
+  public static function addUp($user, $id, $data)
+  {
     $data['pinyin'] = \my\Pinyin::convertInitalPinyin($data['building_name']);
     $user_id = 0;
     $company_id = 0;
@@ -685,7 +695,7 @@ class Building extends Base
         }
       }
 
-      if ($data['commission'] != $oldData->commission) {
+      if (isset($data['commission']) && $data['commission'] != $oldData->commission) {
         if ($oldData->commission) {
           $summary = $summary . '佣金比例：' . $oldData->commission . ' -> ' . $data['commission'] . '\n';
         } else {
@@ -699,8 +709,8 @@ class Building extends Base
 
       if ($oldData->user_id == 0) {
         $data['user_id'] = $user_id;
-      } 
-      
+      }
+
       // else if ($oldData->user_id != $user_id) {
       //   if (isset($data['company_id'])) {
       //     unset($data['company_id']);
@@ -729,7 +739,7 @@ class Building extends Base
       }
 
       if (isset($data['share']) && $data['share'] != $oldData->share) {
-        $summary = $summary . '是否公开：' . self::$share[$oldData->share] . 
+        $summary = $summary . '是否公开：' . self::$share[$oldData->share] .
           ' -> ' . self::$share[$data['share']] . '\n';
       }
 
@@ -749,8 +759,10 @@ class Building extends Base
         ]);
       }
 
-      if (isset($data['share']) && $data['share'] == 1 && 
-        isset($data['send_sms']) && $data['send_sms'] == 1) {
+      if (
+        isset($data['share']) && $data['share'] == 1 &&
+        isset($data['send_sms']) && $data['send_sms'] == 1
+      ) {
         self::sendCommissionConfirm($user, $id);
       }
 
@@ -813,17 +825,17 @@ class Building extends Base
           if ($linkmanData) {
             db('linkman')->insertAll($linkmanData);
           }
-          
+
           // 复制单元
           $unitData = db('unit')
             ->where('building_id', $copy)
             ->where('delete_time', 'null')
-            ->field('id,' . $newData->id . ' as building_id,room,building_no,floor,face,acreage,rent_sell,rent_price,sell_price,decoration,`status`,end_date,`rem`,1 as `share`,' . 
+            ->field('id,' . $newData->id . ' as building_id,room,building_no,floor,face,acreage,rent_sell,rent_price,sell_price,decoration,`status`,end_date,`rem`,1 as `share`,' .
               $company_id . ' as `company_id`,' . $user_id . ' as user_id,now() as create_time')
             ->select();
 
           if ($unitData) {
-            foreach($unitData as $key => $unit) {
+            foreach ($unitData as $key => $unit) {
               $oldId = $unit['id'];
               unset($unit['id']);
               $newUnit = new Unit($unit);
@@ -864,7 +876,8 @@ class Building extends Base
   /**
    * 添加修改英文信息
    */
-  public static function addUpEngInfo($user, $id, $data) {
+  public static function addUpEngInfo($user, $id, $data)
+  {
     $building = self::getById($user, $id);
     if ($building == null) {
       self::exception('项目信息不存在。');
@@ -1009,7 +1022,8 @@ class Building extends Base
   /**
    * 添加资料夹
    */
-  public static function favorite($user, $building_id, $unit_id = 0) {
+  public static function favorite($user, $building_id, $unit_id = 0)
+  {
     if (!$user) {
       return false;
     }
@@ -1018,10 +1032,10 @@ class Building extends Base
       ->where('building_id', $building_id)
       ->where('unit_id', $unit_id)->find()) {
       return db('favorite')->insert([
-        'user_id'=> $user_id, 
+        'user_id' => $user_id,
         'building_id' => $building_id,
         'unit_id' => $unit_id,
-        'create_time' => date("Y-m-d H:i:s",time())
+        'create_time' => date("Y-m-d H:i:s", time())
       ]);
     } else {
       return 1;
@@ -1031,7 +1045,8 @@ class Building extends Base
   /**
    * 从资料夹删除
    */
-  public static function unFavorite($user, $building_id, $unit_id = 0) {
+  public static function unFavorite($user, $building_id, $unit_id = 0)
+  {
     if (!$user) {
       return false;
     }
@@ -1045,18 +1060,19 @@ class Building extends Base
   /**
    * 审核项目
    */
-  public static function audit($user, $id, $status = 1, $summary = '') {
+  public static function audit($user, $id, $status = 1, $summary = '')
+  {
     $building = self::getById($user, $id);
     if ($building == null) {
       self::exception('项目不存在。');
     } else if (!self::allow($user, $building, 'audit')) {
       self::exception('您没有权限审核此项目。');
     }
-    
+
     $result = $building->save([
       'status' => $status,
       'audit_user' => $user->id,
-      'audit_time' => date("Y-m-d H:i:s",time()),
+      'audit_time' => date("Y-m-d H:i:s", time()),
       'audit_rem' => $summary
     ]);
 
@@ -1075,14 +1091,15 @@ class Building extends Base
   /**
    * 删除项目
    */
-  public static function remove($user, $id) {
+  public static function remove($user, $id)
+  {
     $building = self::getById($user, $id);
     if ($building == null) {
       return true;
     } else if (!self::allow($user, $building, 'delete')) {
       self::exception('您没有权限删除此项目。');
     }
-    
+
     $log = [
       "table" => 'building',
       "owner_id" => $building->id,
@@ -1099,7 +1116,8 @@ class Building extends Base
   /**
    * 批量导入项目
    */
-  public static function import($user, $data) {
+  public static function import($user, $data)
+  {
     if (!self::allow($user, null, 'new')) {
       self::exception('您没有权限添加项目。');
     }
@@ -1155,7 +1173,7 @@ class Building extends Base
       ];
 
       if ($building['building_name'] || $building['type']) {
-        foreach($building as $k=>$v) {
+        foreach ($building as $k => $v) {
           if ($v == '' || $v == null || $v == 'null' || $v == 'NULL') {
             unset($building[$k]);
           }
@@ -1230,7 +1248,8 @@ class Building extends Base
   /**
    * 给项目联系人发送确认委托短信
    */
-  public static function sendCommissionConfirm($user, $id) {
+  public static function sendCommissionConfirm($user, $id)
+  {
     $building = self::getById($user, $id);
     if ($building == null) {
       return false;
@@ -1254,7 +1273,7 @@ class Building extends Base
     }
 
     $mobileList = '';
-    foreach($linkman as $item) {
+    foreach ($linkman as $item) {
       if ($mobileList) {
         $mobileList .= ',';
       }
@@ -1263,7 +1282,7 @@ class Building extends Base
 
     $summary = $building->building_name;
     $acreage = $building->acreage;
-    
+
     $unit = Unit::getByBuildingId($user, $id, 1);
     if ($unit && count($unit) > 0) {
       $acreage = 0;
@@ -1277,7 +1296,7 @@ class Building extends Base
 
     $message = sprintf(config('sms.tmp_commission_confirm'),  $summary);
 
-    sysLog::info($mobileList . ':'. $message);
+    sysLog::info($mobileList . ':' . $message);
 
     $sms = new Sms();
     $sms->sendSMS($mobileList, $message);
@@ -1286,7 +1305,8 @@ class Building extends Base
   /**
    * 获取项目短网址
    */
-  private static function getShortUrl(&$building) {
+  private static function getShortUrl(&$building)
+  {
     if (empty($building) || empty($building->id)) {
       return;
     }
