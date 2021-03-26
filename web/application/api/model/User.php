@@ -29,6 +29,11 @@ class User extends Base
     } else {
       $user->isCompanyAdmin = false;
     }
+    if (isset($user['company'])) {
+      if (empty($user['full_name'])) {
+        $user['full_name'] = $user['company'];
+      }
+    }
     if (isset($user['type'])) {
       $user->isAdmin = $user['type'] == 1;
       $user->isSystem = $user['type'] == 2;
