@@ -218,7 +218,7 @@ export default {
     next(vm => {
       vm.user = vm.$store.state.oice.user || vm.user
 
-      if (!vm.user.title || !vm.user.mobile) {
+      if (!vm.user.title || !vm.user.mobile || !vm.user.company_id) {
         vm.$vux.alert.show({
           title: '完善个人信息',
           content: '您需要先完善个人信息才能添加单元',
