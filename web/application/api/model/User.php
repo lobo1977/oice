@@ -39,10 +39,10 @@ class User extends Base
       $user->isSystem = $user['type'] == 2;
       $user->isLimited = $user['type'] == 10;
     }
-    if (isset($user->avatar) && $user->avatar) {
-      $find = strpos($user->avatar, 'http');
+    if (isset($user->ori_avatar) && $user->ori_avatar) {
+      $find = strpos($user->ori_avatar, 'http');
       if ($find === false || $find > 0) {
-        $user->avatar = '/upload/user/images/60/' . $user->avatar;
+        $user->avatar = '/upload/user/images/60/' . $user->ori_avatar;
       }
     } else {
       $user->avatar = '/static/img/avatar.png';
@@ -64,7 +64,7 @@ class User extends Base
     $list = self::alias('a')
       ->leftJoin('user_company b', 'a.id = b.user_id and b.status = 1')
       ->leftJoin('company co', 'b.company_id = co.id')
-      ->field('a.id,a.title,a.avatar,a.mobile,b.company_id,co.full_name')
+      ->field('a.id,a.title,a.avatar as ori_avatar,a.mobile,b.company_id,co.full_name')
       ->where('b.company_id', 'IN', $company)
       ->whereOr('a.id', 'IN', function ($query) use($user) {
         $query->table('tbl_user_contact')->where('user_id', $user->id)->field('contact_id');
@@ -100,7 +100,7 @@ class User extends Base
       ->join('share s', 's.user_id = a.id')
       ->leftJoin('user_company b', 'a.id = b.user_id and b.status = 1 and b.active = 1')
       ->leftJoin('company co', 'b.company_id = co.id')
-      ->field('a.id,a.title,a.avatar,a.mobile,co.title as company,s.create_time')
+      ->field('a.id,a.title,a.avatar as ori_avatar,a.mobile,co.title as company,s.create_time')
       ->where('s.type', $type)
       ->where('s.object_id', $id);
 
@@ -168,7 +168,7 @@ class User extends Base
       $list->where('a.title|a.mobile', 'like', '%' . $keyword . '%');
     }
 
-    $list->field('a.id,a.title,a.avatar,a.mobile')
+    $list->field('a.id,a.title,a.avatar as ori_avatar,a.mobile')
       ->order('b.create_time', 'asc');
 
     if ($page > 0) {
@@ -195,7 +195,7 @@ class User extends Base
       ->join('user_company b', 'a.id = b.user_id and b.status = 1')
       ->join('user_company c', 'b.company_id = c.company_id and c.user_id = ' . $user->id)
       ->leftJoin('company d', 'b.company_id = d.id')
-      ->field('a.id,a.title,a.avatar,a.mobile,b.company_id,d.title as company')
+      ->field('a.id,a.title,a.avatar as ori_avatar,a.mobile,b.company_id,d.title as company')
       ->where('a.id', '<>', $user->id);
 
     if ($company) {
@@ -245,7 +245,7 @@ class User extends Base
         "c.start_time between '" . $date . "' AND '" . date("Y-m-d", strtotime($date . ' +1 day')) . "'")
       ->where('b.superior_id = ' . $user_id . ' OR a.id = ' . $user_id);
 
-    $list->field('a.id,a.title,a.avatar,a.mobile,count(c.id) as daily_count')
+    $list->field('a.id,a.title,a.avatar as ori_avatar,a.mobile,count(c.id) as daily_count')
       ->group('a.id,a.title,a.avatar,a.mobile')
       ->order('b.create_time', 'asc');
 
@@ -272,7 +272,7 @@ class User extends Base
       ->leftJoin('oauth o', "a.id = o.user_id and o.platform = 'wechat'")
       ->where('a.id', $id)
       ->where('a.status', 0)
-      ->field('a.id,a.type,a.title,a.role,a.avatar,a.mobile,a.email,a.qq,a.weixin,
+      ->field('a.id,a.type,a.title,a.role,a.avatar as ori_avatar,a.mobile,a.email,a.qq,a.weixin,
         b.company_id,b.superior_id,u.title as superior,
         c.title as company,c.full_name,c.logo,c.user_id as company_admin,o.openid,o.unionid')
       ->find();

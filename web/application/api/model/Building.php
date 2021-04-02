@@ -794,6 +794,7 @@ class Building extends Base
           "summary" => $newData->building_name
         ]);
 
+        
         if ($copy > 0) {
           // 复制英文信息
           $engData = db('building_en')->where('id', $copy)->find();
@@ -856,7 +857,7 @@ class Building extends Base
                   ->where('type', 'unit')
                   ->where('owner_id', $oldId)
                   ->where('delete_time', 'null')
-                  ->field('`type`,' . $newUnit->id . ' as owner_id,`title`,`department`,`job`,`mobile`,`tel`,`email`,`weixin`,`qq`,`rem`,`status`,now() as create_time,' . $user_id . ' as user_id')
+                  ->field('`type`,' . $newUnit->id . ' as owner_id,`title`,`avatar`,`department`,`job`,`mobile`,`tel`,`email`,`weixin`,`qq`,`rem`,`status`,now() as create_time,' . $user_id . ' as user_id')
                   ->select();
                 if ($linkmanData) {
                   db('linkman')->insertAll($linkmanData);
@@ -864,8 +865,19 @@ class Building extends Base
               }
             }
           }
+        } else {
+          // 自动添加发布用户为项目联系人
+          db('linkman')->insert([
+            'type' => 'building',
+            'owner_id' => $newData->id,
+            'title' => $user->title,
+            'avatar' => $user->ori_avatar,
+            'mobile' => $user->mobile,
+            'email' => $user->email,
+            'qq' => $user->qq,
+            'weixin' => $user->weixin,
+          ]);
         }
-
         return $newData->id;
       } else {
         return false;
