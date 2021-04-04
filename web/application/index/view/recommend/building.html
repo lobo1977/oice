@@ -97,7 +97,9 @@
 
         {if !empty($vo.images)}
             {foreach $vo.images as $key=>$img}
-                <img src="https://{$Think.config.app_host}{$img.src}" style="width:100%;">
+                {if $img.is_image}
+                    <img src="https://{$Think.config.app_host}{$img.src}" style="width:100%;">
+                {/if}
             {/foreach}
         {/if}
 

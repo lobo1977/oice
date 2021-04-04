@@ -52,7 +52,7 @@
                 <!-- <span>周边环境：</span><span>{$vo.environment}</span> -->
             {/if}
             </p>
-            {if count($vo.images) > 1}
+            {if count($vo.images) > 1 && $vo.images[1]['is_image']}
                 <img src="{$vo.images[1]['src']}" border="1">
             {/if}
         </td>
