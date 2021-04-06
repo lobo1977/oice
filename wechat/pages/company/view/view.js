@@ -42,6 +42,12 @@ Page({
    */
   onLoad: function (options) {
     let that = this
+
+    wx.showShareMenu({
+      withShareTicket:true,
+      menus:['shareAppMessage','shareTimeline']  
+    })
+    
     if (options.id) {
       that.data.info.id = options.id
     }
@@ -113,6 +119,18 @@ Page({
     let shareData = {
       title: data.full_name,
       path: '/pages/company/view/view?id=' + data.id
+    }
+    if (data.logo) {
+      shareData.imageUrl = app.globalData.serverUrl + '/' + data.logo
+    }
+    return shareData
+  },
+
+  onShareTimeline: function() {
+    let data = this.data.info
+    let shareData = {
+      title: data.full_name,
+      query: 'id=' + data.id
     }
     if (data.logo) {
       shareData.imageUrl = app.globalData.serverUrl + '/' + data.logo

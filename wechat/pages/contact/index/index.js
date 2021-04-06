@@ -17,6 +17,12 @@ Page({
 
   onLoad: function (options) {
     let that = this
+
+    wx.showShareMenu({
+      withShareTicket:true,
+      menus:['shareAppMessage','shareTimeline']  
+    })
+    
     wx.showLoading({
       title: '加载中',
     })
@@ -73,6 +79,14 @@ Page({
     let shareData = {
       title: '【商办云】联系人',
       path: '/pages/contact/index/index'
+    }
+    return shareData
+  },
+
+  onShareTimeline: function() {
+    let data = this.data.info
+    let shareData = {
+      title: '【商办云】联系人',
     }
     return shareData
   },

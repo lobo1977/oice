@@ -59,6 +59,11 @@ Page({
     list: []
   },
   onLoad: function(options) {
+    wx.showShareMenu({
+      withShareTicket:true,
+      menus:['shareAppMessage','shareTimeline']  
+    })
+
     this.setData({
       filterType: app.globalData.buildingType
     })

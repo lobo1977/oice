@@ -32,7 +32,13 @@ Page({
   },
   
   onLoad(options) {
-    let that = this;
+    let that = this
+
+    wx.showShareMenu({
+      withShareTicket:true,
+      menus:['shareAppMessage','shareTimeline']  
+    })
+
     if (options.id) {
       that.data.id = options.id
     }
@@ -62,6 +68,15 @@ Page({
       title: '【商办云】项目推荐',
       path: '/page/contact/recommend/recommend?id=' + data.id
       // shareData.imageUrl
+    }
+    return shareData
+  },
+
+  onShareTimeline(object) {
+    let data = this.data
+    let shareData = {
+      title: '【商办云】项目推荐',
+      query: 'id=' + data.id
     }
     return shareData
   },

@@ -31,6 +31,12 @@ Page({
    */
   onLoad: function (options) {
     let that = this
+
+    wx.showShareMenu({
+      withShareTicket:true,
+      menus:['shareAppMessage','shareTimeline']  
+    })
+    
     app.globalData.refreshLinkmanView = false
 
     if (options.id) {
@@ -100,6 +106,15 @@ Page({
     let shareData = {
       title: data.title,
       path: '/pages/linkman/view/view?id=' + data.id
+    }
+    return shareData
+  },
+
+  onShareTimeline: function () {
+    let data = this.data.info
+    let shareData = {
+      title: data.title,
+      path: 'id=' + data.id
     }
     return shareData
   },

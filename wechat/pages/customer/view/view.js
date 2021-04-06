@@ -132,6 +132,12 @@ Page({
    */
   onLoad: function (options) {
     let that = this
+
+    wx.showShareMenu({
+      withShareTicket:true,
+      menus:['shareAppMessage','shareTimeline']  
+    })
+    
     app.globalData.refreshCustomerView = false
 
     if (options.id) {
@@ -204,6 +210,14 @@ Page({
       path: '/pages/customer/view/view?id=' + data.id + '&key=' + data.key
     }
     return shareData
+  },
+
+  onShareTimeline: function() {
+    let data = this.data.info
+    return {
+      title: data.customer_name,
+      query: 'id=' + data.id + '&key=' + data.key
+    }
   },
 
   onTabChange: function(event) {

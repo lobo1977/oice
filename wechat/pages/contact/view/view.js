@@ -29,7 +29,13 @@ Page({
   },
   
   onLoad(options) {
-    let that = this;
+    let that = this
+
+    wx.showShareMenu({
+      withShareTicket:true,
+      menus:['shareAppMessage','shareTimeline']  
+    })
+    
     if (options.id) {
       that.data.info.id = options.id
     }
@@ -60,6 +66,18 @@ Page({
     let shareData = {
       title: data.title,
       path: '/pages/contact/view/view?id=' + data.id
+    }
+    if (data.logo) {
+      shareData.imageUrl = app.serverUrl + '/' + data.logo
+    }
+    return shareData
+  },
+
+  onShareTimeline(object) {
+    let data = this.data.info
+    let shareData = {
+      title: data.title,
+      query: 'id=' + data.id
     }
     if (data.logo) {
       shareData.imageUrl = app.serverUrl + '/' + data.logo

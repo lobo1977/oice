@@ -88,10 +88,8 @@ class Wechat extends Base
             ),
             array(
               'name'=> urlencode("联系客服"),
-              'type'=> 'miniprogram',
-              'appid' => 'wxa797b3aba4faaa75',
-              'pagepath' => 'pages/my/contact/contact',
-              'url' => $app_root . '/app/my'
+              'type'=> 'media_id',
+              'media_id' => 'DtsusJONINVD_9nXOilQF-ZQVs7up3O6DqNv2lk2kSY'
             )
             // array(
             //   'name'=> urlencode("商铺独楼"),

@@ -14,6 +14,12 @@ Page({
    */
   onLoad: function (options) {
     let that = this
+
+    wx.showShareMenu({
+      withShareTicket:true,
+      menus:['shareAppMessage','shareTimeline']  
+    })
+    
     if (options.url) {
       that.setData({
         url: options.url
@@ -68,6 +74,14 @@ Page({
     let shareData = {
       title: this.data.title,
       path: '/pages/web/web?url=' + this.data.url
+    }
+    return shareData
+  },
+
+  onShareTimeline(object) {
+    let shareData = {
+      title: this.data.title,
+      query: 'url=' + this.data.url
     }
     return shareData
   }

@@ -84,6 +84,12 @@ Page({
   
   onLoad(options) {
     let that = this
+
+    wx.showShareMenu({
+      withShareTicket:true,
+      menus:['shareAppMessage','shareTimeline']  
+    })
+
     app.globalData.refreshBuildingView = false
     if (app.globalData.isWindows) {
       that.setData({
@@ -135,6 +141,18 @@ Page({
     let shareData = {
       title: data.building_name,
       path: '/pages/building/view/view?id=' + data.id + '&key=' + data.key
+    }
+    if (this.data.info.images.length) {
+      shareData.imageUrl = app.globalData.serverUrl + '/' + this.data.info.images[0].msrc
+    }
+    return shareData
+  },
+
+  onShareTimeline: function() {
+    let data = this.data.info
+    let shareData = {
+      title: data.building_name,
+      query: 'id=' + data.id + '&key=' + data.key
     }
     if (this.data.info.images.length) {
       shareData.imageUrl = app.globalData.serverUrl + '/' + this.data.info.images[0].msrc
