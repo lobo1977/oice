@@ -72,8 +72,8 @@ class Building extends Base
       return ($building->share && ($building->status == 1 || ($user != null && $user->isAdmin))) ||
         $building->user_id == 0 ||
         ($user != null && ($building->share_level !== null ||
-            $building->user_id == $user->id ||
-            ($building->company_id > 0 && $building->company_id == $user->company_id)));
+          $building->user_id == $user->id ||
+          ($building->company_id > 0 && $building->company_id == $user->company_id)));
     } else if ($operate == 'new') {
       return $user != null && $user->company_id > 0;
     } else if ($operate == 'edit') {
@@ -156,7 +156,14 @@ class Building extends Base
     }
 
     if (isset($filter['keyword']) && $filter['keyword'] != '') {
-      $list->where("(a.pinyin like '" . $filter['keyword'] . "%' OR a.building_name like '%" . $filter['keyword'] . "%')");
+      if (Validate::isMobile($filter['keyword']) && $user_id > 0) {
+        $mobile = $filter['keyword'];
+        $list->where('a.id', 'IN', function ($query) use ($mobile) {
+          $query->table('tbl_linkman')->where('mobile', $mobile)->where('type', 'building')->where('status', 0)->field('owner_id');
+        });
+      } else {
+        $list->where("(a.pinyin like '" . $filter['keyword'] . "%' OR a.building_name like '%" . $filter['keyword'] . "%')");
+      }
     } else {
       if (isset($filter['type']) && $filter['type'] != '' && $filter['type'] != 'all') {
         if ($filter['type'] == 'empty') {
@@ -794,7 +801,7 @@ class Building extends Base
           "summary" => $newData->building_name
         ]);
 
-        
+
         if ($copy > 0) {
           // 复制英文信息
           $engData = db('building_en')->where('id', $copy)->find();
