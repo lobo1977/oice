@@ -173,15 +173,17 @@
 
       <van-checkbox-group wx:if="{{info.filter.length}}" value="{{ filterChecked }}" bind:change="filterCheckChange">
         <van-swipe-cell wx:for="{{info.filter}}" wx:for-index="idx" wx:key="id" right-width="{{ 60 }}" disabled="{{!info.allowFollow}}">
-          <van-cell data-data="{{ item }}" 
+          <van-cell data-data="{{ item }}" data-index="{{ idx }}"
             title="{{item.title}}" label="{{item.desc}}" center value-class="value-class"
-            bind:click="bindViewBuilding" custom-class="cell-contact">
+            bind:click="bindViewBuilding" custom-class="cell-contact"
+            bindtouchstart="bindTouchStart" bindtouchend="bindTouchEnd"
+            bindlongtap="bindFilterLongTap">
             <image slot="icon" mode="aspectFill" 
               src="{{filter.imageUrl(item.src)}}" class="cell-image"></image>
             <van-checkbox wx:if="{{showFilterCheckbox}}" class="checkboxes-{{ idx }}" checked-color="#07c160" name="{{ idx }}" catch:tap="noop" />
           </van-cell>
           <view slot="right" style="height:100%">
-            <van-button square type="danger" data-index="{{ idx }}" custom-style="height:100%" bindtap="removeFilter">删除</van-button>
+            <van-button square type="danger" data-index="{{ idx }}" custom-style="height:100%" bindtap="bindRemoveFilter">删除</van-button>
           </view>
         </van-swipe-cell>
       </van-checkbox-group>
@@ -200,15 +202,15 @@
     <van-tab title="推荐">
       <van-cell-group>
         <van-swipe-cell wx:for="{{info.recommend}}" wx:for-index="idx" wx:key="id" right-width="{{ 60 }}" disabled="{{!info.allowFollow}}">
-          <van-cell data-data="{{ item }}" title-width="200px"
-            title="{{item.building + '(' + item.building_count + '个项目)'}}" label="{{item.create_time}}"
-            is-link center
-            bind:click="viewRecommend">
+          <van-cell data-data="{{ item }}" data-index="{{ idx }}" title-width="200px"
+            title="{{item.building + '(' + item.building_count + '个项目)'}}" label="{{item.create_time}}" is-link center
+            bind:click="viewRecommend" bindtouchstart="bindTouchStart" bindtouchend="bindTouchEnd"
+            bindlongtap="bindRecommendLongTap">
             <image slot="icon" mode="aspectFill" 
               src="{{filter.imageUrl(item.image)}}" class="cell-image"></image>
           </van-cell>
           <view slot="right" style="height:100%">
-            <van-button square type="danger" data-index="{{ idx }}" custom-style="height:100%" bindtap="removeRecommend">删除</van-button>
+            <van-button square type="danger" data-index="{{ idx }}" custom-style="height:100%" bindtap="bindRemoveRecommend">删除</van-button>
           </view>
         </van-swipe-cell>
       </van-cell-group>
@@ -272,6 +274,20 @@
     actions="{{ attachActions }}"
     bind:close="onAttachActionsClose"
     bind:select="onAttachActionsSelect"
+  />
+
+  <van-action-sheet
+    show="{{ showFilterActions }}"
+    actions="{{ filterActions }}"
+    bind:close="onFilterActionsClose"
+    bind:select="onFilterActionsSelect"
+  />
+
+  <van-action-sheet
+    show="{{ showRecommendActions }}"
+    actions="{{ recommendActions }}"
+    bind:close="onRecommendActionsClose"
+    bind:select="onRecommendActionsSelect"
   />
 
   <van-action-sheet

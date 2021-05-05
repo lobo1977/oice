@@ -100,6 +100,23 @@ Page({
     showFilterCheckbox: false,
     filterCheckAll: false,
     filterChecked: [],
+    showFilterActions: false,
+    filterIndex: 0,
+    filterActions: [
+      {
+        name: '选择',
+      },
+      {
+        name: '删除',
+      }
+    ],
+    showRecommendActions: false,
+    recommendIndex: 0,
+    recommendActions: [
+      {
+        name: '删除',
+      }
+    ],
     showRecommendType: false,
     recommendType: [ 
       {name: '手机版', value: 0}, 
@@ -295,10 +312,13 @@ Page({
   },
 
   bindViewBuilding: function (event) {
+    if (this.tapEndTime  - this.tapStartTime > 350) {
+      return
+    }
     let item = event.currentTarget.dataset.data
     if (item.unit_id) {
       wx.navigateTo({
-        url: '../../building/unit/unit?id=' + item.unit_id
+        url: '../../unit/view/view?id=' + item.unit_id
       })
     } else {
       wx.navigateTo({
@@ -434,6 +454,26 @@ Page({
     }
   },
 
+  bindFilterLongTap: function(event) {
+    let idx = event.currentTarget.dataset.index
+    if (this.data.info.allowFollow) {
+      this.setData({
+        showFilterActions: true,
+        filterIndex: idx
+      })
+    }
+  },
+
+  bindRecommendLongTap: function(event) {
+    let idx = event.currentTarget.dataset.index
+    if (this.data.info.allowFollow) {
+      this.setData({
+        showRecommendActions: true,
+        recommendIndex: idx
+      })
+    }
+  },
+
   onAttachActionsClose: function() {
     this.setData({
       showAttachActions: false
@@ -462,6 +502,39 @@ Page({
       }, () => {
         wx.hideLoading()
       })
+    }
+  },
+
+  onFilterActionsClose: function() {
+    this.setData({
+      showFilterActions: false
+    })
+  },
+
+  onFilterActionsSelect: function(event) {
+    let that = this
+    if (event.detail.name == '删除') {
+      that.removeFilter(that.data.filterIndex)
+    } else if (event.detail.name == '选择') {
+      let arr = that.data.filterChecked
+      arr.push(that.data.filterIndex.toString())
+      this.setData({
+        showFilterCheckbox: true,
+        filterChecked: arr
+      })
+    }
+  },
+
+  onRecommendActionsClose: function() {
+    this.setData({
+      showRecommendActions: false
+    })
+  },
+
+  onRecommendActionsSelect: function(event) {
+    let that = this
+    if (event.detail.name == '删除') {
+      that.removeRecommend(that.data.filterIndex)
     }
   },
 
@@ -654,9 +727,8 @@ Page({
     })
   },
 
-  removeFilter : function(event) {
+  removeFilter: function(idx) {
     let that = this
-    const idx = event.currentTarget.dataset.index
     const filter = that.data.info.filter[idx]
     wx.showLoading()
     app.post('customer/removeFilter', {
@@ -678,6 +750,11 @@ Page({
     }, () => {
       wx.hideLoading()
     })
+  },
+
+  bindRemoveFilter : function(event) {
+    const idx = event.currentTarget.dataset.index
+    this.removeFilter(idx)
   },
 
   // 获取数据
@@ -979,6 +1056,9 @@ Page({
   },
 
   viewRecommend: function(event) {
+    if (this.tapEndTime  - this.tapStartTime > 350) {
+      return
+    }
     let item = event.currentTarget.dataset.data
     //if (item.mode == 0) {
       wx.navigateTo({
@@ -1006,7 +1086,7 @@ Page({
     //}
   },
 
-  removeRecommend : function(event) {
+  removeRecommend: function(idx) {
     let that = this
     Dialog.confirm({
       title: '删除资料',
@@ -1014,7 +1094,6 @@ Page({
     })
     .then(() => {
       wx.showLoading()
-      const idx = event.currentTarget.dataset.index
       const item = that.data.info.recommend[idx]
       app.post('customer/removeRecommend', {
         id: item.id
@@ -1036,6 +1115,11 @@ Page({
     })
     .catch(() => {
     })
+  },
+
+  bindRemoveRecommend : function(event) {
+    const idx = event.currentTarget.dataset.index
+    this.removeRecommend(idx)
   },
 
   auditClash: function() {

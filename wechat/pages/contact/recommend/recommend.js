@@ -83,9 +83,16 @@ Page({
 
   bindViewBuilding(event) {
     let id = event.currentTarget.dataset.data.building_id
-    wx.navigateTo({
-      url: '../../building/view/view?id=' + id
-    })
+    let uit = event.currentTarget.dataset.data.unit_id
+    if (uit) {
+      wx.navigateTo({
+        url: '../../unit/view/view?id=' + uit
+      })
+    } else {
+      wx.navigateTo({
+        url: '../../building/view/view?id=' + id
+      })
+    }
   },
 
   bindPhoneCall(event) {
