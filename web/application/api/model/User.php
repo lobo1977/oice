@@ -1,4 +1,5 @@
 <?php
+
 namespace app\api\model;
 
 use think\model\concern\SoftDelete;
@@ -15,13 +16,14 @@ class User extends Base
   use SoftDelete;
   protected $pk = 'id';
   protected $deleteTime = 'delete_time';
-  public static $status = ['正常','冻结'];
-  public static $role = ['','发展商','代理行','','','','','','','','其他'];
+  public static $status = ['正常', '冻结'];
+  public static $role = ['', '发展商', '代理行', '', '', '', '', '', '', '', '其他'];
 
   /**
    * 格式化用户信息
    */
-  public static function formatData($user) {
+  public static function formatData($user)
+  {
     if ($user == null) return null;
     if (isset($user->company_admin)) {
       $user->isCompanyAdmin = $user->id == $user->company_admin;
@@ -58,7 +60,8 @@ class User extends Base
   /**
    * 获取通讯录（含同事）
    */
-  public static function contact($user, $page) {
+  public static function contact($user, $page)
+  {
     $company = db('user_company')->where('user_id', $user->id)->column('company_id');
 
     $list = self::alias('a')
@@ -66,7 +69,7 @@ class User extends Base
       ->leftJoin('company co', 'b.company_id = co.id')
       ->field('a.id,a.title,a.avatar as ori_avatar,a.mobile,b.company_id,co.full_name')
       ->where('b.company_id', 'IN', $company)
-      ->whereOr('a.id', 'IN', function ($query) use($user) {
+      ->whereOr('a.id', 'IN', function ($query) use ($user) {
         $query->table('tbl_user_contact')->where('user_id', $user->id)->field('contact_id');
       })
       ->order(['b.active' => 'desc', 'b.company_id' => 'desc']);
@@ -80,7 +83,7 @@ class User extends Base
     $ids = [];
     $data = [];
 
-    foreach($list as &$member) {
+    foreach ($list as &$member) {
       if (!in_array($member->id, $ids)) {
         $member->is_colleague = in_array($member->company_id, $company);
         self::formatData($member);
@@ -88,14 +91,15 @@ class User extends Base
         $data[] = $member;
       }
     }
-    
+
     return $data;
   }
 
   /**
    * 共享用户列表
    */
-  public static function shareList($type, $id, $exclude = null) {
+  public static function shareList($type, $id, $exclude = null)
+  {
     $list = self::alias('a')
       ->join('share s', 's.user_id = a.id')
       ->leftJoin('user_company b', 'a.id = b.user_id and b.status = 1 and b.active = 1')
@@ -110,7 +114,7 @@ class User extends Base
 
     $list = $list->order(['s.create_time' => 'desc'])->select();
 
-    foreach($list as &$member) {
+    foreach ($list as &$member) {
       self::formatData($member);
     }
     return $list;
@@ -119,7 +123,8 @@ class User extends Base
   /**
    * 添加通讯录
    */
-  public static function addContact($user, $id) {
+  public static function addContact($user, $id)
+  {
     $find = db('user_contact')
       ->where('user_id', $user->id)
       ->where('contact_id', $id)
@@ -132,7 +137,7 @@ class User extends Base
         ->data([
           'user_id' => $user->id,
           'contact_id' => $id,
-          'create_time' => date("Y-m-d H:i:s",time())
+          'create_time' => date("Y-m-d H:i:s", time())
         ])->insert();
 
       return $result;
@@ -142,7 +147,8 @@ class User extends Base
   /**
    * 移除通讯录
    */
-  public static function removeContact($user, $id) {
+  public static function removeContact($user, $id)
+  {
     $result = db('user_contact')
       ->where('user_id', $user->id)
       ->where('contact_id', $id)
@@ -154,7 +160,8 @@ class User extends Base
   /**
    * 获取企业成员
    */
-  public static function companyMember($user, $id, $status = 0, $page = 0, $keyword = '') {
+  public static function companyMember($user, $id, $status = 0, $page = 0, $keyword = '')
+  {
     $company = Company::get($id);
     if ($company == null) {
       self::exception('企业不存在。');
@@ -177,7 +184,7 @@ class User extends Base
 
     $list = $list->select();
 
-    foreach($list as $member) {
+    foreach ($list as $member) {
       if ($company->user_id == $member->id) {
         $member->isAdmin = true;
       }
@@ -190,7 +197,8 @@ class User extends Base
   /**
    * 查找同事（所有企业）
    */
-  public static function colleague($user, $company = 0, $keyword = '', $page = 0) {
+  public static function colleague($user, $company = 0, $keyword = '', $page = 0)
+  {
     $list = self::alias('a')
       ->join('user_company b', 'a.id = b.user_id and b.status = 1')
       ->join('user_company c', 'b.company_id = c.company_id and c.user_id = ' . $user->id)
@@ -201,21 +209,21 @@ class User extends Base
     if ($company) {
       $list->where('b.company_id', $company);
     }
-    
+
     if ($keyword != '') {
       $list->where('a.title|a.mobile', 'like', '%' . $keyword . '%')
         ->order(['a.title' => 'asc']);
     } else {
       $list->order(['b.company_id' => 'asc', 'b.create_time' => 'desc']);
     }
-    
+
     if ($page > 0) {
       $list->page($page, 10);
     }
 
     $list = $list->select();
 
-    foreach($list as $member) {
+    foreach ($list as $member) {
       $member->checked = false;
       self::formatData($member);
     }
@@ -225,7 +233,8 @@ class User extends Base
   /**
    * 查询工作日报用户
    */
-  public static function dailyUser($user, $page = 0, $date = '') {
+  public static function dailyUser($user, $page = 0, $date = '')
+  {
     $user_id = 0;
     $company_id = 0;
 
@@ -240,8 +249,8 @@ class User extends Base
 
     $list = self::alias('a')
       ->join('user_company b', 'a.id = b.user_id and b.status = 1 and b.company_id = ' . $company_id)
-      ->leftJoin('log c', "a.id = c.user_id AND c.company_id = b.company_id AND c.delete_time IS NULL " . 
-        "AND c.title <> '登录' AND c.title <> '退出' AND " . 
+      ->leftJoin('log c', "a.id = c.user_id AND c.company_id = b.company_id AND c.delete_time IS NULL " .
+        "AND c.title <> '登录' AND c.title <> '退出' AND " .
         "c.start_time between '" . $date . "' AND '" . date("Y-m-d", strtotime($date . ' +1 day')) . "'")
       ->where('b.superior_id = ' . $user_id . ' OR a.id = ' . $user_id);
 
@@ -255,16 +264,17 @@ class User extends Base
 
     $list = $list->select();
 
-    foreach($list as $member) {
+    foreach ($list as $member) {
       self::formatData($member);
     }
     return $list;
   }
-  
+
   /**
    * 根据 id 获取用户信息
    */
-  public static function getById($id) {
+  public static function getById($id)
+  {
     $data = self::alias('a')
       ->leftJoin('user_company b', 'a.id = b.user_id and b.active = 1 and b.status = 1')
       ->leftJoin('company c', 'b.company_id = c.id')
@@ -276,7 +286,7 @@ class User extends Base
         b.company_id,b.superior_id,u.title as superior,
         c.title as company,c.full_name,c.logo,c.user_id as company_admin,o.openid,o.unionid')
       ->find();
-    
+
     if ($data) {
       $inviteMe = Company::inviteMe($data);
       if ($inviteMe) {
@@ -291,12 +301,13 @@ class User extends Base
   /**
    * 根据 token 获取用户信息
    */
-  public static function getUserByToken($token) {
+  public static function getUserByToken($token)
+  {
     $token = db('token')
       ->where('token', $token)
       ->whereTime('expire_time', '>=', time())
       ->find();
-    
+
     if ($token != null) {
       $user = self::getById($token['user_id']);
       if ($user != null) {
@@ -312,7 +323,8 @@ class User extends Base
   /**
    * 账号密码登录
    */
-  public static function loginByPassword($account, $password, $vcode) {
+  public static function loginByPassword($account, $password, $vcode)
+  {
     $user = self::where('mobile|username|email', $account)->find();
 
     if ($user == null) {
@@ -337,9 +349,10 @@ class User extends Base
   /**
    * 验证码登录
    */
-  public static function loginByVerifyCode($mobile, $verify_code, $oauth = null) {
+  public static function loginByVerifyCode($mobile, $verify_code, $oauth = null)
+  {
     $checkResult = Verify::check($mobile, $verify_code);
-    
+
     if (!$checkResult) {
       self::exception('验证码错误。');
     } else {
@@ -357,7 +370,7 @@ class User extends Base
       } else {
         $user = new User();
         $user->mobile = $mobile;
-        $user->title = preg_replace('/(\d{3})\d{4}(\d{4})/', '$1****$2', $mobile);
+        //$user->title = preg_replace('/(\d{3})\d{4}(\d{4})/', '$1****$2', $mobile);
         $user->salt = substr(md5(strval(time())), 0, 5);
         if ($oauth) {
           if ($oauth->nickname) {
@@ -382,7 +395,8 @@ class User extends Base
   /**
    * 更新 token
    */
-  public static function updateToken($user) {
+  public static function updateToken($user)
+  {
     if ($user == null) {
       self::exception('用户不存在。');
     }
@@ -406,7 +420,8 @@ class User extends Base
   /**
    * 更新用户信息
    */
-  public static function updateInfo($user, $data, $avatar) {
+  public static function updateInfo($user, $data, $avatar)
+  {
     $oldData = self::get($user->id);
     if ($oldData == null) {
       self::exception('用户不存在。');
@@ -504,7 +519,8 @@ class User extends Base
   /**
    * 修改密码
    */
-  public static function changePassword($user, $password) {
+  public static function changePassword($user, $password)
+  {
     $oldData = self::get($user->id);
     if ($oldData == null) {
       self::exception('用户不存在。');
@@ -526,7 +542,8 @@ class User extends Base
   /**
    * 更换手机号码
    */
-  public static function changeMobile($user, $mobile, $verify_code) {
+  public static function changeMobile($user, $mobile, $verify_code)
+  {
     $checkResult = Verify::check($mobile, $verify_code);
     if (!$checkResult) {
       self::exception('验证码错误。');
@@ -543,9 +560,9 @@ class User extends Base
     }
 
     $oldData->mobile = $mobile;
-    if (!$oldData->title) {
-      $oldData->title = preg_replace('/(\d{3})\d{4}(\d{4})/', '$1****$2', $mobile);
-    }
+    // if (!$oldData->title) {
+    //   $oldData->title = preg_replace('/(\d{3})\d{4}(\d{4})/', '$1****$2', $mobile);
+    // }
     $result = $oldData->save();
     if ($result) {
       $user->mobile = $mobile;
@@ -564,10 +581,12 @@ class User extends Base
   /**
    * 退出登录
    */
-  public static function logout($user) {
+  public static function logout($user)
+  {
     if ($user) {
       if (db('token')->where('token', $user->token)
-        ->where('user_id', $user->id)->delete()) {
+        ->where('user_id', $user->id)->delete()
+      ) {
         Log::add($user, [
           "table" => "user",
           "owner_id" => $user->id,
@@ -581,7 +600,8 @@ class User extends Base
   /**
    * 登录成功
    */
-  public static function loginSuccess($user, $summary, $isReg = false) {
+  public static function loginSuccess($user, $summary, $isReg = false)
+  {
     $token = self::genToken($user->id);
     db('token')->insert($token);
     $user->token = $token["token"];
@@ -600,7 +620,8 @@ class User extends Base
   /**
    * 向用户发送消息
    */
-	public static function pushMessage($user_id, $message, $url) {
+  public static function pushMessage($user_id, $message, $url)
+  {
     $wechat = new Wechat();
     $user = self::get($user_id);
 
@@ -615,47 +636,50 @@ class User extends Base
     }
 
     $openid = $Oauth->openid;
-		$weixinMsg = urlencode($message);
-		
-		if ($url) {
-			if (!strpos($url, "t.o-ice.com")) {
-				$url = ShortUrl::generate($url);
-			}
-			$weixinMsg = $weixinMsg . $url;
-		}
+    $weixinMsg = urlencode($message);
+
+    if ($url) {
+      if (!strpos($url, "t.o-ice.com")) {
+        $url = ShortUrl::generate($url);
+      }
+      $weixinMsg = $weixinMsg . $url;
+    }
 
     return $wechat->sendTextMsg($openid, $weixinMsg);
-	}
+  }
 
   /**
    * 生成密码
    */
-  private static function genPassword($password, $salt) {
+  private static function genPassword($password, $salt)
+  {
     return md5($password . $salt);
   }
 
   /**
    * 生成令牌(有效期3天)
    */
-  private static function genToken($user_id) {
+  private static function genToken($user_id)
+  {
     $time = time();
     return array(
       'user_id' => $user_id,
-      'token'=> md5(strval($user_id) . strval($time)), 
-      'expire_time'=> date('Y-m-d H:i:s', $time + 259200)
+      'token' => md5(strval($user_id) . strval($time)),
+      'expire_time' => date('Y-m-d H:i:s', $time + 259200)
     );
   }
 
   /**
    * 上传头像
    */
-  private static function uploadAvatar($avatar) {
+  private static function uploadAvatar($avatar)
+  {
     $uploadPath = '../public/upload/user/images';
-    $info = $avatar->validate(['size'=>2097152,'ext'=>'jpg,jpeg,png,gif'])
+    $info = $avatar->validate(['size' => 2097152, 'ext' => 'jpg,jpeg,png,gif'])
       ->rule('uniqid')->move($uploadPath . '/original');
 
     if ($info) {
-      File::thumbImage($info, [60,200], $uploadPath);
+      File::thumbImage($info, [60, 200], $uploadPath);
       return $info->getFilename();
     } else {
       self::exception($avatar->getError());
@@ -665,14 +689,15 @@ class User extends Base
   /**
    * 根据项目和单元联系人电话绑定项目
    */
-  private static function bindUser($user) {
+  private static function bindUser($user)
+  {
     if (empty($user->mobile)) {
       return;
     }
 
     $linkman = db('linkman')
       ->where('mobile', $user->mobile)
-      ->where('type', 'in', ['building','unit'])
+      ->where('type', 'in', ['building', 'unit'])
       ->where('status', 0)
       ->where('delete_time', 'null')
       ->field('type,owner_id')
@@ -682,7 +707,7 @@ class User extends Base
       return;
     }
 
-    foreach($linkman as $item) {
+    foreach ($linkman as $item) {
       if ($item['type'] == 'building') {
         $building = db('building')
           ->where('id', $item['owner_id'])
@@ -695,7 +720,7 @@ class User extends Base
             db('building')
               ->where('id', $building['id'])
               ->update(['user_id' => $user->id, 'company_id' => $user->company_id]);
-          // 添加共享
+            // 添加共享
           } else {
             $share = db('share')
               ->where('type', 'building')
@@ -712,10 +737,10 @@ class User extends Base
               ]);
             } else {
               db('share')
-              ->where('type', 'building')
-              ->where('user_id', $user->id)
-              ->where('object_id', $building['id'])
-              ->update(['level' => 1]);
+                ->where('type', 'building')
+                ->where('user_id', $user->id)
+                ->where('object_id', $building['id'])
+                ->update(['level' => 1]);
             }
           }
         }
@@ -724,14 +749,14 @@ class User extends Base
           ->where('id', $item['owner_id'])
           ->where('delete_time', 'null')
           ->find();
-        
+
         if ($unit) {
           // 自动认领
           if (empty($unit['user_id'])) {
             db('unit')
               ->where('id', $unit['id'])
               ->update(['user_id' => $user->id, 'company_id' => $user->company_id]);
-          // 添加共享
+            // 添加共享
           } else {
             $share = db('share')
               ->where('type', 'unit')
@@ -748,10 +773,10 @@ class User extends Base
               ]);
             } else {
               db('share')
-              ->where('type', 'unit')
-              ->where('user_id', $user->id)
-              ->where('object_id', $unit['id'])
-              ->update(['level' => 1]);
+                ->where('type', 'unit')
+                ->where('user_id', $user->id)
+                ->where('object_id', $unit['id'])
+                ->update(['level' => 1]);
             }
           }
         }
