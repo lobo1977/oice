@@ -1,4 +1,5 @@
 <?php
+
 namespace app\api\model;
 
 use think\model\concern\SoftDelete;
@@ -14,13 +15,14 @@ class Unit extends Base
   protected $pk = 'id';
   protected $deleteTime = 'delete_time';
 
-  public static $status = ['在驻','空置','已出'];
-  public static $share = ['隐藏','公开'];
+  public static $status = ['在驻', '空置', '已出'];
+  public static $share = ['隐藏', '公开'];
 
   /**
    * 权限检查
    */
-  public static function allow($user, $unit, $operate, $building = null) {
+  public static function allow($user, $unit, $operate, $building = null)
+  {
     if ($unit == null) {
       return false;
     }
@@ -29,27 +31,23 @@ class Unit extends Base
     }
 
     if ($operate == 'view') {
-      return 
-        $unit->share || 
-        (
-          Building::allow($user, $building, 'view') ||
+      return
+        $unit->share ||
+        (Building::allow($user, $building, 'view') ||
           $user != null && ($unit->user_id == $user->id ||
-          $unit->share_level !== null ||
-          ($unit->company_id > 0 && $unit->company_id == $user->company_id))
-        );
+            $unit->share_level !== null ||
+            ($unit->company_id > 0 && $unit->company_id == $user->company_id)));
     } else if ($operate == 'new') {
       return $user != null && Building::allow($user, $building, 'edit');
     } else if ($operate == 'edit') {
-      return $user != null && (
-        Building::allow($user, $building, 'edit') || 
+      return $user != null && (Building::allow($user, $building, 'edit') ||
         $unit->share_level > 0 ||
         $unit->user_id == $user->id ||
         ($unit->company_id > 0 && $unit->company_id == $user->company_id));
     } else if ($operate == 'copy') {
       return $user != null && Building::allow($user, $building, 'edit');
     } else if ($operate == 'delete') {
-      return $user != null && (
-        Building::allow($user, $building, 'edit') ||
+      return $user != null && (Building::allow($user, $building, 'edit') ||
         $unit->share_level > 1 ||
         $unit->user_id == $user->id ||
         ($unit->company_id > 0 && $unit->company_id == $user->company_id));
@@ -61,7 +59,8 @@ class Unit extends Base
   /**
    * 格式化单元信息
    */
-  public static function formatInfo($unit) {
+  public static function formatInfo($unit)
+  {
     if ($unit != null) {
       if ($unit->create_time) {
         $unit->create_time_text = date('Y年n月j日 H:i', strtotime($unit->create_time));
@@ -95,8 +94,10 @@ class Unit extends Base
         $unit->title = $unit->title . '[私有]';
       }
 
-      if (empty($unit->file)) {
+      if (empty($unit->file) && empty($unit->unit_file)) {
         $unit->src = '/static/img/error.png';
+      } else if (!empty($unit->unit_file)) {
+        $unit->src = '/upload/unit/images/300/' . $unit->unit_file;
       } else if (!empty($unit->file_type)) {
         $unit->src = '/upload/' . $unit->file_type . '/images/300/' . $unit->file;
       } else {
@@ -122,7 +123,8 @@ class Unit extends Base
   /**
    * 通过项目ID获取单元列表
    */
-  public static function getByBuildingId($user, $id, $status = -1) {
+  public static function getByBuildingId($user, $id, $status = -1)
+  {
     $user_id = 0;
     $company_id = 0;
 
@@ -134,36 +136,37 @@ class Unit extends Base
     $building = Building::getById($user, $id);
 
     $list = self::alias('a')
-      ->leftJoin('file b',"b.parent_id = a.id AND b.type = 'unit' AND b.default = 1")
+      ->leftJoin('file b', "b.parent_id = a.id AND b.type = 'unit' AND b.default = 1")
       ->leftJoin('share s', "s.type = 'unit' and a.id = s.object_id and s.user_id = " . $user_id)
       ->where('a.building_id', $id);
 
-      if ($status >= 0) {
-        $list->where('a.status', $status);
-      }
+    if ($status >= 0) {
+      $list->where('a.status', $status);
+    }
 
-      $list = $list->field('a.id,a.building_no,a.floor,a.room,a.acreage,a.rent_sell,a.rent_price,
+    $list = $list->field('a.id,a.building_no,a.floor,a.room,a.acreage,a.rent_sell,a.rent_price,
         a.sell_price,a.end_date,a.status,a.share,a.user_id,a.company_id,b.file,s.level as share_level')
       ->order('a.building_no', 'asc')
       ->order('a.floor', 'desc')
       ->order('a.room', 'asc')
       ->order('a.id', 'asc')
       ->select();
-    
-    foreach($list as $key=>$unit) {
+
+    foreach ($list as $key => $unit) {
       self::formatInfo($unit);
       $unit->allowView = self::allow($user, $unit, 'view', $building);
       $unit->allowEdit = self::allow($user, $unit, 'edit', $building);
       $unit->allowDelete = self::allow($user, $unit, 'delete', $building);
     }
-    
+
     return $list;
   }
 
-    /**
+  /**
    * 通过ID获取单元信息
    */
-  public static function getById($user, $id) {
+  public static function getById($user, $id)
+  {
     $user_id = 0;
 
     if ($user) {
@@ -183,7 +186,8 @@ class Unit extends Base
   /**
    * 根据ID获取单元信息
    */
-  public static function detail($user, $id, $operate = 'view', $key = '') {
+  public static function detail($user, $id, $operate = 'view', $key = '')
+  {
     $user_id = 0;
 
     if ($user) {
@@ -206,7 +210,7 @@ class Unit extends Base
         ]);
       }
     }
-    
+
     $unit = self::alias('a')
       ->join('building b', 'a.building_id = b.id')
       ->leftJoin('share s', "s.type = 'unit' and a.id = s.object_id and s.user_id = " . $user_id)
@@ -235,22 +239,24 @@ class Unit extends Base
 
       $images = [];
       $videos = [];
-      
+      $attach = [];
+
       $files = File::getList($user, 'unit', $id);
       if ($files) {
-        foreach($files as $key => $file) {
+        foreach ($files as $key => $file) {
           if ($file->is_image) {
             array_push($images, $file);
           } else if ($file->is_video) {
             array_push($videos, $file);
           } else {
-            $data->attach = $file;
+            array_push($attach, $file);
           }
         }
       }
 
       $unit->images = $images;
       $unit->videos = $videos;
+      $unit->attach = $attach;
 
       self::formatInfo($unit);
       $unit->key = md5('unit' . $unit->id . config('wechat.app_secret'));
@@ -264,9 +270,11 @@ class Unit extends Base
         $unit->allowDelete = self::allow($user, $unit, 'delete', $building);
         $unit->isFavorite = false;
         if ($user_id) {
-          if (db('favorite')->where('user_id', $user_id)
-            ->where('unit_id', $id)->find() != null) {
-              $unit->isFavorite = true;
+          if (
+            db('favorite')->where('user_id', $user_id)
+            ->where('unit_id', $id)->find() != null
+          ) {
+            $unit->isFavorite = true;
           }
         }
 
@@ -287,7 +295,8 @@ class Unit extends Base
   /**
    * 添加/修改单元信息
    */
-  public static function addUp($user, $id, $data) {
+  public static function addUp($user, $id, $data)
+  {
     if (empty($data['end_date'])) {
       unset($data['end_date']);
     }
@@ -401,7 +410,7 @@ class Unit extends Base
       }
 
       if ($data['status'] != $oldData->status) {
-        $summary = $summary . '状态：' . self::$status[$oldData->status] . 
+        $summary = $summary . '状态：' . self::$status[$oldData->status] .
           ' -> ' . self::$status[$data['status']] . '\n';
       }
 
@@ -469,7 +478,7 @@ class Unit extends Base
       }
 
       if (isset($data['share']) && $data['share'] != $oldData->share) {
-        $summary = $summary . '是否公开：' . self::$share[$oldData->share] . 
+        $summary = $summary . '是否公开：' . self::$share[$oldData->share] .
           ' -> ' . self::$share[$data['share']] . '\n';
       }
 
@@ -565,7 +574,8 @@ class Unit extends Base
   /**
    * 删除单元
    */
-  public static function remove($user, $id) {
+  public static function remove($user, $id)
+  {
     $unit = self::get($id);
     if ($unit == null) {
       return true;

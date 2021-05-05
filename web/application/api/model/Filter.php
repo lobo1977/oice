@@ -1,4 +1,5 @@
 <?php
+
 namespace app\api\model;
 
 use app\api\model\Base;
@@ -11,20 +12,23 @@ class Filter extends Base
   /**
    * 客户筛选表
    */
-  public static function query($user, $customer_id) {
+  public static function query($user, $customer_id)
+  {
     $list = self::alias('a')
       ->leftJoin('unit u', 'a.unit_id = u.id AND a.unit_id > 0')
       ->join('building b', 'a.building_id = b.id OR u.building_id = b.id')
-      ->leftJoin('file f',"f.parent_id = b.id AND f.type = 'building' AND f.default = 1")
+      ->leftJoin('file f', "f.parent_id = a.building_id AND f.type = 'building' AND f.default = 1")
+      ->leftJoin('file uf', "uf.parent_id = a.unit_id AND uf.type = 'unit' AND uf.default = 1")
       ->where('a.customer_id', $customer_id)
       //->where('a.user_id', $user->id)
-      ->field('a.building_id,b.building_name,b.level,b.area,b.district,b.address,b.price,f.file,f.type as file_type,
+      ->field('a.building_id,b.building_name,b.level,b.area,b.district,b.address,b.price,
+        f.file,f.type as file_type,uf.file as unit_file,
         a.unit_id,u.building_no,u.floor,u.room,u.acreage,u.rent_price,u.sell_price,u.status')
       ->order('a.sort', 'asc')
       ->order('a.create_time', 'asc')
       ->select();
 
-    foreach($list as $key => $building) {
+    foreach ($list as $key => $building) {
       $building->title = $building->building_name;
       Unit::formatInfo($building);
 
@@ -61,7 +65,8 @@ class Filter extends Base
   /**
    * 添加推荐项目
    */
-  public static function addBuilding($user, $customer_id, $building_id, $unit_id) {
+  public static function addBuilding($user, $customer_id, $building_id, $unit_id)
+  {
     $customer = Customer::getById($user, $customer_id);
     if ($customer == null) {
       self::exception('客户不存在。');
@@ -102,7 +107,8 @@ class Filter extends Base
   /**
    * 项目排序
    */
-  public static function sort($user, $customer_id, $building_id, $unit_id, $up) {
+  public static function sort($user, $customer_id, $building_id, $unit_id, $up)
+  {
     $data = self::where('customer_id', $customer_id)
       ->where('building_id', $building_id)
       ->where('unit_id', $unit_id)
@@ -135,7 +141,8 @@ class Filter extends Base
   /**
    * 删除推荐项目
    */
-  public static function removeBuilding($user, $customer_id, $building_id, $unit_id) {
+  public static function removeBuilding($user, $customer_id, $building_id, $unit_id)
+  {
     $customer = Customer::getById($user, $customer_id);
     if ($customer == null) {
       self::exception('客户不存在。');
@@ -148,7 +155,7 @@ class Filter extends Base
       ->where('unit_id', $unit_id)
       ->where('user_id', $user->id)
       ->find();
-    
+
     if ($data == null) {
       return true;
     }
