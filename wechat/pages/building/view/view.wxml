@@ -173,7 +173,6 @@
     show-cancel-button
     confirm-button-text="通过"
     cancel-button-text="驳回"
-    async-close="{{true}}"
     close-on-click-overlay
     bind:close="onAuditClose">
     <van-cell-group>
