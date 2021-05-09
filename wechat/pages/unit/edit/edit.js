@@ -578,7 +578,7 @@ Page({
         wx.uploadFile({
           header: header,
           url: app.globalData.serverUrl + '/api/building/uploadUnitImage',
-          filePath: that.data.uploadAccept == 'media' ? file.tempFilePath : file.path,
+          filePath: file.url,
           name: 'images[]',
           formData: {
             'id': that.data.id,
@@ -618,6 +618,7 @@ Page({
             }
           },
           complete() {
+            count++
             if (count >= files.length) {
               app.globalData.refreshUnitView = true
               wx.hideLoading()
@@ -630,11 +631,20 @@ Page({
             }
           },
           fail(e) {
+            count++
             error++
-            console.log(e.errMsg)
+            if (count >= files.length) {
+              app.globalData.refreshUnitView = true
+              wx.hideLoading()
+              if (error > 0) {
+                Dialog.alert({
+                  title: '发生错误',
+                  message: error + '个文件上传失败'
+                })
+              }
+            }
           }
         })
-        count++
       })
     } catch(e) {
       wx.hideLoading()

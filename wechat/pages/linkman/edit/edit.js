@@ -246,7 +246,7 @@ Page({
       wx.uploadFile({
         header: header,
         url: app.globalData.serverUrl + '/api/linkman/edit?id=' + that.data.id,
-        filePath: that.data.avatarFile.path,
+        filePath: that.data.avatarFile.url,
         name: 'file',
         formData: that.data.info,
         success(res) {

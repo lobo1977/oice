@@ -237,7 +237,7 @@ Page({
       wx.uploadFile({
         header: header,
         url: app.globalData.serverUrl + '/api/company/edit?id=' + that.data.id,
-        filePath: that.data.logo_file.path,
+        filePath: that.data.logo_file.url,
         name: 'logo',
         formData:  that.data.info,
         success(res) {

@@ -1,4 +1,5 @@
 <?php
+
 namespace app\api\controller;
 
 use think\Validate;
@@ -16,7 +17,8 @@ class My extends Base
   /**
    * 我的收藏
    */
-  public function favorite($page = 1, $page_size = 10) {
+  public function favorite($page = 1, $page_size = 10)
+  {
     $list = Building::myFavorite($this->user, $page, $page_size);
     return $this->succeed($list);
   }
@@ -24,7 +26,8 @@ class My extends Base
   /**
    * 通讯录
    */
-  public function contact($page = 1) {
+  public function contact($page = 1)
+  {
     $list = User::contact($this->user, $page);
     return $this->succeed($list);
   }
@@ -32,7 +35,8 @@ class My extends Base
   /**
    * 添加通讯录
    */
-  public function addContact($contact_id) {
+  public function addContact($contact_id)
+  {
     $result = User::addContact($this->user, $contact_id);
     if ($result) {
       return $this->succeed();
@@ -44,7 +48,8 @@ class My extends Base
   /**
    * 移除通讯录
    */
-  public function removeContact($contact_id) {
+  public function removeContact($contact_id)
+  {
     $result = User::removeContact($this->user, $contact_id);
     if ($result) {
       return $this->succeed();
@@ -56,7 +61,8 @@ class My extends Base
   /**
    * 我的项目
    */
-  public function building($page = 1) {
+  public function building($page = 1)
+  {
     $list = Building::search($this->user, ['my' => 2, 'page' => $page]);
     return $this->succeed($list);
   }
@@ -64,7 +70,8 @@ class My extends Base
   /**
    * 到期客户
    */
-  public function task($page = 1) {
+  public function task($page = 1)
+  {
     $list = Customer::search($this->user, ['status' => '0,4,5', 'endDate' => true]);
     return $this->succeed($list);
   }
@@ -72,7 +79,8 @@ class My extends Base
   /**
    * 我的可跟进客户
    */
-  public function customer() {
+  public function customer()
+  {
     $list = Customer::search($this->user, ['status' => '0,1,2,3', 'clash' => false]);
     return $this->succeed($list);
   }
@@ -80,7 +88,8 @@ class My extends Base
   /**
    * 修改账号信息
    */
-  public function edit() {
+  public function edit()
+  {
     if ($this->request->isGet()) {
       $form_token = $this->formToken();
       $data = User::getById($this->user_id);
@@ -93,7 +102,7 @@ class My extends Base
       $validate = Validate::make([
         'title'  => 'require',
         'email' => 'email|unique:user,email,' . $this->user_id
-      ],[
+      ], [
         'title.require' => '必须填写姓名。',
         'email.email' => '电子邮箱无效。',
         'email.unique' => '电子邮箱已存在，请使用其他邮箱。'
@@ -110,7 +119,7 @@ class My extends Base
         unset($data['qq']);
       }
       $avatar = request()->file('avatar');
-      
+
       if (!$this->checkFormToken($data)) {
         return $this->fail('无效请求，请勿重复提交表单');
       } else if (!$validate->check($data)) {
@@ -129,9 +138,28 @@ class My extends Base
   }
 
   /**
+   * 更新头像
+   */
+  public function avatar()
+  {
+    $avatar = request()->file('avatar');
+    if (empty($avatar)) {
+      return $this->fail('请上传头像');
+    } else {
+      $result = User::updateInfo($this->user, null, $avatar);
+      if ($result) {
+        return $this->succeed($this->getUser(true));
+      } else {
+        return $this->fail();
+      }
+    }
+  }
+
+  /**
    * 更换手机号码
    */
-  public function mobile($mobile, $verifyCode) {
+  public function mobile($mobile, $verifyCode)
+  {
     if ($mobile && $verifyCode) {
       $result = User::changeMobile($this->user, $mobile, $verifyCode);
       return $this->succeed($this->getUser(true));
@@ -143,7 +171,8 @@ class My extends Base
   /**
    * 修改密码
    */
-  public function changePwd() {
+  public function changePwd()
+  {
     if (input('?post.password')) {
       $password = input('post.password');
       $result = User::changePassword($this->user, $password);

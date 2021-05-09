@@ -269,8 +269,8 @@ Page({
     try {
       wx.uploadFile({
         header: header,
-        url: app.globalData.serverUrl + '/api/my/edit',
-        filePath: file.path,
+        url: app.globalData.serverUrl + '/api/my/avatar',
+        filePath: file.url,
         name: 'avatar',
         formData: {
           '__token__': that.data.info.__token__

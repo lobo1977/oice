@@ -359,7 +359,7 @@ Page({
                   app.globalData.appUserInfo.token : ''
               },
               url: app.globalData.serverUrl + '/api/customer/uploadAttach',
-              filePath: element.path,
+              filePath: element.url,
               name: 'attach[]',
               formData: {
                 'id': that.data.info.id,

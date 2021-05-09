@@ -676,7 +676,7 @@ Page({
                   app.globalData.appUserInfo.token : ''
               },
               url: app.globalData.serverUrl + '/api/building/uploadAttach',
-              filePath: element.path,
+              filePath: element.url,
               name: 'attach[]',
               formData: {
                 'id': that.data.info.id,
@@ -746,7 +746,7 @@ Page({
         wx.uploadFile({
           header: header,
           url: app.globalData.serverUrl + '/api/building/uploadImage',
-          filePath: that.data.uploadAccept == 'media' ? file.tempFilePath : file.path,
+          filePath: file.url,
           name: 'images[]',
           formData: {
             'id': that.data.info.id,

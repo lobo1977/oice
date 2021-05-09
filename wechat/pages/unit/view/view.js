@@ -428,7 +428,7 @@ Page({
         wx.uploadFile({
           header: header,
           url: app.globalData.serverUrl + '/api/building/uploadUnitImage',
-          filePath: that.data.uploadAccept == 'media' ? file.tempFilePath : file.path,
+          filePath: file.url,
           name: 'images[]',
           formData: {
             'id': that.data.info.id,
