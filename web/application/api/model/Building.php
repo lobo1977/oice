@@ -144,7 +144,7 @@ class Building extends Base
         $list->where('(a.share = 0 AND ((a.user_id > 0 AND a.user_id = ' . $user_id . ') OR 
           (a.company_id > 0 AND a.company_id = ' . $company_id . ')))');
       } else {
-        $list->where('(a.user_id > 0 AND (s.object_id is not null OR a.user_id = ' . $user_id . ' OR 
+        $list->where('(a.user_id > 0 AND (a.user_id = ' . $user_id . ' OR 
           (a.company_id > 0 AND a.company_id = ' . $company_id . ')))');
       }
     } else if ($isAdmin) {
