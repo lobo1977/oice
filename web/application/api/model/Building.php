@@ -883,6 +883,7 @@ class Building extends Base
             'email' => $user->email,
             'qq' => $user->qq,
             'weixin' => $user->weixin,
+            'user_id' => $user->id
           ]);
         }
         return $newData->id;

@@ -770,7 +770,7 @@ Page({
                   app.globalData.appUserInfo.token : ''
               },
               url: app.globalData.serverUrl + '/api/building/uploadAttach',
-              filePath: element.url,
+              filePath: element.path,
               name: 'attach[]',
               formData: {
                 'id': that.data.id
