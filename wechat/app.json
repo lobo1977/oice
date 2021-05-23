@@ -6,9 +6,6 @@
     "navigationBarTextStyle": "black",
     "enablePullDownRefresh": true
   },
-  "page": {
-    "onReachBottomDistance": 50
-  },
   "sitemapLocation": "sitemap.json",
   "usingComponents": {
     "van-button": "@vant/weapp/button",
@@ -50,6 +47,12 @@
   "tabBar": {
     "list": [
       {
+        "text": "首页",
+        "pagePath": "pages/index/index",
+        "iconPath": "icon/home_a.png",
+        "selectedIconPath": "icon/home_b.png"
+      },
+      {
         "text": "项目",
         "pagePath": "pages/building/index/index",
         "iconPath": "icon/building_a.png",
@@ -70,6 +73,7 @@
     ]
   },
   "pages": [
+    "pages/index/index",
     "pages/building/index/index",
     "pages/building/view/view",
     "pages/building/edit/edit",

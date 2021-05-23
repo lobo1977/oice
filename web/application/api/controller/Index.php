@@ -1,4 +1,5 @@
 <?php
+
 namespace app\api\controller;
 
 use think\captcha\Captcha;
@@ -7,24 +8,41 @@ use app\api\controller\Base;
 use app\api\model\User;
 use app\api\model\Oauth;
 use app\api\model\Verify;
+use app\api\model\Building;
+use app\api\model\Unit;
 
 class Index extends Base
 {
   protected $beforeActionList = [
-    'checkAuth' => ['only'=>'getUserInfo,updateToken']
+    'checkAuth' => ['only' => 'getUserInfo,updateToken']
   ];
 
-  protected function initialize() {
+  protected function initialize()
+  {
   }
 
-  public function index() {
-    return;
+  // 首页
+  public function index()
+  {
+    $params = [
+      'page_size' => 3,
+      'banner' => 1
+    ];
+    $banner = Building::search($this->user, $params);
+
+    $unit = Unit::search($this->user, ['page_size' => 5]);
+
+    return $this->succeed([
+      'banner' => $banner,
+      'unit' => $unit
+    ]);
   }
 
   /**
    * 图片验证码
    */
-  public function verify() {
+  public function verify()
+  {
     ob_clean();
     $captcha = new Captcha();
     $captcha->expire = 300;
@@ -33,15 +51,16 @@ class Index extends Base
     $captcha->imageH = 44;
     return $captcha->entry();
   }
-  
+
   /**
    * 用户登录
    */
-  public function login() {
+  public function login()
+  {
     if (input('?post.mobile')) {
       $mobile = input('post.mobile');
       $password = input('post.password');
-      $vcode = input('post.vcode','');
+      $vcode = input('post.vcode', '');
       $verify_code = input('post.verifyCode');
 
       $user = null;
@@ -64,7 +83,8 @@ class Index extends Base
   /**
    * 第三方登录绑定手机号码
    */
-  public function mobile() {
+  public function mobile()
+  {
     if (input('?post.mobile')) {
       $mobile = input('post.mobile');
       $verify_code = input('post.verifyCode');
@@ -83,7 +103,8 @@ class Index extends Base
   /**
    * 发送手机验证码
    */
-  public function sendVerifyCode() {
+  public function sendVerifyCode()
+  {
     if (input('?post.mobile')) {
       if (Verify::send(input('post.mobile'))) {
         return $this->succeed();
@@ -97,14 +118,16 @@ class Index extends Base
   /**
    * 获取当前登录用户信息
    */
-  public function getUserInfo() {
+  public function getUserInfo()
+  {
     return $this->succeed($this->user);
   }
 
   /**
    * 更新 Token
    */
-  public function updateToken() {
+  public function updateToken()
+  {
     $newToken = User::updateToken($this->user);
     if ($newToken) {
       return $this->succeed($newToken);
@@ -116,7 +139,8 @@ class Index extends Base
   /**
    * 退出登录
    */
-  public function logout() {
+  public function logout()
+  {
     if ($this->getUser() != null) {
       User::logout($this->user);
     }
@@ -126,11 +150,13 @@ class Index extends Base
   /**
    * 表单令牌
    */
-  public function token() {
+  public function token()
+  {
     return $this->succeed($this->formToken());
   }
 
-  public function test() {
+  public function test()
+  {
     $video = "d:\\5e86c65196cba.mp4";
     $path = "d:\\5e86c65196cba.jpg";
     Utils::getVideoCover($video, $path);

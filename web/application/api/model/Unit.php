@@ -120,6 +120,48 @@ class Unit extends Base
     }
   }
 
+  public static function search($user, $filter)
+  {
+    if (!isset($filter['page'])) {
+      $filter['page'] = 1;
+    }
+
+    if (!isset($filter['page_size'])) {
+      $filter['page_size'] = 10;
+    }
+
+    // $user_id = 0;
+    // $company_id = 0;
+    // $isAdmin = false;
+
+    // if ($user) {
+    //   $user_id = $user->id;
+    //   $company_id = $user->company_id;
+    //   $isAdmin = $user->isAdmin;
+    // }
+
+    $list = self::alias('u')
+      ->join('building b', 'u.building_id = b.id')
+      ->leftJoin('file f', "f.parent_id = u.id AND f.type = 'unit' AND f.default = 1")
+      ->where('u.status', 1)
+      ->where('u.share', 1)
+      ->where('f.file', 'not null')
+      ->where('u.company_id', '>', 0)
+      ->where('u.user_id', '>', 0);
+
+    $list = $list->field('u.id,u.building_id,u.building_no,u.floor,u.room,u.acreage,u.rent_sell,u.rent_price,
+        u.sell_price,u.end_date,u.status,u.share,u.user_id,u.company_id,b.building_name,b.district,b.address,f.file')
+      ->order('u.id', 'asc')
+      ->page($filter['page'], $filter['page_size'])
+      ->select();
+
+    foreach ($list as $key => $unit) {
+      self::formatInfo($unit);
+    }
+
+    return $list;
+  }
+
   /**
    * 通过项目ID获取单元列表
    */
@@ -161,6 +203,8 @@ class Unit extends Base
 
     return $list;
   }
+
+
 
   /**
    * 通过ID获取单元信息

@@ -4,40 +4,73 @@ const app = getApp()
 
 Page({
   data: {
-    motto: '',
-    userInfo: {},
-    hasUserInfo: false,
-    canIUse: wx.canIUse('button.open-type.getUserInfo')
+    isLoading: false,
+    isPullDown: false,
+    banner: [],
+    unitList: []
   },
+
   //事件处理函数
-  bindViewTap: function() {
+  onLoad: function () {
+    wx.showShareMenu({
+      withShareTicket:true,
+      menus:['shareAppMessage','shareTimeline']  
+    })
+    this.getData()
+  },
+
+  // 触发下拉刷新时执行
+  onPullDownRefresh: function() {
+    if (this.data.isLoading == false) {
+      this.setData({
+        isPullDown: true
+      })
+      this.getData()
+    }
+    wx.stopPullDownRefresh()
+  },
+
+  bindViewBuilding: function(event) {
     wx.navigateTo({
+      url: '../building/view/view?id=' + event.currentTarget.dataset.id
     })
   },
-  
-  onLoad: function () {
-    if (app.globalData.userInfo) {
-      this.setData({
-        userInfo: app.globalData.userInfo,
-        hasUserInfo: true
-      })
-    } else if (this.data.canIUse){
-      // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
-      // 所以此处加入 callback 以防止这种情况
-      app.userInfoReadyCallback = res => {
-        this.setData({
-          userInfo: res.userInfo,
-          hasUserInfo: true
+
+  bindAddBuilding: function() {
+    app.checkUser('/pages/building/edit/edit')
+  },
+
+  bindAddCustomer: function() {
+    app.checkUser('/pages/customer/edit/edit')
+  },
+
+  // 通过接口获取数据
+  getData: function() {
+    let that = this
+
+    if (that.data.isLoading) return
+
+    that.setData({
+      isLoading: true
+    })
+
+    that.setData({
+      banner: [],
+      unitList: []
+    })
+
+    app.get('index/index', (res) => {
+      if (res.data) {
+        that.setData({
+          banner: res.data.banner,
+          unitList: res.data.unit
         })
       }
-    }
-  },
-  
-  getUserInfo: function(e) {
-    app.globalData.userInfo = e.detail.userInfo
-    this.setData({
-      userInfo: e.detail.userInfo,
-      hasUserInfo: true
+    }, () => {
+      that.setData({
+        isPullDown: false,
+        isLoading: false
+      })
     })
   }
 })

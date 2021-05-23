@@ -139,7 +139,13 @@ class Building extends Base
       ->leftJoin('share s', "s.type = 'building' and a.id = s.object_id and s.user_id = " . $user_id)
       ->where('a.city', self::$city);
 
-    if (isset($filter['my'])) {
+    if (isset($filter['banner']) && $filter['banner'] == 1) {
+      $list->where('b.file', 'not null')
+        ->where('a.share', 1)
+        ->where('a.status', 1)
+        ->where('a.company_id', '>', 0)
+        ->where('a.user_id', '>', 0);
+    } else if (isset($filter['my'])) {
       if ($filter['my'] == 1) {
         $list->where('(a.share = 0 AND ((a.user_id > 0 AND a.user_id = ' . $user_id . ') OR 
           (a.company_id > 0 AND a.company_id = ' . $company_id . ')))');
@@ -189,7 +195,12 @@ class Building extends Base
       a.rent_sell,a.price,b.file,a.user_id,a.share,a.status,s.level as share_level')
       ->page($filter['page'], $filter['page_size']);
 
-    if (isset($filter['my']) && $filter['my'] >= 1) {
+    if (isset($filter['banner']) && $filter['banner'] == 1) {
+      $list->order([
+        'a.update_time' => 'desc',
+        'a.id' => 'desc'
+      ]);
+    } else if (isset($filter['my']) && $filter['my'] >= 1) {
       $list->order([
         'a.share' => 'asc',
         'a.status' => 'asc',
