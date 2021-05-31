@@ -11,6 +11,7 @@ Page({
     isLoading: false,
     isPullDown: false,
     isVideoPlay: false,
+    showQr: false,
     info: {
       id: 0,
       building_name: '',    // 名称
@@ -286,6 +287,18 @@ Page({
   previewCode: function() {
     wx.previewImage({
       urls: [ this.data.qrcode ]
+    })
+  },
+
+  bindShowQr: function() {
+    this.setData({
+      showQr: true
+    })
+  },
+
+  bindHideQr: function() {
+    this.setData({
+      showQr: false
     })
   },
 

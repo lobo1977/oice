@@ -10,3 +10,10 @@
 .cell-label .van-icon {
   top:2rpx;
 }
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}

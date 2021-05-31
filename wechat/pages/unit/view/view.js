@@ -9,6 +9,7 @@ Page({
     isLoading: false,
     isPullDown: false,
     isVideoPlay: false,
+    showQr: false,
     info: {
       id: 0,
       title: '',
@@ -134,6 +135,18 @@ Page({
   onVideoStop() {
     this.setData({
       isVideoPlay: false
+    })
+  },
+
+  bindShowQr: function() {
+    this.setData({
+      showQr: true
+    })
+  },
+
+  bindHideQr: function() {
+    this.setData({
+      showQr: false
     })
   },
   

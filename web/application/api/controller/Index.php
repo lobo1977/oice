@@ -14,6 +14,7 @@ use app\api\model\Unit;
 class Index extends Base
 {
   protected $beforeActionList = [
+    'getUser',
     'checkAuth' => ['only' => 'getUserInfo,updateToken']
   ];
 

@@ -19,7 +19,9 @@
   </view>
   
   <van-cell-group>
-    <van-cell title="{{info.building_name + ' ' +info.title}}" title-class="cell-title" custom-class="cell-view"></van-cell>
+    <van-cell title="{{info.building_name + ' ' +info.title}}" title-class="cell-title" custom-class="cell-view">
+      <van-icon slot="right-icon" name="qr" bind:click="bindShowQr" />
+    </van-cell>
     <van-cell title="朝向" wx:if="{{info.face}}" custom-class="cell-view"
       title-width="160rpx" value="{{info.face}}" value-class="text-left"></van-cell>
     <van-cell title="面积" wx:if="{{info.acreage}}" custom-class="cell-view"
@@ -88,6 +90,16 @@
     bind:close="onMenuClose"
     bind:select="onMenuSelect"
   />
+
+  <van-overlay show="{{ showQr }}" z-index="100" bind:click="bindHideQr">
+    <view class="wrapper">
+      <van-image
+        width="10rem"
+        height="10rem"
+        src="{{filter.imageUrl('/api/unit/qrcode?id=' + info.id)}}"
+      />
+    </view>
+  </van-overlay>
 
   <van-row gutter="0" custom-class="button-bar">
     <van-col span="7">

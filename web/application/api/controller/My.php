@@ -11,6 +11,7 @@ use app\api\model\Customer;
 class My extends Base
 {
   protected $beforeActionList = [
+    'getUser',
     'checkAuth'
   ];
 

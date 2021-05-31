@@ -42,7 +42,8 @@
     "van-grid": "@vant/weapp/grid",
     "van-grid-item": "@vant/weapp/grid-item",
     "van-radio": "@vant/weapp/radio",
-    "van-radio-group": "@vant/weapp/radio-group"
+    "van-radio-group": "@vant/weapp/radio-group",
+    "van-overlay": "@vant/weapp/overlay"
   },
   "tabBar": {
     "list": [

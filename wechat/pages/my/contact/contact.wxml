@@ -4,5 +4,5 @@
     <van-button type="primary" open-type="contact">联系客服</van-button>
   </view> -->
 
-  <cell bind:startmessage="startmessage" bind:completemessage="completemessage" plugid="e0ccc689d04179c1c7906b728791b41e" paddingStyle="10" />
+  <cell plugid="e0ccc689d04179c1c7906b728791b41e" paddingStyle="10" />
 </view>

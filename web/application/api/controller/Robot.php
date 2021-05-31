@@ -1,4 +1,5 @@
 <?php
+
 namespace app\api\controller;
 
 use app\common\Python;
@@ -8,13 +9,15 @@ use app\api\model\Robot as modelRobot;
 class Robot extends Base
 {
   protected $beforeActionList = [
+    'getUser',
     'checkAuth'
   ];
 
   /**
    * 微信登录二维码
    */
-  public function qrcode() {
+  public function qrcode()
+  {
     if ($this->user->isLimited) {
       return $this->fail('对不起，您是受限用户，不能使用机器人。');
     } else {
@@ -22,11 +25,12 @@ class Robot extends Base
       return $this->succeed($ret);
     }
   }
-    
+
   /**
    * 在线机器人
    */
-  public function online() {
+  public function online()
+  {
     $robots = modelRobot::online($this->user);
     return $this->succeed($robots);
   }
@@ -34,7 +38,8 @@ class Robot extends Base
   /**
    * 机器人联系人/群列表
    */
-  public function contact($id = 0) {
+  public function contact($id = 0)
+  {
     $contact = modelRobot::contact($this->user, $id);
     return $this->succeed($contact);
   }
@@ -42,7 +47,8 @@ class Robot extends Base
   /**
    * 推送分享
    */
-  public function push($type, $contact, $content, $url = '', $cycle = 0, $start = null, $end = null) {
+  public function push($type, $contact, $content, $url = '', $cycle = 0, $start = null, $end = null)
+  {
     if ($type != '0' && $type != '1' && empty($contact)) {
       return $this->fail('请选择要推送的群或联系人。');
     } else {
@@ -58,7 +64,8 @@ class Robot extends Base
   /**
    * 离线
    */
-  public function offline($id) {
+  public function offline($id)
+  {
     $result = modelRobot::sendAction($this->user, $id, 0);
     if ($result) {
       return $this->succeed();
@@ -70,7 +77,8 @@ class Robot extends Base
   /**
    * 休眠
    */
-  public function sleep($id) {
+  public function sleep($id)
+  {
     $result = modelRobot::sendAction($this->user, $id, 2);
     if ($result) {
       return $this->succeed();
@@ -82,7 +90,8 @@ class Robot extends Base
   /**
    * 唤醒
    */
-  public function weakup($id) {
+  public function weakup($id)
+  {
     $result = modelRobot::sendAction($this->user, $id, 1);
     if ($result) {
       return $this->succeed();
@@ -94,7 +103,8 @@ class Robot extends Base
   /**
    * 清除所有任务
    */
-  public function clearTask($id) {
+  public function clearTask($id)
+  {
     $result = modelRobot::clearTask($this->user, $id);
     if ($result) {
       return $this->succeed();

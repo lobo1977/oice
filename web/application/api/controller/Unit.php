@@ -1,7 +1,9 @@
 <?php
+
 namespace app\api\controller;
 
 use think\Validate;
+use app\common\Utils;
 use app\api\controller\Base;
 use app\api\model\Unit as modelUnit;
 use app\api\model\Building;
@@ -12,13 +14,14 @@ class Unit extends Base
 {
   protected $beforeActionList = [
     'getUser',
-    'checkAuth' => ['except'=>'detail']
+    'checkAuth' => ['except' => 'detail,qrcode']
   ];
 
   /**
    * 获取项目单元
    */
-  public function buildingUnit($id) {
+  public function buildingUnit($id)
+  {
     if ($id) {
       $data = modelUnit::getByBuildingId($this->user, $id);
       return $this->succeed($data);
@@ -30,7 +33,8 @@ class Unit extends Base
   /**
    * 查看单元信息
    */
-  public function detail($id = 0, $key = '') {
+  public function detail($id = 0, $key = '')
+  {
     if ($id) {
       $data = modelUnit::detail($this->user, $id, 'view', $key);
       if ($data) {
@@ -47,9 +51,23 @@ class Unit extends Base
   }
 
   /**
+   * 二维码
+   */
+  public function qrcode($id)
+  {
+    $qrcode_url = sprintf('https://' . config('app_host') . '/app/unit/view/%s', $id);
+    $qrCode = Utils::qrcode($qrcode_url, 1);
+    ob_end_clean();
+    header('Content-type:image/png');
+    imagepng($qrCode);
+    imagedestroy($qrCode);
+  }
+
+  /**
    * 添加/修改单元信息
    */
-  public function edit($id = 0, $copy = 0) {
+  public function edit($id = 0, $copy = 0)
+  {
     if ($this->request->isGet()) {
       $form_token = $this->formToken();
       $companyList = Company::my($this->user);
@@ -73,25 +91,25 @@ class Unit extends Base
       if ($id > 0) {
         $validate = Validate::make([
           'room'  => 'require'
-        ],[
+        ], [
           'room.require' => '必须填写房间号'
         ]);
       } else {
         $validate = Validate::make([
           'room'  => 'require',
-          'mobile' =>'mobile'
-        ],[
+          'mobile' => 'mobile'
+        ], [
           'room.require' => '必须填写房间号',
           'mobile.mobile' => '联系人手机号码无效'
         ]);
       }
 
       $data = input('post.');
-      
+
       if (isset($data['mobile'])) {
         $data['mobile'] = str_replace(' ', '', $data['mobile']);
       }
-      
+
       if (!$this->checkFormToken($data)) {
         return $this->fail('无效请求，请勿重复提交表单');
       } else if (!$validate->check($data)) {
@@ -113,7 +131,8 @@ class Unit extends Base
   /**
    * 添加到收藏夹
    */
-  public function favorite($id) {
+  public function favorite($id)
+  {
     $result = Building::favorite($this->user, 0, $id);
     if ($result == 1) {
       return $this->succeed();
@@ -125,7 +144,8 @@ class Unit extends Base
   /**
    * 从收藏夹删除
    */
-  public function unFavorite($id) {
+  public function unFavorite($id)
+  {
     $result = Building::unFavorite($this->user, 0, $id);
     if ($result == 1) {
       return $this->succeed();
@@ -137,7 +157,8 @@ class Unit extends Base
   /**
    * 删除单元
    */
-  public function remove($id, $bid = 0) {
+  public function remove($id, $bid = 0)
+  {
     $result = modelUnit::remove($this->user, $id);
     if ($result == 1) {
       if ($bid) {
