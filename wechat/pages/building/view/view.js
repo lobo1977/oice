@@ -80,7 +80,8 @@ Page({
     uploadAccept: 'media',
     showCopy: false,
     showPush: false,
-    push_message: ''
+    push_message: '',
+    
   },
   
   onLoad(options) {
@@ -179,6 +180,14 @@ Page({
     wx.previewMedia({
       sources: this.data.previewImages,
       current: idx
+    })
+  },
+
+  viewQrCode() {
+    let urls = [ app.globalData.serverUrl + '/api/building/qrcode/' + this.data.info.id + '.png' ]
+    wx.previewImage({
+      urls: urls,
+      current: urls[0]
     })
   },
   

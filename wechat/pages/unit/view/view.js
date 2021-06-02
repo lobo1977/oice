@@ -149,6 +149,14 @@ Page({
       showQr: false
     })
   },
+
+  viewQrCode() {
+    let urls = [ app.globalData.serverUrl + '/api/unit/qrcode/' + this.data.info.id + '.png' ]
+    wx.previewImage({
+      urls: urls,
+      current: urls[0]
+    })
+  },
   
   // 预览图片
   bindViewImage(event) {

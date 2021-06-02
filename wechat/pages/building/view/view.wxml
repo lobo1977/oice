@@ -50,7 +50,7 @@
       <van-button block color="#ffffff" bind:click="bindPush" icon="comment-o" custom-class="text-button">群发贴</van-button>
     </van-col>
     <van-col span="{{info.allowCopy2 ? 12 : 8}}">
-      <van-button block color="#ffffff" bind:click="bindShowQr" icon="qr" custom-class="text-button">二维码</van-button>
+      <van-button block color="#ffffff" bind:click="viewQrCode" icon="qr" custom-class="text-button">二维码</van-button>
     </van-col>
     <van-col span="12" wx:if="{{info.allowCopy2}}">
       <van-button block color="#ffffff" bind:click="bindCopy" icon="records" custom-class="text-button">复制私盘</van-button>
@@ -237,16 +237,6 @@
     bind:close="onAttachActionsClose"
     bind:select="onAttachActionsSelect"
   />
-
-  <van-overlay show="{{ showQr }}" z-index="100" bind:click="bindHideQr">
-    <view class="wrapper">
-      <van-image
-        width="10rem"
-        height="10rem"
-        src="{{filter.imageUrl('/api/building/qrcode?id=' + info.id)}}"
-      />
-    </view>
-  </van-overlay>
 
   <van-row gutter="0" custom-class="button-bar">
     <van-col span="{{ !info.allowAudit && !info.allowEdit && !info.allowDelete ? 12 : (!info.allowAudit && !info.allowEdit ? 10 : 8) }}">
