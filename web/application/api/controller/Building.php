@@ -67,7 +67,17 @@ class Building extends Base
   public function qrcode($id)
   {
     $qrcode_url = sprintf('https://' . config('app_host') . '/app/building/view/%s', $id);
-    $qrCode = Utils::qrcode($qrcode_url, 1);
+    $logo = true;
+    $files = File::getList(null, 'building', $id);
+    if ($files) {
+      foreach ($files as $key => $file) {
+        if ($file->is_image) {
+          $logo = substr($file->msrc, 1);
+          break;
+        }
+      }
+    }
+    $qrCode = Utils::qrcode($qrcode_url, $logo);
     ob_end_clean();
     header('Content-type:image/png');
     imagepng($qrCode);

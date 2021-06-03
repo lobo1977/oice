@@ -9,6 +9,7 @@ use app\api\model\Unit as modelUnit;
 use app\api\model\Building;
 use app\api\model\Customer;
 use app\api\model\Company;
+use app\api\model\File;
 
 class Unit extends Base
 {
@@ -56,7 +57,17 @@ class Unit extends Base
   public function qrcode($id)
   {
     $qrcode_url = sprintf('https://' . config('app_host') . '/app/unit/view/%s', $id);
-    $qrCode = Utils::qrcode($qrcode_url, 1);
+    $logo = true;
+    $files = File::getList(null, 'unit', $id);
+    if ($files) {
+      foreach ($files as $key => $file) {
+        if ($file->is_image) {
+          $logo = substr($file->msrc, 1);
+          break;
+        }
+      }
+    }
+    $qrCode = Utils::qrcode($qrcode_url, $logo);
     ob_end_clean();
     header('Content-type:image/png');
     imagepng($qrCode);

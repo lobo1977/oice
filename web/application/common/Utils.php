@@ -296,19 +296,21 @@ class Utils
   /**
    * 生成二维码
    */
-  public static function qrcode($code, $addLogo = false)
+  public static function qrcode($code, $logoFile = false)
   {
     $qrCode = new \QRcode();
 
     $errorCorrectionLevel = 'Q';      //容错级别  
     $matrixPointSize = 6;          //生成图片大小
     $margin = 2;
-    $logoFile = 'static/img/logo_q.png';
+    if ($logoFile === true || ($logoFile && !file_exists($logoFile))) {
+      $logoFile = 'static/img/logo_q.png';
+    }
     $codeFile = 'qrcode/' . microtime() . '.png';
     $qrCode->png($code, $codeFile, $errorCorrectionLevel, $matrixPointSize, $margin);
     $QR = imagecreatefromstring(file_get_contents($codeFile));
 
-    if ($addLogo && file_exists($logoFile)) {
+    if ($logoFile && file_exists($logoFile)) {
       $logo = imagecreatefromstring(file_get_contents($logoFile));
       $QR_width = imagesx($QR);      //二维码图片宽度   
       $QR_height = imagesy($QR);      //二维码图片高度   
