@@ -1138,7 +1138,7 @@ Page({
     let that = this
     wx.showLoading()
     app.post('customer/clashPass', {
-      id: that.info.data.id,
+      id: that.data.info.id,
       operate: operate
     }, (res) => {
       if (res.success) {
