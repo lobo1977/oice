@@ -470,10 +470,10 @@ Page({
         push_message += '\n【交付标准】'
         if (res.data.linkman && res.data.linkman.length) {
           push_message += '\n【联系人】' + res.data.linkman[0].title
-          push_message += '\n【联系电话】' + res.data.linkman[0].mobile
+          push_message += '\n【联系电话】' + res.data.linkman[0].mobile + '（微同）'
         }
-        push_message += '\n' + res.data.short_url
-
+        push_message += '\n【项目详情】' + res.data.short_url
+        push_message += '推广支持 - 公众号【商办云信息】- 开发商发布项目销控平台'
         that.setData({
           info: res.data,
           previewImages: prevList,
