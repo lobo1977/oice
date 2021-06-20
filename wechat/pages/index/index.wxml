@@ -4,9 +4,16 @@
 <wxs src="../../utils/filter.wxs" module="filter" />
 
 <view>
-  <swiper wx:if="{{banner && banner.length}}" indicator-dots="{{true}}" autoplay="{{true}}" style="height:380rpx;">
+  <van-nav-bar fixed placeholder title="商办云">
+    <view slot="left" bindtap="switchCity" style="font-size:0.9em">
+      <van-icon name="location-o" size="18px" custom-style="top:2px;" />
+      <text>{{city}}</text>
+    </view>
+  </van-nav-bar>
+
+  <swiper wx:if="{{banner && banner.length}}" indicator-dots="{{true}}" autoplay="{{true}}" style="height:420rpx;">
     <swiper-item wx:for="{{banner}}" wx:key="id" wx:for-index="idx" data-data="{{idx}}" data-id="{{item.id}}" bindtap="bindViewBuilding">
-      <view style="position:absolute;width:100%;color:#fff;top:170rpx;text-align:center;font-size:1.2em;">{{item.building_name}}</view>
+      <view style="position:absolute;width:100%;color:#fff;top:180rpx;text-align:center;font-size:1.2em;">{{item.building_name}}</view>
       <image style="width:100%;height:100%;background-color:#eeeeee;" 
         mode="aspectFill" src="{{filter.imageUrl(item.src)}}"></image>
     </swiper-item>

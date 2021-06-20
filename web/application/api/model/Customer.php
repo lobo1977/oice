@@ -1,4 +1,5 @@
 <?php
+
 namespace app\api\model;
 
 use think\model\concern\SoftDelete;
@@ -20,20 +21,21 @@ class Customer extends Base
   protected $pk = 'id';
   protected $deleteTime = 'delete_time';
 
-  public static $status = ['潜在','跟进','看房','洽谈','成交','失败','名录'];
-  public static $share = ['私有','共享'];
+  public static $status = ['潜在', '跟进', '看房', '洽谈', '成交', '失败', '名录'];
+  public static $share = ['私有', '共享'];
   public static $IGNORE_WORDS = '/北京|上海|深圳|广州|中国|美国|日本|德国|英国|法国|（|）|\(|\)/';
-  
+
   /**
    * 格式化列表数据
    */
-  protected static function formatList($list) {
-    foreach($list as $key=>$customer) {
+  protected static function formatList($list)
+  {
+    foreach ($list as $key => $customer) {
       $customer->title = '【' . self::$status[$customer->status] . '】' . $customer->customer_name;
       //if ($customer->clash) {
       //  $customer->title = $customer->title . '<span style="color:red">（撞单）</span>';
       //}
-      $customer->desc = (empty($customer->lease_buy) ? '' : $customer->lease_buy) . 
+      $customer->desc = (empty($customer->lease_buy) ? '' : $customer->lease_buy) .
         (empty($customer->demand) ? '' : $customer->demand . ' ');
 
       if ($customer->min_acreage && $customer->max_acreage) {
@@ -56,11 +58,12 @@ class Customer extends Base
     }
     return $list;
   }
-  
+
   /**
    * 权限检查
    */
-  public static function allow($user, $customer, $operate) {
+  public static function allow($user, $customer, $operate)
+  {
     if ($user == null) {
       return false;
     } else if ($customer == null && $operate != 'new') {
@@ -74,9 +77,9 @@ class Customer extends Base
     }
 
     if ($operate == 'view') {
-      return ($user->isCompanyAdmin && $customer->company_id == $user->company_id) || 
-        $customer->share_level !== null || $customer->user_id == $user->id || 
-        ($customer->share && $customer->company_id > 0 && $customer->company_id == $user->company_id) || 
+      return ($user->isCompanyAdmin && $customer->company_id == $user->company_id) ||
+        $customer->share_level !== null || $customer->user_id == $user->id ||
+        ($customer->share && $customer->company_id > 0 && $customer->company_id == $user->company_id) ||
         ($user->id == $superior_id && $customer->company_id > 0 && $customer->company_id == $user->company_id);
     } else if ($operate == 'new') {
       return $user->company_id > 0;
@@ -84,19 +87,18 @@ class Customer extends Base
       return $customer->company_id == $user->company_id &&
         ($customer->user_id == $user->id || $user->isCompanyAdmin);
     } else if ($operate == 'edit') {
-      return (($user->isCompanyAdmin && $customer->company_id == $user->company_id) || 
-        $customer->user_id == $user->id || $customer->share_level > 0); 
-        //&& (!$customer->clash || $customer->parallel);
+      return (($user->isCompanyAdmin && $customer->company_id == $user->company_id) ||
+        $customer->user_id == $user->id || $customer->share_level > 0);
+      //&& (!$customer->clash || $customer->parallel);
     } else if ($operate == 'follow') {    // 跟进
       return (
-        ($user->isCompanyAdmin && $customer->company_id == $user->company_id) || 
-        $customer->share_level !== null || $customer->user_id == $user->id || 
-        ($customer->share && $customer->company_id > 0 && $customer->company_id == $user->company_id) || 
-        ($user->id == $superior_id && $customer->company_id > 0 && $customer->company_id == $user->company_id)
-      ) && (!$customer->clash || $customer->parallel);
+        ($user->isCompanyAdmin && $customer->company_id == $user->company_id) ||
+        $customer->share_level !== null || $customer->user_id == $user->id ||
+        ($customer->share && $customer->company_id > 0 && $customer->company_id == $user->company_id) ||
+        ($user->id == $superior_id && $customer->company_id > 0 && $customer->company_id == $user->company_id)) && (!$customer->clash || $customer->parallel);
     } else if ($operate == 'confirm') {   // 确认
       return $customer->user_id == $user->id &&
-        $customer->company_id > 0 && $customer->company_id == $user->company_id && 
+        $customer->company_id > 0 && $customer->company_id == $user->company_id &&
         (!$customer->clash || $customer->parallel);
     } else if ($operate == 'clash') {     // 撞单处理
       return $user->isCompanyAdmin && $customer->clash &&
@@ -105,17 +107,18 @@ class Customer extends Base
       return ($customer->user_id == $user->id &&
         $customer->company_id > 0 && $customer->company_id == $user->company_id) ||
         ($user->isCompanyAdmin && $customer->clash &&
-        $customer->company_id > 0 && $customer->company_id == $user->company_id) ||
+          $customer->company_id > 0 && $customer->company_id == $user->company_id) ||
         $customer->share_level > 1;
     } else {
       return false;
     }
   }
-  
+
   /**
    * 检索客户信息
    */
-  public static function search($user, $filter) {
+  public static function search($user, $filter)
+  {
     if (!isset($filter['page'])) {
       $filter['page'] = 1;
     }
@@ -131,7 +134,7 @@ class Customer extends Base
       $user_id = $user->id;
       $company_id = $user->company_id;
     }
-    
+
     $list = self::alias('a')
       ->leftJoin('user_company b', 'a.user_id = b.user_id AND a.company_id = b.company_id AND b.status = 1')
       ->leftJoin('user u', 'a.user_id = u.id')
@@ -189,7 +192,8 @@ class Customer extends Base
   /**
    * 通过ID获取客户信息
    */
-  public static function getById($user, $id) {
+  public static function getById($user, $id)
+  {
     $user_id = 0;
 
     if ($user) {
@@ -197,8 +201,8 @@ class Customer extends Base
     }
 
     $data = self::alias('a')
-      ->leftJoin('user b','b.id = a.user_id')
-      ->leftJoin('company c','c.id = a.company_id')
+      ->leftJoin('user b', 'b.id = a.user_id')
+      ->leftJoin('company c', 'c.id = a.company_id')
       ->leftJoin('share s', "s.type = 'customer' and a.id = s.object_id and s.user_id <> a.user_id and s.user_id = " . $user_id)
       ->where('a.id', $id)
       ->field('a.*,
@@ -212,7 +216,8 @@ class Customer extends Base
   /**
    * 获取客户详细信息
    */
-  public static function detail($user, $id, $key = '', $operate = 'view') {
+  public static function detail($user, $id, $key = '', $operate = 'view')
+  {
     $user_id = 0;
     // $company_id = 0;
 
@@ -239,11 +244,11 @@ class Customer extends Base
     }
 
     $data = self::alias('a')
-      ->leftJoin('user b','b.id = a.user_id')
-      ->leftJoin('company c','c.id = a.company_id')
+      ->leftJoin('user b', 'b.id = a.user_id')
+      ->leftJoin('company c', 'c.id = a.company_id')
       ->leftJoin('share s', "s.type = 'customer' and a.id = s.object_id and s.user_id <> a.user_id and s.user_id = " . $user_id)
       ->where('a.id', $id)
-      ->field('a.id,a.customer_name,a.tel,a.area,a.address,a.demand,a.lease_buy,
+      ->field('a.id,a.customer_name,a.tel,a.city,a.area,a.area_code,a.address,a.demand,a.lease_buy,
         a.district,a.min_acreage,a.max_acreage,a.budget,a.settle_date,a.current_area,
         a.end_date,a.remind,a.rem,a.status,a.clash,a.parallel,a.share,a.user_id,a.company_id,
         b.title as manager,b.avatar,b.mobile as manager_mobile,c.title as company,
@@ -253,7 +258,7 @@ class Customer extends Base
     if ($data == null) {
       self::exception('客户不存在。');
     }
-    
+
     if (!self::allow($user, $data, $operate)) {
       self::exception('您没有权限' . ($operate == 'view' ? '查看' : '修改') . '此客户。');
     }
@@ -297,7 +302,7 @@ class Customer extends Base
 
       if ($data->clash && $data->allowClash) {
         $data->clashCustomer = self::alias('a')
-          ->leftJoin('user b','b.id = a.user_id')
+          ->leftJoin('user b', 'b.id = a.user_id')
           ->where('a.id', $data->clash)
           ->field('a.id,a.customer_name as name,a.update_time,b.title as manager')->find();
       }
@@ -308,8 +313,9 @@ class Customer extends Base
   /**
    * 撞单检查
    */
-  public static function clashCheck($id, $name, $tel, $company_id) {
-    if(!$company_id) {
+  public static function clashCheck($id, $name, $tel, $company_id)
+  {
+    if (!$company_id) {
       return false;
     }
 
@@ -322,9 +328,9 @@ class Customer extends Base
       ->where('a.company_id', $company_id)
       ->where('(a.clash IS NULL OR a.clash = 0)')
       ->where('(a.parallel IS NULL OR a.parallel = 0)')
-      ->where(function ($query) use($keyword, $tel) {
+      ->where(function ($query) use ($keyword, $tel) {
         if ($tel) {
-          $query->where("(a.tel = '" .$tel . "' OR a.customer_name like '%" . $keyword . "%')");
+          $query->where("(a.tel = '" . $tel . "' OR a.customer_name like '%" . $keyword . "%')");
         } else {
           $query->where('a.customer_name', 'like', '%' . $keyword . '%');
         }
@@ -337,7 +343,8 @@ class Customer extends Base
   /**
    * 添加/修改客户信息
    */
-  public static function addUp($user, $id, $data) {
+  public static function addUp($user, $id, $data)
+  {
     $oldData = null;
     $user_id = 0;
     $company_id = 0;
@@ -355,8 +362,9 @@ class Customer extends Base
       } else if (!self::allow($user, $oldData, 'edit')) {
         self::exception('您没有权限修改此客户。');
       }
-      if ((isset($data['clash']) && $data['clash'] > 0) || 
-        $oldData->clash || $oldData->parallel) {
+      if ((isset($data['clash']) && $data['clash'] > 0) ||
+        $oldData->clash || $oldData->parallel
+      ) {
         $checkClash = false;
       }
     } else if (!self::allow($user, null, 'new')) {
@@ -374,7 +382,7 @@ class Customer extends Base
     // 撞单检查
     if ($checkClash && isset($data['company_id']) && $data['company_id'] > 0) {
       $clash = self::clashCheck($id, $data['customer_name'], $tel, $data['company_id']);
-      
+
       if ($clash) {
         $message = '';
         $resultData = [
@@ -396,8 +404,8 @@ class Customer extends Base
           if ($clash->status == 5) {
             self::transfer($user, $clash->id, $user_id, $data);
             $message = '客户资料和 【' . $clash->user . '】 的' . self::$status[$clash->status] . '客户：【' .
-              $clash->customer_name . '】 发生撞单，旧客户已自动转交给您并转为' . 
-                self::$status[$data['status']] . '客户，请及时跟进。';
+              $clash->customer_name . '】 发生撞单，旧客户已自动转交给您并转为' .
+              self::$status[$data['status']] . '客户，请及时跟进。';
           } else {
             $message = '客户资料和 【' . $clash->user . '】 的' . self::$status[$clash->status] . '客户：【' .
               $clash->customer_name . '】 发生撞单，您可以选择【放弃登记】或【申请转交或并行】。' .
@@ -452,6 +460,14 @@ class Customer extends Base
           $summary = '直线电话：' . $oldData->tel . ' -> ' . $data['tel'] . '\n';
         } else {
           $summary = '直线电话：' . $data['tel'] . '\n';
+        }
+      }
+
+      if ($data['city'] != $oldData->city) {
+        if ($oldData->city) {
+          $summary = $summary . '城市：' . $oldData->city . ' -> ' . $data['city'] . '\n';
+        } else {
+          $summary = $summary . '城市：' . $data['city'] . '\n';
         }
       }
 
@@ -562,7 +578,7 @@ class Customer extends Base
       }
 
       if ($data['status'] != $oldData->status) {
-        $summary = $summary . '状态：' . self::$status[$oldData->status] . 
+        $summary = $summary . '状态：' . self::$status[$oldData->status] .
           ' -> ' . self::$status[$data['status']] . '\n';
       }
 
@@ -585,7 +601,7 @@ class Customer extends Base
       }
 
       if ($data['share'] != $oldData->share) {
-        $summary = $summary . '共享：' . self::$share[$oldData->share] . 
+        $summary = $summary . '共享：' . self::$share[$oldData->share] .
           ' -> ' . self::$share[$data['share']] . '\n';
       }
 
@@ -604,7 +620,7 @@ class Customer extends Base
           if ($company) {
             $admin_id = $company->user_id;
             $message = $user->title . '登记的客户“' . $data['customer_name'] . '”发生撞单，已申请并行或强行转交，请及时处理。';
-            $url = 'https://' . config('app_host') . '/app/customer/view/'. $id;
+            $url = 'https://' . config('app_host') . '/app/customer/view/' . $id;
             User::pushMessage($admin_id, $message, $url);
           }
         }
@@ -612,7 +628,9 @@ class Customer extends Base
 
       return $id;
     } else {
-      $data['city'] = self::$city;
+      if (!isset($data['city']) || empty($data['city'])) {
+        $data['city'] = self::$city;
+      }
       $data['user_id'] = $user_id;
 
       $linkman = null;
@@ -653,7 +671,7 @@ class Customer extends Base
           if ($company) {
             $admin_id = $company->user_id;
             $message = $user->title . '登记的客户“' . $data['customer_name'] . '”发生撞单，已申请并行或强行转交，请及时处理。';
-            $url = 'https://' . config('app_host') . '/app/customer/view/'. $newData->id;
+            $url = 'https://' . config('app_host') . '/app/customer/view/' . $newData->id;
             User::pushMessage($admin_id, $message, $url);
           }
         }
@@ -668,7 +686,8 @@ class Customer extends Base
   /**
    * 变更客户状态
    */
-  public static function changeStatus($user, $id, $status) {
+  public static function changeStatus($user, $id, $status)
+  {
     $customer = self::get($id);
     if ($customer == null) {
       return true;
@@ -695,7 +714,8 @@ class Customer extends Base
   }
 
   // 转交客户
-  public static function transfer($user, $id, $to_user, $data = null, $checkRight = false) {
+  public static function transfer($user, $id, $to_user, $data = null, $checkRight = false)
+  {
     $customer = self::alias('a')
       ->join('user u', "a.user_id = u.id")
       ->field('a.id,a.user_id,a.company_id,a.clash,a.parallel,a.status,u.title')
@@ -725,7 +745,7 @@ class Customer extends Base
     if ($data != null && isset($data['company_id']) && !empty($data['company_id'])) {
       $customer->company_id = $data['company_id'];
     }
-    
+
     $result = $customer->save();
     if ($result) {
       Log::add($user, [
@@ -740,7 +760,8 @@ class Customer extends Base
   }
 
   // 移除共享
-  public static function removeShare($user, $id, $user_id) {
+  public static function removeShare($user, $id, $user_id)
+  {
     $customer = self::getById($user, $id);
 
     if ($customer == null) {
@@ -759,7 +780,7 @@ class Customer extends Base
       ->where('object_id', $id)
       ->where('user_id', $user_id)
       ->delete();
-    
+
     if ($result) {
       Log::add($user, [
         "table" => 'customer',
@@ -775,7 +796,8 @@ class Customer extends Base
   /**
    * 撞单处理
    */
-  public static function clashPass($user, $id, $operate) {
+  public static function clashPass($user, $id, $operate)
+  {
     $customer = self::get($id);
 
     if ($customer == null) {
@@ -831,7 +853,8 @@ class Customer extends Base
   /**
    * 删除客户
    */
-  public static function remove($user, $id) {
+  public static function remove($user, $id)
+  {
     $customer = self::get($id);
     if ($customer == null) {
       return true;
@@ -854,7 +877,8 @@ class Customer extends Base
   /**
    * 批量导入客户
    */
-  public static function import($user, $data) {
+  public static function import($user, $data)
+  {
     if (!self::allow($user, null, 'new')) {
       self::exception('您没有权限添加客户。');
     }
@@ -901,7 +925,7 @@ class Customer extends Base
       ];
 
       if ($customer['customer_name']) {
-        foreach($customer as $k=>$v) {
+        foreach ($customer as $k => $v) {
           if ($v == '' || $v == null || $v == 'null' || $v == 'NULL') {
             unset($customer[$k]);
           }
@@ -985,7 +1009,8 @@ class Customer extends Base
   /**
    * 导出客户
    */
-  public static function export($user, $type) {
+  public static function export($user, $type)
+  {
     $user_id = 0;
     $company_id = 0;
 

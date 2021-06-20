@@ -6,8 +6,6 @@ use think\facade\Log as sysLog;
 use think\model\concern\SoftDelete;
 use think\facade\Validate;
 use app\common\Excel;
-use app\common\Wechat;
-use app\common\Utils;
 use app\common\Sms;
 use app\api\model\Base;
 use app\api\model\File;
@@ -136,8 +134,11 @@ class Building extends Base
 
     $list = self::alias('a')
       ->leftJoin('file b', "b.parent_id = a.id AND b.type = 'building' AND b.default = 1 AND b.delete_time is null")
-      ->leftJoin('share s', "s.type = 'building' and a.id = s.object_id and s.user_id = " . $user_id)
-      ->where('a.city', self::$city);
+      ->leftJoin('share s', "s.type = 'building' and a.id = s.object_id and s.user_id = " . $user_id);
+
+    if (isset($filter['city']) && $filter['city'] != '') {
+      $list->where('a.city', $filter['city']);
+    }
 
     if (isset($filter['banner']) && $filter['banner'] == 1) {
       $list->where('b.file', 'not null')
@@ -365,7 +366,7 @@ class Building extends Base
     $data = self::alias('a')
       ->leftJoin('share s', "s.type = 'building' and a.id = s.object_id and s.user_id = " . $user_id)
       ->leftJoin('user u', 'a.user_id = u.id')
-      ->field('a.id,a.building_name,a.type,a.level,a.area,a.district,a.address,a.subway,a.longitude,a.latitude,
+      ->field('a.id,a.building_name,a.type,a.level,a.city,a.area,a.area_code,a.district,a.address,a.subway,a.longitude,a.latitude,
         a.completion_date,a.rent_sell,a.price,a.acreage,a.floor,a.floor_area,a.floor_height,a.bearing,
         a.developer,a.manager,a.fee,a.electricity_fee,a.car_seat,a.rem,a.commission,a.facility,a.equipment,a.traffic,
         a.environment,a.share,a.user_id,a.company_id,a.short_url,a.create_time,u.title as user,u.avatar,
@@ -529,6 +530,14 @@ class Building extends Base
           $summary = $summary . '项目等级：' . $oldData->level . ' -> ' . $data['level'] . '\n';
         } else {
           $summary = $summary . '项目等级：' . $data['level'] . '\n';
+        }
+      }
+
+      if ($data['city'] != $oldData->city) {
+        if ($oldData->city) {
+          $summary = $summary . '城市：' . $oldData->city . ' -> ' . $data['city'] . '\n';
+        } else {
+          $summary = $summary . '城市：' . $data['city'] . '\n';
         }
       }
 
@@ -788,7 +797,9 @@ class Building extends Base
     } else if (!self::allow($user, null, 'new')) {
       self::exception('您没有权限添加项目。');
     } else {
-      $data['city'] = self::$city;
+      if (!isset($data['city']) || empty($data['city'])) {
+        $data['city'] = self::$city;
+      }
       $data['user_id'] = $user_id;
       if (empty($data['company_id'])) {
         $data['company_id'] = $user->company_id;

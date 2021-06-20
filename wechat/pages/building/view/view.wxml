@@ -32,7 +32,7 @@
       is-link="{{info.latitude !== null && info.latitude !== 0 && info.longitude !== null && info.longitude !== 0}}" center bind:click="bindOpenLocation">
       <view slot="label" style="font-weight:normal;">
         <view wx:if="{{info.area || info.address}}">
-          <van-icon name="location-o" /> {{info.area + info.address}}
+          <van-icon name="location-o" /> {{info.address}}
         </view>
         <view wx:if="{{info.subway}}">
           <van-icon name="logistics" /> {{info.subway}}

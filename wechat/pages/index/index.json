@@ -1,4 +1,7 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "van-nav-bar": "@vant/weapp/nav-bar"
+  },
+  "navigationStyle": "custom",
   "navigationBarTitleText": "商办云"
 }

@@ -6,17 +6,31 @@ Page({
   data: {
     isLoading: false,
     isPullDown: false,
+    city: '',
     banner: [],
     unitList: []
   },
 
   //事件处理函数
   onLoad: function () {
+    this.setData({
+      city: app.globalData.currentCity
+    })
     wx.showShareMenu({
       withShareTicket:true,
       menus:['shareAppMessage','shareTimeline']  
     })
     this.getData()
+  },
+
+  onShow: function() {
+    if (app.globalData.changeCity) {
+      this.setData({
+        city: app.globalData.currentCity
+      })
+      app.globalData.changeCity = false
+      this.getData()
+    }
   },
 
   // 触发下拉刷新时执行
@@ -44,6 +58,12 @@ Page({
     app.checkUser('/pages/customer/edit/edit')
   },
 
+  switchCity: function() {
+    wx.navigateTo({
+      url: '../city/city'
+    })
+  },
+
   // 通过接口获取数据
   getData: function() {
     let that = this
@@ -59,7 +79,9 @@ Page({
       unitList: []
     })
 
-    app.get('index/index', (res) => {
+    app.post('index/index', {
+      city: that.data.city
+    }, (res) => {
       if (res.data) {
         that.setData({
           banner: res.data.banner,

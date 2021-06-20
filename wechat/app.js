@@ -13,6 +13,7 @@ App({
     wx.getSystemInfo({
       success (res) {
         app.globalData.isWindows = /win/.test(res.system.toLowerCase())
+        app.globalData.windowHeight = res.windowHeight
       }
     })
     
@@ -29,7 +30,9 @@ App({
   },
   
   globalData: {
+    currentCity: '北京市',
     isWindows: false,
+    windowHeight: 0,
     userInfo: null,
     appUserInfo: null,
     myCustomer: [],
@@ -281,6 +284,7 @@ App({
         value: "private"
       }
     ],
+    changeCity: false,
     refreshBuilding: false,
     refreshCustomer: false,
     refreshBuildingView: false,

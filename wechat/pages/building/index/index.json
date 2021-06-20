@@ -1,8 +1,10 @@
 {
   "usingComponents": {
+    "van-nav-bar": "@vant/weapp/nav-bar",
     "van-dropdown-menu": "@vant/weapp/dropdown-menu",
     "van-dropdown-item": "@vant/weapp/dropdown-item",
     "van-tree-select": "@vant/weapp/tree-select"
   },
+  "navigationStyle": "custom",
   "navigationBarTitleText": "项目"
 }

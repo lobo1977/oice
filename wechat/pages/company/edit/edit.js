@@ -1,5 +1,6 @@
 // pages/company/edit/edit.js
 import Dialog from '../../../miniprogram_npm/@vant/weapp/dialog/dialog';
+import { areaList } from '@vant/area-data';
 
 const app = getApp()
 
@@ -9,8 +10,8 @@ Page({
    * 页面的初始数据
    */
   data: {
+    areaList,
     showArea: false,
-    area: [],
     showJoinWay: false,
     join_way: [
       {name: '开放加入', value: 0}, 
@@ -22,7 +23,9 @@ Page({
       __token__: '',
       title: '',     // 简称
       full_name: '', // 全称
+      city: '',      // 城市
       area: '',      // 城区
+      area_code: '110105',  // 行政区划代码
       address: '',   // 地址
       rem: '',
       join_way: 0,
@@ -135,8 +138,22 @@ Page({
   },
 
   onAreaSelected: function(event) {
+    let selected = event.detail.values
+    let city = '', area = '', code = ''
+    if (selected[2] && selected[2].code) {
+      city = selected[1].name
+      area = selected[2].name
+      code = selected[2].code
+    } else if (selected[1] && selected[1].code) {
+      city = selected[1].name
+      code = selected[1].code
+    } else if (selected[0] && selected[0].code) {
+      code = selected[0].code
+    }
     this.setData({
-      ['info.area']: event.detail.value,
+      ['info.city']: city,
+      ['info.area']: area,
+      ['info.area_code']: code,
       showArea: false
     })
   },
@@ -191,18 +208,10 @@ Page({
           }
         }
 
-        let arrArea = []
-        app.globalData.area.forEach(element => {
-          if (element.id != 'all') {
-            arrArea.push(element.text)
-          }
-        })
-
         that.setData({
           info: info,
           join_way_text: that.data.join_way[info.join_way].name,
-          logo: res.data.logo ? res.data.logo : '',
-          area: arrArea
+          logo: res.data.logo ? res.data.logo : ''
         })
       } else {
         Dialog.alert({

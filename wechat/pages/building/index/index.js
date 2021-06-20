@@ -1,4 +1,5 @@
 //index.js
+import { areaList } from '@vant/area-data';
 
 //获取应用实例
 const app = getApp()
@@ -6,6 +7,8 @@ const app = getApp()
 Page({
   data: {
     me: null,
+    city: '',
+    areaList,
     pageIndex: 1,
     pageSize: 10,
     isLoading: false,
@@ -20,7 +23,7 @@ Page({
     mainDropIndex: 0,
     filterDropTitle: "区域",
     filterType: [],
-    filterArea: app.globalData.area,
+    filterArea: [],
     filterRentSell: [
       {
         text: "租售",
@@ -64,9 +67,12 @@ Page({
       menus:['shareAppMessage','shareTimeline']  
     })
 
+    this.setFilterArea()
+
     this.setData({
-      filterType: app.globalData.buildingType
+      filterType: app.globalData.buildingType,
     })
+
     if (app.globalData.appUserInfo) {
       this.setData({
         me: app.globalData.appUserInfo
@@ -82,9 +88,14 @@ Page({
     }
   },
   onShow: function() {
+    if (app.globalData.changeCity) {
+      app.globalData.refreshBuilding = true
+      app.globalData.changeCity = false
+      this.setFilterArea()
+    }
     if (app.globalData.refreshBuilding) {
-      this.getList()
       app.globalData.refreshBuilding = false
+      this.getList()
     }
   },
   onReady: function() {
@@ -181,6 +192,55 @@ Page({
   bindAdd: function() {
     app.checkUser('/pages/building/edit/edit')
   },
+
+  setFilterArea: function() {
+    let filterArea = app.globalData.area
+    if (app.globalData.currentCity != '北京市') {
+      filterArea = []
+      filterArea.push({
+        text: "所有区域",
+        id: "all",
+        children: [
+        ]
+      })
+
+      let areaCode = ''
+      for(let code in areaList.city_list) {
+        if (areaList.city_list[code] == app.globalData.currentCity) {
+          areaCode = code.substring(0, 4)
+          break
+        }
+      }
+
+      if (areaCode) {
+        for(let code in areaList.county_list) {
+          if (code.indexOf(areaCode) == 0) {
+            filterArea.push({
+              text: areaList.county_list[code],
+              id: areaList.county_list[code],
+              children: [
+                {
+                  text: "全区",
+                  id: ""
+                }
+              ]
+            })
+          }
+        }
+      }
+    }
+
+    this.setData({
+      city: app.globalData.currentCity,
+      filterArea: filterArea
+    })
+  },
+
+  switchCity: function() {
+    wx.navigateTo({
+      url: '../../city/city'
+    })
+  },
     
   // 获取列表
   getList: function() {
@@ -201,6 +261,7 @@ Page({
     app.post('building/index', { 
       page: that.data.pageIndex,
       keyword: that.data.keyword,
+      city: that.data.city,
       type: that.data.type,
       area: that.data.area,
       district: that.data.district,

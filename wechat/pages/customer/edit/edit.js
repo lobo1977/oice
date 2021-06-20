@@ -1,12 +1,13 @@
 // pages/customer/edit/edit.js
 import Dialog from '../../../miniprogram_npm/@vant/weapp/dialog/dialog';
+import { areaList } from '@vant/area-data';
 
 const app = getApp()
 
 Page({
   data: {
     id: 0,
-    area: [],
+    areaList,
     showArea: false,
     demand:[],
     showDemand: false,
@@ -32,7 +33,9 @@ Page({
       __token__: '',
       customer_name: '',    // 名称
       tel: '',              // 直线电话
-      area: '',             // 城区
+      city: '',      // 城市
+      area: '',      // 城区
+      area_code: '110105',  // 行政区划代码
       address: '',          // 地址
       demand: '',           // 需求项目
       lease_buy: '',        // 租赁/购买
@@ -151,12 +154,10 @@ Page({
           })
         }
 
-        let arrArea = []
         let arrDistrict = []
         let arrDemand = []
         app.globalData.area.forEach(element => {
           if (element.id != 'all') {
-            arrArea.push(element.text)
             if (element.children && element.children.length) {
               let dataDistrict = info.district ? info.district : ''
               element.children.forEach(d => {
@@ -167,6 +168,7 @@ Page({
             }
           }
         })
+
         app.globalData.buildingType.forEach(element => {
           if (element.text != '类别') {
             arrDemand.push(element.text)
@@ -175,7 +177,6 @@ Page({
 
         that.setData({
           info: info,
-          area: arrArea,
           demand: arrDemand,
           district: arrDistrict
         })
@@ -227,8 +228,22 @@ Page({
   },
 
   onAreaSelected: function(event) {
+    let selected = event.detail.values
+    let city = '', area = '', code = ''
+    if (selected[2] && selected[2].code) {
+      city = selected[1].name
+      area = selected[2].name
+      code = selected[2].code
+    } else if (selected[1] && selected[1].code) {
+      city = selected[1].name
+      code = selected[1].code
+    } else if (selected[0] && selected[0].code) {
+      code = selected[0].code
+    }
     this.setData({
-      ['info.area']: event.detail.value,
+      ['info.city']: city,
+      ['info.area']: area,
+      ['info.area_code']: code,
       showArea: false
     })
   },

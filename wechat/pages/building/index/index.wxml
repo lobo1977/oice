@@ -3,6 +3,13 @@
 </page-meta>
 <wxs src="../../../utils/filter.wxs" module="filter" />
 <view>
+  <van-nav-bar fixed placeholder title="项目">
+    <view slot="left" bindtap="switchCity" style="font-size:0.9em">
+      <van-icon name="location-o" size="18px" custom-style="top:2px;" />
+      <text>{{city}}</text>
+    </view>
+  </van-nav-bar>
+
   <van-search value="{{ keyword }}" placeholder="请输入搜索关键词"
     bind:change="onKewordChange"
     bind:search="onSearch"

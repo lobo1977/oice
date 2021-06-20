@@ -23,15 +23,16 @@ class Index extends Base
   }
 
   // 首页
-  public function index()
+  public function index($city = '')
   {
     $params = [
+      'city' => $city,
       'page_size' => 3,
       'banner' => 1
     ];
     $banner = Building::search($this->user, $params);
 
-    $unit = Unit::search($this->user, ['page_size' => 5]);
+    $unit = Unit::search($this->user, ['city' => $city, 'page_size' => 5]);
 
     return $this->succeed([
       'banner' => $banner,

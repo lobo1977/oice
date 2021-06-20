@@ -5,14 +5,14 @@
     <van-field title-width="80px" label="客户名称" value="{{ info.customer_name }}" required placeholder="{{ name_error }}" error="{{is_name_empty}}" maxlength="30" bind:input="onNameInput" />
     <van-field title-width="80px" label="直线电话" value="{{ info.tel }}" maxlength="30" bind:input="onTelInput" />
     <van-field wx:if="{{id == 0}}" title-width="80px" label="联系人" value="{{ info.linkman }}" maxlength="30" bind:input="onLinkmanInput" />
-    <van-field title-width="80px" label="所在地" value="{{ info.area }}" is-link readonly clickable bindtap="bindSelectArea" />
+    <van-field title-width="80px" label="所在地" value="{{ info.city + info.area }}" is-link readonly clickable bindtap="bindSelectArea" />
     <van-field title-width="80px" label="详细地址" value="{{ info.address }}" maxlength="100" bind:input="onAddressInput" />
   </van-cell-group>
 
   <van-cell-group>
     <van-field title-width="80px" label="需求项目" value="{{ info.demand }}" is-link readonly clickable bindtap="bindSelectDemand" />
     <van-field title-width="80px" label="租购" value="{{ info.lease_buy }}" is-link readonly clickable bindtap="bindSelectLeaseBuy" />
-    <van-field title-width="80px" label="意向区域" value="{{ info.district }}" is-link readonly clickable bindtap="bindSelectDistrict" />
+    <van-field wx:if="{{info.city == '北京市'}}" title-width="80px" label="意向区域" value="{{ info.district }}" is-link readonly clickable bindtap="bindSelectDistrict" />
     <van-field title-width="80px" label="最小面积" value="{{ info.min_acreage }}" type="number" maxlength="10" bind:input="onMinAcreageInput">
       <text slot="button">平方米</text>
     </van-field>
@@ -43,7 +43,10 @@
   </van-cell-group>
 
   <van-popup show="{{ showArea }}" position="bottom" bind:close="onAreaPickerClose">
-    <van-picker columns="{{ area }}" bind:confirm="onAreaSelected" bind:cancel="onAreaPickerClose" show-toolbar />
+    <van-area area-list="{{ areaList }}" value="{{info.area_code}}"
+        columns-placeholder="{{ ['请选择', '请选择', '请选择'] }}"
+        bind:confirm="onAreaSelected"
+        bind:cancel="onAreaPickerClose" />
   </van-popup>
 
   <van-popup show="{{ showDemand }}" position="bottom" bind:close="onDemandPickerClose">

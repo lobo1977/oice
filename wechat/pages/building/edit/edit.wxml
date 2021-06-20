@@ -12,7 +12,7 @@
       <van-field title-width="80px" label="项目名称" value="{{ info.building_name }}" required placeholder="{{ name_error }}" error="{{is_name_empty}}" maxlength="30" bind:input="onNameInput" />
       <van-field title-width="80px" label="类型" value="{{ info.type }}" is-link readonly clickable bindtap="bindSelectType" />
       <van-field title-width="80px" label="等级" value="{{ info.level }}" is-link readonly clickable bindtap="bindSelectLevel" />
-      <van-field title-width="80px" label="所在地" value="{{ info.area + info.district }}" is-link readonly clickable bindtap="bindSelectArea" />
+      <van-field title-width="80px" label="所在地" value="{{ info.city + info.area }}" is-link readonly clickable bindtap="bindSelectArea" />
       <van-field title-width="80px" label="详细地址" value="{{ info.address }}" maxlength="100" bind:input="onAddressInput" readonly bindtap="bindselectLatLng">
         <van-icon slot="right-icon" name="location-o" bindtap="bindselectLatLng" />
       </van-field>
@@ -63,7 +63,10 @@
     </van-cell-group>
 
     <van-popup show="{{ showArea }}" position="bottom" bind:close="onAreaPickerClose">
-      <van-picker columns="{{ areaData }}" bind:confirm="onAreaSelected" bind:cancel="onAreaPickerClose" bind:change="onAreaPickerChange" show-toolbar />
+      <van-area area-list="{{ areaList }}" value="{{info.area_code}}"
+        columns-placeholder="{{ ['请选择', '请选择', '请选择'] }}"
+        bind:confirm="onAreaSelected" bind:change="onAreaPickerChange"
+        bind:cancel="onAreaPickerClose" />
     </van-popup>
 
     <van-popup show="{{ showType }}" position="bottom" bind:close="onTypePickerClose">

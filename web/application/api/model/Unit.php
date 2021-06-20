@@ -149,6 +149,10 @@ class Unit extends Base
       ->where('u.company_id', '>', 0)
       ->where('u.user_id', '>', 0);
 
+    if (isset($filter['city']) && $filter['city'] != '') {
+      $list->where('b.city', $filter['city']);
+    }
+
     $list = $list->field('u.id,u.building_id,u.building_no,u.floor,u.room,u.acreage,u.rent_sell,u.rent_price,
         u.sell_price,u.end_date,u.status,u.share,u.user_id,u.company_id,b.building_name,b.district,b.address,f.file')
       ->order('u.id', 'asc')

@@ -1,3 +1,5 @@
 {
-  "usingComponents": {}
+  "usingComponents": {
+    "van-area": "@vant/weapp/area"
+  }
 }

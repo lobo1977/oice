@@ -1,15 +1,16 @@
 // pages/building/edit/edit.js
 import Dialog from '../../../miniprogram_npm/@vant/weapp/dialog/dialog';
 import Toast from '../../../miniprogram_npm/@vant/weapp/toast/toast';
+import { areaList } from '@vant/area-data';
 
 const app = getApp()
 
 Page({
   data: {
+    areaList,
     activeTab: 1,
     id: 0,
     copy: 0,
-    areaData: [],
     showArea: false,
     type:[],
     showType: false,
@@ -25,7 +26,9 @@ Page({
       building_name: '',    // 名称
       type: '',             // 类别
       level: '',            // 等级
+      city: '',             // 城市
       area: '',             // 城区
+      area_code: '110105',  // 行政区划代码
       district: '',         // 商圈
       address: '',          // 地址
       longitude: 0,          // 经度
@@ -242,30 +245,30 @@ Page({
           })
         }
 
-        let arrArea = [], arrDistrict = [], area
-        let idx = 0, idx2 = 0, areaIdx = 0, districtIdx = 0
-        app.globalData.area.forEach(element => {
-          if (element.id != 'all') {
-            arrArea.push(element.text)
-            if (res.data.area == element.text) {
-              area = element
-              areaIdx = idx
-            }
-            idx++
-          }
-        })
+        // let arrArea = [], arrDistrict = [], area
+        // let idx = 0, idx2 = 0, areaIdx = 0, districtIdx = 0
+        // app.globalData.area.forEach(element => {
+        //   if (element.id != 'all') {
+        //     arrArea.push(element.text)
+        //     if (res.data.area == element.text) {
+        //       area = element
+        //       areaIdx = idx
+        //     }
+        //     idx++
+        //   }
+        // })
 
-        if (area && area.children && area.children.length) {
-          area.children.forEach(d => {
-            if (d.id != '') {
-              arrDistrict.push(d.text)
-              if (res.data.district == d.text) {
-                districtIdx = idx2
-              }
-              idx2++
-            }
-          })
-        }
+        // if (area && area.children && area.children.length) {
+        //   area.children.forEach(d => {
+        //     if (d.id != '') {
+        //       arrDistrict.push(d.text)
+        //       if (res.data.district == d.text) {
+        //         districtIdx = idx2
+        //       }
+        //       idx2++
+        //     }
+        //   })
+        // }
 
         that.setData({
           id: that.data.copy == 1 ? 0 : that.data.id,
@@ -274,7 +277,7 @@ Page({
           //attach: res.data.attach ? res.data.attach : null,
           engInfo: engInfo,
           images: imageList,
-          areaData: [{values: arrArea, defaultIndex: areaIdx}, {values: arrDistrict, defaultIndex: districtIdx}]
+          //areaData: [{values: arrArea, defaultIndex: areaIdx}, {values: arrDistrict, defaultIndex: districtIdx}]
         })
       } else {
         Dialog.alert({
@@ -318,16 +321,16 @@ Page({
   },
 
   onAreaPickerChange(event) {
-    const { picker, value, index } = event.detail
-    let arrDistrict = []
-    app.globalData.area.forEach(element => {
-      if (element.text == value[0] && element.children && element.children.length) {
-        element.children.forEach(d => {
-          arrDistrict.push(d.text)
-        })
-      }
-    })
-    picker.setColumnValues(1, arrDistrict)
+    // const { picker, value, index } = event.detail
+    // let arrDistrict = []
+    // app.globalData.area.forEach(element => {
+    //   if (element.text == value[0] && element.children && element.children.length) {
+    //     element.children.forEach(d => {
+    //       arrDistrict.push(d.text)
+    //     })
+    //   }
+    // })
+    // picker.setColumnValues(1, arrDistrict)
   },
 
   onAreaPickerClose: function() {
@@ -337,9 +340,22 @@ Page({
   },
 
   onAreaSelected: function(event) {
+    let selected = event.detail.values
+    let city = '', area = '', code = ''
+    if (selected[2] && selected[2].code) {
+      city = selected[1].name
+      area = selected[2].name
+      code = selected[2].code
+    } else if (selected[1] && selected[1].code) {
+      city = selected[1].name
+      code = selected[1].code
+    } else if (selected[0] && selected[0].code) {
+      code = selected[0].code
+    }
     this.setData({
-      ['info.area']: event.detail.value[0],
-      ['info.district']: event.detail.value[1],
+      ['info.city']: city,
+      ['info.area']: area,
+      ['info.area_code']: code,
       showArea: false
     })
   },

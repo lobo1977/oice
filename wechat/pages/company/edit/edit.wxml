@@ -12,7 +12,7 @@
     </van-cell>
     <van-field title-width="80px" label="企业简称" value="{{ info.title }}" required placeholder="{{ title_error }}" error="{{is_title_empty}}" maxlength="10" bind:input="onTitleInput" input-align="right" />
     <van-field title-width="80px" label="企业全称" value="{{ info.full_name }}" maxlength="50" bind:input="onFullNameInput" input-align="right" />
-    <van-field title-width="80px" label="所在地" value="{{ info.area }}" is-link readonly clickable bindtap="bindSelectArea" input-align="right" />
+    <van-field title-width="80px" label="所在地" value="{{ info.city + info.area }}" is-link readonly clickable bindtap="bindSelectArea" input-align="right" />
     <van-field title-width="80px" label="详细地址" value="{{ info.address }}" maxlength="100" bind:input="onAddressInput" input-align="right" />
   </van-cell-group>
   <van-cell-group title="企业介绍">
@@ -26,7 +26,10 @@
   </van-cell-group>
 
   <van-popup show="{{ showArea }}" position="bottom" bind:close="onAreaPickerClose">
-    <van-picker columns="{{ area }}" bind:confirm="onAreaSelected" bind:cancel="onAreaPickerClose" show-toolbar />
+    <van-area area-list="{{ areaList }}" value="{{info.area_code}}"
+        columns-placeholder="{{ ['请选择', '请选择', '请选择'] }}"
+        bind:confirm="onAreaSelected"
+        bind:cancel="onAreaPickerClose" />
   </van-popup>
 
   <van-action-sheet show="{{ showJoinWay }}" actions="{{ join_way }}" bind:close="onJoinWayClose" bind:select="onJoinWaySelect" z-index="1000" />

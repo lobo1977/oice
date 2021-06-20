@@ -105,7 +105,8 @@
     "pages/daily/review/review",
     "pages/daily/reviewView/reviewView",
     "pages/my/contact/contact",
-    "pages/my/switch/switch"
+    "pages/my/switch/switch",
+    "pages/city/city"
   ],
   "permission": {
     "scope.userLocation": {

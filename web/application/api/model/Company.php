@@ -99,7 +99,7 @@ class Company extends Base
       $list = $list->where('title|full_name', 'like', '%' . $keyword . '%');
     }
 
-    $list = $list->field('id,title,full_name,logo,area,address,create_time')
+    $list = $list->field('id,title,full_name,logo,city,area,address,create_time')
       ->page($page, 10)
       ->order('id', 'asc')
       ->select();
@@ -171,7 +171,7 @@ class Company extends Base
   public static function detail($user, $id, $operate = 'view')
   {
     $data = self::where('id', $id)
-      ->field('id,title,full_name,logo,stamp,enable_stamp,area,address,rem,' .
+      ->field('id,title,full_name,logo,stamp,enable_stamp,city,area,area_code,address,rem,' .
         'user_id,join_way,status')
       ->find();
 
@@ -253,6 +253,14 @@ class Company extends Base
         }
       }
 
+      if ($data['city'] != $oldData->city) {
+        if ($oldData->city) {
+          $summary = $summary . '城市：' . $oldData->city . ' -> ' . $data['city'] . '\n';
+        } else {
+          $summary = $summary . '城市：' . $data['city'] . '\n';
+        }
+      }
+
       if ($data['area'] != $oldData->area) {
         if ($oldData->area) {
           $summary = $summary . '城区：' . $oldData->area . ' -> ' . $data['area'] . '\n';
@@ -321,7 +329,9 @@ class Company extends Base
     } else if (!self::allow($user, null, 'new')) {
       self::exception('您没有权限添加企业。');
     } else {
-      $data['city'] = self::$city;
+      if (!isset($data['city']) || empty($data['city'])) {
+        $data['city'] = self::$city;
+      }
       $data['user_id'] = $user_id;
 
       if ($logo) {

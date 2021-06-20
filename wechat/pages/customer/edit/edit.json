@@ -1,4 +1,6 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "van-area": "@vant/weapp/area"
+  },
   "navigationBarTitleText": "客户信息"
 }
