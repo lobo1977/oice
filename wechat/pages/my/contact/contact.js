@@ -1,4 +1,7 @@
 // pages/my/contact/contact.js
+
+const app = getApp()
+
 Page({
 
   /**
@@ -62,5 +65,8 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+
+  startmessage: function() {
   }
 })
