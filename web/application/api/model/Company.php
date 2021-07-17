@@ -8,6 +8,7 @@ use app\common\Sms;
 use app\api\model\Base;
 use app\api\model\Log;
 use app\api\model\User;
+use app\api\model\File;
 
 class Company extends Base
 {

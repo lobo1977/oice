@@ -7,6 +7,7 @@ use app\common\Wechat;
 use app\api\model\Building;
 use app\api\model\Unit;
 use app\api\model\Recommend as modelRecommend;
+use app\api\model\Article;
 
 define ('K_PATH_IMAGES', $_SERVER['DOCUMENT_ROOT']);
 
@@ -258,6 +259,24 @@ class Recommend extends Controller
       $this->assign('share_image', '');
     }
 
+    echo $this->fetch();
+  }
+
+    /**
+   * 文章
+   */
+  public function article($id) {
+    $data = Article::detail(null, $id);
+    if (Utils::isWechat()) {
+      $share = $this->wechatConfig();
+      $this->assign('wechat', $share);
+    }
+    $this->assign('vo', $data);
+    if(!empty($data->cover)) {
+      $this->assign('share_image', 'https://' . config('app_host') . $data->cover);
+    } else {
+      $this->assign('share_image', '');
+    }
     echo $this->fetch();
   }
 

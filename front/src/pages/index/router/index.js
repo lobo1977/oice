@@ -490,6 +490,53 @@ export default new Router({
         require(['../views/My/Contact.vue'], resolve)
       }
     }, {
+      path: '/article',
+      children: [
+        {
+          path: 'list/:type?',
+          name: 'Article',
+          component: function (resolve) {
+            require(['../views/Article/List.vue'], resolve)
+          },
+          meta: {
+            title: '文章管理',
+            showBack: true,
+            showPlus: true,
+            hideBar: true,
+            requiresAuth: true
+          }
+        }
+      ],
+      component: function (resolve) {
+        require(['../views/Article/Index.vue'], resolve)
+      }
+    }, {
+      path: '/article/view/:id/:key?',
+      name: 'ArticleView',
+      meta: {
+        title: '',
+        showBack: true,
+        showPlus: true,
+        hideBar: true,
+        canShare: true,
+        requiresAuth: true
+      },
+      component: function (resolve) {
+        require(['../views/Article/View.vue'], resolve)
+      }
+    }, {
+      path: '/article/edit/:id?/:type?',
+      name: 'ArticleEdit',
+      meta: {
+        title: '',
+        showBack: true,
+        hideBar: true,
+        requiresAuth: true
+      },
+      component: function (resolve) {
+        require(['../views/Article/Edit.vue'], resolve)
+      }
+    }, {
       path: '/my/robot',
       name: 'Robot',
       meta: {

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <meta name="application-name" content="{$Think.config.app_name}">
+        <title>{$vo.title}</title>
+        {if !empty($wechat)}
+        <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+        {/if}
+        <style>
+            body {
+                padding: 0 15px;
+                margin: 0;
+                background-color:#ffffff;
+                font-size:15px;
+                font-family:Arial, Helvetica, sans-serif,Verdana;
+                font-weight:normal;
+                color:#000000;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="text-align:center;">
+          <h3 style="font-size:1.2em;">{$vo.title}</h3>
+          <p style="font-size:0.85em;">{$vo.desc}</p>
+        </div>
+
+        {if $vo.cover}
+            <img src="https://{$Think.config.app_host}{$vo.cover}" style="width:100%;margin:15px 0;">
+        {/if}
+
+        <div>
+          {$vo.content|raw}
+        </div>
+
+        {if !empty($wechat)}
+        <script>
+            wx.config({
+                debug: false,
+                appId: '{$wechat.appId}',
+                timestamp: {$wechat.timestamp},
+                nonceStr: '{$wechat.nonceStr}', 
+                signature: '{$wechat.signature}',
+                jsApiList: ['showMenuItems',
+                    'updateAppMessageShareData',
+                    'updateTimelineShareData',
+                    'getLocation',
+                    'openLocation',
+                    'previewImage']
+            });
+
+            wx.ready(function(){
+                wx.updateAppMessageShareData({ 
+                    title: '{$vo.title}', // 分享标题
+                    desc: '{$vo.summary}',
+                    link: window.location.href,
+                    imgUrl: '{$share_image}', // 分享图标
+                    success: function () {
+                    }
+                })
+
+                wx.updateTimelineShareData({ 
+                    title: '{$vo.title}',
+                    link: window.location.href,
+                    imgUrl: '{$share_image}',
+                    success: function () {
+                    }
+                })
+
+                wx.miniProgram.postMessage({ data:{title: '{$vo.title}', desc:'{$vo.summary}'} });
+            });
+        </script>
+        {/if}
+    </body>
+</html>
