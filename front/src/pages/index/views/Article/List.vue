@@ -87,7 +87,7 @@ export default {
       if (this.isLoading) {
         return '正在加载'
       } else if (this.isEnd) {
-        return this.list.length ? '没有更多了' : '暂无数据'
+        return this.list.length ? '没有更多了' : '暂无内容'
       } else {
         return '加载更多'
       }

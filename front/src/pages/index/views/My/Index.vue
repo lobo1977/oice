@@ -71,7 +71,7 @@
         v-if="user.id && user.isAdmin"
         title="文章管理"
         :link="{ name: 'Article' }">
-        <x-icon slot="icon" type="android-lock" class="cell-icon"></x-icon>
+        <x-icon slot="icon" type="document-text" class="cell-icon"></x-icon>
       </cell>
       <cell v-if="user.id" title="修改密码" :link="{ name: 'Password' }">
         <x-icon slot="icon" type="android-lock" class="cell-icon"></x-icon>

@@ -14,7 +14,7 @@
     <flexbox v-if="info.allowEdit || info.allowDelete" :gutter="0" class="bottom-bar">
       <flexbox-item :span="5">
         <x-button type="warn" class="bottom-btn" @click.native="setTop" :disabled="!info.allowEdit">
-          <x-icon type="log-in" class="btn-icon"></x-icon> {{info.top == 1 ? '取消顶置' : '顶置'}}
+          <x-icon type="arrow-up-b" class="btn-icon"></x-icon> {{info.top == 1 ? '取消顶置' : '顶置'}}
         </x-button>
       </flexbox-item>
       <flexbox-item :span="5">

@@ -73,7 +73,7 @@
         <p style="text-align:center;line-height:1.8em;font-size:0.86em">
           <a href="http://beian.miit.gov.cn" target="_blank">京ICP备13024830号-3</a>
           <br />
-          北京云普力合信息技术有限公司 版权所有
+          北京商办云信息技术有限公司 版权所有
         </p>
       </div>
     </div>
