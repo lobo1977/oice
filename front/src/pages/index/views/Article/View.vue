@@ -4,11 +4,11 @@
       <h3 style="color:#999;">{{info.title}}</h3>
       <p style="margin-top:10px;font-size:0.85em;color:#999;">{{info.desc}}</p>
       <div v-if="info.cover && info.cover.length > 0" style="margin:15px 0;">
-        <img :src="info.cover" style="width:100%" />
+        <img :src="info.cover" style="max-width:100%" />
       </div>
     </div>
 
-    <div v-html="info.content" style="margin:0 10px;" class="article-content">
+    <div v-html="info.content" style="margin:0 20px;" class="article-content">
     </div>
 
     <flexbox v-if="info.allowEdit || info.allowDelete" :gutter="0" class="bottom-bar">
@@ -87,14 +87,13 @@ export default {
 
           if (vm.$isWechat()) {
             let shareLink = window.location.href
-            let shareDesc = vm.info.summary
             let shareImage = null
             if (vm.info.cover) {
               shareImage = window.location.protocol + '//' +
                 window.location.host + vm.info.cover
             }
 
-            vm.$wechatShare(null, shareLink, vm.info.full_name, shareDesc, shareImage)
+            vm.$wechatShare(null, shareLink, vm.info.title, vm.info.summary, shareImage)
           }
         } else {
           vm.info.id = 0
@@ -152,7 +151,7 @@ export default {
 
 <style lang="less">
 .article-content img {
-  width:100%;
+  max-width:100%;
 }
 .btn-warn {
   fill: #CE3C39 !important;
