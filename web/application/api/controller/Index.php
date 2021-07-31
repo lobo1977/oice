@@ -10,6 +10,7 @@ use app\api\model\Oauth;
 use app\api\model\Verify;
 use app\api\model\Building;
 use app\api\model\Unit;
+use app\api\model\Article;
 
 class Index extends Base
 {
@@ -38,6 +39,23 @@ class Index extends Base
       'banner' => $banner,
       'unit' => $unit
     ]);
+  }
+
+  public function index2($city = '')
+  {
+    $banner = Article::search($this->user, ['page_size' => 3, 'banner' => 1, 'status' => 1]);
+    $article = Article::search($this->user, ['page_size' => 5, 'type' => 0, 'status' => 1]);
+    $unit = Unit::search($this->user, ['city' => $city, 'page_size' => 5]);
+    return $this->succeed([
+      'banner' => $banner,
+      'article' => $article,
+      'unit' => $unit
+    ]);
+  }
+
+  public function article($type = 0) {
+    $list = Article::search($this->user, ['page_size' => 5, 'type' => $type, 'status' => 1]);
+    return $this->succeed($list);
   }
 
   /**

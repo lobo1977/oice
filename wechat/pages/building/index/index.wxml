@@ -10,6 +10,14 @@
     </view>
   </van-nav-bar>
 
+  <swiper wx:if="{{banner && banner.length}}" indicator-dots="{{true}}" autoplay="{{true}}" style="height:420rpx;">
+    <swiper-item wx:for="{{banner}}" wx:key="id" wx:for-index="idx" data-data="{{idx}}" data-id="{{item.id}}" bindtap="bindViewBuilding">
+      <view style="position:absolute;width:100%;color:#fff;top:180rpx;text-align:center;font-size:1.2em;">{{item.building_name}}</view>
+      <image style="width:100%;height:100%;background-color:#eeeeee;" 
+        mode="aspectFill" src="{{filter.imageUrl(item.src)}}"></image>
+    </swiper-item>
+  </swiper>
+
   <van-search value="{{ keyword }}" placeholder="请输入搜索关键词"
     bind:change="onKewordChange"
     bind:search="onSearch"

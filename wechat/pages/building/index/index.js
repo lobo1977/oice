@@ -8,6 +8,7 @@ Page({
   data: {
     me: null,
     city: '',
+    banner: [],
     areaList,
     pageIndex: 1,
     pageSize: 10,
@@ -61,6 +62,7 @@ Page({
     ],
     list: []
   },
+
   onLoad: function(options) {
     wx.showShareMenu({
       withShareTicket:true,
@@ -77,12 +79,14 @@ Page({
       this.setData({
         me: app.globalData.appUserInfo
       })
+      this.getBanner()
       this.getList()
     } else {
       app.userLoginCallback = () => {
         this.setData({
           me: app.globalData.appUserInfo
         })
+        this.getBanner()
         this.getList()
       }
     }
@@ -239,6 +243,26 @@ Page({
   switchCity: function() {
     wx.navigateTo({
       url: '../../city/city'
+    })
+  },
+
+  bindViewBuilding: function(event) {
+    wx.navigateTo({
+      url: '../view/view?id=' + event.currentTarget.dataset.id
+    })
+  },
+
+  getBanner: function() {
+    let that = this
+    app.post('building/banner', { 
+      city: that.data.city
+    }, (res) => {
+      if (res.data) {
+        that.setData({
+          banner: res.data
+        })
+      }
+    }, () => {
     })
   },
     

@@ -4,10 +4,12 @@ const app = getApp()
 
 Page({
   data: {
+    activeTab: 0,
     isLoading: false,
     isPullDown: false,
     city: '',
     banner: [],
+    article: [],
     unitList: []
   },
 
@@ -64,6 +66,20 @@ Page({
     })
   },
 
+  onTabChange(event) {
+    this.setData({
+      activeTab: event.detail.name
+    })
+    this.getArticle()
+  },
+
+  bindViewArticle: function(event) {
+    console.log(event.currentTarget.dataset.url)
+    wx.navigateTo({
+      url: '../web/web?url=' + app.globalData.serverUrl + event.currentTarget.dataset.url
+    })
+  },
+
   // 通过接口获取数据
   getData: function() {
     let that = this
@@ -76,21 +92,49 @@ Page({
 
     that.setData({
       banner: [],
+      article: [],
       unitList: []
     })
 
-    app.post('index/index', {
+    app.post('index/index2', { 
       city: that.data.city
-    }, (res) => {
+     }, (res) => {
       if (res.data) {
         that.setData({
           banner: res.data.banner,
+          article: res.data.article,
           unitList: res.data.unit
         })
       }
     }, () => {
       that.setData({
         isPullDown: false,
+        isLoading: false
+      })
+    })
+  },
+
+  getArticle: function() {
+    let that = this
+
+    if (that.data.isLoading) return
+
+    that.setData({
+      isLoading: true
+    })
+
+    that.setData({
+      article: []
+    })
+
+    app.get('index/article?type=' + that.data.activeTab, (res) => {
+      if (res.data) {
+        that.setData({
+          article: res.data
+        })
+      }
+    }, () => {
+      that.setData({
         isLoading: false
       })
     })

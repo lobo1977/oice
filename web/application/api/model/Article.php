@@ -50,6 +50,7 @@ class Article extends Base
       $article->src = empty($article->cover) ? '/static/img/error.png' : '/upload/article/images/200/' . $article->cover;
       $article->fallbackSrc = '/static/img/error.png';
       $article->url = '/article/view/' . $article->id;
+      $article->h5_url = '/index/article/' . $article->id;
       $article->desc = $article->create_time_text . ' ' . $article->username;
       if ($article->cover) {
         $article->cover = '/upload/article/images/640/' . $article->cover;
@@ -79,6 +80,10 @@ class Article extends Base
 
     if (isset($filter['type'])) {
       $list->where('a.type', $filter['type']);
+    }
+
+    if (isset($filter['banner'])) {
+      $list->where('a.cover', '<>', '');
     }
 
     if (isset($filter['user_id'])) {

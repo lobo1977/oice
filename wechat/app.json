@@ -115,7 +115,7 @@
   },
   "plugins": {
     "contactPlugin": {
-      "version": "1.4.0",
+      "version": "1.4.2",
       "provider": "wx104a1a20c3f81ec2"
     }
   }

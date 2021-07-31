@@ -31,6 +31,16 @@ class Building extends Base
     }
   }
 
+  public function banner($city = '') {
+    $params = [
+      'city' => $city,
+      'page_size' => 3,
+      'banner' => 1
+    ];
+    $data = modelBuilding::search($this->user, $params);
+    return $this->succeed($data);
+  }
+
   /**
    * 批量导入项目
    */

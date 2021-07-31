@@ -55,6 +55,11 @@ swiper {
   height:120rpx;
 }
 
+.cell-right-image {
+  width:120rpx;
+  height:120rpx;
+}
+
 .cell-logo {
   width:260rpx;
   height:120rpx;

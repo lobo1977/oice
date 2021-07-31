@@ -28,6 +28,7 @@ Route::rule('index/print/:id', 'index/recommend/index');
 Route::rule('index/download/:id/:mode/:file', 'index/recommend/index');
 Route::rule('index/building/:id', 'index/recommend/building');
 Route::rule('index/unit/:id', 'index/recommend/unit');
+Route::rule('index/article/:id', 'index/recommend/article');
 Route::rule('index/import', 'index/index/import');
 
 return [];
