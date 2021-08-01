@@ -4,7 +4,7 @@ const app = getApp()
 
 Page({
   data: {
-    activeTab: 0,
+    activeTab: -1,
     isLoading: false,
     isPullDown: false,
     city: '',

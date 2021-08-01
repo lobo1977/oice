@@ -24,7 +24,8 @@
     <van-grid-item icon="friends-o" text="添加客户" bindtap="bindAddCustomer" />
   </van-grid>
 
-  <van-tabs swipe-threshold="5" sticky active="{{ activeTab }}" bind:change="onTabChange">
+  <van-tabs swipe-threshold="5" sticky active="{{ activeTab }}" bind:click="onTabChange">
+    <van-tab title="all" name="-1" wx:if="{{false}}"></van-tab>
     <van-tab title="商办云介绍" name="0"></van-tab>
     <van-tab title="使用帮助" name="1"></van-tab>
     <van-tab title="供应商介绍" name="2"></van-tab>
@@ -41,7 +42,7 @@
     </van-cell>
   </van-cell-group>
 
-  <van-cell-group title="最新单元">
+  <van-cell-group title="最新单元" wx:if="{{false}}">
     <van-cell wx:for="{{unitList}}" wx:key="id"
       title="{{item.building_name + ' ' + item.title}}" label="{{item.desc}}" is-link center
       custom-class="cell-view" link-type="navigateTo"

@@ -44,7 +44,7 @@ class Index extends Base
   public function index2($city = '')
   {
     $banner = Article::search($this->user, ['page_size' => 3, 'banner' => 1, 'status' => 1]);
-    $article = Article::search($this->user, ['page_size' => 5, 'type' => 0, 'status' => 1]);
+    $article = Article::search($this->user, ['page_size' => 10, 'status' => 1]);
     $unit = Unit::search($this->user, ['city' => $city, 'page_size' => 5]);
     return $this->succeed([
       'banner' => $banner,
