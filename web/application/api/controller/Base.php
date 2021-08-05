@@ -88,7 +88,7 @@ class Base extends Controller
    */
   protected function checkFormToken($data) {
     if (!Validate::token(null, '__token__', $data)) {
-      if (Cache::get($this->user_token) == $data['__token__']) {
+      if (isset($data['__token__']) && Cache::get($this->user_token) == $data['__token__']) {
         Cache::rm($this->user_token);
         return true;
       } else {

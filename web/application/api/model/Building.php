@@ -533,11 +533,13 @@ class Building extends Base
         }
       }
 
-      if ($data['city'] != $oldData->city) {
-        if ($oldData->city) {
-          $summary = $summary . '城市：' . $oldData->city . ' -> ' . $data['city'] . '\n';
-        } else {
-          $summary = $summary . '城市：' . $data['city'] . '\n';
+      if (isset($data['city'])) {
+        if ($data['city'] != $oldData->city) {
+          if ($oldData->city) {
+            $summary = $summary . '城市：' . $oldData->city . ' -> ' . $data['city'] . '\n';
+          } else {
+            $summary = $summary . '城市：' . $data['city'] . '\n';
+          }
         }
       }
 
