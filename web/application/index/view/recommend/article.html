@@ -29,8 +29,13 @@
     <body>
         <div style="text-align:center;">
           <h3 style="font-size:1.2em;">{$vo.title}</h3>
-          <p style="font-size:0.85em;">{$vo.desc}</p>
         </div>
+
+        {if $vo.cover}
+        <div style="padding:0 10px;">
+            <p style="font-style: italic;">{$vo.summary}</p>
+        </div>
+        {/if}
 
         {if $vo.cover}
         <div style="padding:0 10px 10px 10px;text-align:center;">

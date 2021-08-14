@@ -74,8 +74,8 @@
     ]
   },
   "pages": [
-    "pages/index/index",
     "pages/building/index/index",
+    "pages/index/index",
     "pages/building/view/view",
     "pages/building/edit/edit",
     "pages/unit/view/view",
@@ -106,7 +106,8 @@
     "pages/daily/reviewView/reviewView",
     "pages/my/contact/contact",
     "pages/my/switch/switch",
-    "pages/city/city"
+    "pages/city/city",
+    "pages/article/article"
   ],
   "permission": {
     "scope.userLocation": {

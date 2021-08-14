@@ -5,7 +5,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-    title: '项目笔记',
+    title: '',
     url: ''
   },
 

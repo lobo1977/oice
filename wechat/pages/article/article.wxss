@@ -1,0 +1,30 @@
+.container {
+  padding:0;
+}
+
+.page-title {
+  text-align: center;
+  margin-bottom: 30rpx;
+  font-weight: bold;
+}
+
+.page-summary {
+  padding:0 20rpx;
+  font-size: 0.9em;
+  font-style: italic;
+}
+
+.page-cover {
+  text-align: center;
+}
+
+.page-cover image {
+  max-width:95%;
+}
+
+.page-content {
+  padding:0 20rpx;
+  margin-bottom:20rpx;
+  font-size: 0.95em;
+  line-height: 2em;
+}

@@ -1,0 +1,16 @@
+<page-meta background-text-style="dark">
+</page-meta>
+<wxs src="../../utils/filter.wxs" module="filter" />
+
+<view class="container">
+  <view class="page-body">
+    <view class="page-title">{{info.title}}</view>
+    <view class="page-summary" wx:if="{{info.summary}}">{{info.summary}}</view>
+    <view class="page-cover" wx:if="{{info.cover}}">
+      <image mode="aspectFit" src="{{filter.imageUrl(info.cover)}}"></image>
+    </view>
+    <view class="page-content">
+      <rich-text nodes="{{info.content}}"></rich-text>
+    </view>
+  </view>
+</view>

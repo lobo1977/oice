@@ -36,6 +36,7 @@
       title="{{item.title}}" center
       custom-class="cell-view"
       bindtap="bindViewArticle"
+      data-id="{{item.id}}"
       data-url="{{item.h5_url}}">
       <image slot="right-icon" mode="aspectFill" 
         src="{{filter.imageUrl(item.src)}}" class="cell-right-image"></image>
