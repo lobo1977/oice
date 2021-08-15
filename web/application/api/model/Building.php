@@ -7,6 +7,7 @@ use think\model\concern\SoftDelete;
 use think\facade\Validate;
 use app\common\Excel;
 use app\common\Sms;
+use app\common\Wechat;
 use app\api\model\Base;
 use app\api\model\File;
 use app\api\model\Log;
@@ -740,6 +741,8 @@ class Building extends Base
         $data['user_id'] = $user_id;
       }
 
+      $data['update_user_id'] = $user_id;
+
       // else if ($oldData->user_id != $user_id) {
       //   if (isset($data['company_id'])) {
       //     unset($data['company_id']);
@@ -803,6 +806,7 @@ class Building extends Base
         $data['city'] = self::$city;
       }
       $data['user_id'] = $user_id;
+      $data['update_user_id'] = $user_id;
       if (empty($data['company_id'])) {
         $data['company_id'] = $user->company_id;
       }
@@ -1128,6 +1132,38 @@ class Building extends Base
         "summary" => $building->building_name
       ];
       Log::add($user, $log);
+
+      // 推送消息
+      $userInfo = db("oauth")->where('platform', 'wechat')
+        ->where('user_id', $building['update_user_id'])->find();
+
+      if ($userInfo) {
+        if ($userInfo['mini_openid']) {
+          $wechat = new Wechat();
+          $page = "/pages/building/view/view?id=" . $building['id'];
+          $data = array(
+            "character_string1" => [
+              "value" => $building['id']
+            ],
+            "thing13" => [
+              "value" => $building['building_name']
+            ],
+            "date3" => [
+              "value" => date("Y年m月d日 H:i", time()),
+            ],
+            "thing2" => [
+              "value" => $status == 1 ? '审核通过' : '驳回'
+            ],
+            "thing6" => [
+              "value" => $summary
+            ]
+          );
+          $result = $wechat->sendTemplateMsg($userInfo['mini_openid'], 
+            config('wechat.mini_template_building_audit'), $page, $data);
+
+          $wechat->sendTemplateMsg($userInfo['mini_openid'], $weapp_template, null);
+        }
+      }
     }
     return $result;
   }

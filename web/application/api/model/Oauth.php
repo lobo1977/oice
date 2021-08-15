@@ -102,6 +102,8 @@ class Oauth extends Base
       $oauth->avatar = '';
     }
 
+    $oauth->mini_openid = $token['openid'];
+
     if (isset($token['nickname'])) {
       $oauth->nickname = $token['nickname'];
     }

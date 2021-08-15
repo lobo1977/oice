@@ -616,8 +616,13 @@ Page({
               duration: 1000,
               message: '复制成功',
               onClose: () => {
-                wx.redirectTo({
-                  url: '../view/view?id=' + id
+                wx.requestSubscribeMessage({
+                  tmplIds: ['1CWqFvCATiyHzJUWKddmwLDxKGcdsx_aznWhqH71Q1Q'],
+                  complete () {
+                    wx.redirectTo({
+                      url: '../view/view?id=' + id
+                    })
+                  }
                 })
               },
             })
@@ -627,8 +632,13 @@ Page({
             })
           }
         } else {
-          app.globalData.refreshBuildingView = true
-          app.goBack()
+          wx.requestSubscribeMessage({
+            tmplIds: ['1CWqFvCATiyHzJUWKddmwLDxKGcdsx_aznWhqH71Q1Q'],
+            complete () {
+              app.globalData.refreshBuildingView = true
+              app.goBack()
+            }
+          })
         }
       } else {
         if (res.data && res.data.token) {

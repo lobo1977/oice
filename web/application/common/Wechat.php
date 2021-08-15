@@ -263,6 +263,27 @@ class Wechat {
 	}
 
 	/**
+	 * 发送小程序模板消息
+	 */
+	public function sendTemplateMsg($toUser, $template_id, $page, $data) {
+		$access_token = $this->getMiniAccessToken();
+		$url = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=" . $access_token;
+		$param = array (
+			"touser" => $toUser,
+			"template_id" => $template_id,
+			"page" => $page,
+			"data" => $data
+		);
+
+		$jsondata = json_encode($param);
+		$res = $this->https_request($url, $jsondata);
+		if (isset($res['errcode']) && $res['errcode'] != 0) {
+			$this->parseError($res, 'sendWeappMsg');
+		}
+		return $res;
+	}
+
+	/**
 	 * 发送消息
 	 * @param unknown $openId
 	 * @param unknown $msg
@@ -280,7 +301,7 @@ class Wechat {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * 发送文本消息
 	 * @param unknown $openId

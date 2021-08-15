@@ -4,6 +4,7 @@ namespace app\api\controller;
 
 use think\captcha\Captcha;
 use app\common\Utils;
+use app\common\Wechat;
 use app\api\controller\Base;
 use app\api\model\User;
 use app\api\model\Oauth;
@@ -181,5 +182,31 @@ class Index extends Base
     $path = "d:\\5e86c65196cba.jpg";
     Utils::getVideoCover($video, $path);
     echo 'ok';
+  }
+
+  public function push() {
+    $wechat = new Wechat();
+    $page = "/pages/building/view/view?id=4515";
+    $data = array(
+      "character_string1" => [
+        "value" => '12345678'
+      ],
+      "thing13" => [
+        "value" => '项目名称'
+      ],
+      "date3" => [
+        "value" => date("Y年m月d日 H:i", time()),
+      ],
+      "thing2" => [
+        "value" => '审核通过'
+      ],
+      "thing6" => [
+        "value" => '备注信息'
+      ]
+    );
+    $result = $wechat->sendTemplateMsg('oMffm5SH8PEaW8NQlvNPYZRqpa8o', 
+      config('wechat.mini_template_building_audit'), $page, $data);
+    
+    return $result;
   }
 }
