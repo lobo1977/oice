@@ -1160,8 +1160,6 @@ class Building extends Base
           );
           $result = $wechat->sendTemplateMsg($userInfo['mini_openid'], 
             config('wechat.mini_template_building_audit'), $page, $data);
-
-          $wechat->sendTemplateMsg($userInfo['mini_openid'], $weapp_template, null);
         }
       }
     }
