@@ -31,5 +31,5 @@ return [
     'mini_get_user_session_url' => 'https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code',
     'mini_get_access_token_url' => 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s',
     'mini_get_code_url' => 'https://api.weixin.qq.com/wxa/getwxacode?access_token=%s',
-    'mini_template_building_audit' => '1CWqFvCATiyHzJUWKddmwLDxKGcdsx_aznWhqH'
+    'mini_template_building_audit' => '1CWqFvCATiyHzJUWKddmwLDxKGcdsx_aznWhqH71Q1Q'
 ];  
