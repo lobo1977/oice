@@ -16,6 +16,7 @@ use app\api\model\Linkman;
 use app\api\model\Unit;
 use app\api\model\Confirm;
 use app\api\model\ShortUrl;
+use app\common\Utils;
 
 class Building extends Base
 {
@@ -493,7 +494,8 @@ class Building extends Base
       $data['acreage'] = null;
     }
 
-    if (isset($data['floor_height']) && $data['floor_height'] == 'null') {
+    if (isset($data['floor_height']) && 
+      ($data['floor_height'] == 'null' || !is_numeric($data['floor_height']))) {
       $data['floor_height'] = null;
     }
 
@@ -1158,7 +1160,7 @@ class Building extends Base
               "value" => $summary
             ]
           );
-          $result = $wechat->sendTemplateMsg($userInfo['mini_openid'], 
+          $wechat->sendTemplateMsg($userInfo['mini_openid'], 
             config('wechat.mini_template_building_audit'), $page, $data);
         }
       }
