@@ -88,8 +88,10 @@ class Wechat extends Base
             ),
             array(
               'name'=> urlencode("联系客服"),
-              'type'=> 'media_id',
-              'media_id' => 'DtsusJONINVD_9nXOilQF-ZQVs7up3O6DqNv2lk2kSY'
+              //'type'=> 'media_id',
+              //'media_id' => 'DtsusJONINVD_9nXOilQF-ZQVs7up3O6DqNv2lk2kSY'
+              'type' => 'view',
+              'url' => 'https://work.weixin.qq.com/kfid/kfc0beff0aaf2fd8d4a'
             )
             // array(
             //   'name'=> urlencode("商铺独楼"),
