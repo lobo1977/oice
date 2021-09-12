@@ -18,7 +18,7 @@ class ShortUrl extends Base
 
     $find = self::where('url', $url)->find();
     if ($find) {
-      return $host . $find('id');
+      return $host . $find['id'];
     } else {
       $id = Utils::shortUrl($url);
       if ($id) {
