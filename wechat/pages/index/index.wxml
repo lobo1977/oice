@@ -30,6 +30,7 @@
     <van-tab title="使用帮助" name="1"></van-tab>
     <van-tab title="供应商介绍" name="2"></van-tab>
     <van-tab title="做单技巧" name="3"></van-tab>
+    <van-tab title="招聘市场" name="4"></van-tab>
   </van-tabs>
   <van-cell-group>
     <van-cell wx:for="{{article}}" wx:key="id"
