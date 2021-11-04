@@ -26,11 +26,12 @@
 
   <van-tabs swipe-threshold="5" sticky active="{{ activeTab }}" bind:click="onTabChange">
     <van-tab title="all" name="-1" wx:if="{{false}}"></van-tab>
-    <van-tab title="商办云介绍" name="0"></van-tab>
-    <van-tab title="使用帮助" name="1"></van-tab>
-    <van-tab title="供应商介绍" name="2"></van-tab>
-    <van-tab title="做单技巧" name="3"></van-tab>
-    <van-tab title="招聘市场" name="4"></van-tab>
+    <van-tab title="简介" name="0"></van-tab>
+    <van-tab title="帮助" name="1"></van-tab>
+    <van-tab title="装修" name="2"></van-tab>
+    <van-tab title="招聘" name="4"></van-tab>
+    <van-tab title="需求" name="5"></van-tab>
+    <van-tab title="技巧" name="3"></van-tab>
   </van-tabs>
   <van-cell-group>
     <van-cell wx:for="{{article}}" wx:key="id"

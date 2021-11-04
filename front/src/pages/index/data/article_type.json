@@ -1,18 +1,21 @@
 [
   {
-    "label": "商办云介绍",
+    "label": "简介",
     "value": 0
   }, {
-    "label": "使用帮助",
+    "label": "帮助",
     "value": 1
   }, {
-    "label": "供应商介绍",
+    "label": "装修",
     "value": 2
   }, {
-    "label": "做单技巧",
-    "value": 3
-  }, {
-    "label": "招聘市场",
+    "label": "招聘",
     "value": 4
+  }, {
+    "label": "需求",
+    "value": 5
+  }, {
+    "label": "技巧",
+    "value": 3
   }
 ]
