@@ -11,7 +11,7 @@ var formatDateTime = function(date) {
 }
 
 var formatDate = function(date) {
-  var time = Date.now
+  var time = Date.now()
   if (date) {
    time = getDate(date)
   }
@@ -46,6 +46,7 @@ var imageUrl = function(url) {
 }
 
 module.exports = {
+  formatDateTime: formatDateTime,
   formatTime: formatTime,
   formatDate: formatDate,
   imageUrl: imageUrl
