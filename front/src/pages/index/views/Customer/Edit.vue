@@ -82,6 +82,7 @@
     <div v-if="tab === 1">
     </div>
     
+    <service></service>
   </div>
 </template>
 

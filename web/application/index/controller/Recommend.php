@@ -244,6 +244,46 @@ class Recommend extends Controller
   }
 
   /**
+   * 项目笔记 PDF 版
+   */
+  public function buildingPdf($id, $file = '') {
+    set_time_limit(0);
+    $building = Building::detail(null, $id, 'notes');
+    if ($building) {
+      $title = $building->building_name;
+      if (empty($file)) {
+        $file = urlencode($title . '.pdf');
+      }
+      $image = '';
+      if(!empty($building->images)) {
+         $image = 'https://' . config('app_host') . $building->images[0]['src'];
+      }
+
+      $pdf = new MYPDF('P', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false, true);
+      $fontname = \TCPDF_FONTS::addTTFfont('../extend/fonts/DroidSansFallback.ttf', 'TrueTypeUnicode', '', 32);
+      $pdf->SetAuthor(config('app_name'));
+      $pdf->SetCreator(PDF_CREATOR);
+      $pdf->SetTitle($title);
+      
+      $pdf->SetFont($fontname, '', 12);
+      $pdf->SetDefaultMonospacedFont(\PDF_FONT_MONOSPACED);
+      $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+      $pdf->SetAutoPageBreak(true, 25);
+      $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+
+      $pdf->setPrintHeader(false);
+      $pdf->setPrintFooter(false);
+      $pdf->AddPage();
+      $pdf->writeHTML($this->fetch('building', ['vo' => $building, 'pdf' => 1, 'share_image' => $image]));
+      ob_clean();
+      $res = new \think\Response;
+      $res->contentType('application/pdf;charset=UTF-8');
+      $pdf->Output($file, 'D');
+      return $res;
+    }
+  }
+
+  /**
    * 单元笔记
    */
   public function unit($id) {
@@ -260,6 +300,46 @@ class Recommend extends Controller
     }
 
     echo $this->fetch();
+  }
+
+  /**
+   * 单元笔记 PDF 版
+   */
+  public function unitPdf($id, $file = '') {
+    set_time_limit(0);
+    $unit = Unit::detail(null, $id, 'notes');
+    if ($unit) {
+      $title = $unit->building_name . ' ' . $unit->title;
+      if (empty($file)) {
+        $file = urlencode($title . '.pdf');
+      }
+      $image = '';
+      if(!empty($unit->images)) {
+         $image = 'https://' . config('app_host') . $unit->images[0]['src'];
+      }
+
+      $pdf = new MYPDF('P', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false, true);
+      $fontname = \TCPDF_FONTS::addTTFfont('../extend/fonts/DroidSansFallback.ttf', 'TrueTypeUnicode', '', 32);
+      $pdf->SetAuthor(config('app_name'));
+      $pdf->SetCreator(PDF_CREATOR);
+      $pdf->SetTitle($title);
+      
+      $pdf->SetFont($fontname, '', 12);
+      $pdf->SetDefaultMonospacedFont(\PDF_FONT_MONOSPACED);
+      $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+      $pdf->SetAutoPageBreak(true, 25);
+      $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+
+      $pdf->setPrintHeader(false);
+      $pdf->setPrintFooter(false);
+      $pdf->AddPage();
+      $pdf->writeHTML($this->fetch('unit', ['vo' => $unit, 'pdf' => 1, 'share_image' => $image]));
+      ob_clean();
+      $res = new \think\Response;
+      $res->contentType('application/pdf;charset=UTF-8');
+      $pdf->Output($file, 'D');
+      return $res;
+    }
   }
 
     /**

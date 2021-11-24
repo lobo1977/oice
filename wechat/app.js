@@ -476,6 +476,41 @@ App({
   	this.request(url, 'get', null, cb, finish)
   },
 
+  downloadPdfFile(fileName, url) {
+    wx.showLoading({title: '加载中'})
+    wx.downloadFile({
+      url: this.globalData.serverUrl + url + '/' + fileName,
+      success: function (res) {
+        if (res.statusCode === 200) {
+          wx.openDocument({
+            showMenu: true,
+            fileType: 'pdf',
+            filePath: res.tempFilePath,
+            success: function (res) {
+            }
+          })
+        }
+      },
+      complete: function() {
+        wx.hideLoading()
+      }
+    })
+  },
+
+  customerService() {
+    if (wx.openCustomerServiceChat) {
+      wx.openCustomerServiceChat({
+        extInfo: { url: 'https://work.weixin.qq.com/kfid/kfc0beff0aaf2fd8d4a' },
+        corpId: 'ww3d426954268a1aee',
+        success(res) {}
+      })
+    } else {
+      wx.navigateTo({
+        url: '/pages/my/contact/contact',
+      })
+    }
+  },
+
   formatTime(time, fmt) {
     var time = new Date(time)
     var o = {

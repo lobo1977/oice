@@ -42,14 +42,17 @@
   </van-cell-group>
 
   <van-row gutter="0">
-    <van-col span="{{info.allowCopy2 ? 12 : 8}}">
+    <van-col span="{{info.allowCopy2 ? 8 : 12}}">
       <van-button block color="#ffffff" bind:click="favorite" custom-class="text-button" 
         icon="{{ info.isFavorite ? 'star' : 'star-o'}}">收藏</van-button>
     </van-col>
-    <van-col span="{{info.allowCopy2 ? 12 : 8}}">
+    <van-col span="{{info.allowCopy2 ? 8 : 12}}">
       <van-button block color="#ffffff" bind:click="bindPush" icon="comment-o" custom-class="text-button">群发贴</van-button>
     </van-col>
-    <van-col span="{{info.allowCopy2 ? 12 : 8}}">
+    <van-col span="{{info.allowCopy2 ? 8 : 12}}">
+      <van-button block color="#ffffff" bind:click="downloadPdf" icon="down" custom-class="text-button">PDF</van-button>
+    </van-col>
+    <van-col span="12">
       <van-button block color="#ffffff" bind:click="viewQrCode" icon="qr" custom-class="text-button">二维码</van-button>
     </van-col>
     <van-col span="12" wx:if="{{info.allowCopy2}}">
@@ -257,4 +260,6 @@
       <van-button square type="danger" icon="delete" block bind:click="bindDelete" disabled="{{ !info.allowDelete }}"></van-button>
     </van-col>
   </van-row>
+
+  <service/>
 </view>

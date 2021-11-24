@@ -9,7 +9,7 @@
   <view hidden="{{activeTab != 1}}">
     <van-cell-group>
       <van-field title-width="80px" label="房间号" value="{{ info.room }}" required placeholder="{{ room_error }}" error="{{is_room_empty}}" maxlength="20" bind:input="onRoomInput" />
-      <van-field title-width="80px" label="楼栋" value="{{ info.building_no }}" maxlength="10" bind:input="onBuildingInput" />
+      <van-field title-width="80px" label="楼栋" value="{{ info.building_no }}" maxlength="10" bind:input="onBuildingInput" placeholder="如为独栋可不填" />
       <van-field title-width="80px" label="楼层" value="{{ info.floor }}" type="number" maxlength="10" placeholder="地下填写负数" bind:input="onFloorInput">
         <text slot="button">层</text>
       </van-field>
@@ -91,4 +91,6 @@
 
   <van-dialog id="van-dialog" />
   <van-toast id="van-toast" />
+
+  <service/>
 </view>

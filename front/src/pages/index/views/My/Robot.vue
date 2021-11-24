@@ -34,6 +34,8 @@
         content=""
         @on-close="closePush"></robotpush>
     </popup>
+
+    <service></service>
   </div>
 </template>
 

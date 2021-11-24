@@ -257,6 +257,8 @@
         </swipeout>
       </group>
     </div>
+
+    <service></service>
   </div>
 </template>
 

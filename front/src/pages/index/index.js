@@ -11,6 +11,7 @@ import { dateFormat, LoadingPlugin, ToastPlugin, AlertPlugin, ConfirmPlugin, Dat
   Panel, Sticky, Tab, TabItem, Group, Cell, LoadMore, Flexbox, FlexboxItem,
   Actionsheet, Popup, PopupPicker, Badge, Divider,
   XButton, XInput, XSwitch, InlineXNumber, XTextarea } from 'vux'
+import service from '@/components/Service.vue'
 
 Vue.config.productionTip = false
 
@@ -44,6 +45,7 @@ Vue.component('x-input', XInput)
 Vue.component('inline-x-number', InlineXNumber)
 Vue.component('x-textarea', XTextarea)
 Vue.component('x-switch', XSwitch)
+Vue.component('service', service)
 
 Vue.prototype.$dateFormat = dateFormat
 

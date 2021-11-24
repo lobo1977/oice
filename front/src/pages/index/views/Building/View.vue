@@ -180,6 +180,8 @@
           x5-video-player-type="h5" x5-video-player-fullscreen="true"></video>
       </div>
     </popup>
+
+    <service></service>
   </div>
 </template>
 

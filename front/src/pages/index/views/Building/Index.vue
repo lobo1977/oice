@@ -77,6 +77,8 @@
         </p>
       </div>
     </div>
+
+    <service></service>
   </div>
 </template>
 

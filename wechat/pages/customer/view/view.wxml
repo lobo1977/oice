@@ -306,4 +306,6 @@
   />
 
   <van-dialog id="van-dialog" z-index="200" />
+
+  <service/>
 </view>

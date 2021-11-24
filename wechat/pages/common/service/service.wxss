@@ -1,0 +1,5 @@
+.right-float-btn {
+  position:fixed;
+  bottom:180px;
+  right:-12px;
+}

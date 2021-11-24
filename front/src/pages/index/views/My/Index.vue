@@ -80,6 +80,8 @@
         <x-icon slot="icon" type="android-exit" class="cell-icon"></x-icon>
       </cell>
     </group>
+
+    <service></service>
   </div>
 </template>
 

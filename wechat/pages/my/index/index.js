@@ -83,16 +83,6 @@ Page({
   },
 
   onChat: function () {
-    if (wx.openCustomerServiceChat) {
-      wx.openCustomerServiceChat({
-        extInfo: { url: 'https://work.weixin.qq.com/kfid/kfc0beff0aaf2fd8d4a' },
-        corpId: 'ww3d426954268a1aee',
-        success(res) {}
-      })
-    } else {
-      wx.navigateTo({
-        url: '../contact/contact',
-      })
-    }
+    app.customerService()
   }
 })

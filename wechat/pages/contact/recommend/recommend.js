@@ -164,25 +164,8 @@ Page({
     this.setData({
       showPDFType: false
     })
-    wx.showLoading({title: '加载中'})
     let now = new Date()
     let fileName = `${now.getFullYear()}${now.getMonth() + 1 >= 10 ? (now.getMonth() + 1) : '0' + (now.getMonth() + 1)}${now.getDate() >= 10 ? now.getDate() : '0' + now.getDate()}${now.getHours() >= 10 ? now.getHours() : '0' + now.getHours()}${now.getMinutes() >= 10 ? now.getMinutes() : '0' + now.getMinutes()}${now.getSeconds() >= 10 ? now.getSeconds() : '0' + now.getSeconds()}.pdf`
-    wx.downloadFile({
-      url: app.globalData.serverUrl + '/index/download/' + this.data.id + '/' + event.detail.value + '/' + fileName,
-      success: function (res) {
-        if (res.statusCode === 200) {
-          wx.openDocument({
-            showMenu: true,
-            fileType: 'pdf',
-            filePath: res.tempFilePath,
-            success: function (res) {
-            }
-          })
-        }
-      },
-      complete: function() {
-        wx.hideLoading()
-      }
-    })
+    app.downloadPdfFile(fileName, '/index/download/' + this.data.id + '/' + event.detail.value)
   }
 })

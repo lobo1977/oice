@@ -12,18 +12,20 @@
         <style>
             body {
                 padding: 0 15px;
-                margin: 0;
+                margin: 0px;
                 background-color:#ffffff;
                 font-size:15px;
-                font-family:Arial, Helvetica, sans-serif,Verdana;
+                font-family:幼圆,Verdana;
                 font-weight:normal;
                 color:#000000;
             }
         </style>
     </head>
     <body>
-        <p>
-            {if !empty($vo.area) || !empty($vo.address)}
+        {if !empty($pdf)}
+            <h3>{$vo.building_name}</h3>
+        {/if}
+        <p>{if !empty($vo.area) || !empty($vo.address)}
                 【位置】{if !empty($vo.area)}{$vo.area}{/if}{if !empty($vo.address)}{$vo.address}{/if}<br/>
             {/if}
             {if !empty($vo.subway)}
@@ -85,7 +87,7 @@
             <p>【周边环境】{$vo.environment}</p>
         {/if}
 
-        {if !empty($vo.videos)}
+        {if empty($pdf) && !empty($vo.videos)}
             {foreach $vo.videos as $key=>$img}
                 <video src="https://{$Think.config.app_host}{$img.src}" 
                     poster="https://{$Think.config.app_host}{$img.msrc}" 
@@ -98,7 +100,12 @@
         {if !empty($vo.images)}
             {foreach $vo.images as $key=>$img}
                 {if $img.is_image}
-                    <img src="https://{$Think.config.app_host}{$img.src}" style="width:100%;">
+                    {if !empty($pdf)}
+                        <img src="https://{$Think.config.app_host}{$img.src}" style="width:400px;"><br/>
+                    {/if}
+                    {if empty($pdf)}
+                        <img src="https://{$Think.config.app_host}{$img.src}" style="width:100%;">
+                    {/if}
                 {/if}
             {/foreach}
         {/if}

@@ -15,15 +15,17 @@
                 margin: 0px;
                 background-color:#ffffff;
                 font-size:15px;
-                font-family:Arial, Helvetica, sans-serif,Verdana;
+                font-family:幼圆,Verdana;
                 font-weight:normal;
                 color:#000000;
             }
         </style>
     </head>
     <body>
-        <p>
-            {if !empty($vo.face)}
+        {if !empty($pdf)}
+            <h3>{$vo.building_name} {$vo.title}</h3>
+        {/if}
+        <p>{if !empty($vo.face)}
                 【朝向】{$vo.face}<br/>
             {/if}
             {if !empty($vo.acreage)}
@@ -49,7 +51,7 @@
             <p>【其他说明】{$vo.rem}</p>
         {/if}
 
-        {if !empty($vo.videos)}
+        {if empty($pdf) && !empty($vo.videos)}
             {foreach $vo.videos as $key=>$img}
                 <video src="https://{$Think.config.app_host}{$img.src}" 
                     poster="https://{$Think.config.app_host}{$img.msrc}" 
@@ -61,7 +63,12 @@
 
         {if !empty($vo.images)}
             {foreach $vo.images as $key=>$img}
-                <img src="https://{$Think.config.app_host}{$img.src}" style="width:100%;">
+                {if !empty($pdf)}
+                    <img src="https://{$Think.config.app_host}{$img.src}" style="width:400px;"><br/>
+                {/if}
+                {if empty($pdf)}
+                    <img src="https://{$Think.config.app_host}{$img.src}" style="width:100%;">
+                {/if}
             {/foreach}
         {/if}
 
@@ -99,7 +106,7 @@
                     }
                 })
 
-                wx.miniProgram.postMessage({ data:{title: '{$vo.building_name} {$vo.title}', desc:''} });
+                //wx.miniProgram.postMessage({ data:{title: '{$vo.building_name} {$vo.title}', desc:''} });
             });
         </script>
         {/if}

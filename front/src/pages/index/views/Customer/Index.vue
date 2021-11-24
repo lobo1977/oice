@@ -29,6 +29,7 @@
       </sticky>
       <router-view ref="listCustomer"></router-view>
     </div>
+    <service></service>
   </div>
 </template>
 

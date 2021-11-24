@@ -34,5 +34,6 @@
     <van-loading wx:if="{{ isLoading && isPullDown === false }}" type="spinner" size="20px">加载中...</van-loading>
   </van-divider>
 
+  <service/>
   <van-icon name="add" color="#07c160" size="40" custom-style="position:fixed;bottom:30px;right:15px;" bindtap="bindAdd" />
 </view>

@@ -85,4 +85,6 @@
       <van-button square type="primary" icon="sign" block bindtap="bindSave">保存</van-button>
     </van-col>
   </van-row>
+
+  <service/>
 </view>

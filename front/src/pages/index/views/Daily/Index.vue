@@ -13,6 +13,8 @@
     <div style="height:50px;">
       <load-more :show-loading="isLoading" @click.native="loadMore" :tip="loadingTip"></load-more>
     </div>
+
+    <service></service>
   </div>
 </template>
 

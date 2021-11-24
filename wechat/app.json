@@ -8,6 +8,7 @@
   },
   "sitemapLocation": "sitemap.json",
   "usingComponents": {
+    "service": "pages/common/service/service",
     "van-button": "@vant/weapp/button",
     "van-loading": "@vant/weapp/loading",
     "van-image": "@vant/weapp/image",
@@ -116,7 +117,7 @@
   },
   "plugins": {
     "contactPlugin": {
-      "version": "1.4.2",
+      "version": "1.4.4",
       "provider": "wx104a1a20c3f81ec2"
     }
   }

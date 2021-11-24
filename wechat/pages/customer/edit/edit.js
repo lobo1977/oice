@@ -490,5 +490,5 @@ Page({
     }, () => {
       wx.hideLoading()
     })
-}
+  }
 })

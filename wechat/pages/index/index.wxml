@@ -54,4 +54,6 @@
         src="{{filter.imageUrl(item.src)}}" class="cell-image"></image>
     </van-cell>
   </van-cell-group>
+
+  <service/>
 </view>
