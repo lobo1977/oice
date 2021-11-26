@@ -14,10 +14,9 @@
     <van-field title-width="80px" label="姓名" value="{{ info.title }}" required placeholder="{{ title_error }}" error="{{is_title_empty}}" maxlength="30" bind:input="onTitleInput" input-align="right" />
     <van-field wx:if="{{!info.company}}" title-width="80px" label="公司" required maxlength="30" bind:input="onCompanyInput" input-align="right" placeholder="{{ company_error }}" 
     error="{{is_company_empty}}" />
-    <van-cell wx:if="{{!!info.company}}" title="公司" link-type="navigateTo" is-link url="../../company/index/index" value="{{ info.company }}" ></van-cell>
-    <van-field title-width="80px" label="行业属性" required value="{{ role_name }}" is-link readonly clickable bindtap="bindSelectRole" input-align="right"placeholder="{{ role_error }}" error="{{is_role_empty}}" />
-    <van-cell title="手机" link-type="navigateTo" is-link
-      url="../mobile/mobile" value="{{ mobile }}" ></van-cell>
+    <van-field wx:if="{{!!info.company}}"title-width="80px" label="公司" required value="{{ info.company }}" readonly is-link clickable bindtap="bindCompany" input-align="right" />
+    <van-field title-width="80px" label="行业属性" required value="{{ role_name }}" is-link readonly clickable bindtap="bindSelectRole" input-align="right" placeholder="{{ role_error }}" error="{{is_role_empty}}" />
+    <van-field title-width="80px" label="手机" required value="{{ mobile }}" readonly clickable is-link bindtap="bindMobile" input-align="right" placeholder="{{ mobile_error }}" error="{{is_mobile_empty}}" />
     <van-field title-width="80px" label="电子邮箱" value="{{ info.email }}" type="email" error="{{ is_email_error }}" maxlength="30" bind:input="onEmailInput" input-align="right" error-message="{{email_error}}" />
     <van-field title-width="80px" label="微信" value="{{ info.weixin }}" maxlength="30" bind:input="onWeixinInput" input-align="right" />
     <van-field title-width="80px" label="QQ" value="{{ info.qq }}" maxlength="30" bind:input="onQQInput" input-align="right" />

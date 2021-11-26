@@ -26,6 +26,8 @@ Page({
     title_error: '',
     is_company_empty : false,
     company_error: '',
+    is_mobile_empty : false,
+    mobile_error: '',
     is_email_error: false,
     role_error: '',
     is_role_empty: false,
@@ -51,7 +53,17 @@ Page({
       ['info.role']: app.globalData.appUserInfo.role,
       ['info.email']: app.globalData.appUserInfo.email || '',
       ['info.weixin']: app.globalData.appUserInfo.weixin || '',
-      ['info.qq']: app.globalData.appUserInfo.qq || ''
+      ['info.qq']: app.globalData.appUserInfo.qq || '',
+      is_title_empty : false,
+      title_error: '',
+      is_company_empty : false,
+      company_error: '',
+      is_mobile_empty : false,
+      mobile_error: '',
+      is_email_error: false,
+      role_error: '',
+      is_role_empty: false,
+      email_error: ''
     })
 
     app.get('index/token', (res) => {
@@ -66,9 +78,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    if (app.globalData.appUserInfo) {
-      this.setInfo()
-    } else {
+    if(!app.globalData.appUserInfo) {
       app.userLoginCallback = () => {
         this.setInfo()
       }
@@ -85,6 +95,9 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
+    if (app.globalData.appUserInfo) {
+      this.setInfo()
+    }
   },
 
   /**
@@ -120,6 +133,18 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+
+  bindCompany: function() {
+    wx.navigateTo({
+      url: '../../company/index/index',
+    })
+  },
+
+  bindMobile: function() {
+    wx.navigateTo({
+      url: '../mobile/mobile',
+    })
   },
 
   bindSelectRole: function() {
@@ -206,6 +231,13 @@ Page({
         role_error: '请选择行业属性'
       })
     }
+
+    if (!that.data.mobile) { 
+      that.setData({
+        is_mobile_empty: true,
+        mobile_error: '请填写手机号码'
+      })
+    }
     
     if (that.data.info.email && !app.isEmail(that.data.info.email)) {
       that.setData({
@@ -215,7 +247,7 @@ Page({
     }
 
     if (that.data.is_title_empty || that.data.is_company_empty || 
-      that.data.is_role_empty || that.data.is_email_error) {
+      that.data.is_role_empty || that.data.is_mobile_empty || that.data.is_email_error) {
       return
     }
 
