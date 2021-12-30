@@ -10,11 +10,12 @@
   </van-search>
   <van-sticky>
     <van-tabs swipe-threshold="5" active="{{ type }}" bind:change="onTabChange">
+      <van-tab title="潜在" name="potential"></van-tab>
       <van-tab title="跟进" name="follow"></van-tab>
       <van-tab title="洽谈" name="talk"></van-tab>
-      <van-tab title="潜在" name="potential"></van-tab>
       <van-tab title="成交" name="success"></van-tab>
       <van-tab title="失败" name="fail"></van-tab>
+      <van-tab title="名录" name="list"></van-tab>
     </van-tabs>
   </van-sticky>
   <van-cell-group>

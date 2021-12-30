@@ -82,6 +82,8 @@ Page({
       app.userLoginCallback = () => {
         this.setInfo()
       }
+    } else {
+      this.setInfo()
     }
   },
 
@@ -96,7 +98,26 @@ Page({
    */
   onShow: function () {
     if (app.globalData.appUserInfo) {
-      this.setInfo()
+      if (app.globalData.appUserInfo.mobile) {
+        this.setData({
+          mobile: app.globalData.appUserInfo.mobile
+        })
+      } else {
+        wx.navigateTo({
+          url: '../mobile/mobile',
+        })
+      }
+      if (app.globalData.appUserInfo.company) {
+        this.setData({
+          ['info.company']: app.globalData.appUserInfo.company,
+          is_company_empty : false,
+          company_error: ''
+        })
+      }
+    } else {
+      wx.navigateTo({
+        url: '../mobile/mobile',
+      })
     }
   },
 

@@ -202,7 +202,7 @@ Page({
     }, (res) => {
       if (res.success) {
         if (res.data) {
-          app.globalData.appUserInfo = res.data
+          app.globalData.appUserInfo.mobile = res.data.mobile
         }
         app.goBack()
       } else {

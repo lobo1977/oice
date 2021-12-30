@@ -399,7 +399,7 @@ Page({
         that.data.customer_id = app.globalData.myCustomer[0].id
       } else {
         Dialog.alert({
-          message: '您需要添加客户才可以添加拼盘'
+          message: '您需要添加可跟进客户才可以添加拼盘'
         }).then(() => {
           wx.navigateTo({
             url: '../../customer/edit/edit',

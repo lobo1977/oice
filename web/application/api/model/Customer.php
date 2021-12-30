@@ -148,18 +148,18 @@ class Customer extends Base
     } else if (isset($filter['status']) && $filter['status'] != '') {
       $list->where('a.status', 'in', $filter['status']);
     } else if (isset($filter['type'])) {
-      if ($filter['type'] == 'potential') {
+      if ($filter['type'] == 'potential') {   // 潜在
         $list->where('a.status', '0');
-      } else if ($filter['type'] == 'talk') {
+      } else if ($filter['type'] == 'talk') { // 洽谈
         $list->where('a.status', '3');
-      } else if ($filter['type'] == 'success') {
+      } else if ($filter['type'] == 'success') { // 成交
         $list->where('a.status', '4');
-      } else if ($filter['type'] == 'fail') {
-        $list->where('a.status', 'in', '5,6');
-      } else if ($filter['type'] == 'pool') {
-        $list->where('a.status', 'in', '4,5,6');
+      } else if ($filter['type'] == 'fail') {   // 失败
+        $list->where('a.status', '5');
+      } else if ($filter['type'] == 'list') {  // 名录
+        $list->where('a.status', '6');
       } else {
-        $list->where('a.status', 'in', '1,2');
+        $list->where('a.status', 'in', '1,2');  // 跟进
       }
     }
 

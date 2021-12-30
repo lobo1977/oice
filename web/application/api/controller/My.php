@@ -82,7 +82,7 @@ class My extends Base
    */
   public function customer()
   {
-    $list = Customer::search($this->user, ['status' => '0,1,2,3', 'clash' => false]);
+    $list = Customer::search($this->user, ['status' => '0,1,2,3,6', 'clash' => false]);
     return $this->succeed($list);
   }
 

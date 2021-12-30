@@ -478,6 +478,7 @@ Page({
           push_message += '\n【联系人】' + res.data.linkman[0].title
           push_message += '\n【联系电话】' + res.data.linkman[0].mobile + '（微同）'
         }
+        push_message += '\n【项目说明】' + res.data.rem
         push_message += '\n【项目详情】' + res.data.short_url
         push_message += '推广支持 - 公众号【商办云信息】- 开发商发布项目销控平台'
         that.setData({
@@ -573,7 +574,7 @@ Page({
         that.data.customer_id = app.globalData.myCustomer[0].id
       } else {
         Dialog.alert({
-          message: '您需要添加客户才可以添加拼盘'
+          message: '您需要添加可跟进客户才可以添加拼盘'
         }).then(() => {
           wx.navigateTo({
             url: '../../customer/edit/edit',

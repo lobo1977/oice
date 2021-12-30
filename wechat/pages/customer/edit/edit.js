@@ -48,7 +48,7 @@ Page({
       end_date: '',         // 到期日
       remind: 8,            // 到期提醒（提前月份数）
       rem: '',              // 项目说明
-      status: 6,            // 状态
+      status: 0,            // 状态
       company_id: 0,        // 所属企业
       share: 0,
       linkman: '',          // 联系人
@@ -425,13 +425,12 @@ Page({
     app.post('customer/edit?id=' + that.data.id, that.data.info, (res) => {
       if (res.success) {
         app.globalData.refreshCustomer = true
+        app.getMyCustomer()
         if (res.message) {
           Dialog.alert({
             title: '保存成功',
             message: res.message
           }).then(() => {
-            app.getMyCustomer()
-            app.globalData.refreshCustomerView = true
             if (that.data.id == 0) {
               let id = res.data
               wx.redirectTo({
