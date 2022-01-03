@@ -263,9 +263,32 @@ Page({
   },
 
   bindPush: function(event) {
-    this.setData({
-      showCopy: true
-    })
+    let that = this
+    if (that.data.push_message == '') {
+      wx.showLoading({
+        title: '加载中',
+      })
+      let url = 'building/pushText?id=' + that.data.info.id
+      app.get(url, (res) => {
+        if (res.success && res.data) {
+          that.setData({
+            push_message: res.data,
+            showCopy: true
+          })
+        } else {
+          Dialog.alert({
+            title: '发生错误',
+            message: res.message ? res.message : '系统异常'
+          })
+        }
+      }, () => {
+        wx.hideLoading()
+      })
+    } else {
+      this.setData({
+        showCopy: true
+      })
+    }
   },
 
   onPushInput: function(event) {
@@ -465,26 +488,9 @@ Page({
             })
           })
         }
-
-        let push_message = '【项目名称】' + res.data.building_name
-        push_message += '\n【地理位置】' + res.data.area + res.data.district + res.data.address
-        push_message += '\n【空置面积】'
-        push_message += '\n【交 通】' + res.data.traffic
-        push_message += '\n【报 价】' + res.data.price
-        push_message += '\n【物业费】' + res.data.fee
-        push_message += '\n【佣 金】'
-        push_message += '\n【交付标准】'
-        if (res.data.linkman && res.data.linkman.length) {
-          push_message += '\n【联系人】' + res.data.linkman[0].title
-          push_message += '\n【联系电话】' + res.data.linkman[0].mobile + '（微同）'
-        }
-        push_message += '\n【项目说明】' + res.data.rem
-        push_message += '\n【项目详情】' + res.data.short_url
-        push_message += '推广支持 - 公众号【商办云信息】- 开发商发布项目销控平台'
         that.setData({
           info: res.data,
-          previewImages: prevList,
-          push_message: push_message
+          previewImages: prevList
         })
       } else {
         Dialog.alert({
