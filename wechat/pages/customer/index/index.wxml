@@ -2,12 +2,20 @@
 <page-meta background-text-style="dark">
 </page-meta>
 <view>
-  <van-search value="{{ keyword }}" placeholder="请输入搜索关键词"
-    bind:change="onKewordChange"
-    bind:search="bindSearch"
-    bind:cancel="onCancel"
-    shape="round" show-action>
-  </van-search>
+  <van-row gutter="5">
+    <van-col span="18">
+      <van-search value="{{ keyword }}" placeholder="请输入搜索关键词"
+        bind:change="onKewordChange"
+        bind:search="bindSearch"
+        bind:cancel="onCancel"
+        shape="round" show-action>
+      </van-search>
+    </van-col>
+    <van-col span="6">
+      <van-button icon="plus" type="primary" size="small" round
+      custom-style="margin-top:12px" bindtap="bindAdd">添加</van-button>
+    </van-col>
+  </van-row>
   <van-sticky>
     <van-tabs swipe-threshold="5" active="{{ type }}" bind:change="onTabChange">
       <van-tab title="潜在" name="potential"></van-tab>
@@ -36,5 +44,5 @@
   </van-divider>
 
   <service/>
-  <van-icon name="add" color="#07c160" size="40" custom-style="position:fixed;bottom:30px;right:15px;" bindtap="bindAdd" />
+  <van-icon wx:if="{{false}}" name="add" color="#07c160" size="40" custom-style="position:fixed;bottom:80px;right:15px;" bindtap="bindAdd" />
 </view>

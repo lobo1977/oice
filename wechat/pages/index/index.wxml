@@ -20,7 +20,7 @@
   </swiper>
 
   <van-grid wx:if="{{false}}" direction="horizontal" column-num="2">
-    <van-grid-item icon="hotel-o" text="添加项目" bindtap="bindAddBuilding" />
+    <van-grid-item icon="hotel-o" text="发布项目" bindtap="bindAddBuilding" />
     <van-grid-item icon="friends-o" text="添加客户" bindtap="bindAddCustomer" />
   </van-grid>
 

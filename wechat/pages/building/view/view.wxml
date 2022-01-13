@@ -147,7 +147,7 @@
 
   <van-cell-group title="附件" wx:if="{{ (info.attach && info.attach.length) || info.allowEdit}}">
     <van-cell wx:for="{{info.attach}}" wx:for-index="idx" wx:key="id" data-data="{{ idx }}" 
-      title="{{item.title}}" label="{{item.username ? (item.username + ' 于 ' + item.upload_time + ' 上传 ') : '' + (item.size || '')}}" center
+      title="{{item.title}}" label="{{(item.username ? (item.username + ' 于 ' + item.upload_time + ' 上传 ') : '') + (item.size || '')}}" center
       bind:click="bindViewAttach" custom-class="cell-contact"
       bindtouchstart="bindTouchStart" bindtouchend="bindTouchEnd"
       bindlongtap="bindAttachLongTap">

@@ -51,29 +51,48 @@ class File extends Base
     foreach($list as $key => $file) {
       $file->is_image = Utils::isImageFile($file->file);
       $file->is_video = Utils::isVideoFile($file->file);
-      if ($type == 'building' || $type == 'unit') {
-        if ($file->is_image) {
+      if ($file->is_image) {
+        if ($type == 'building' || $type == 'unit') {
           $file->src = '/upload/' . $type . '/images/900/' . $file->file;
           $file->msrc = '/upload/' . $type . '/images/300/' . $file->file;
           $file->url = $file->src;
-        } else if ($file->is_video) {
+        } else {
+          $file->src = '/upload/' . $type . '/attach/' . $file->file;
+          $file->msrc = '/upload/' . $type . '/attach/' . $file->file;
+          $file->url = $file->src;
+        }
+      } else if ($file->is_video) {
+        if ($type == 'building' || $type == 'unit') {
           $file->src = '/upload/' . $type . '/images/original/' . $file->file;
           $file->msrc = '/upload/' . $type . '/images/300/' . Utils::replaceExt($file->file, 'jpg');
           $file->url = $file->src;
         } else {
-          $file->src = '/static/img/attach.png';
-          $file->msrc = '/static/img/attach.png';
-          $file->url = '/upload/' . $type . '/attach/' . $file->file;
-        }
-      } else if ($type == 'customer') {
-        $file->src = '/upload/' . $type . '/attach/' . $file->file;
-        $file->url = $file->src;
-        if ($file->is_image) {
+          $file->src = '/upload/' . $type . '/attach/' . $file->file;
           $file->msrc = '/upload/' . $type . '/attach/' . $file->file;
+          $file->url = $file->src;
+        }
+      } else {
+        $ext = Utils::getFileExt($file->file);
+        if ($ext == 'ppt' || $ext == 'pptx') {
+          $file->src = '/static/img/ppt.png';
+          $file->msrc = '/static/img/ppt.png';
+        } else if ($ext == 'pdf') {
+          $file->src = '/static/img/pdf.png';
+          $file->msrc = '/static/img/pdf.png';
+        } else if ($ext == 'zip' || $ext == 'rar') {
+          $file->src = '/static/img/zip.png';
+          $file->msrc = '/static/img/zip.png';
+        } else if ($ext == 'doc' || $ext == 'docx') {
+          $file->src = '/static/img/docx.png';
+          $file->msrc = '/static/img/docx.png';
+        } else if ($ext == 'xls' || $ext == 'xlsx') {
+          $file->src = '/static/img/xlsx.png';
+          $file->msrc = '/static/img/xlsx.png';
         } else {
           $file->src = '/static/img/attach.png';
           $file->msrc = '/static/img/attach.png';
         }
+        $file->url = '/upload/' . $type . '/attach/' . $file->file;
       }
       if (mb_strlen($file->title) > 26) {
         $file->title = mb_substr($file->title, 0, 26) . '...';
@@ -81,7 +100,7 @@ class File extends Base
       if ($file->size) {
         $file->size = round(floatval($file->size) / 1048576, 2) . 'MB';
       }
-      $file->upload_time = date('Y年n月j日 H:i', strtotime($file->create_time));
+      $file->upload_time = Utils::timeSpan($file->create_time);
     }
 
     return $list;

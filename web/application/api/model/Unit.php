@@ -192,6 +192,7 @@ class Unit extends Base
 
     $list = $list->field('a.id,a.building_no,a.floor,a.room,a.acreage,a.rent_sell,a.rent_price,
         a.sell_price,a.end_date,a.status,a.share,a.user_id,a.company_id,b.file,s.level as share_level')
+      ->order('a.status', 'asc')
       ->order('a.building_no', 'asc')
       ->order('a.floor', 'desc')
       ->order('a.room', 'asc')

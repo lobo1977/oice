@@ -1,0 +1,32 @@
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  color: #000 !important;
+  background-color: #fff;
+}
+
+.action {
+  display: inline-block;
+  width: 20%;
+  text-align: center;
+}
+
+.tabbar image {
+  width: 60rpx;
+  height: 60rpx;
+  display: block;
+  margin: 10rpx auto;
+}
+
+.special image {
+  position: relative;
+  width: 100rpx;
+  height: 100rpx;
+  top: 0;
+}
+
+.tabbar text {
+  font-size: 0.8em;
+}

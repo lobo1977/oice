@@ -103,22 +103,42 @@ class Building extends Base
     if ($id) {
       $data = modelBuilding::detail($this->user, $id);
       if ($data != null) {
-        $text = '【项目名称】' . $data['building_name'] .'
+        $strUnit = '';
+        $unit = db('Unit')->where('building_id', $id)
+          ->where('delete_time', null)
+          ->where('status', 1)
+          ->where('share', 1)
+          ->field('id,acreage')
+          ->order('acreage', 'asc')
+          ->select();
+
+        if ($unit) {
+          foreach ($unit as $key => $item) {
+            if ($strUnit && $item['acreage']) {
+              $strUnit .= '、' . intval($item['acreage']);
+            } else if ($item['acreage']) {
+              $strUnit = intval($item['acreage']);
+            }
+          }
+        }
+
+        $text = '【项目名称】' . $data['building_name'] . '
 【地理位置】' . $data['area'] . $data['district'] . $data['address'] . '
-【空置面积】
+【空置面积】' . $strUnit . '
 【交 通】' . $data['traffic'] . '
 【报 价】' . $data['price'] . '
 【物业费】' . $data['fee'] . '
-【佣 金】
+【佣 金】' . $data['commission'] . '
 【交付标准】
 【项目说明】' . $data['rem'];
         if ($data['linkman'] && count($data['linkman']) > 0) {
           $text .= '
 【联系人】' . $data['linkman'][0]['title'] . '
-【联系电话】' . $data['linkman'][0]['mobile'] . '（微同）';
+【电话】' . $data['linkman'][0]['mobile'] . '（微同）';
         }
-        $text .= '【项目详情】' . $data['short_url'] . '
-推广支持 - 公众号【商办云信息】- 开发商发布项目销控平台';
+        $text .= '
+【项目详情】' . $data['short_url'] . '
+推广支持 - 小程序【商办云】商办楼盘指定发布平台，代理行管理系统，做单工具大全。';
       }
     }
 

@@ -25,20 +25,22 @@
     shape="round" show-action>
   </van-search>
 
-  <van-dropdown-menu>
-    <van-dropdown-item value="" options="{{ filterType }}" bind:change="filterTypeChange" />
-    <van-dropdown-item id="dropArea" title="{{ filterDropTitle }}">
-      <van-tree-select
-        items="{{ filterArea }}"
-        main-active-index="{{ mainDropIndex }}"
-        active-id="{{ district }}"
-        bind:click-nav="onClickDropNav"
-        bind:click-item="onClickDropItem"
-      />
-    </van-dropdown-item>
-    <van-dropdown-item value="出租,出售" options="{{ filterRentSell }}" bind:change="filterRentSellChange" />
-    <van-dropdown-item value="0,0" options="{{ filterAcreage }}" bind:change="filterAcreageChange" />
-  </van-dropdown-menu>
+  <van-sticky offset-top="{{ 65 }}">
+    <van-dropdown-menu>
+      <van-dropdown-item value="" options="{{ filterType }}" bind:change="filterTypeChange" />
+      <van-dropdown-item id="dropArea" title="{{ filterDropTitle }}">
+        <van-tree-select
+          items="{{ filterArea }}"
+          main-active-index="{{ mainDropIndex }}"
+          active-id="{{ district }}"
+          bind:click-nav="onClickDropNav"
+          bind:click-item="onClickDropItem"
+        />
+      </van-dropdown-item>
+      <van-dropdown-item value="出租,出售" options="{{ filterRentSell }}" bind:change="filterRentSellChange" />
+      <van-dropdown-item value="0,0" options="{{ filterAcreage }}" bind:change="filterAcreageChange" />
+    </van-dropdown-menu>
+  </van-sticky>
 
   <van-cell-group>
     <van-cell wx:for="{{list}}" wx:key="id"
@@ -67,5 +69,5 @@
   </van-divider>
 
   <service/>
-  <van-icon name="add" color="#07c160" size="40" custom-style="position:fixed;bottom:30px;right:15px;" bindtap="bindAdd" />
+  <van-icon wx:if="{{false}}" name="add" color="#07c160" size="40" custom-style="position:fixed;bottom:30px;right:15px;" bindtap="bindAdd" />
 </view>

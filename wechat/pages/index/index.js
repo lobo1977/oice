@@ -14,7 +14,12 @@ Page({
   },
 
   //事件处理函数
-  onLoad: function () {
+  onLoad: function (options) {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({
+        selected: 0
+      })
+    }
     this.setData({
       city: app.globalData.currentCity
     })
