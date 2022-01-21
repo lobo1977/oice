@@ -1,6 +1,6 @@
 <view class="tabbar">
   <block wx:for="{{listTab}}" wx:key="{{item.pagePath}}">
-    <view class="action {{item.isSpecial ? 'special' : ''}}" bindtap="switchTab" data-path="{{item.pagePath}}" data-index="{{index}}"
+    <view class="action" bindtap="switchTab" data-path="{{item.pagePath}}" data-index="{{index}}"
       style="color:{{selected == index ? selectedColor : color}}" data-special="{{item.isSpecial ? 1 : 0}}">
       <image src="{{selected == index ? item.selectedIconPath : item.iconPath}}" mode="aspectFit"></image>
       <text>{{item.text}}</text>
