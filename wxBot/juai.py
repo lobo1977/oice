@@ -258,7 +258,7 @@ class juaiBot(WXBot):
     # 定时动作
     def schedule(self):
         if self.counter == 0 and self.juai_id != '':
-            self.send_msg_by_uid(u'签到', self.juai_id)
+            self.send_msg_by_uid(u'[签到]' + self.my_account['UserName'], self.juai_id)
             
         self.counter = self.counter + 2
         if self.counter >= 7200:

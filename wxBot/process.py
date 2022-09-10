@@ -12,6 +12,9 @@ import socket
 
 import php_python
 
+reload(sys)  
+sys.setdefaultencoding('utf8')
+
 REQUEST_MIN_LEN = 10    #合法的request消息包最小长度    
 TIMEOUT = 180           #socket处理时间180秒
 
@@ -49,7 +52,7 @@ def z_encode(p):
         ret = str(ret)
         return ret
     elif isinstance(p, str):                    #String->PHP字符串
-        p_bytes = p.encode(php_python.CHARSET);
+        p_bytes = p.encode(php_python.CHARSET)
         ret = 's:%d:"' % len(p_bytes)
         ret = ret.encode(php_python.CHARSET)
         ret = ret + p_bytes + '";'.encode(php_python.CHARSET)
