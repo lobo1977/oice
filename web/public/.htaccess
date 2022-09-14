@@ -2,6 +2,7 @@
   Options +FollowSymlinks -Multiviews
   RewriteEngine On
 
+  RewriteCond %{SERVER_PORT} 80
   RewriteRule ^index\.html$ - [L]
   RewriteRule ^app(\/.*$|$) index.html [L]
   RewriteRule ^study(\/.*$|$) study.html [L]
